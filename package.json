@@ -1,0 +1,20 @@
+{
+  "name": "ViziCities",
+  "version": "0.0.0",
+  "description": "3D city visualisation",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Robin Hawkes",
+  "license": "All Rights Reserved",
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-jshint": "~0.7.0",
+    "grunt-contrib-uglify": "~0.2.2",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-contrib-connect": "~0.5.0",
+    "grunt-notify": "https://github.com/robhawkes/grunt-notify/archive/master.tar.gz"
+  }
+}
