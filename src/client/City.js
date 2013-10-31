@@ -6,29 +6,24 @@
 		VIZI.Log("Inititialising city");
 
 		_.extend(this, VIZI.Mediator);
-		
+			
+		// Set up basic WebGL components (scene, camera, lights, renderer)
 		this.webgl = new VIZI.WebGL();
-		this.loop = new VIZI.Loop();
 
-		// this.floor = new VIZI.Floor();
-		this.createFloor();
+		// Set up core city-scene objects (floor, skybox, etc)
+		this.floor = new VIZI.Floor();
+
+		// References to standard city features
+		this.buildings = undefined;
+
+		// Set up and start application loop
+		this.loop = new VIZI.Loop();
 	};
 
-	VIZI.City.prototype.createFloor = function() {
-		var floorWireGeom = new THREE.PlaneGeometry(5000, 5000, 200, 200);
+	VIZI.City.prototype.loadBuildings = function(url) {
+		VIZI.Log("Loading buildings");
 
-		var floorWireMat = new THREE.MeshBasicMaterial({color: 0xeeeeee, wireframe: true});
-		var floorWire = new THREE.Mesh(floorWireGeom, floorWireMat);
-		floorWire.position.y = -0.3;
-		floorWire.rotation.x = - 90 * Math.PI / 180;
-		this.publish("addToScene", floorWire);
-
-		var floorGeom = new THREE.PlaneGeometry(60000, 60000, 4, 4);
-
-		var floorMat = new THREE.MeshBasicMaterial({color: 0xffffff});
-		var floor = new THREE.Mesh(floorGeom, floorMat);
-		floor.position.y = -0.4;
-		floor.rotation.x = - 90 * Math.PI / 180;
-		this.publish("addToScene", floor);
+		var buildingManager = new VIZI.BuildingManager();
+		buildingManager.load(url).then(console.log, console.error).done();
 	};
 }());

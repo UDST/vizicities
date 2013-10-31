@@ -8,6 +8,7 @@
 		_.extend(this, VIZI.Mediator);
 
 		this.scene = this.createScene();
+		this.objects = [];
 
 		// Listeners
 		this.subscribe("addToScene", function(object) {
@@ -28,5 +29,6 @@
 
 	VIZI.Scene.prototype.addToScene = function(object) {
 		this.scene.add(object);
+		this.objects.push(object);
 	};
 }());
