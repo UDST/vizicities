@@ -17,7 +17,11 @@
 
 		this.camera = this.createCamera();
 
+		this.lookAtTarget();
+
 		this.publish("addToScene", this.camera);
+
+		this.subscribe("resize", this.resize);
 	};
 
 	VIZI.Camera.prototype.createCamera = function() {
@@ -29,6 +33,10 @@
 		camera.position.z = this.cameraRadius * Math.cos( this.theta * Math.PI / 360 ) * Math.cos( this.phi * Math.PI / 360 );
 
 		return camera;
+	};
+
+	VIZI.Camera.prototype.lookAtTarget = function() {
+		this.camera.lookAt(this.target.position);
 	};
 
 	VIZI.Camera.prototype.enableControls = function() {
@@ -47,5 +55,10 @@
 		this.subscribe("mouseWheel", function(event) {
 			VIZI.Log("Camera mouse wheel handler");
 		});
+	};
+
+	VIZI.Camera.prototype.resize = function() {
+		this.camera.aspect = window.innerWidth / window.innerHeight;
+		this.camera.updateProjectionMatrix();
 	};
 }());

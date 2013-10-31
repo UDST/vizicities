@@ -19,7 +19,8 @@ module.exports = function(grunt) {
 				// src: ['src/shared/vendor/underscore.js', 'src/shared/vendor/three.js', 'src/client/*'],
 				src: [
 					'src/shared/vendor/underscore.js',
-					'src/shared/vendor/three.js',
+					'src/shared/vendor/three/three.js',
+					'src/shared/vendor/three/ColorConverter.js',
 					'src/client/Vizi.js',
 					'src/client/Log.js',
 					'src/client/Mediator.js',
@@ -27,7 +28,8 @@ module.exports = function(grunt) {
 					'src/client/Loop.js',
 					'src/client/webgl/WebGL.js',
 					'src/client/webgl/Scene.js',
-					'src/client/webgl/Camera.js'
+					'src/client/webgl/Camera.js',
+					'src/client/webgl/Renderer.js'
 				],
 				dest: 'build/vizi.js'
 			}

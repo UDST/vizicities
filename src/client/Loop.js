@@ -8,7 +8,7 @@
 		_.extend(this, VIZI.Mediator);
 
 		this.stopLoop = false;
-		// this.start();
+		this.start();
 	};
 
 	VIZI.Loop.prototype.start = function() {
@@ -23,7 +23,8 @@
 	};
 
 	VIZI.Loop.prototype.tick = function() {
-		this.publish("tick");
+		this.publish("update");
+		this.publish("render");
 
 		if (!this.stopLoop) {
 			// Should probably be a bit more obvious that this comes from Three.js
