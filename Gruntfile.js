@@ -34,6 +34,7 @@ module.exports = function(grunt) {
 					'src/client/Geo.js',
 					'src/client/City.js',
 					'src/client/Loop.js',
+					'src/client/DOMEvents.js',
 					'src/client/webgl/WebGL.js',
 					'src/client/webgl/Scene.js',
 					'src/client/webgl/Camera.js',

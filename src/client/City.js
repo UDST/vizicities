@@ -23,6 +23,9 @@
 		// Set up basic WebGL components (scene, camera, lights, renderer)
 		this.webgl = new VIZI.WebGL();
 
+		// Set up DOM events
+		this.domEvents = new VIZI.DOMEvents();
+
 		// Set up core city-scene objects (floor, skybox, etc)
 		this.floor = new VIZI.Floor();
 
