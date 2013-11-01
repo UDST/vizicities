@@ -22,9 +22,11 @@ module.exports = function(grunt) {
 					'src/shared/vendor/q.js',
 					'src/shared/vendor/three/three.js',
 					'src/shared/vendor/three/ColorConverter.js',
+					'src/shared/vendor/d3.js',
 					'src/client/Vizi.js',
 					'src/client/Log.js',
 					'src/client/Mediator.js',
+					'src/client/Geo.js',
 					'src/client/City.js',
 					'src/client/Loop.js',
 					'src/client/webgl/WebGL.js',
@@ -34,7 +36,8 @@ module.exports = function(grunt) {
 					'src/client/objects/ObjectManager.js',
 					'src/client/objects/BuildingManager.js',
 					'src/client/objects/Object.js',
-					'src/client/objects/Floor.js'
+					'src/client/objects/Floor.js',
+					'src/client/objects/Building.js'
 				],
 				dest: 'build/vizi.js'
 			}

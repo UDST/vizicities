@@ -6,6 +6,14 @@
 		VIZI.Log("Inititialising city");
 
 		_.extend(this, VIZI.Mediator);
+
+		// Set up geo methods
+		this.geo = VIZI.Geo.getInstance({
+			areaCoords: {
+				bottomLeft: [-0.090062,51.489438],
+				topRight: [0.012322,51.519747]
+			}
+		});
 			
 		// Set up basic WebGL components (scene, camera, lights, renderer)
 		this.webgl = new VIZI.WebGL();
@@ -24,6 +32,11 @@
 		VIZI.Log("Loading buildings");
 
 		var buildingManager = new VIZI.BuildingManager();
-		buildingManager.load(url).then(console.log, console.error).done();
+		buildingManager.load(url).then(function(value) {
+			VIZI.Log(value);
+			buildingManager.process(value);
+		}, function(error) {
+			console.error(error.stack);
+		}).done();
 	};
 }());

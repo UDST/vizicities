@@ -5,11 +5,12 @@
 	VIZI.Floor = function() {
 		VIZI.Log("Inititialising floor object");
 
-		// Extend Object class
 		VIZI.Object.call(this);
 
 		this.object = this.createObject();
 	};
+
+	VIZI.Floor.prototype = Object.create( VIZI.Object.prototype );
 
 	VIZI.Floor.prototype.createObject = function() {
 		var floorContainer = new THREE.Object3D();
