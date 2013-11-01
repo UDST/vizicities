@@ -61,6 +61,7 @@
 
 		var meter = new FPSMeter(domElement, {
 			theme: "colorful",
+			decimals: 0,
 			heat: 1,
 			graph: 1,
 			history: 20,
