@@ -28,12 +28,18 @@
 		return container;
 	};
 
-	VIZI.FPS.prototype.createDOMElement = function(name) {
+	VIZI.FPS.prototype.createDOMElement = function() {
 		VIZI.Log("Creating FPS meter DOM element");
 
 		var element = document.createElement("div");
 		element.style.float = "left";
 
+		this.domContainer.appendChild(element);
+
+		return element;
+	};
+
+	VIZI.FPS.prototype.createDOMTitle = function(name) {
 		var title = document.createElement("p");
 
 		// Style copied from FPSMeter
@@ -41,18 +47,14 @@
 		title.style.fontFamily = "sans-serif";
 		title.style.fontSize = "10px";
 		title.style.fontWeight = "bold";
-		title.style.margin = "5px 5px 0 5px";
+		title.style.margin = "0 5px 5px 5px";
 		title.style.textAlign = "left";
 		title.style.textTransform = "uppercase";
 		
 		title.innerHTML = name;
 
-		element.appendChild(title);
-
-		this.domContainer.appendChild(element);
-
-		return element;
-	};
+		return title;
+	};	
 
 	VIZI.FPS.prototype.createMeter = function(name) {
 		VIZI.Log("Creating FPS meter: " + name);
@@ -70,6 +72,8 @@
 			top: 0,
 			margin: "5px 0 5px 5px"
 		});
+
+		domElement.appendChild(this.createDOMTitle(name));
 
 		this.meters[name] = meter;
 

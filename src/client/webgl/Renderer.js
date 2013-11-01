@@ -42,10 +42,8 @@
 
 	VIZI.Renderer.prototype.render = function() {
 		this.publish("fpsTickStart", "render");
-		this.publish("fpsTickStart", "render2");
 		this.renderer.render( this.scene, this.camera );
 		this.publish("fpsTickEnd", "render");
-		this.publish("fpsTickEnd", "render2");
 	};
 
 	VIZI.Renderer.prototype.resize = function() {

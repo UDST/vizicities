@@ -7,11 +7,11 @@
 
 		_.extend(this, VIZI.Mediator);
 
-		this.cameraRadius = 6000;
+		this.cameraRadius = 4100;
 		this.theta = 45; // Horizontal orbit
 		this.onMouseDownTheta = 45;
-		this.phi = 60; // Vertical oribt
-		this.onMouseDownPhi = 60;
+		this.phi = 80; // Vertical oribt
+		this.onMouseDownPhi = 80;
 
 		this.target = new THREE.Object3D();
 
@@ -20,7 +20,7 @@
 		this.lookAtTarget();
 
 		this.publish("addToScene", this.camera);
-		this.publish("addToDat", this, {name: "Camera", properties: ["theta", "phi", "lookAtTarget", "updatePosition"]});
+		this.publish("addToDat", this, {name: "Camera", properties: ["cameraRadius", "theta", "phi", "lookAtTarget", "updatePosition"]});
 
 		this.subscribe("resize", this.resize);
 	};
@@ -72,5 +72,6 @@
 
 	VIZI.Camera.prototype.datChange = function() {
 		this.updatePosition();
+		this.lookAtTarget();
 	};
 }());

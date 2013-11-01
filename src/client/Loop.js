@@ -23,6 +23,8 @@
 	};
 
 	VIZI.Loop.prototype.tick = function() {
+		this.publish("fpsTickStart", "Main Loop");
+		
 		this.publish("update");
 		this.publish("render");
 
@@ -31,5 +33,7 @@
 			// http://stackoverflow.com/questions/6065169/requestanimationframe-with-this-keyword
 			window.requestAnimationFrame( this.tick.bind(this) );
 		}
+
+		this.publish("fpsTickEnd", "Main Loop");
 	};
 }());
