@@ -7,6 +7,10 @@
 
 		_.extend(this, VIZI.Mediator);
 
+		// Set up debug tools
+		this.dat = new VIZI.Dat();
+		this.fps = new VIZI.FPS();
+
 		// Set up geo methods
 		this.geo = VIZI.Geo.getInstance({
 			areaCoords: {
