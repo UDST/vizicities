@@ -10,6 +10,7 @@
 		// Set up debug tools
 		this.dat = new VIZI.Dat();
 		this.fps = new VIZI.FPS();
+		this.rendererInfo = new VIZI.RendererInfo();
 
 		// Set up geo methods
 		this.geo = VIZI.Geo.getInstance({

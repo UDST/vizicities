@@ -20,7 +20,7 @@
 		this.lookAtTarget();
 
 		this.publish("addToScene", this.camera);
-		this.publish("addToDat", this, {name: "Camera", properties: ["cameraRadius", "theta", "phi", "lookAtTarget", "updatePosition"]});
+		this.publish("addToDat", this, {name: "Camera", properties: ["cameraRadius", "theta", "phi"]});
 
 		this.subscribe("resize", this.resize);
 	};
