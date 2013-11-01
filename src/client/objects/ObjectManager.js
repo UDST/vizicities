@@ -25,7 +25,14 @@
 		return deferred.promise;
 	};
 
-	VIZI.ObjectManager.prototype.process = function(objects) {};
+	VIZI.ObjectManager.prototype.processFeatures = function(features) {
+		var objects = _.map(features, this.processFeature);
+
+		this.combinedObjects = this.combineObjects(objects);
+
+		this.publish("addToScene", this.combinedObjects);
+	};
+
 	VIZI.ObjectManager.prototype.processFeature = function(feature) {};
 
 	VIZI.ObjectManager.prototype.combineObjects = function(objects) {
@@ -35,7 +42,7 @@
 			if (!object.object) {
 				return;
 			}
-			
+
 			THREE.GeometryUtils.merge(combinedGeom, object.object);
 		});
 

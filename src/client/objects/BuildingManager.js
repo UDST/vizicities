@@ -10,17 +10,6 @@
 
 	VIZI.BuildingManager.prototype = Object.create( VIZI.ObjectManager.prototype );
 
-	VIZI.BuildingManager.prototype.process = function(data) {
-		VIZI.Log("Processing buildings");
-		
-		var features = data.features;
-		var objects = _.map(features, this.processFeature);
-
-		this.combinedObjects = this.combineObjects(objects);
-
-		this.publish("addToScene", this.combinedObjects);
-	};
-
 	VIZI.BuildingManager.prototype.processFeature = function(feature) {
 		switch (feature.type) {
 			case "Feature":

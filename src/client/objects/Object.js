@@ -6,6 +6,7 @@
 		_.extend(this, VIZI.Mediator);
 
 		this.geo = VIZI.Geo.getInstance();
+		this.object = undefined;
 	};
 
 	VIZI.Object.prototype.createObject = function() {};

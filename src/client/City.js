@@ -34,7 +34,7 @@
 		var buildingManager = new VIZI.BuildingManager();
 		buildingManager.load(url).then(function(value) {
 			VIZI.Log(value);
-			buildingManager.process(value);
+			buildingManager.processFeatures(value.features);
 		}, function(error) {
 			console.error(error.stack);
 		}).done();
