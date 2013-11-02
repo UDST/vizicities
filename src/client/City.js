@@ -42,8 +42,8 @@
 		var buildingManager = new VIZI.BuildingManager();
 		buildingManager.load(url).then(function(value) {
 			VIZI.Log(value);
-			// buildingManager.processFeatures(value.features);
-			buildingManager.processFeaturesWorker(value.features);
+			buildingManager.processFeatures(value.features);
+			// buildingManager.processFeaturesWorker2(value.features);
 		}, function(error) {
 			console.error(error.stack);
 		}).done();

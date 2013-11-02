@@ -19,4 +19,30 @@
 				return;
 		}
 	};
+
+	VIZI.BuildingManager.prototype.debugTimes = function() {
+		var self = this;
+		
+		var totals = {};
+		_.each(self.objects, function(object) {
+			_.each(object.debugTimes, function(time, key) {
+				if (!totals[key]) {
+					totals[key] = 0;
+				}
+
+				totals[key] += time;
+				// _.each(item, function(time) {
+				// 	total += time;
+				// });
+				// VIZI.Log(key + ": " + total/_.size(item));
+			});
+		});
+
+		var averages = {};
+		_.each(totals, function(total, key) {
+			averages[key] = total / _.size(self.objects);
+		});
+
+		VIZI.Log({totals: totals, averages: averages});
+	};
 }());

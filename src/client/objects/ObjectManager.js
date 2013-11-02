@@ -26,7 +26,13 @@
 	};
 
 	VIZI.ObjectManager.prototype.processFeatures = function(features) {
+		var startTime = Date.now();
+
 		var objects = _.map(features, this.processFeature);
+
+		VIZI.Log(Date.now() - startTime);
+
+		this.objects = objects;
 
 		this.combinedObjects = this.combineObjects(objects);
 
@@ -60,6 +66,8 @@
 			process: function(features) {
 				importScripts("worker/three.min.js", "worker/underscore.min.js");
 
+				var startTime = Date.now();
+
 				var applyVertexColors = function( g, c ) {
 					g.faces.forEach( function( f ) {
 						var n = ( f instanceof THREE.Face3 ) ? 3 : 4;
@@ -80,9 +88,9 @@
 					var area = properties.area;
 
 					// Skip if building area is too small
-					// if (area < 200) {
-					// 	return;
-					// }
+					if (area < 200) {
+						return;
+					}
 					
 					var coords = feature.geometry.coordinatesConverted[0];
 					// // var shape = this.createShapeFromCoords(coords);
@@ -118,13 +126,18 @@
 					meshes.push(mesh);
 				});
 
+				// return Date.now() - startTime;
+
 				return meshes;
 			}
 		}, 4);
 
 		var startTime = Date.now();
 
-		// TODO: Work out why this still locks up the browser
+		// TODO: Work out why this still locks up the browser (amount of data being transferred back from the worker? Is it quicker to create objects in the browser?)
+		// TODO: See if simply batching objects and creating them in the browser is less sluggish for the browser
+		// TODO: Work out why not every feature is being returned in the promises (about 10–20 less than expected)
+
 		// Batch features
 		var batches = 20;
 		var featuresPerBatch = Math.ceil(features.length / batches);
@@ -167,95 +180,158 @@
 			});
 
 			VIZI.Log(count);
+			VIZI.Log(Date.now() - startTime);
 		}).done();
+	};
 
-		// worker.batch.process(features).then(function(data) {
-		// 	VIZI.Log(Date.now() - startTime);
-		// 	VIZI.Log(data);
-		// });
+	VIZI.ObjectManager.prototype.processFeaturesWorker2 = function(features) {
+		VIZI.Log("Processing features using worker");
 
-		// worker.batch(function(feature) {
-		// 	return feature;
-		// 	// VIZI.Log(feature);
-		// 	// worker.close();
-		// }).process(features).then(function(data) {
-		// 	VIZI.Log(Date.now() - startTime);
-		// 	VIZI.Log(data);
-		// });
+		var geo = VIZI.Geo.getInstance();
 
-		// worker.data(features).then(function(data) {
-		// 	VIZI.Log(Date.now() - startTime);
-		// 	VIZI.Log(data);
-		// 	worker.close();
-		// });
+		// Convert coordinates
+		_.each(features, function(feature) {
+			var coords = feature.geometry.coordinates[0];
+			feature.geometry.coordinatesConverted = [[]];
+			_.each(coords, function(coord) {
+				feature.geometry.coordinatesConverted[0].push(geo.projection(coord));
+			});
+		});
 
-		// var worker = new Parallel(features, { evalPath: "worker/eval.js" });
-		// worker.require("three.min.js");
-		// worker.require("underscore.min.js");
-		// worker.require({fn: VIZI.applyVertexColors, name: "applyVertexColors"});
+		VIZI.Log(features);
 
-		// var startTime = Date.now();
-		// worker.spawn(function(features) {
-		// 	var meshes = [];
-		// 	var material = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors});
+		var worker = cw({
+			process: function(feature) {
+				importScripts("worker/three.min.js", "worker/underscore.min.js");
 
-		// 	_.each(features, function(feature) {
-				// var properties = feature.properties;
+				var startTime = Date.now();
 
-				// var area = properties.area;
+				var applyVertexColors = function( g, c ) {
+					g.faces.forEach( function( f ) {
+						var n = ( f instanceof THREE.Face3 ) ? 3 : 4;
+						for( var j = 0; j < n; j ++ ) {
+							f.vertexColors[ j ] = c;
+						}
+					} );
+				};
 
-				// // Skip if building area is too small
-				// if (area < 200) {
-				// 	return;
-				// }
+				var material = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors});
+				var material2 = new THREE.MeshLambertMaterial({color: 0xcccccc});
+				var colour = new THREE.Color(0xcccccc);
 
-				// var colour = new THREE.Color(0xcccccc);
-				
-				// var coords = feature.geometry.coordinatesConverted[0];
-				// // // var shape = this.createShapeFromCoords(coords);
-				// var shape = new THREE.Shape();
-				// _.each(coords, function(coord, index) {
-				// 	// Move if first coordinate
-				// 	if (index === 0) {
-				// 		shape.moveTo( coord[0], coord[1] );
-				// 	} else {
-				// 		shape.lineTo( coord[0], coord[1] );
-				// 	}
+				// _.each(features, function(feature) {
+					var properties = feature.properties;
+
+					var area = properties.area;
+
+					// Skip if building area is too small
+					if (area < 200) {
+						return;
+					}
+					
+					var coords = feature.geometry.coordinatesConverted[0];
+					// // var shape = this.createShapeFromCoords(coords);
+					var shape = new THREE.Shape();
+					_.each(coords, function(coord, index) {
+						// Move if first coordinate
+						if (index === 0) {
+							shape.moveTo( coord[0], coord[1] );
+						} else {
+							shape.lineTo( coord[0], coord[1] );
+						}
+					});
+
+					// var height = 10 * this.geo.pixelsPerMeter;
+					var height = 10;
+
+					var extrudeSettings = { amount: height, bevelEnabled: false };
+					// var geom = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+					var geom = new THREE.CubeGeometry(10, 10, 10);
+
+					// applyVertexColors( geom, colour );
+					
+					// Move geom to 0,0 and return offset
+					// var offset = THREE.GeometryUtils.center( geom );
+
+					geom.computeFaceNormals();
+					var mesh = new THREE.Mesh(geom, material2);
+
+					// mesh.position.y = height;
+
+					// Flip buildings as they are up-side down
+					// mesh.rotation.x = 90 * Math.PI / 180;
+
+					// meshes.push(mesh);
 				// });
 
-				// // var height = 10 * this.geo.pixelsPerMeter;
-				// var height = 10;
+				// return Date.now() - startTime;
 
-				// var extrudeSettings = { amount: height, bevelEnabled: false };
-				// var geom = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+				return mesh;
+			}
+		}, 4);
 
-				// applyVertexColors( geom, colour );
-				
-				// // Move geom to 0,0 and return offset
-				// // var offset = THREE.GeometryUtils.center( geom );
+		var startTime = Date.now();
 
-				// geom.computeFaceNormals();
-				// var mesh = new THREE.Mesh(geom, material);
+		// TODO: Work out why this still locks up the browser (amount of data being transferred back from the worker? Is it quicker to create objects in the browser?)
+		// TODO: See if simply batching objects and creating them in the browser is less sluggish for the browser
+		// TODO: Work out why not every feature is being returned in the promises (about 10–20 less than expected)
 
-				// mesh.position.y = height;
+		// Batch features
+		// var batches = 20;
+		// var featuresPerBatch = Math.ceil(features.length / batches);
+		// var batchedMeshes = [];
+		// var batchPromises = [];
 
-				// // Flip buildings as they are up-side down
-				// mesh.rotation.x = 90 * Math.PI / 180;
+		// var i = batches;
+		// while (i--) {
+		// 	var startIndex = i * featuresPerBatch;
+		// 	startIndex = (startIndex < 0) ? 0 : startIndex;
 
-				// meshes.push(mesh);
+		// 	// VIZI.Log("Start index: " + startIndex);
+		// 	// VIZI.Log("End index: " + (startIndex+(featuresPerBatch-1)));
+
+		// 	// var endIndex = i * featuresPerBatch;
+		// 	// endIndex = (endIndex > features.length-1) ? features.length-1 : endIndex;
+
+		// 	var featuresBatch = features.splice(startIndex, featuresPerBatch-1);
+
+		// 	batchPromises.push(this.workerPromise(worker, featuresBatch));
+
+		// 	// worker.process(featuresBatch).then(function(data) {
+		// 	// 	VIZI.Log(Date.now() - startTime);
+		// 	// 	// VIZI.Log(data);
+		// 	// 	batchedMeshes.concat(data);
+		// 	// 	// worker.close();
+		// 	// });
+		// }
+
+		// // Handle promises
+		// Q.allSettled(batchPromises).then(function (promises) {
+		// 	var count = 0;
+
+		// 	_.each(promises, function (promise) {
+		// 		if (promise.state === "fulfilled") {
+		// 			var value = promise.value;
+		// 			count += value.length;
+		// 			// VIZI.Log(value);
+		// 		}
 		// 	});
 
-		// 	return meshes;
-		// }).then(function(meshes) {
+		// 	VIZI.Log(count);
 		// 	VIZI.Log(Date.now() - startTime);
-		// 	VIZI.Log(meshes);
-		// });
-
-		// var objects = _.map(features, this.processFeature);
-
-		// this.combinedObjects = this.combineObjects(objects);
-
-		// this.publish("addToScene", this.combinedObjects);
+		// }).done();
+		
+		var self = this;
+		worker.batch(function(feature) {
+			feature.__proto__.constructor = THREE.Object3D;
+			self.publish("addToScene", feature);
+			// return feature;
+			// VIZI.Log(feature);
+			// worker.close();
+		}).process(features).then(function(data) {
+			VIZI.Log(Date.now() - startTime);
+			VIZI.Log(data);
+		});
 	};
 
 	VIZI.ObjectManager.prototype.processFeature = function(feature) {};
