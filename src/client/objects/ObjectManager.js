@@ -41,19 +41,26 @@
 
 	VIZI.ObjectManager.prototype.workerPromise = function(worker, features) {
 		var deferred = Q.defer();
+
+		var startTime = Date.now();
 		worker.process(features).then(function(data) {
-			deferred.resolve(data);
+			var timeToSend = data.startTime - startTime;
+			var timeToArrive = Date.now() - data.timeSent;
+			deferred.resolve({data: data, timeToArrive: timeToArrive, timeToSend: timeToSend});
 		});
 		return deferred.promise;
 	};
 	
 	// TODO: Should be possible if geo functionality can be performed before / after the worker task
+	// TODO: Try and get rid of lock-up that occurs at beginning and end of worker process (possibly due to data being sent back and forth)
 	VIZI.ObjectManager.prototype.processFeaturesWorker = function(features) {
 		VIZI.Log("Processing features using worker");
 
 		var geo = VIZI.Geo.getInstance();
 
 		// Convert coordinates
+		var coordinateTime = Date.now();
+
 		_.each(features, function(feature) {
 			var coords = feature.geometry.coordinates[0];
 			feature.geometry.coordinatesConverted = [[]];
@@ -61,6 +68,8 @@
 				feature.geometry.coordinatesConverted[0].push(geo.projection(coord));
 			});
 		});
+
+		VIZI.Log("Converting coordinates: " + (Date.now() - coordinateTime));
 
 		var worker = cw({
 			process: function(features) {
@@ -85,6 +94,8 @@
 				var colour = new THREE.Color(0xcccccc);
 
 				var combinedGeom = new THREE.Geometry();
+
+				var count = 0;
 
 				_.each(features, function(feature) {
 					var properties = feature.properties;
@@ -129,13 +140,23 @@
 
 					// meshes.push(mesh);
 					THREE.GeometryUtils.merge(combinedGeom, mesh);
+
+					count++;
 				});
 
-				// return Date.now() - startTime;
+				var timeTaken = Date.now() - startTime;
+				var exportedGeom = exporter.parse(combinedGeom);
+				// var exportedGeom = {};
+
+				// The size of this seems to be the problem
+				// Work out how to reduce it
+				var size = JSON.stringify(exportedGeom).length;
+
+				var timeSent = Date.now();
 
 				// return meshes;
 
-				return exporter.parse(combinedGeom);
+				return {json: exportedGeom, size: size, count: count, startTime: startTime, timeTaken: timeTaken, timeSent: timeSent};
 			}
 		});
 
@@ -146,7 +167,7 @@
 		// TODO: Work out why not every feature is being returned in the promises (about 10–20 less than expected)
 
 		// Batch features
-		var batches = 4;
+		var batches = 20;
 		var featuresPerBatch = Math.ceil(features.length / batches);
 		var batchedMeshes = [];
 		var batchPromises = [];
@@ -186,18 +207,35 @@
 			_.each(promises, function (promise) {
 				if (promise.state === "fulfilled") {
 					var value = promise.value;
+					var data = value.data;
 
-					var json = loader.parse(value);
-					var mesh = new THREE.Mesh(json.geometry, material);
+					// Not sure how reliable this time is
+					var timeToSend = value.timeToSend;
+
+					var timeToArrive = value.timeToArrive;
+					var timeTaken = data.timeTaken;
+					var size = data.size;
+					var count = data.count;
+					var json = data.json;
+
+					VIZI.Log("Worker input sent in " + timeToSend + "ms");
+					VIZI.Log("Worker output received in " + timeToArrive + "ms");
+					VIZI.Log("Worker output size is " + size);
+					VIZI.Log("Processed " + count + " features in " + timeTaken + "ms");
+
+					VIZI.Log(json);
+
+					// TODO: Stop this locking up the browser
+					var geom = loader.parse(json);
+					var mesh = new THREE.Mesh(geom.geometry, material);
 					self.publish("addToScene", mesh);
 
-					// count += value.length;
-					// VIZI.Log(value);
+					// count += data.length;
 				}
 			});
 
 			// VIZI.Log(count);
-			VIZI.Log(Date.now() - startTime);
+			VIZI.Log("Overall worker time is " + (Date.now() - startTime) + "ms");
 		}).done();
 	};
 
@@ -207,6 +245,7 @@
 		var geo = VIZI.Geo.getInstance();
 
 		// Convert coordinates
+		var coordinateTime = Date.now();
 		_.each(features, function(feature) {
 			var coords = feature.geometry.coordinates[0];
 			feature.geometry.coordinatesConverted = [[]];
@@ -214,6 +253,7 @@
 				feature.geometry.coordinatesConverted[0].push(geo.projection(coord));
 			});
 		});
+		VIZI.Log("Converting coordinates: " + Date.now() - coordinateTime);
 
 		VIZI.Log(features);
 

@@ -3,7 +3,7 @@
 	"use strict";
 
 	// http://addyosmani.com/resources/essentialjsdesignpatterns/book/#mediatorpatternjavascript
-	VIZI.Log = function(msg) {
-		console.log(msg);
-	};
+	// https://gist.github.com/bgrins/5108712
+	VIZI.Log = console.log.bind(console);
+	VIZI.Log.apply(this, arguments);
 }());
