@@ -146,7 +146,7 @@
 		// TODO: Work out why not every feature is being returned in the promises (about 10–20 less than expected)
 
 		// Batch features
-		var batches = 20;
+		var batches = 4;
 		var featuresPerBatch = Math.ceil(features.length / batches);
 		var batchedMeshes = [];
 		var batchPromises = [];
