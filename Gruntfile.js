@@ -23,6 +23,7 @@ module.exports = function(grunt) {
 					'src/shared/vendor/three/three.js',
 					'src/shared/vendor/three/ColorConverter.js',
 					'src/shared/vendor/d3.js',
+					'src/shared/vendor/catiline.js',
 					'src/shared/vendor/dat.gui.js',
 					'src/shared/vendor/fpsmeter.js',
 					'src/client/Vizi.js',
@@ -50,6 +51,7 @@ module.exports = function(grunt) {
 		},
 		jshint: {
 			options: {
+				force: true,
 				curly: false,
 				eqeqeq: true,
 				immed: true,
@@ -64,7 +66,8 @@ module.exports = function(grunt) {
 				globals: {
 					head: false,
 					module: false,
-					console: false
+					console: false,
+					importScripts: true
 				},
 				ignores: ['src/shared/vendor/**']
 			},

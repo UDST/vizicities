@@ -69,15 +69,10 @@
 	// Global helpers (move elsewhere?)
 	VIZI.applyVertexColors = function( g, c ) {
 		g.faces.forEach( function( f ) {
-
 			var n = ( f instanceof THREE.Face3 ) ? 3 : 4;
-
 			for( var j = 0; j < n; j ++ ) {
-
 				f.vertexColors[ j ] = c;
-
 			}
-
 		} );
 	};
 }());

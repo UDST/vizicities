@@ -20,10 +20,10 @@
 			}
 		});
 			
-		// Set up basic WebGL components (scene, camera, lights, renderer)
+		// Set up basic WebGL components (scene, camera, renderer, lights, etc)
 		this.webgl = new VIZI.WebGL();
 
-		// Set up DOM events
+		// Set up DOM events (window resize, mouse, keyboard, etc)
 		this.domEvents = new VIZI.DOMEvents();
 
 		// Set up core city-scene objects (floor, skybox, etc)
@@ -42,9 +42,12 @@
 		var buildingManager = new VIZI.BuildingManager();
 		buildingManager.load(url).then(function(value) {
 			VIZI.Log(value);
-			buildingManager.processFeatures(value.features);
+			// buildingManager.processFeatures(value.features);
+			buildingManager.processFeaturesWorker(value.features);
 		}, function(error) {
 			console.error(error.stack);
 		}).done();
+
+		this.buildings = buildingManager;
 	};
 }());
