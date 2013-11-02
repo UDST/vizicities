@@ -64,9 +64,11 @@
 
 		var worker = cw({
 			process: function(features) {
-				importScripts("worker/three.min.js", "worker/underscore.min.js");
+				importScripts("worker/three.min.js", "worker/GeometryExporter.js", "worker/underscore.min.js");
 
 				var startTime = Date.now();
+
+				var exporter = new THREE.GeometryExporter();
 
 				var applyVertexColors = function( g, c ) {
 					g.faces.forEach( function( f ) {
@@ -77,10 +79,12 @@
 					} );
 				};
 
-				var meshes = [];
+				// var meshes = [];
 
-				var material = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors});
+				// var material = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors});
 				var colour = new THREE.Color(0xcccccc);
+
+				var combinedGeom = new THREE.Geometry();
 
 				_.each(features, function(feature) {
 					var properties = feature.properties;
@@ -116,21 +120,24 @@
 					// var offset = THREE.GeometryUtils.center( geom );
 
 					geom.computeFaceNormals();
-					var mesh = new THREE.Mesh(geom, material);
+					var mesh = new THREE.Mesh(geom);
 
 					mesh.position.y = height;
 
 					// Flip buildings as they are up-side down
 					mesh.rotation.x = 90 * Math.PI / 180;
 
-					meshes.push(mesh);
+					// meshes.push(mesh);
+					THREE.GeometryUtils.merge(combinedGeom, mesh);
 				});
 
 				// return Date.now() - startTime;
 
-				return meshes;
+				// return meshes;
+
+				return exporter.parse(combinedGeom);
 			}
-		}, 4);
+		});
 
 		var startTime = Date.now();
 
@@ -167,6 +174,11 @@
 			// });
 		}
 
+		var loader = new THREE.JSONLoader();
+		var material = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors});
+
+		var self = this;
+
 		// Handle promises
 		Q.allSettled(batchPromises).then(function (promises) {
 			var count = 0;
@@ -174,12 +186,17 @@
 			_.each(promises, function (promise) {
 				if (promise.state === "fulfilled") {
 					var value = promise.value;
-					count += value.length;
+
+					var json = loader.parse(value);
+					var mesh = new THREE.Mesh(json.geometry, material);
+					self.publish("addToScene", mesh);
+
+					// count += value.length;
 					// VIZI.Log(value);
 				}
 			});
 
-			VIZI.Log(count);
+			// VIZI.Log(count);
 			VIZI.Log(Date.now() - startTime);
 		}).done();
 	};
@@ -202,22 +219,24 @@
 
 		var worker = cw({
 			process: function(feature) {
-				importScripts("worker/three.min.js", "worker/underscore.min.js");
+				importScripts("worker/three.min.js", "worker/GeometryExporter.js", "worker/underscore.min.js");
+
+				var exporter = new THREE.GeometryExporter();
 
 				var startTime = Date.now();
 
-				var applyVertexColors = function( g, c ) {
-					g.faces.forEach( function( f ) {
-						var n = ( f instanceof THREE.Face3 ) ? 3 : 4;
-						for( var j = 0; j < n; j ++ ) {
-							f.vertexColors[ j ] = c;
-						}
-					} );
-				};
+				// var applyVertexColors = function( g, c ) {
+				// 	g.faces.forEach( function( f ) {
+				// 		var n = ( f instanceof THREE.Face3 ) ? 3 : 4;
+				// 		for( var j = 0; j < n; j ++ ) {
+				// 			f.vertexColors[ j ] = c;
+				// 		}
+				// 	} );
+				// };
 
-				var material = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors});
-				var material2 = new THREE.MeshLambertMaterial({color: 0xcccccc});
-				var colour = new THREE.Color(0xcccccc);
+				// var material = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors});
+				// var material2 = new THREE.MeshLambertMaterial({color: 0xcccccc});
+				// var colour = new THREE.Color(0xcccccc);
 
 				// _.each(features, function(feature) {
 					var properties = feature.properties;
@@ -245,8 +264,8 @@
 					var height = 10;
 
 					var extrudeSettings = { amount: height, bevelEnabled: false };
-					// var geom = new THREE.ExtrudeGeometry( shape, extrudeSettings );
-					var geom = new THREE.CubeGeometry(10, 10, 10);
+					var geom = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+					// var geom = new THREE.CubeGeometry(10, 10, 10);
 
 					// applyVertexColors( geom, colour );
 					
@@ -254,7 +273,7 @@
 					// var offset = THREE.GeometryUtils.center( geom );
 
 					geom.computeFaceNormals();
-					var mesh = new THREE.Mesh(geom, material2);
+					// var mesh = new THREE.Mesh(geom, material2);
 
 					// mesh.position.y = height;
 
@@ -266,9 +285,9 @@
 
 				// return Date.now() - startTime;
 
-				return mesh;
+				return exporter.parse(geom);
 			}
-		}, 4);
+		}, 4, true);
 
 		var startTime = Date.now();
 
@@ -320,13 +339,19 @@
 		// 	VIZI.Log(count);
 		// 	VIZI.Log(Date.now() - startTime);
 		// }).done();
+
+		var loader = new THREE.JSONLoader();
+		var material = new THREE.MeshLambertMaterial({color: 0xcccccc});
 		
 		var self = this;
 		worker.batch(function(feature) {
-			feature.__proto__.constructor = THREE.Object3D;
-			self.publish("addToScene", feature);
+			var json = loader.parse(feature);
+			var mesh = new THREE.Mesh(json.geometry, material);
+			mesh.position.y = 10;
+			mesh.rotation.x = 90 * Math.PI / 180;
+			self.publish("addToScene", mesh);
 			// return feature;
-			// VIZI.Log(feature);
+			// VIZI.Log(loader.parse(feature));
 			// worker.close();
 		}).process(features).then(function(data) {
 			VIZI.Log(Date.now() - startTime);

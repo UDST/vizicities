@@ -34,15 +34,20 @@
 
 		// Set up and start application loop
 		this.loop = new VIZI.Loop();
+
+		this.publish("addToDat", this, {name: "City", properties: ["loadBuildings"]});
 	};
 
 	VIZI.City.prototype.loadBuildings = function(url) {
 		VIZI.Log("Loading buildings");
 
+		url = (!url) ? "osm-buildings.json" : url;
+
 		var buildingManager = new VIZI.BuildingManager();
 		buildingManager.load(url).then(function(value) {
 			VIZI.Log(value);
-			buildingManager.processFeatures(value.features);
+			// buildingManager.processFeatures(value.features);
+			buildingManager.processFeaturesWorker(value.features);
 			// buildingManager.processFeaturesWorker2(value.features);
 		}, function(error) {
 			console.error(error.stack);

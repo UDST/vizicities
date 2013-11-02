@@ -43,6 +43,7 @@
 
 		var createShapeTime = Date.now();
 		var shape = this.createShapeFromCoords(coords);
+		var geom = new THREE.ShapeGeometry(shape);
 		this.debugTimes.createShape = Date.now() - createShapeTime;
 
 		var height = 10 * this.geo.pixelsPerMeter;
