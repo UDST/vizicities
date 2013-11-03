@@ -1,4 +1,4 @@
-/* globals window, _, VIZI, THREE */
+/* globals window, _, VIZI, Q, THREE */
 (function() {
 	"use strict";
 
@@ -8,12 +8,27 @@
 		_.extend(this, VIZI.Mediator);
 
 		this.domContainer = this.createDOMContainer();
+		this.scene = undefined;
+		this.camera = undefined;
+		this.renderer = undefined;
+
+		this.lights = [];
+	};
+
+	VIZI.WebGL.prototype.init = function() {
+		var deferred = Q.defer();
+
+		this.domContainer = this.createDOMContainer();
 		this.scene = new VIZI.Scene();
 		this.camera = new VIZI.Camera();
 		this.renderer = new VIZI.Renderer(this.scene, this.camera, this.domContainer);
 
 		this.lights = [];
 		this.addLights();
+
+		deferred.resolve();
+
+		return deferred.promise;
 	};
 
 	VIZI.WebGL.prototype.createDOMContainer = function() {

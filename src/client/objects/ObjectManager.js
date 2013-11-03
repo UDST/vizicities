@@ -25,6 +25,7 @@
 		return deferred.promise;
 	};
 
+	// TODO: Convert to a promise
 	VIZI.ObjectManager.prototype.processFeatures = function(features) {
 		var startTime = Date.now();
 
@@ -56,6 +57,8 @@
 	// TODO: Try and get rid of lock-up that occurs at beginning and end of worker process (possibly due to size of data being sent back and forth)
 	VIZI.ObjectManager.prototype.processFeaturesWorker = function(features) {
 		VIZI.Log("Processing features using worker");
+
+		var deferred = Q.defer();
 
 		var geo = VIZI.Geo.getInstance();
 
@@ -233,7 +236,11 @@
 			});
 
 			VIZI.Log("Overall worker time is " + (Date.now() - startTime) + "ms");
-		}).done();
+		}).done(function() {
+			deferred.resolve();
+		});
+
+		return deferred.promise;
 	};
 
 	VIZI.ObjectManager.prototype.processFeaturesWorker2 = function(features) {
