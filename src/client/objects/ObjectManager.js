@@ -72,6 +72,7 @@
 
 		VIZI.Log("Converting coordinates: " + (Date.now() - coordinateTime));
 
+		// TODO: See if initialising this before calling processFeaturesWorker speeds things up
 		var worker = cw({
 			processDebug: function(features) {
 				var inputSize = JSON.stringify(features).length;
@@ -224,6 +225,7 @@
 					VIZI.Log(json);
 
 					// TODO: Stop this locking up the browser
+					// No visible lock up at all when removed
 					var geom = loader.parse(json);
 					var mesh = new THREE.Mesh(geom.geometry, material);
 					self.publish("addToScene", mesh);
