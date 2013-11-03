@@ -8,13 +8,14 @@
 		_.extend(this, VIZI.Mediator);
 
 		this.domContainer = undefined;
+		this.domTimer = undefined;
 	};
 
 	VIZI.Loading.prototype.init = function() {
 		var deferred = Q.defer();
 
 		this.domContainer = this.createDOMContainer();
-		this.domElement = this.createDOMElement();
+		this.domTimer = this.createDOMTimer();
 
 		this.subscribe("loadingComplete", this.remove);
 
@@ -46,7 +47,9 @@
 	// Or CSS loading bars, like:
 	// http://codepen.io/collection/HtAne
 	// http://codepen.io/SLembas/pen/kotcg
-	VIZI.Loading.prototype.createDOMElement = function() {
+	VIZI.Loading.prototype.createDOMTimer = function() {
+		VIZI.Log("Creating loading UI timer DOM");
+
 		var timerContainerDOM = document.createElement("div");
 		timerContainerDOM.classList.add("timer-container");
 
@@ -62,6 +65,13 @@
 	};
 
 	VIZI.Loading.prototype.remove = function() {
-		document.body.removeChild(this.domContainer);
+		var self = this;
+
+		self.domContainer.classList.add("inactive");
+
+		setTimeout(function() {
+			VIZI.Log("Removing loading UI DOM container");
+			document.body.removeChild(self.domContainer);
+		}, 2000);
 	};
 }());

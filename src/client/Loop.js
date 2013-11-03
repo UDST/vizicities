@@ -8,6 +8,9 @@
 		_.extend(this, VIZI.Mediator);
 
 		this.stopLoop = false;
+
+		this.publish("addToDat", this, {name: "Loop", properties: ["start", "stop"]});
+
 		this.start();
 	};
 

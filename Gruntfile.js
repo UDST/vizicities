@@ -26,6 +26,7 @@ module.exports = function(grunt) {
 					'src/shared/vendor/catiline.js',
 					'src/shared/vendor/dat.gui.js',
 					'src/shared/vendor/fpsmeter.js',
+					'src/shared/vendor/moment.js',
 					'src/client/Vizi.js',
 					'src/client/Log.js',
 					'src/client/Mediator.js',
@@ -123,7 +124,8 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-notify');
 
 	// Default task(s).
-	grunt.registerTask('default', ['jshint', 'concat', 'uglify', 'notify:finish']);
+	// grunt.registerTask('default', ['jshint', 'concat', 'uglify', 'notify:finish']);
+	grunt.registerTask('default', ['jshint', 'concat', 'notify:finish']);
 
 	// Serve examples locally
 	grunt.registerTask('serve', ['connect', 'notify:connect', 'watch']);
