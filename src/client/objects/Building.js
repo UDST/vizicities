@@ -43,7 +43,6 @@
 
 		var createShapeTime = Date.now();
 		var shape = this.createShapeFromCoords(coords);
-		var geom = new THREE.ShapeGeometry(shape);
 		this.debugTimes.createShape = Date.now() - createShapeTime;
 
 		var height = 10 * this.geo.pixelsPerMeter;
@@ -57,9 +56,6 @@
 		var applyVertexColorsTime = Date.now();
 		VIZI.applyVertexColors( geom, colour );
 		this.debugTimes.applyVertexColors = Date.now() - applyVertexColorsTime;
-		
-		// Move geom to 0,0 and return offset
-		// var offset = THREE.GeometryUtils.center( geom );
 
 		geom.computeFaceNormals();
 

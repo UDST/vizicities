@@ -22,7 +22,7 @@
 
 	VIZI.BuildingManager.prototype.debugTimes = function() {
 		var self = this;
-		
+
 		var totals = {};
 		_.each(self.objects, function(object) {
 			_.each(object.debugTimes, function(time, key) {
@@ -31,10 +31,6 @@
 				}
 
 				totals[key] += time;
-				// _.each(item, function(time) {
-				// 	total += time;
-				// });
-				// VIZI.Log(key + ": " + total/_.size(item));
 			});
 		});
 

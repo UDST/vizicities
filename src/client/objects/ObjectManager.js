@@ -75,6 +75,8 @@
 			process: function(features) {
 				importScripts("worker/three.min.js", "worker/GeometryExporter.js", "worker/underscore.min.js");
 
+				var inputSize = JSON.stringify(features).length;
+
 				var startTime = Date.now();
 
 				var exporter = new THREE.GeometryExporter();
@@ -88,9 +90,6 @@
 					} );
 				};
 
-				// var meshes = [];
-
-				// var material = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors});
 				var colour = new THREE.Color(0xcccccc);
 
 				var combinedGeom = new THREE.Geometry();
@@ -108,7 +107,6 @@
 					}
 					
 					var coords = feature.geometry.coordinatesConverted[0];
-					// // var shape = this.createShapeFromCoords(coords);
 					var shape = new THREE.Shape();
 					_.each(coords, function(coord, index) {
 						// Move if first coordinate
@@ -119,16 +117,13 @@
 						}
 					});
 
-					// var height = 10 * this.geo.pixelsPerMeter;
+					//var height = 10 * this.geo.pixelsPerMeter;
 					var height = 10;
 
 					var extrudeSettings = { amount: height, bevelEnabled: false };
 					var geom = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 
 					applyVertexColors( geom, colour );
-					
-					// Move geom to 0,0 and return offset
-					// var offset = THREE.GeometryUtils.center( geom );
 
 					geom.computeFaceNormals();
 					var mesh = new THREE.Mesh(geom);
@@ -138,7 +133,6 @@
 					// Flip buildings as they are up-side down
 					mesh.rotation.x = 90 * Math.PI / 180;
 
-					// meshes.push(mesh);
 					THREE.GeometryUtils.merge(combinedGeom, mesh);
 
 					count++;
@@ -146,17 +140,14 @@
 
 				var timeTaken = Date.now() - startTime;
 				var exportedGeom = exporter.parse(combinedGeom);
-				// var exportedGeom = {};
 
 				// The size of this seems to be the problem
 				// Work out how to reduce it
-				var size = JSON.stringify(exportedGeom).length;
+				var outputSize = JSON.stringify(exportedGeom).length;
 
 				var timeSent = Date.now();
 
-				// return meshes;
-
-				return {json: exportedGeom, size: size, count: count, startTime: startTime, timeTaken: timeTaken, timeSent: timeSent};
+				return {json: exportedGeom, outputSize: outputSize, inputSize: inputSize, count: count, startTime: startTime, timeTaken: timeTaken, timeSent: timeSent};
 			}
 		});
 
@@ -177,22 +168,9 @@
 			var startIndex = i * featuresPerBatch;
 			startIndex = (startIndex < 0) ? 0 : startIndex;
 
-			// VIZI.Log("Start index: " + startIndex);
-			// VIZI.Log("End index: " + (startIndex+(featuresPerBatch-1)));
-
-			// var endIndex = i * featuresPerBatch;
-			// endIndex = (endIndex > features.length-1) ? features.length-1 : endIndex;
-
 			var featuresBatch = features.splice(startIndex, featuresPerBatch-1);
 
 			batchPromises.push(this.workerPromise(worker, featuresBatch));
-
-			// worker.process(featuresBatch).then(function(data) {
-			// 	VIZI.Log(Date.now() - startTime);
-			// 	// VIZI.Log(data);
-			// 	batchedMeshes.concat(data);
-			// 	// worker.close();
-			// });
 		}
 
 		var loader = new THREE.JSONLoader();
@@ -209,18 +187,19 @@
 					var value = promise.value;
 					var data = value.data;
 
-					// Not sure how reliable this time is
+					// Not sure how reliable the send time is
 					var timeToSend = value.timeToSend;
-
 					var timeToArrive = value.timeToArrive;
 					var timeTaken = data.timeTaken;
-					var size = data.size;
+					var inputSize = data.inputSize;
+					var outputSize = data.outputSize;
 					var count = data.count;
 					var json = data.json;
 
 					VIZI.Log("Worker input sent in " + timeToSend + "ms");
+					VIZI.Log("Worker input size is " + inputSize);
 					VIZI.Log("Worker output received in " + timeToArrive + "ms");
-					VIZI.Log("Worker output size is " + size);
+					VIZI.Log("Worker output size is " + outputSize);
 					VIZI.Log("Processed " + count + " features in " + timeTaken + "ms");
 
 					VIZI.Log(json);
@@ -229,12 +208,9 @@
 					var geom = loader.parse(json);
 					var mesh = new THREE.Mesh(geom.geometry, material);
 					self.publish("addToScene", mesh);
-
-					// count += data.length;
 				}
 			});
 
-			// VIZI.Log(count);
 			VIZI.Log("Overall worker time is " + (Date.now() - startTime) + "ms");
 		}).done();
 	};
@@ -265,20 +241,6 @@
 
 				var startTime = Date.now();
 
-				// var applyVertexColors = function( g, c ) {
-				// 	g.faces.forEach( function( f ) {
-				// 		var n = ( f instanceof THREE.Face3 ) ? 3 : 4;
-				// 		for( var j = 0; j < n; j ++ ) {
-				// 			f.vertexColors[ j ] = c;
-				// 		}
-				// 	} );
-				// };
-
-				// var material = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors});
-				// var material2 = new THREE.MeshLambertMaterial({color: 0xcccccc});
-				// var colour = new THREE.Color(0xcccccc);
-
-				// _.each(features, function(feature) {
 					var properties = feature.properties;
 
 					var area = properties.area;
@@ -289,7 +251,6 @@
 					}
 					
 					var coords = feature.geometry.coordinatesConverted[0];
-					// // var shape = this.createShapeFromCoords(coords);
 					var shape = new THREE.Shape();
 					_.each(coords, function(coord, index) {
 						// Move if first coordinate
@@ -300,30 +261,12 @@
 						}
 					});
 
-					// var height = 10 * this.geo.pixelsPerMeter;
 					var height = 10;
 
 					var extrudeSettings = { amount: height, bevelEnabled: false };
 					var geom = new THREE.ExtrudeGeometry( shape, extrudeSettings );
-					// var geom = new THREE.CubeGeometry(10, 10, 10);
-
-					// applyVertexColors( geom, colour );
-					
-					// Move geom to 0,0 and return offset
-					// var offset = THREE.GeometryUtils.center( geom );
 
 					geom.computeFaceNormals();
-					// var mesh = new THREE.Mesh(geom, material2);
-
-					// mesh.position.y = height;
-
-					// Flip buildings as they are up-side down
-					// mesh.rotation.x = 90 * Math.PI / 180;
-
-					// meshes.push(mesh);
-				// });
-
-				// return Date.now() - startTime;
 
 				return exporter.parse(geom);
 			}
@@ -335,51 +278,6 @@
 		// TODO: See if simply batching objects and creating them in the browser is less sluggish for the browser
 		// TODO: Work out why not every feature is being returned in the promises (about 10–20 less than expected)
 
-		// Batch features
-		// var batches = 20;
-		// var featuresPerBatch = Math.ceil(features.length / batches);
-		// var batchedMeshes = [];
-		// var batchPromises = [];
-
-		// var i = batches;
-		// while (i--) {
-		// 	var startIndex = i * featuresPerBatch;
-		// 	startIndex = (startIndex < 0) ? 0 : startIndex;
-
-		// 	// VIZI.Log("Start index: " + startIndex);
-		// 	// VIZI.Log("End index: " + (startIndex+(featuresPerBatch-1)));
-
-		// 	// var endIndex = i * featuresPerBatch;
-		// 	// endIndex = (endIndex > features.length-1) ? features.length-1 : endIndex;
-
-		// 	var featuresBatch = features.splice(startIndex, featuresPerBatch-1);
-
-		// 	batchPromises.push(this.workerPromise(worker, featuresBatch));
-
-		// 	// worker.process(featuresBatch).then(function(data) {
-		// 	// 	VIZI.Log(Date.now() - startTime);
-		// 	// 	// VIZI.Log(data);
-		// 	// 	batchedMeshes.concat(data);
-		// 	// 	// worker.close();
-		// 	// });
-		// }
-
-		// // Handle promises
-		// Q.allSettled(batchPromises).then(function (promises) {
-		// 	var count = 0;
-
-		// 	_.each(promises, function (promise) {
-		// 		if (promise.state === "fulfilled") {
-		// 			var value = promise.value;
-		// 			count += value.length;
-		// 			// VIZI.Log(value);
-		// 		}
-		// 	});
-
-		// 	VIZI.Log(count);
-		// 	VIZI.Log(Date.now() - startTime);
-		// }).done();
-
 		var loader = new THREE.JSONLoader();
 		var material = new THREE.MeshLambertMaterial({color: 0xcccccc});
 		
@@ -390,9 +288,6 @@
 			mesh.position.y = 10;
 			mesh.rotation.x = 90 * Math.PI / 180;
 			self.publish("addToScene", mesh);
-			// return feature;
-			// VIZI.Log(loader.parse(feature));
-			// worker.close();
 		}).process(features).then(function(data) {
 			VIZI.Log(Date.now() - startTime);
 			VIZI.Log(data);
