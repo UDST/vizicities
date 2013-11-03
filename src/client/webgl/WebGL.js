@@ -3,11 +3,11 @@
 	"use strict";
 
 	VIZI.WebGL = function() {
-		VIZI.Log("Inititialising WebGL");
+		VIZI.Log("Initialising WebGL");
 
 		_.extend(this, VIZI.Mediator);
 
-		this.domContainer = this.createDOMContainer();
+		this.domContainer = undefined;
 		this.scene = undefined;
 		this.camera = undefined;
 		this.renderer = undefined;

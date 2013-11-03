@@ -32,6 +32,7 @@ module.exports = function(grunt) {
 					'src/client/debug/Dat.js',
 					'src/client/debug/FPS.js',
 					'src/client/debug/RendererInfo.js',
+					'src/client/ui/Loading.js',
 					'src/client/Geo.js',
 					'src/client/City.js',
 					'src/client/Loop.js',

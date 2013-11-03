@@ -12,6 +12,10 @@
 		this.fps = undefined;
 		this.rendererInfo = undefined;
 
+		// UI
+		this.ui = {};
+		this.ui.loading = undefined;
+
 		// Set up geo methods
 		this.geo = VIZI.Geo.getInstance({
 			areaCoords: {
@@ -55,8 +59,11 @@
 
 		// Load city using promises
 
-		// Initialise debug tools
-		this.initDebug().then(function() {
+		// Initialise loading UI
+		this.initLoadingUI().then(function() {
+			// Initialise debug tools
+			return self.initDebug();
+		}).then(function() {
 			// Initialise WebGL
 			return self.initWebGL();
 		}).then(function() {
@@ -79,8 +86,26 @@
 			// Set up and start application loop
 			self.loop = new VIZI.Loop();
 
+			self.publish("loadingComplete");
+
 			VIZI.Log("Finished loading city in " + (Date.now() - startTime) + "ms");
 		});
+	};
+
+	VIZI.City.prototype.initLoadingUI = function() {
+		var startTime = Date.now();
+
+		var deferred = Q.defer();
+
+		this.ui.loading = new VIZI.Loading();
+
+		this.ui.loading.init().then(function(result) {
+			VIZI.Log("Finished intialising loading UI in " + (Date.now() - startTime) + "ms");
+
+			deferred.resolve();
+		});
+
+		return deferred.promise;
 	};
 
 	VIZI.City.prototype.initDebug = function() {
