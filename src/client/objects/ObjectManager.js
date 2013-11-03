@@ -44,6 +44,7 @@
 
 		var startTime = Date.now();
 		worker.process(features).then(function(data) {
+		//worker.processDebug({}).then(function(data) {
 			var timeToSend = data.startTime - startTime;
 			var timeToArrive = Date.now() - data.timeSent;
 			deferred.resolve({data: data, timeToArrive: timeToArrive, timeToSend: timeToSend});
@@ -52,7 +53,7 @@
 	};
 	
 	// TODO: Should be possible if geo functionality can be performed before / after the worker task
-	// TODO: Try and get rid of lock-up that occurs at beginning and end of worker process (possibly due to data being sent back and forth)
+	// TODO: Try and get rid of lock-up that occurs at beginning and end of worker process (possibly due to size of data being sent back and forth)
 	VIZI.ObjectManager.prototype.processFeaturesWorker = function(features) {
 		VIZI.Log("Processing features using worker");
 
@@ -72,6 +73,24 @@
 		VIZI.Log("Converting coordinates: " + (Date.now() - coordinateTime));
 
 		var worker = cw({
+			processDebug: function(features) {
+				var inputSize = JSON.stringify(features).length;
+
+				var startTime = Date.now();
+
+				var count = 0;
+
+				var timeTaken = Date.now() - startTime;
+				var exportedGeom = {};
+
+				// The size of this seems to be the problem
+				// Work out how to reduce it
+				var outputSize = JSON.stringify(exportedGeom).length;
+
+				var timeSent = Date.now();
+
+				return {json: exportedGeom, outputSize: outputSize, inputSize: inputSize, count: count, startTime: startTime, timeTaken: timeTaken, timeSent: timeSent};
+			},
 			process: function(features) {
 				importScripts("worker/three.min.js", "worker/GeometryExporter.js", "worker/underscore.min.js");
 
