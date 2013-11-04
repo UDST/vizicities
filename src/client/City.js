@@ -59,17 +59,27 @@
 
 		// Load city using promises
 
+		self.publish("loadingProgress", 0);
+
 		// Initialise loading UI
 		this.initLoadingUI().then(function() {
+			self.publish("loadingProgress", 0.1);
+
 			// Initialise debug tools
 			return self.initDebug();
 		}).then(function() {
+			self.publish("loadingProgress", 0.2);
+
 			// Initialise WebGL
 			return self.initWebGL();
 		}).then(function() {
+			self.publish("loadingProgress", 0.3);
+
 			// Initialise DOM events
 			return self.initDOMEvents();
 		}).then(function() {
+			self.publish("loadingProgress", 0.4);
+
 			// Load objects using promises
 			var promises = [];
 
@@ -86,6 +96,7 @@
 			// Set up and start application loop
 			self.loop = new VIZI.Loop();
 
+			self.publish("loadingProgress", 1);
 			self.publish("loadingComplete");
 
 			VIZI.Log("Finished loading city in " + (Date.now() - startTime) + "ms");

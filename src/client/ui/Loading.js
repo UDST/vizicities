@@ -9,6 +9,7 @@
 
 		this.domContainer = undefined;
 		this.domTimer = undefined;
+		this.domIndicator = undefined;
 	};
 
 	VIZI.Loading.prototype.init = function() {
@@ -16,7 +17,9 @@
 
 		this.domContainer = this.createDOMContainer();
 		this.domTimer = this.createDOMTimer();
+		this.domIndicator = this.createDOMIndicator();
 
+		this.subscribe("loadingProgress", this.progress);
 		this.subscribe("loadingComplete", this.remove);
 
 		deferred.resolve();
@@ -51,23 +54,50 @@
 		VIZI.Log("Creating loading UI timer DOM");
 
 		var timerContainerDOM = document.createElement("div");
-		timerContainerDOM.classList.add("timer-container");
+		timerContainerDOM.classList.add("ui-loading-timer-container");
 
 		var timerDOM = document.createElement("div");
-		timerDOM.classList.add("timer");
+		timerDOM.classList.add("ui-loading-timer");
 
 		var handDOM = document.createElement("div");
-		handDOM.classList.add("hand");
+		handDOM.classList.add("ui-loading-hand");
 
 		timerDOM.appendChild(handDOM);
 		timerContainerDOM.appendChild(timerDOM);
 		this.domContainer.appendChild(timerContainerDOM);
+
+		return timerContainerDOM;
+	};
+
+	VIZI.Loading.prototype.createDOMIndicator = function() {
+		VIZI.Log("Creating loading UI indicator DOM");
+
+		var indicatorContainerDOM = document.createElement("div");
+		indicatorContainerDOM.classList.add("ui-loading-indicator-container");
+
+		var indicatorBarDOM = document.createElement("div");
+		indicatorBarDOM.classList.add("ui-loading-indicator-bar");
+
+		indicatorContainerDOM.appendChild(indicatorBarDOM);
+		this.domContainer.appendChild(indicatorContainerDOM);
+
+		return indicatorBarDOM;
+	};
+
+	VIZI.Loading.prototype.progress = function(fraction) {
+		var position = (-100 + (100 * fraction)) + "%";
+
+		this.domIndicator.style.WebkitTransform = "translate3d(" + position + ", 0, 0)";
+		this.domIndicator.style.MozTransform = "translate3d(" + position + ", 0, 0)";
+		this.domIndicator.style.transform = "translate3d(" + position + ", 0, 0)";
 	};
 
 	VIZI.Loading.prototype.remove = function() {
 		var self = this;
 
-		self.domContainer.classList.add("inactive");
+		setTimeout(function() {
+			self.domContainer.classList.add("inactive");
+		}, 500);
 
 		setTimeout(function() {
 			VIZI.Log("Removing loading UI DOM container");
