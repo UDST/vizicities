@@ -13,8 +13,6 @@
 	};
 
 	VIZI.Loading.prototype.init = function() {
-		var deferred = Q.defer();
-
 		this.domContainer = this.createDOMContainer();
 		this.domTimer = this.createDOMTimer();
 		this.domIndicator = this.createDOMIndicator();
@@ -22,9 +20,7 @@
 		this.subscribe("loadingProgress", this.progress);
 		this.subscribe("loadingComplete", this.remove);
 
-		deferred.resolve();
-
-		return deferred.promise;
+		return Q.fcall(function() {});
 	};
 
 	VIZI.Loading.prototype.createDOMContainer = function() {
@@ -97,7 +93,7 @@
 
 		setTimeout(function() {
 			self.domContainer.classList.add("inactive");
-		}, 500);
+		}, 800);
 
 		setTimeout(function() {
 			VIZI.Log("Removing loading UI DOM container");

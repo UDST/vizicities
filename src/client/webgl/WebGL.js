@@ -16,8 +16,6 @@
 	};
 
 	VIZI.WebGL.prototype.init = function() {
-		var deferred = Q.defer();
-
 		this.domContainer = this.createDOMContainer();
 		this.scene = new VIZI.Scene();
 		this.camera = new VIZI.Camera();
@@ -26,9 +24,7 @@
 		this.lights = [];
 		this.addLights();
 
-		deferred.resolve();
-
-		return deferred.promise;
+		return Q.fcall(function() {});
 	};
 
 	VIZI.WebGL.prototype.createDOMContainer = function() {

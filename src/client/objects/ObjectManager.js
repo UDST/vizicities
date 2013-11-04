@@ -196,49 +196,94 @@
 			batchPromises.push(this.workerPromise(worker, featuresBatch));
 		}
 
+		VIZI.Log(batchPromises.length);
+
 		var loader = new THREE.JSONLoader();
 		var material = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors});
 
 		var self = this;
 
+		// TODO: Update this to fire progress events for each completed batch
+		// Possibly by using promise sequences rather than waiting for all to complete
+		// https://github.com/kriskowal/q#sequences
+
 		// Handle promises
-		Q.allSettled(batchPromises).then(function (promises) {
-			var count = 0;
+		var processedCount = 0;
+		var result = batchPromises[0];
+		batchPromises.forEach(function (f) {
+			result = result.then(function(value) {
+				var data = value.data;
 
-			_.each(promises, function (promise) {
-				if (promise.state === "fulfilled") {
-					var value = promise.value;
-					var data = value.data;
+				// Not sure how reliable the send time is
+				var timeToSend = value.timeToSend;
+				var timeToArrive = value.timeToArrive;
+				var timeTaken = data.timeTaken;
+				var inputSize = data.inputSize;
+				var outputSize = data.outputSize;
+				var count = data.count;
+				var json = data.json;
 
-					// Not sure how reliable the send time is
-					var timeToSend = value.timeToSend;
-					var timeToArrive = value.timeToArrive;
-					var timeTaken = data.timeTaken;
-					var inputSize = data.inputSize;
-					var outputSize = data.outputSize;
-					var count = data.count;
-					var json = data.json;
+				VIZI.Log("Worker input sent in " + timeToSend + "ms");
+				VIZI.Log("Worker input size is " + inputSize);
+				VIZI.Log("Worker output received in " + timeToArrive + "ms");
+				VIZI.Log("Worker output size is " + outputSize);
+				VIZI.Log("Processed " + count + " features in " + timeTaken + "ms");
 
-					VIZI.Log("Worker input sent in " + timeToSend + "ms");
-					VIZI.Log("Worker input size is " + inputSize);
-					VIZI.Log("Worker output received in " + timeToArrive + "ms");
-					VIZI.Log("Worker output size is " + outputSize);
-					VIZI.Log("Processed " + count + " features in " + timeTaken + "ms");
+				// VIZI.Log(json);
 
-					VIZI.Log(json);
+				// TODO: Stop this locking up the browser
+				// No visible lock up at all when removed
+				var geom = loader.parse(json);
+				var mesh = new THREE.Mesh(geom.geometry, material);
+				self.publish("addToScene", mesh);
 
-					// TODO: Stop this locking up the browser
-					// No visible lock up at all when removed
-					var geom = loader.parse(json);
-					var mesh = new THREE.Mesh(geom.geometry, material);
-					self.publish("addToScene", mesh);
+				processedCount++;
+
+				deferred.notify( processedCount / batches );
+
+				if (processedCount === batches) {
+					VIZI.Log("Overall worker time is " + (Date.now() - startTime) + "ms");
+					deferred.resolve();
 				}
-			});
 
-			VIZI.Log("Overall worker time is " + (Date.now() - startTime) + "ms");
-		}).done(function() {
-			deferred.resolve();
+				return f;
+			});
 		});
+		//Q.allSettled(batchPromises).then(function (promises) {
+		//	_.each(promises, function (promise) {
+		//		if (promise.state === "fulfilled") {
+		//			var value = promise.value;
+		//			var data = value.data;
+
+		//			//Not sure how reliable the send time is
+		//			var timeToSend = value.timeToSend;
+		//			var timeToArrive = value.timeToArrive;
+		//			var timeTaken = data.timeTaken;
+		//			var inputSize = data.inputSize;
+		//			var outputSize = data.outputSize;
+		//			var count = data.count;
+		//			var json = data.json;
+
+		//			VIZI.Log("Worker input sent in " + timeToSend + "ms");
+		//			VIZI.Log("Worker input size is " + inputSize);
+		//			VIZI.Log("Worker output received in " + timeToArrive + "ms");
+		//			VIZI.Log("Worker output size is " + outputSize);
+		//			VIZI.Log("Processed " + count + " features in " + timeTaken + "ms");
+
+		//			//VIZI.Log(json);
+
+		//			//TODO: Stop this locking up the browser
+		//			//No visible lock up at all when removed
+		//			var geom = loader.parse(json);
+		//			var mesh = new THREE.Mesh(geom.geometry, material);
+		//			self.publish("addToScene", mesh);
+		//		}
+		//	});
+
+		//	VIZI.Log("Overall worker time is " + (Date.now() - startTime) + "ms");
+		//}).done(function() {
+		//	deferred.resolve();
+		//});
 
 		return deferred.promise;
 	};

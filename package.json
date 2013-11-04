@@ -15,6 +15,6 @@
     "grunt-contrib-concat": "~0.3.0",
     "grunt-contrib-watch": "~0.5.3",
     "grunt-contrib-connect": "~0.5.0",
-    "grunt-notify": "~0.2.14"
+    "grunt-notify": "~0.2.15"
   }
 }

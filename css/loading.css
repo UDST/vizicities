@@ -102,7 +102,7 @@
 	width: 250px;
 	height: 50px;
 	margin: 40px 0 0;
-	background: rgba(0,0,0,0.1);
+	background: rgba(0, 0, 0, 0.1);
 	pointer-events: none;
 	overflow: hidden;
 }
@@ -114,13 +114,6 @@
 	background: #f5f5f5;
 	-webkit-transform: translate3d(-100%, 0, 0);
 	transform: translate3d(-100%, 0, 0);
-	-webkit-transition: -webkit-transform 0.1s linear;
-	transition: transform 0.1s linear;
+	-webkit-transition: -webkit-transform 0.5s linear;
+	transition: transform 0.5s linear;
 }
-
-/*.ui-loading-indicator::before {
-	-webkit-transition: -webkit-transform 5.4s linear 0.3s;
-	transition: transform 5.4s linear 0.3s;
-	-webkit-transform: translate3d(0, 0, 0);
-	transform: translate3d(0, 0, 0);
-}*/

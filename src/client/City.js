@@ -80,6 +80,9 @@
 		}).then(function() {
 			self.publish("loadingProgress", 0.4);
 
+			// TODO: Work out a way to use progress event of each promises to increment loading progress
+			// Perhaps by looping through each promises individually and working out progress fraction by num. of promises / amount processed
+
 			// Load objects using promises
 			var promises = [];
 
@@ -124,16 +127,12 @@
 
 		var startTime = Date.now();
 
-		var deferred = Q.defer();
-
 		this.fps = new VIZI.FPS();
 		this.rendererInfo = new VIZI.RendererInfo();
 
 		VIZI.Log("Finished intialising debug tools in " + (Date.now() - startTime) + "ms");
 
-		deferred.resolve();
-
-		return deferred.promise;
+		return Q.fcall(function() {});
 	};
 
 	// TODO: Move set up of core objects out to somewhere else
@@ -160,9 +159,11 @@
 
 		this.domEvents = new VIZI.DOMEvents();
 
-		VIZI.Log("Finished intialising DOM events in " + (Date.now() - startTime) + "ms");
+		this.domEvents.init().then(function(result) {
+			VIZI.Log("Finished intialising DOM events in " + (Date.now() - startTime) + "ms");
 
-		deferred.resolve();
+			deferred.resolve();
+		});
 
 		return deferred.promise;
 	};
@@ -172,16 +173,12 @@
 
 		var startTime = Date.now();
 
-		var deferred = Q.defer();
-
 		// Set up core components
 		this.floor = new VIZI.Floor();
 
 		VIZI.Log("Finished loading core objects in " + (Date.now() - startTime) + "ms");
 
-		deferred.resolve();
-
-		return deferred.promise;
+		return Q.fcall(function() {});
 	};
 
 	VIZI.City.prototype.loadBuildings = function(url) {
@@ -198,6 +195,9 @@
 			buildingManager.processFeaturesWorker(value.features).then(function(result) {
 				VIZI.Log("Finished loading buildings in " + (Date.now() - startTime) + "ms");
 				deferred.resolve(buildingManager);
+			}, undefined, function(progress) {
+				// Pass-through progress
+				deferred.notify(progress);
 			});
 			// buildingManager.processFeaturesWorker2(value.features);
 		}, function(error) {
