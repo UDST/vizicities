@@ -187,7 +187,7 @@
 					normals: normalsArray,
 					uvs: uvsArray,
 					faces: facesArray
-				}
+				};
 
 				var timeSent = Date.now();
 
@@ -241,61 +241,62 @@
 		// // TODO: Work out why this is causing some buildings not to get parsed
 		// // If I don't 
 		// batchPromises.forEach(function (f) {
-		// 	result = result.then(function(value) {
-		// 		var data = value.data;
+		//result = result.then(function(value) {
+		//	var data = value.data;
 
-		// 		VIZI.Log(data);
+		//	VIZI.Log(data);
 
-		// 		// Not sure how reliable the send time is
-		// 		var timeToSend = value.timeToSend;
-		// 		var timeToArrive = value.timeToArrive;
-		// 		var timeTaken = data.timeTaken;
-		// 		var inputSize = data.inputSize;
-		// 		var outputSize = data.outputSize;
-		// 		var count = data.count;
-		// 		var model = data.model;
+		//	// Not sure how reliable the send time is
+		//	var timeToSend = value.timeToSend;
+		//	var timeToArrive = value.timeToArrive;
+		//	var timeTaken = data.timeTaken;
+		//	var inputSize = data.inputSize;
+		//	var outputSize = data.outputSize;
+		//	var count = data.count;
+		//	var model = data.model;
 
-		// 		// Convert typed data back to arrays
-		// 		// model.vertices = Array.apply( [], model.vertices );
-		// 		// model.normals = Array.apply( [], model.normals );
-		// 		// // Wrap UVs within an array
-		// 		// // https://github.com/mrdoob/three.js/blob/master/examples/js/exporters/GeometryExporter.js#L231
-		// 		// model.uvs = [ Array.apply( [], model.uvs ) ];
-		// 		// model.faces = Array.apply( [], model.faces );
+		//	// Convert typed data back to arrays
+		//	// model.vertices = Array.apply( [], model.vertices );
+		//	// model.normals = Array.apply( [], model.normals );
+		//	// // Wrap UVs within an array
+		//	// // https://github.com/mrdoob/three.js/blob/master/examples/js/exporters/GeometryExporter.js#L231
+		//	// model.uvs = [ Array.apply( [], model.uvs ) ];
+		//	// model.faces = Array.apply( [], model.faces );
 
-		// 		totalReceivedTime += timeToArrive;
+		//	totalReceivedTime += timeToArrive;
 
-		// 		VIZI.Log("Worker input sent in " + timeToSend + "ms");
-		// 		VIZI.Log("Worker input size is " + inputSize);
-		// 		VIZI.Log("Worker output received in " + timeToArrive + "ms");
-		// 		VIZI.Log("Worker output size is " + outputSize);
-		// 		VIZI.Log("Processed " + count + " features in " + timeTaken + "ms");
+		//	VIZI.Log("Worker input sent in " + timeToSend + "ms");
+		//	VIZI.Log("Worker input size is " + inputSize);
+		//	VIZI.Log("Worker output received in " + timeToArrive + "ms");
+		//	VIZI.Log("Worker output size is " + outputSize);
+		//	VIZI.Log("Processed " + count + " features in " + timeTaken + "ms");
 
-		// 		// VIZI.Log(data.json.uvs);
-		// 		// VIZI.Log(data.uvsArray);
+		//	// VIZI.Log(data.json.uvs);
+		//	// VIZI.Log(data.uvsArray);
 
-		// 		// VIZI.Log(model);
+		//	// VIZI.Log(model);
 
-		// 		// TODO: Stop this locking up the browser
-		// 		// No visible lock up at all when removed
-		// 		var geom = loader.parse(model);
-		// 		var mesh = new THREE.Mesh(geom.geometry, material);
-		// 		self.publish("addToScene", mesh);
+		//	// TODO: Stop this locking up the browser
+		//	// No visible lock up at all when removed
+		//	var geom = loader.parse(model);
+		//	var mesh = new THREE.Mesh(geom.geometry, material);
+		//	self.publish("addToScene", mesh);
 
-		// 		processedCount++;
+		//	processedCount++;
 
-		// 		deferred.notify( processedCount / batches );
+		//	deferred.notify( processedCount / batches );
 
-		// 		if (processedCount === batches) {
-		// 			VIZI.Log("Average output received time is " + (totalReceivedTime / batches) + "ms");
-		// 			VIZI.Log("Overall worker time is " + (Date.now() - startTime) + "ms");
-		// 			worker.close();
-		// 			deferred.resolve();
-		// 		}
+		//	if (processedCount === batches) {
+		//		VIZI.Log("Average output received time is " + (totalReceivedTime / batches) + "ms");
+		//		VIZI.Log("Overall worker time is " + (Date.now() - startTime) + "ms");
+		//		worker.close();
+		//		deferred.resolve();
+		//	}
 
-		// 		return f;
-		// 	});
+		//	return f;
+		//});
 		// });
+
 		Q.allSettled(batchPromises).then(function (promises) {
 			var totalReceivedTime = 0;
 
