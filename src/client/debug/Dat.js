@@ -19,7 +19,7 @@
 	};
 
 	VIZI.Dat.prototype.addToDat = function(object, options) {
-		VIZI.Log("Adding object to dat.GUI");
+		VIZI.Log("Adding " + options.name + " to dat.GUI");
 
 		// Create folder
 		var folder = this.gui.addFolder(options.name);

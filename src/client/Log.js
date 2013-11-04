@@ -8,7 +8,7 @@
 	VIZI.Log = function() {
 		var args = Array.prototype.slice.call(arguments);
 
-		var timestamp = "[" + moment().format("h:mm:ss:SSS") + "]";
+		var timestamp = "[" + moment().format("HH:mm:ss.SSS") + "]";
 		args.unshift(timestamp);
 
 		if (console) {
