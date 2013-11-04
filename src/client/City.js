@@ -199,7 +199,6 @@
 				// Pass-through progress
 				deferred.notify(progress);
 			});
-			// buildingManager.processFeaturesWorker2(value.features);
 		}, function(error) {
 			console.error(error.stack);
 		}).done();
