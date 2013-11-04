@@ -192,7 +192,8 @@
 		buildingManager.load(url).then(function(value) {
 			VIZI.Log(value);
 			// buildingManager.processFeatures(value.features);
-			buildingManager.processFeaturesWorker(value.features).then(function(result) {
+			// buildingManager.processFeaturesWorker(value.features).then(function(result) {
+			buildingManager.processFeaturesWorkerInput("osm-buildings.js").then(function(result) {
 				VIZI.Log("Finished loading buildings in " + (Date.now() - startTime) + "ms");
 				deferred.resolve(buildingManager);
 			}, undefined, function(progress) {
