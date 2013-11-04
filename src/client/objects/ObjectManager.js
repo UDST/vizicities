@@ -55,6 +55,9 @@
 	
 	// TODO: Should be possible if geo functionality can be performed before / after the worker task
 	// TODO: Try and get rid of lock-up that occurs at beginning and end of worker process (possibly due to size of data being sent back and forth)
+	// TODO: Build objects as BufferGeometry for very easy export and messaging out of worker
+	// http://stackoverflow.com/questions/18262868/transforming-geometry-to-buffergeometry
+	// https://github.com/mrdoob/three.js/blob/f396baf5876eb41bcd2ee34eb65b1f97bb92d530/examples/js/exporters/BufferGeometryExporter.js
 	VIZI.ObjectManager.prototype.processFeaturesWorker = function(features) {
 		VIZI.Log("Processing features using worker");
 
@@ -77,7 +80,7 @@
 
 		// TODO: See if initialising this before calling processFeaturesWorker speeds things up
 		var worker = cw({
-			processDebug: function(features) {
+			processDebug: function(features, callback) {
 				var inputSize = JSON.stringify(features).length;
 
 				var startTime = Date.now();
@@ -93,9 +96,9 @@
 
 				var timeSent = Date.now();
 
-				return {json: exportedGeom, outputSize: outputSize, inputSize: inputSize, count: count, startTime: startTime, timeTaken: timeTaken, timeSent: timeSent};
+				callback({json: exportedGeom, outputSize: outputSize, inputSize: inputSize, count: count, startTime: startTime, timeTaken: timeTaken, timeSent: timeSent});
 			},
-			process: function(features) {
+			process: function(features, callback) {
 				importScripts("worker/three.min.js", "worker/GeometryExporter.js", "worker/underscore.min.js");
 
 				var inputSize = JSON.stringify(features).length;
@@ -168,20 +171,46 @@
 				// Work out how to reduce it
 				var outputSize = JSON.stringify(exportedGeom).length;
 
+				var verticesArray = new Float64Array( exportedGeom.vertices );
+				var normalsArray = new Float64Array( exportedGeom.normals );
+				// var colorsArray = new Float64Array( exportedGeom.colors );
+
+				// Seems to be manually set to have 1 array in the uvs array
+				// https://github.com/mrdoob/three.js/blob/master/examples/js/exporters/GeometryExporter.js#L231
+				var uvsArray = new Float64Array( exportedGeom.uvs[0] );
+				var facesArray = new Float64Array( exportedGeom.faces );
+
+				var model = {
+					metadata: exportedGeom.metadata,
+					colors: exportedGeom.colors,
+					vertices: verticesArray,
+					normals: normalsArray,
+					uvs: uvsArray,
+					faces: facesArray
+				}
+
 				var timeSent = Date.now();
 
-				return {json: exportedGeom, outputSize: outputSize, inputSize: inputSize, count: count, startTime: startTime, timeTaken: timeTaken, timeSent: timeSent};
+				// var data = exportedGeom;
+				// var data = {model: exportedGeom, outputSize: outputSize, inputSize: inputSize, count: count, startTime: startTime, timeTaken: timeTaken, timeSent: timeSent};
+				var data2 = {model: model, outputSize: outputSize, inputSize: inputSize, count: count, startTime: startTime, timeTaken: timeTaken, timeSent: timeSent};
+
+				// callback(data);
+				callback(data2, [model.vertices.buffer, model.normals.buffer, model.uvs.buffer, model.faces.buffer]);
+				// callback(data2);
 			}
 		});
 
 		var startTime = Date.now();
 
 		// TODO: Work out why this still locks up the browser (amount of data being transferred back from the worker? Is it quicker to create objects in the browser?)
+		// Solution: https://speakerdeck.com/mourner/high-performance-data-visualizations?slide=51
 		// TODO: See if simply batching objects and creating them in the browser is less sluggish for the browser
 		// TODO: Work out why not every feature is being returned in the promises (about 10–20 less than expected)
 
 		// Batch features
-		var batches = 20;
+		// 4 batches or below seems to stop the model.faces typed array from converting to a normal array
+		var batches = 8;
 		var featuresPerBatch = Math.ceil(features.length / batches);
 		var batchedMeshes = [];
 		var batchPromises = [];
@@ -196,8 +225,6 @@
 			batchPromises.push(this.workerPromise(worker, featuresBatch));
 		}
 
-		VIZI.Log(batchPromises.length);
-
 		var loader = new THREE.JSONLoader();
 		var material = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors});
 
@@ -208,82 +235,121 @@
 		// https://github.com/kriskowal/q#sequences
 
 		// Handle promises
-		var processedCount = 0;
-		var result = batchPromises[0];
-		batchPromises.forEach(function (f) {
-			result = result.then(function(value) {
-				var data = value.data;
+		// var processedCount = 0;
+		// var totalReceivedTime = 0;
+		// var result = batchPromises[0];
+		// // TODO: Work out why this is causing some buildings not to get parsed
+		// // If I don't 
+		// batchPromises.forEach(function (f) {
+		// 	result = result.then(function(value) {
+		// 		var data = value.data;
 
-				// Not sure how reliable the send time is
-				var timeToSend = value.timeToSend;
-				var timeToArrive = value.timeToArrive;
-				var timeTaken = data.timeTaken;
-				var inputSize = data.inputSize;
-				var outputSize = data.outputSize;
-				var count = data.count;
-				var json = data.json;
+		// 		VIZI.Log(data);
 
-				VIZI.Log("Worker input sent in " + timeToSend + "ms");
-				VIZI.Log("Worker input size is " + inputSize);
-				VIZI.Log("Worker output received in " + timeToArrive + "ms");
-				VIZI.Log("Worker output size is " + outputSize);
-				VIZI.Log("Processed " + count + " features in " + timeTaken + "ms");
+		// 		// Not sure how reliable the send time is
+		// 		var timeToSend = value.timeToSend;
+		// 		var timeToArrive = value.timeToArrive;
+		// 		var timeTaken = data.timeTaken;
+		// 		var inputSize = data.inputSize;
+		// 		var outputSize = data.outputSize;
+		// 		var count = data.count;
+		// 		var model = data.model;
 
-				// VIZI.Log(json);
+		// 		// Convert typed data back to arrays
+		// 		// model.vertices = Array.apply( [], model.vertices );
+		// 		// model.normals = Array.apply( [], model.normals );
+		// 		// // Wrap UVs within an array
+		// 		// // https://github.com/mrdoob/three.js/blob/master/examples/js/exporters/GeometryExporter.js#L231
+		// 		// model.uvs = [ Array.apply( [], model.uvs ) ];
+		// 		// model.faces = Array.apply( [], model.faces );
 
-				// TODO: Stop this locking up the browser
-				// No visible lock up at all when removed
-				var geom = loader.parse(json);
-				var mesh = new THREE.Mesh(geom.geometry, material);
-				self.publish("addToScene", mesh);
+		// 		totalReceivedTime += timeToArrive;
 
-				processedCount++;
+		// 		VIZI.Log("Worker input sent in " + timeToSend + "ms");
+		// 		VIZI.Log("Worker input size is " + inputSize);
+		// 		VIZI.Log("Worker output received in " + timeToArrive + "ms");
+		// 		VIZI.Log("Worker output size is " + outputSize);
+		// 		VIZI.Log("Processed " + count + " features in " + timeTaken + "ms");
 
-				deferred.notify( processedCount / batches );
+		// 		// VIZI.Log(data.json.uvs);
+		// 		// VIZI.Log(data.uvsArray);
 
-				if (processedCount === batches) {
-					VIZI.Log("Overall worker time is " + (Date.now() - startTime) + "ms");
-					deferred.resolve();
+		// 		// VIZI.Log(model);
+
+		// 		// TODO: Stop this locking up the browser
+		// 		// No visible lock up at all when removed
+		// 		var geom = loader.parse(model);
+		// 		var mesh = new THREE.Mesh(geom.geometry, material);
+		// 		self.publish("addToScene", mesh);
+
+		// 		processedCount++;
+
+		// 		deferred.notify( processedCount / batches );
+
+		// 		if (processedCount === batches) {
+		// 			VIZI.Log("Average output received time is " + (totalReceivedTime / batches) + "ms");
+		// 			VIZI.Log("Overall worker time is " + (Date.now() - startTime) + "ms");
+		// 			worker.close();
+		// 			deferred.resolve();
+		// 		}
+
+		// 		return f;
+		// 	});
+		// });
+		Q.allSettled(batchPromises).then(function (promises) {
+			var totalReceivedTime = 0;
+
+			_.each(promises, function (promise) {
+				if (promise.state === "fulfilled") {
+					var value = promise.value;
+					var data = value.data;
+
+					// VIZI.Log(data);
+
+					// Not sure how reliable the send time is
+					var timeToSend = value.timeToSend;
+					var timeToArrive = value.timeToArrive;
+					var timeTaken = data.timeTaken;
+					var inputSize = data.inputSize;
+					var outputSize = data.outputSize;
+					var count = data.count;
+					var model = data.model;
+
+					// Convert typed data back to arrays
+					model.vertices = Array.apply( [], model.vertices );
+					model.normals = Array.apply( [], model.normals );
+					// Wrap UVs within an array
+					// https://github.com/mrdoob/three.js/blob/master/examples/js/exporters/GeometryExporter.js#L231
+					model.uvs = [ Array.apply( [], model.uvs ) ];
+					model.faces = Array.apply( [], model.faces );
+
+					totalReceivedTime += timeToArrive;
+
+					VIZI.Log("Worker input sent in " + timeToSend + "ms");
+					VIZI.Log("Worker input size is " + inputSize);
+					VIZI.Log("Worker output received in " + timeToArrive + "ms");
+					VIZI.Log("Worker output size is " + outputSize);
+					VIZI.Log("Processed " + count + " features in " + timeTaken + "ms");
+
+					// VIZI.Log(data.json.uvs);
+					// VIZI.Log(data.uvsArray);
+
+					// VIZI.Log(model);
+
+					// TODO: Stop this locking up the browser
+					// No visible lock up at all when removed
+					var geom = loader.parse(model);
+					var mesh = new THREE.Mesh(geom.geometry, material);
+					self.publish("addToScene", mesh);
 				}
-
-				return f;
 			});
+			
+			VIZI.Log("Average output received time is " + (totalReceivedTime / batches) + "ms");
+			VIZI.Log("Overall worker time is " + (Date.now() - startTime) + "ms");
+		}).done(function() {
+			worker.close();
+			deferred.resolve();
 		});
-		//Q.allSettled(batchPromises).then(function (promises) {
-		//	_.each(promises, function (promise) {
-		//		if (promise.state === "fulfilled") {
-		//			var value = promise.value;
-		//			var data = value.data;
-
-		//			//Not sure how reliable the send time is
-		//			var timeToSend = value.timeToSend;
-		//			var timeToArrive = value.timeToArrive;
-		//			var timeTaken = data.timeTaken;
-		//			var inputSize = data.inputSize;
-		//			var outputSize = data.outputSize;
-		//			var count = data.count;
-		//			var json = data.json;
-
-		//			VIZI.Log("Worker input sent in " + timeToSend + "ms");
-		//			VIZI.Log("Worker input size is " + inputSize);
-		//			VIZI.Log("Worker output received in " + timeToArrive + "ms");
-		//			VIZI.Log("Worker output size is " + outputSize);
-		//			VIZI.Log("Processed " + count + " features in " + timeTaken + "ms");
-
-		//			//VIZI.Log(json);
-
-		//			//TODO: Stop this locking up the browser
-		//			//No visible lock up at all when removed
-		//			var geom = loader.parse(json);
-		//			var mesh = new THREE.Mesh(geom.geometry, material);
-		//			self.publish("addToScene", mesh);
-		//		}
-		//	});
-
-		//	VIZI.Log("Overall worker time is " + (Date.now() - startTime) + "ms");
-		//}).done(function() {
-		//	deferred.resolve();
-		//});
 
 		return deferred.promise;
 	};
