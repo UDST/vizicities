@@ -355,6 +355,8 @@
 		return deferred.promise;
 	};
 
+	// Likely not showing anything due to coordinates needed converting [line 370-376] (so actually is working but buildings are placed in a minute area)
+	// Coordinates need to be converted in the worker or within the osm-buildings.js file
 	VIZI.ObjectManager.prototype.processFeaturesWorkerInput = function(featuresUrl) {
 		VIZI.Log("Processing features using worker");
 
