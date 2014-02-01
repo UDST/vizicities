@@ -1,6 +1,6 @@
 # ViziCities Viewer
 
-*Introduction to ViziCities and what it is
+* Introduction to ViziCities and what it is
 
 ## Current features
 
