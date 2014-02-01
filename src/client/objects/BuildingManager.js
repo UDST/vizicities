@@ -10,6 +10,7 @@
 
 	VIZI.BuildingManager.prototype = Object.create( VIZI.ObjectManager.prototype );
 
+	// TODO: Utilise this when loading via Web Workers (right now it's not being called anywhere)
 	VIZI.BuildingManager.prototype.processFeature = function(feature) {
 		switch (feature.type) {
 			case "Feature":

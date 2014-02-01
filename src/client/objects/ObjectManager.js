@@ -45,7 +45,6 @@
 
 		var startTime = Date.now();
 		worker.process(features).then(function(data) {
-		//worker.processDebug({}).then(function(data) {
 			var timeToSend = data.startTime - startTime;
 			var timeToArrive = Date.now() - data.timeSent;
 			deferred.resolve({data: data, timeToArrive: timeToArrive, timeToSend: timeToSend});
@@ -61,6 +60,8 @@
 	// - Each worker processes features and passes a reference back using transferable objects
 	// - Features are added to scene for each completed worker promise
 
+	// TODO: Move feature definition and render options into separate class (eg. BuildingManager and Building)
+	//       - Right now, the generation of Three.js objects in this file is based on buildings
 	// TODO: Should be possible if geo functionality can be performed before / after the worker task
 	// TODO: Try and get rid of lock-up that occurs at beginning and end of worker process (possibly due to size of data being sent back and forth)
 	// TODO: Build objects as BufferGeometry for very easy export and messaging out of worker
@@ -112,7 +113,9 @@
 				var combinedGeom = new THREE.Geometry();
 
 				var count = 0;
-
+				
+				// TODO: Work out how to put feature-specific object generation in here
+				//       - eg. Buildings, rivers, roads, etc.
 				_.each(features, function(feature) {
 					var properties = feature.properties;
 
