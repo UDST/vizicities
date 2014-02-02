@@ -1,17 +1,72 @@
 # Contributing to ViziCities
 
-[Like Ghost](https://github.com/TryGhost/Ghost/blob/master/CONTRIBUTING.md)
+The fact that you're looking at this page makes us incredibly happy, we need your help to make ViziCities as good as we know it can be.
+
+There are multiple ways you can help:
+
+* [Submitting bugs](#bug-reports)
+* [Requesting new features](#feature-requests)
+* [Requesting changes to existing features](#change-requests)
+* [Submitting your own code to the project](#working-on-vizicities)
 
 ## Raising issues
 
+The majority of contributions will come from bug reports and feature requests. Please read the following guidelines so things can happen as quickly and smoothly as possible.
+
+In general, make sure that you [search for existing issues](https://github.com/robhawkes/vizicities/issues) and discussions __before__ posting something new. Dealing with unnecessary duplication takes valuable time away from working on the project. If in doubt, [post something in the ViziCities Google Group](https://groups.google.com/forum/#!forum/vizicities).
+
 ### Bug reports
+
+Found something wrong with an existing feature? [Submit a bug report](https://github.com/robhawkes/vizicities/issues/new) so it can be fixed.
+
+If you follow the template below then you'll make everyone really happy.
+
+```
+Short and descriptive example bug report title
+
+### Issue Summary
+
+A summary of the issue and the browser/OS environment in which it occurs. If
+suitable, include the steps required to reproduce the bug.
+
+### Steps to Reproduce
+
+1. This is the first step
+2. This is the second step
+3. Further steps, etc.
+
+Any other information you want to share that is relevant to the issue being
+reported. Especially, why do you consider this to be a bug? What do you expect to happen instead?
+
+### Technical details: 
+
+* ViziCities version: master (latest commit: c371147805bfaa448e973061be89c013ac867d15)
+* Client OS: Mac OS X 10.9.1
+* Node version: 0.10.0
+* Browser: Chrome 32.0.1700.77
+```
 
 ### Feature requests
 
+Got an idea for a new feature? Awesome! Double-checked to make sure it hasn't already been suggested? Even more awesome! Now you're ready to [submit a feature request](https://github.com/robhawkes/vizicities/issues/new). Make sure to provide as much detail as possible, focussing particularly on why this feature is needed (bonus points for example uses).
+
+If your idea isn't fully fleshed out yet then hold off on the feature request and [start a new topic in the ViziCities Google Group](https://groups.google.com/forum/#!forum/vizicities) &mdash; we'll put our heads together.
+
 ### Change requests
 
+Not happy with an existing feature, or think something could be tweaked? Check that it hasn't already been suggested and then [submit a change request](https://github.com/robhawkes/vizicities/issues/new).
 
-## Working on ViziCities
+## Submitting code to ViziCities
+
+If you want to submit code to the project, perhaps on one of the new features, then you can do so [via a pull request](https://github.com/robhawkes/vizicities/pulls). We're pretty relaxed about the process for now, though we'll be implementing testing and procedure as the project matures.
+
+Bear in mind the following to help things go smoothly and quickly:
+
+* Pull requests that don't relate to [an existing issue](https://github.com/robhawkes/vizicities/issues) will be ignored or put to the back of the queue
+* Submitted code should be clean (no mess) and roughly follow the coding conventions of the project
+* Submitted code should not break an existing feature
+
+If in doubt, [talk to us](https://github.com/robhawkes/vizicities#contact--community) and we'll help you through it.
 
 
 ## Contributor license agreement
