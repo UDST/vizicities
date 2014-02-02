@@ -16,13 +16,8 @@
 		this.ui = {};
 		this.ui.loading = undefined;
 
-		// Set up geo methods
-		this.geo = VIZI.Geo.getInstance({
-			areaCoords: {
-				bottomLeft: [-0.090062,51.489438],
-				topRight: [0.012322,51.519747]
-			}
-		});
+		// Geo methods
+		this.geo = undefined;
 			
 		// Basic WebGL components (scene, camera, renderer, lights, etc)
 		this.webgl = undefined;
@@ -53,12 +48,21 @@
 		}
 
 		_.defaults(options, {
+			areaCoords: {
+				bottomLeft: [-0.090062,51.489438],
+				topRight: [0.012322,51.519747]
+			}, 
 			buildings: true,
 			buildingsURL: null
 		});
 
 		// Output city options
 		VIZI.Log(options);
+
+		// Set up geo methods
+		self.geo = VIZI.Geo.getInstance({
+			areaCoords: options.areaCoords
+		});
 
 		// Load city using promises
 
