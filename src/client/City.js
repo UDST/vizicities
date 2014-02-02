@@ -54,8 +54,11 @@
 
 		_.defaults(options, {
 			buildings: true,
-			buildingsURL: "osm-buildings.json"
+			buildingsURL: null
 		});
+
+		// Output city options
+		VIZI.Log(options);
 
 		// Load city using promises
 
