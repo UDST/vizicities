@@ -1,13 +1,13 @@
 {
   "name": "ViziCities",
   "version": "0.1.0",
-  "description": "3D city visualisation",
+  "description": "3D city and data visualisation platform",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Robin Hawkes",
-  "license": "All Rights Reserved",
+  "author": "Robin Hawkes & Peter Smart",
+  "license": "MIT",
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-jshint": "~0.7.0",
