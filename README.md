@@ -20,9 +20,9 @@ Aside from seeing a city in 3D, here are some of the others things you'll have t
 
 ### Further information
 
-In 2013, Peter and Robin spoke in detail about ViziCities at Front Trends.
+In 2013, Peter and Robin [spoke in detail about ViziCities](https://vimeo.com/66495599) at Front Trends.
 
-<iframe src="http://player.vimeo.com/video/66495599" width="722" height="406" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+[![](https://secure-b.vimeocdn.com/ts/437/939/437939443_640.jpg)](https://vimeo.com/66495599)
 
 For more information you should start here:
 
