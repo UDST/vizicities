@@ -25,6 +25,10 @@
 * Building ViziCities with Grunt
 * Serving examples using Grunt
 
+### Data Formats
+
+* How to format data to be read by ViziCities
+
 ### Using ViziCities
 
 * Using the built in example
