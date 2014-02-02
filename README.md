@@ -69,10 +69,10 @@ cd /path/to/vizicities
 npm install
 ```
 
-#### Build ViziCities using Grunt
+#### Build ViziCities and watch for file changes using Grunt
 ```
 cd /path/to/vizicities
-grunt
+grunt dev
 ```
 
 #### Serve examples using Grunt
@@ -82,12 +82,6 @@ grunt serve
 ```
 
 Then open [http://127.0.0.1:8000/examples](http://127.0.0.1:8000/examples)
-
-#### Build ViziCities and watch for file changes using Grunt
-```
-cd /path/to/vizicities
-grunt dev
-```
 
 ### Data formats
 
@@ -106,6 +100,11 @@ ViziCities can't happen without your help. We need people to submit bugs, sugges
 ## Contact & community
 
 Communicate with the ViziCities team via email ([hello@vizicities.com](mailto:hello@vizicities.com)) and Twitter ([@ViziCities](http://twitter.com/ViziCities)). All other discussion should happen in the [ViziCities Google Group](https://groups.google.com/forum/#!forum/vizicities) or [relevant GitHub issues page](https://github.com/robhawkes/vizicities/issues).
+
+
+## Contributors
+
+[Robin Hawkes](http://twitter.com/robhawkes), [Peter Smart](http://twitter.com/petewsmart), [Matthew Harrison-Jones](http://twitter.com/matt_hojo)
 
 
 ## FAQ
