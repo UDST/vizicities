@@ -88,12 +88,14 @@ module.exports = function(grunt) {
 			server: {
 				options: {
 					port: port,
-					base: '.'
+					base: '.',
+					keepalive: true,
+					debug: true
 				}
 			}
 		},
 		notify: {
-			connect: {
+			watch: {
 				options: {
 					// title: 'Watching files',  // optional
 					message: 'Watching for changes' //required
@@ -128,8 +130,10 @@ module.exports = function(grunt) {
 	grunt.registerTask('default', ['jshint', 'concat', 'notify:finish']);
 
 	// Serve examples locally
-	grunt.registerTask('serve', ['connect', 'notify:connect', 'watch']);
+	grunt.registerTask('serve', ['connect']);
+
+	// Build files and refresh content on file changes
+	grunt.registerTask('dev', ['default', 'notify:watch', 'watch']);
 
 	grunt.task.run('notify_hooks');
-
 };

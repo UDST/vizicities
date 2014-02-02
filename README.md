@@ -83,6 +83,12 @@ grunt serve
 
 Then open [http://127.0.0.1:8000/examples](http://127.0.0.1:8000/examples)
 
+#### Build ViziCities and watch for file changes using Grunt
+```
+cd /path/to/vizicities
+grunt dev
+```
+
 ### Data formats
 
 Visualising geographic features lies at the core of ViziCities. To make sure features render correctly you'll need to [use the correct data formats](https://github.com/robhawkes/vizicities/blob/master/DATA-FORMATTING.md).
