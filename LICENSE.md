@@ -1,0 +1,2 @@
+# ViziCities License
+

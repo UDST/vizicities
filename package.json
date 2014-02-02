@@ -1,6 +1,6 @@
 {
   "name": "ViziCities",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "3D city visualisation",
   "main": "index.js",
   "scripts": {

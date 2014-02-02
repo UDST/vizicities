@@ -1,14 +1,31 @@
-# ViziCities Viewer
+# ViziCities
 
 * Introduction to ViziCities and what it is
 
-## Current features
+## Current Features
 
-## Future features
+## Future Features
 
-## Getting started
+## Getting Started
 
-## Getting involved
+* Installing Grunt
+* Installing NPM packages
+* Building ViziCities with Grunt
+* Serving examples using Grunt
 
-* Contributions
-* Feature requests
+## Getting Involved
+
+* Overview of contribution methods
+* Link to contribution details, [like Ghost](https://github.com/TryGhost/Ghost#getting-involved)
+
+## Community
+
+* Where to find ViziCities devs and community, [like Ghost](https://github.com/TryGhost/Ghost#community)
+
+## Versioning
+
+* Potentially use [Ghost versioning text](https://github.com/TryGhost/Ghost#versioning)
+
+## Copyright & License
+
+* Paste license here
