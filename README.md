@@ -4,7 +4,14 @@
 
 ## Current Features
 
+### 0.1.0
+
+* Buildings
+* Processing of geographic features into 3D objects using Web Workers
+
 ## Future Features
+
+* Tests and build status (TravisCI)
 
 ## Getting Started
 
