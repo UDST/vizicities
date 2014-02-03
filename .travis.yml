@@ -4,9 +4,4 @@ node_js:
 before_install:
   - npm install -g grunt-cli
 notifications:
-  email:
-    recipients:
-      - robin@vizicities.com
-    on_success: always
-    on_failure: always
   irc: "chat.eu.freenode.net#vizicities"
