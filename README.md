@@ -1,4 +1,4 @@
-# ViziCities <a href="https://magnum.travis-ci.com/robhawkes/vizicities" style="float: right"><img src="https://magnum.travis-ci.com/robhawkes/vizicities.png?token=RuiyUr4VxmxkBfNHP9YA&branch=master" title="Build status"></a>
+# ViziCities [![Build Status](https://magnum.travis-ci.com/robhawkes/vizicities.png?token=RuiyUr4VxmxkBfNHP9YA&branch=master)](https://magnum.travis-ci.com/robhawkes/vizicities)
 __Bringing cities to life using the power of open data and the Web__
 
 ![](http://f.cl.ly/items/0r0u0t1c2g1o3U1y3r2x/vizicities-combined-ssao.jpg)
