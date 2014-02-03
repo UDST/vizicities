@@ -135,5 +135,8 @@ module.exports = function(grunt) {
 	// Build files and refresh content on file changes
 	grunt.registerTask('dev', ['default', 'notify:watch', 'watch']);
 
+	// Run tests
+	grunt.registerTask('test', ['jshint']);
+	
 	grunt.task.run('notify_hooks');
 };
