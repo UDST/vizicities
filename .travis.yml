@@ -7,9 +7,8 @@ notifications:
   irc: "chat.eu.freenode.net#vizicities"
   webhooks:
     urls:
-      - http://surveyor-hubot.apps.rawk.es/hubot/travis?room=1
+      - http://surveyor-hubot.apps.rawk.es/hubot/travis?room=%23vizicities
       - http://requestb.in/1gwc0by1
-      - http://requestb.in/12345678
     on_success: always
     on_failure: always
     on_start: true
