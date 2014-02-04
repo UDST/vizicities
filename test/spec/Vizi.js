@@ -1,9 +1,9 @@
 describe("VIZI", function() {
-	it("Added to window global", function() {
+	it("is added to window global", function() {
 		expect(window.VIZI).to.exist;
 	});
 
-	it("Version number exists", function() {
+	it("has a version number", function() {
 		expect(VIZI.VERSION).to.exist;
 	});
 });
