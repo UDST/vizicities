@@ -5,3 +5,4 @@ before_install:
   - npm install -g grunt-cli
 notifications:
   irc: "chat.eu.freenode.net#vizicities"
+  webhooks: http://surveyor-hubot.apps.rawk.es/hubot/travis?room=1
