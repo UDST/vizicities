@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+		<title>ViziCities Mocha Tests</title>
+		<link href="../node_modules/mocha/mocha.css" media="screen" rel="stylesheet" type="text/css" />
+	</head>
+	<body>
+			<div id="mocha"></div>
+
+			<!-- Dependencies -->
+			<script src="../node_modules/mocha/mocha.js"></script>
+			<script src="../node_modules/chai/chai.js"></script>
+			<script>
+				mocha.ui('bdd');
+				mocha.reporter('html');
+				expect = chai.expect;
+			</script>
+
+			<!-- Source files -->
+			<script src="../src/client/Vizi.js"></script>
+	
+			<!-- Tests -->		
+			<script src="spec/Vizi.js"></script>
+
+			<!-- Run Mocha -->
+			<script>
+				(window.mochaPhantomJS || window.mocha).run();
+			</script>
+	</body>
+</html>

@@ -75,6 +75,9 @@ module.exports = function(grunt) {
 			},
 			files: [ 'Gruntfile.js', 'src/**' ]
 		},
+		mocha_phantomjs: {
+			files: ['test/*.html']
+		},
 		watch: {
 			main: {
 				files: [ 'Gruntfile.js', 'src/**', 'examples/**' ],
@@ -124,6 +127,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-connect');
 	grunt.loadNpmTasks('grunt-notify');
+	grunt.loadNpmTasks('grunt-mocha-phantomjs');
 
 	// Default task(s).
 	// grunt.registerTask('default', ['jshint', 'concat', 'uglify', 'notify:finish']);
@@ -136,7 +140,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('dev', ['default', 'notify:watch', 'watch']);
 
 	// Run tests
-	grunt.registerTask('test', ['jshint']);
+	grunt.registerTask('test', ['jshint', 'mocha_phantomjs']);
 	
 	grunt.task.run('notify_hooks');
 };
