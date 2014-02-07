@@ -11,7 +11,7 @@ There are multiple ways you can help:
 
 ## Raising issues
 
-The majority of contributions will come from bug reports and feature requests. Please read the following guidelines so things can happen as quickly and smoothly as possible.
+The majority of contributions will come from bug reports and feature requests. Please read the following guidelines so things can happen as quickly and smoothly as possible. Also, it's a good idea to [use the right tags](https://github.com/robhawkes/vizicities/wiki/Which-issue-tags-to-use-and-when/) when creating an issue.
 
 In general, make sure that you [search for existing issues](https://github.com/robhawkes/vizicities/issues) and discussions __before__ posting something new. Dealing with unnecessary duplication takes valuable time away from working on the project. If in doubt, [post something in the ViziCities Google Group](https://groups.google.com/forum/#!forum/vizicities).
 
