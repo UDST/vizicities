@@ -37,12 +37,11 @@ For more information you should start here:
 
 * Buildings
 * Processing of geographic features into 3D objects using Web Workers
-
+* Basic tests and build status using Travis CI
 
 ## Future features
 
 * Dynamic city loading using OpenStreetMap data
-* Tests and build status (TravisCI)
 
 
 ## Getting started
