@@ -184,30 +184,6 @@
 		return Q.fcall(function() {});
 	};
 
-	VIZI.City.prototype.loadBuildings = function(url) {
-		VIZI.Log("Loading buildings");
-
-		var startTime = Date.now();
-
-		var deferred = Q.defer();
-
-		var buildingManager = new VIZI.BuildingManager();
-		buildingManager.load(url).then(function(value) {
-			VIZI.Log(value);
-			buildingManager.processFeaturesWorker(value.features).then(function(result) {
-				VIZI.Log("Finished loading buildings in " + (Date.now() - startTime) + "ms");
-				deferred.resolve(buildingManager);
-			}, undefined, function(progress) {
-				// Pass-through progress
-				deferred.notify(progress);
-			});
-		}, function(error) {
-			console.error(error.stack);
-		}).done();
-
-		return deferred.promise;
-	};
-
 	VIZI.City.prototype.loadOverpass = function() {
 		VIZI.Log("Loading data from OSM Overpass API");
 

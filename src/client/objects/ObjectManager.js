@@ -11,20 +11,6 @@
 		this.combinedObjects = undefined;
 	};
 
-	VIZI.ObjectManager.prototype.load = function(url) {
-		var deferred = Q.defer();
-
-		d3.json(url, function(error, data) {
-			if (error) {
-				deferred.reject(new Error(error));
-			} else {
-				deferred.resolve(data);
-			}
-		});
-
-		return deferred.promise;
-	};
-
 	// TODO: Convert to a promise
 	VIZI.ObjectManager.prototype.processFeatures = function(features) {
 		var startTime = Date.now();
