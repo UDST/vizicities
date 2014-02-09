@@ -19,6 +19,6 @@ describe("Mediator", function() {
 		VIZI.Mediator.subscribe("test_topic", spy);
 		VIZI.Mediator.publish("test_topic", message);
 
-		assert.equal(message, spy.args[0][0]);
+		expect(spy).to.have.been.calledWith(message);
 	});
 });

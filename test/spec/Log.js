@@ -17,14 +17,12 @@ describe("Log", function() {
 	it("runs `Log` function", function() {
 
 		VIZI.Log("arg1", "arg2", "arg3");
-
-		assert.equal(spy.called, true);
+		expect(spy).to.have.been.called;
 	});
 
 	it("accepts and sets arguments correctly", function() {
 
 		VIZI.Log("arg1", 2, {"arg": 3});
-
-		assert.deepEqual(spy.args[0], ["arg1", 2, {"arg": 3}]);
+		expect(spy).to.have.been.calledWithExactly("arg1", 2, {"arg": 3});
 	});
 });

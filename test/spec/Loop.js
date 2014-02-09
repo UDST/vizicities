@@ -26,7 +26,7 @@ describe("Loop", function() {
 		loop.stop(); // Stop default loop
 		loop.start();
 
-		assert.equal(spy.called, true);
+		expect(spy).to.have.been.called;
 		assert.equal(loop.stopLoop, false);
 		
 		loop.stop();
@@ -37,7 +37,7 @@ describe("Loop", function() {
 		loop.start();
 		loop.stop();
 
-		assert.equal(spy.called, true);
+		expect(spy).to.have.been.called;
 	});
 
 	it("stops loop", function() {
@@ -45,7 +45,7 @@ describe("Loop", function() {
 		loop.start();
 		loop.stop();
 
-		assert.equal(spy.called, true);
+		expect(spy).to.have.been.called;
 		assert.equal(loop.stopLoop, true);
 	});
 });
