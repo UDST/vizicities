@@ -75,19 +75,6 @@
 
 		var geo = VIZI.Geo.getInstance();
 
-		// Convert coordinates
-		var coordinateTime = Date.now();
-
-		_.each(features, function(feature) {
-			var coords = feature.geometry.coordinates[0];
-			feature.geometry.coordinatesConverted = [[]];
-			_.each(coords, function(coord) {
-				feature.geometry.coordinatesConverted[0].push(geo.projection(coord));
-			});
-		});
-
-		VIZI.Log("Converting coordinates: " + (Date.now() - coordinateTime));
-
 		// TODO: See if initialising this before calling processFeaturesWorker speeds things up
 		var worker = cw({
 			process: function(features, callback) {
@@ -108,7 +95,10 @@
 					} );
 				};
 
-				var colour = new THREE.Color(0xcccccc);
+				//var colour = new THREE.Color(0xcccccc);
+
+				// Use random colour per worker to show grouping of objects
+				var colour = new THREE.Color(0xFFFFFF * Math.random());
 
 				var combinedGeom = new THREE.Geometry();
 
@@ -119,26 +109,32 @@
 				_.each(features, function(feature) {
 					var properties = feature.properties;
 
-					var area = properties.area;
+					// var area = properties.area;
 
-					// Skip if building area is too small
-					if (area < 200) {
-						return;
-					}
+					// // Skip if building area is too small
+					// if (area < 200) {
+					// return;
+					// }
 					
-					var coords = feature.geometry.coordinatesConverted[0];
+					var offset = [];
+					var coords = feature.coordinates;
 					var shape = new THREE.Shape();
 					_.each(coords, function(coord, index) {
+						if (offset.length === 0) {
+							offset[0] = -1 * coord[0];
+							offset[1] = -1 * coord[1];
+						}
+
 						// Move if first coordinate
 						if (index === 0) {
-							shape.moveTo( coord[0], coord[1] );
+							shape.moveTo( coord[0] + offset[0], coord[1] + offset[1] );
 						} else {
-							shape.lineTo( coord[0], coord[1] );
+							shape.lineTo( coord[0] + offset[0], coord[1] + offset[1] );
 						}
 					});
 
-					//var height = 10 * this.geo.pixelsPerMeter;
-					var height = 10;
+					// Height value is in meters
+					var height = properties.height;
 
 					var extrudeSettings = { amount: height, bevelEnabled: false };
 					var geom = new THREE.ExtrudeGeometry( shape, extrudeSettings );
@@ -150,6 +146,10 @@
 
 					mesh.position.y = height;
 
+					// Offset building
+					mesh.position.x = -1 * offset[0];
+					mesh.position.z = -1 * offset[1];
+
 					// Flip buildings as they are up-side down
 					mesh.rotation.x = 90 * Math.PI / 180;
 
@@ -157,6 +157,9 @@
 
 					count++;
 				});
+
+				// Move merged geom to 0,0 and return offset
+				var offset = THREE.GeometryUtils.center( combinedGeom );
 
 				var timeTaken = Date.now() - startTime;
 				var exportedGeom = exporter.parse(combinedGeom);
@@ -186,7 +189,7 @@
 
 				var timeSent = Date.now();
 
-				var data = {model: model, outputSize: outputSize, inputSize: inputSize, count: count, startTime: startTime, timeTaken: timeTaken, timeSent: timeSent};
+				var data = {model: model, offset: offset, outputSize: outputSize, inputSize: inputSize, count: count, startTime: startTime, timeTaken: timeTaken, timeSent: timeSent};
 
 				// Send exported geom back to worker manager
 				// Second parameter contains reference to typed arrays as transferable objects
@@ -238,6 +241,7 @@
 					var outputSize = data.outputSize;
 					var count = data.count;
 					var model = data.model;
+					var offset = data.offset;
 
 					// Convert typed data back to arrays
 					model.vertices = Array.apply( [], model.vertices );
@@ -259,6 +263,13 @@
 					// No visible lock up at all when removed
 					var geom = loader.parse(model);
 					var mesh = new THREE.Mesh(geom.geometry, material);
+
+					// Use previously calculated offset to return merged mesh to correct position
+					// This allows frustum culling to work correctly
+					mesh.position.x = -1 * offset.x;
+					mesh.position.y = -1 * offset.y;
+					mesh.position.z = -1 * offset.z;
+
 					self.publish("addToScene", mesh);
 				}
 			});

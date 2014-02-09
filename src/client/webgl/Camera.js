@@ -2,7 +2,7 @@
 (function() {
 	"use strict";
 
-	VIZI.Camera = function() {
+	VIZI.Camera = function(pos) {
 		VIZI.Log("Inititialising WebGL camera");
 
 		_.extend(this, VIZI.Mediator);
@@ -11,12 +11,12 @@
 		this.theta = 45; // Horizontal orbit
 		this.onMouseDownTheta = 45;
 		this.phi = 80; // Vertical oribt
-		this.onMouseDownPhi = 80;
+		this.onMouseDownPhi = 80;	
 
 		this.target = new THREE.Object3D();
+		this.updateTargetPositon(pos);
 
 		this.camera = this.createCamera();
-
 		this.lookAtTarget();
 
 		this.publish("addToScene", this.camera);
@@ -34,13 +34,19 @@
 		return camera;
 	};
 
+	// TODO: Why is a camera object being passed in?
 	VIZI.Camera.prototype.updatePosition = function(camera) {
 		camera = (camera) ? camera : this.camera;
 
-		camera.position.x = this.cameraRadius * Math.sin( this.theta * Math.PI / 360 ) * Math.cos( this.phi * Math.PI / 360 );
-		camera.position.y = this.cameraRadius * Math.sin( this.phi * Math.PI / 360 );
-		camera.position.z = this.cameraRadius * Math.cos( this.theta * Math.PI / 360 ) * Math.cos( this.phi * Math.PI / 360 );
+		camera.position.x = this.target.position.x + this.cameraRadius * Math.sin( this.theta * Math.PI / 360 ) * Math.cos( this.phi * Math.PI / 360 );
+		camera.position.y = this.target.position.y + this.cameraRadius * Math.sin( this.phi * Math.PI / 360 );
+		camera.position.z = this.target.position.z + this.cameraRadius * Math.cos( this.theta * Math.PI / 360 ) * Math.cos( this.phi * Math.PI / 360 );
 		camera.updateMatrix();
+	};
+
+	VIZI.Camera.prototype.updateTargetPositon = function(pos) {
+		this.target.position.x = pos[0];
+		this.target.position.z = pos[1];
 	};
 
 	VIZI.Camera.prototype.lookAtTarget = function() {

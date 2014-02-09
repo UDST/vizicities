@@ -4,25 +4,68 @@
 
 	VIZI.Geo = (function() {
 		var Geo = function(options) {
-			this.projection = this.setProjection(options.areaCoords);
+			// Meters per degree latitude
+			// Given radius of earth is 6378137 meters
+			// (2 * Math.PI / 360) * 6378137 = 111319.49079327357
+			// From: http://stackoverflow.com/a/7478827/997339
+			this.metersPerLat = 111319.49;
+
+			this.tileSize = 256;
+			this.tileZoom = 14;
+
+			this.projection = this.setProjection();
 			this.pixelsPerMeter = this.setPixelsPerMeter();
+
+			// Center of view (different to projection.center())
+			this.center = options.center || [0, 0];
+			this.centerPixels = this.projection(this.center);
+			this.bounds = this.getBounds(this.center);
 		};
 
-		Geo.prototype.setProjection = function(areaCoords) {
+		Geo.prototype.setProjection = function() {
 			return d3.geo.mercator()
-				.center([
-					areaCoords.bottomLeft[0] + (areaCoords.topRight[0] - areaCoords.bottomLeft[0]) / 2, 
-					areaCoords.bottomLeft[1] + (areaCoords.topRight[1] - areaCoords.bottomLeft[1]) / 2
-				]) // Geographic coordinates of map centre
+				.center([0, 0]) // Geographic coordinates of map centre
 				.translate([0, 0]) // Pixel coordinates of .center()
-				.scale(10000000);
+				// Scale is the pixel width of the entire world when projected using the mercator projection.
+				// So, if your json data had outlines for the whole world – spanning from lat/lng -180,90 to 
+				// latLng 180,-90 – and if someScale was 1024, then the world would be drawn such that it exactly 
+				// fits within a 1024x1024-pixel square.
+				// http://stackoverflow.com/a/13277197/997339
+				//.scale(256 * Math.pow(2, 14)); // Map width = tileSize * Math.pow(2, zoom)
+				// Bitwise method
+				// "Bitwise shifting any number x to the left by y bits yields x * 2^y."
+				// From: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators#<<_(Left_shift)
+				// Map width (scale) = tilesize << zoom
+				.scale(this.tileSize << this.tileZoom);
 		};
 
 		// TODO: Stop using London as a base for this
+		// Pixel-per-meter: http://wiki.openstreetmap.org/wiki/Zoom_levels
 		Geo.prototype.setPixelsPerMeter = function() {
-			var metersPerLat = 111200;
 			var pixelsPerLat = this.projection([0, 50])[1] - this.projection([0, 51])[1];
-			return pixelsPerLat / metersPerLat;
+			return pixelsPerLat / this.metersPerLat;
+		};
+
+		// Return geographic boundary around given coordindate
+		Geo.prototype.getBounds = function(coords, distance) {
+			// Distance in degrees to calculate bounds from center
+			// Default is around 1km each direction
+			var distanceLat = distance || 0.009;
+			var distanceLon = distanceLat * 2;
+
+			var bounds = {
+				n: this.decimalPlaces(coords[1] + distanceLat),
+				e: this.decimalPlaces(coords[0] + distanceLon),
+				s: this.decimalPlaces(coords[1] - distanceLat),
+				w: this.decimalPlaces(coords[0] - distanceLat)
+			};
+
+			return bounds;
+		};
+
+		Geo.prototype.decimalPlaces = function(num, places) {
+			places = places || 5;
+			return parseFloat(num.toFixed(places));
 		};
 
 		var instance;

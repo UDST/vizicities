@@ -18,6 +18,9 @@
 
 		// Geo methods
 		this.geo = undefined;
+
+		// Data gathering and processing
+		this.data = undefined;
 			
 		// Basic WebGL components (scene, camera, renderer, lights, etc)
 		this.webgl = undefined;
@@ -27,9 +30,6 @@
 
 		// Core city-scene objects (floor, skybox, etc)
 		this.floor = undefined;
-
-		// References to standard city features
-		this.buildings = undefined;
 
 		// Main application loop
 		this.loop = undefined;
@@ -48,12 +48,7 @@
 		}
 
 		_.defaults(options, {
-			areaCoords: {
-				bottomLeft: [-0.090062,51.489438],
-				topRight: [0.012322,51.519747]
-			}, 
-			buildings: true,
-			buildingsURL: null
+			coords: [-0.01924, 51.50358]
 		});
 
 		// Output city options
@@ -61,8 +56,11 @@
 
 		// Set up geo methods
 		self.geo = VIZI.Geo.getInstance({
-			areaCoords: options.areaCoords
+			center: options.coords
 		});
+
+		// Set up data loader
+		self.data = new VIZI.DataOverpass();
 
 		// Load city using promises
 
@@ -96,10 +94,8 @@
 			// Load core city objects
 			promises.push(self.loadCoreObjects());
 
-			// Load buildings
-			if (options.buildings) {
-				promises.push(self.loadBuildings(options.buildingsURL));
-			}
+			// Load data from the OSM Overpass API
+			promises.push(self.loadOverpass());
 
 			return Q.allSettled(promises);
 		}).then(function (results) {
@@ -150,7 +146,7 @@
 		
 		this.webgl = new VIZI.WebGL();
 
-		this.webgl.init().then(function(result) {
+		this.webgl.init(this.geo.centerPixels).then(function(result) {
 			VIZI.Log("Finished intialising WebGL in " + (Date.now() - startTime) + "ms");
 
 			deferred.resolve();
@@ -200,6 +196,29 @@
 			VIZI.Log(value);
 			buildingManager.processFeaturesWorker(value.features).then(function(result) {
 				VIZI.Log("Finished loading buildings in " + (Date.now() - startTime) + "ms");
+				deferred.resolve(buildingManager);
+			}, undefined, function(progress) {
+				// Pass-through progress
+				deferred.notify(progress);
+			});
+		}, function(error) {
+			console.error(error.stack);
+		}).done();
+
+		return deferred.promise;
+	};
+
+	VIZI.City.prototype.loadOverpass = function() {
+		VIZI.Log("Loading data from OSM Overpass API");
+
+		var startTime = Date.now();
+
+		var deferred = Q.defer();
+
+		var buildingManager = new VIZI.BuildingManager();
+		this.data.update().then(function(features) {
+			buildingManager.processFeaturesWorker(features).then(function(result) {
+				VIZI.Log("Finished loading Overpass data in " + (Date.now() - startTime) + "ms");
 				deferred.resolve(buildingManager);
 			}, undefined, function(progress) {
 				// Pass-through progress
