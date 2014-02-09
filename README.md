@@ -35,13 +35,12 @@ For more information you should start here:
 
 ### 0.1.0
 
+* Dynamic city loading using OpenStreetMap data
 * Buildings
 * Processing of geographic features into 3D objects using Web Workers
 * Basic tests and build status using Travis CI
 
 ## Future features
-
-* Dynamic city loading using OpenStreetMap data
 
 
 ## Getting started
