@@ -191,11 +191,11 @@
 
 		var deferred = Q.defer();
 
-		var buildingManager = new VIZI.BuildingManager();
+		var objectManager = new VIZI.ObjectManager();
 		this.data.update().then(function(features) {
-			buildingManager.processFeaturesWorker(features).then(function(result) {
+			objectManager.processFeaturesWorker(features).then(function(result) {
 				VIZI.Log("Finished loading Overpass data in " + (Date.now() - startTime) + "ms");
-				deferred.resolve(buildingManager);
+				deferred.resolve(objectManager);
 			}, undefined, function(progress) {
 				// Pass-through progress
 				deferred.notify(progress);

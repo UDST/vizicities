@@ -81,10 +81,11 @@
 					} );
 				};
 
-				//var colour = new THREE.Color(0xcccccc);
+				// Default colour
+				var colour = new THREE.Color(0xFF87FC);
 
 				// Use random colour per worker to show grouping of objects
-				var colour = new THREE.Color(0xFFFFFF * Math.random());
+				// var colour = new THREE.Color(0xFFFFFF * Math.random());
 
 				var combinedGeom = new THREE.Geometry();
 
@@ -125,7 +126,8 @@
 					var extrudeSettings = { amount: height, bevelEnabled: false };
 					var geom = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 
-					applyVertexColors( geom, colour );
+					var elementColour = (properties.colour) ? new THREE.Color(properties.colour) : colour;
+					applyVertexColors( geom, elementColour );
 
 					geom.computeFaceNormals();
 					var mesh = new THREE.Mesh(geom);
@@ -192,7 +194,8 @@
 
 		// Batch features
 		// 4 batches or below seems to stop the model.faces typed array from converting to a normal array
-		var batches = 8;
+		// Ideal 8 batches, if odd then subtract difference to make featuresPerBatch division clean
+		var batches = 8 - (features.length % 8);
 		var featuresPerBatch = Math.ceil(features.length / batches);
 		var batchPromises = [];
 
