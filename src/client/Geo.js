@@ -11,15 +11,16 @@
 			this.metersPerLat = 111319.49;
 
 			this.tileSize = 256;
-			this.tileZoom = 14;
+			this.tileZoom = 16;
 
 			this.projection = this.setProjection();
-			this.pixelsPerMeter = this.setPixelsPerMeter();
 
 			// Center of view (different to projection.center())
 			this.center = options.center || [0, 0];
 			this.centerPixels = this.projection(this.center);
 			this.bounds = this.getBounds(this.center);
+
+			this.pixelsPerMeter = this.setPixelsPerMeter();
 		};
 
 		Geo.prototype.setProjection = function() {
@@ -43,6 +44,7 @@
 		// Pixel-per-meter: http://wiki.openstreetmap.org/wiki/Zoom_levels
 		Geo.prototype.setPixelsPerMeter = function() {
 			var pixelsPerLat = this.projection([0, 50])[1] - this.projection([0, 51])[1];
+			// var pixelsPerLat = 6378137 * Math.cos(this.center[1])/Math.pow((this.tileZoom + 8), 2);
 			return pixelsPerLat / this.metersPerLat;
 		};
 
@@ -65,7 +67,7 @@
 
 		Geo.prototype.decimalPlaces = function(num, places) {
 			places = places || 5;
-			return parseFloat(num.toFixed(places));
+			return parseFloat(num).toFixed(places);
 		};
 
 		var instance;

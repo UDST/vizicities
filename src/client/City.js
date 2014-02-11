@@ -19,6 +19,9 @@
 		// Geo methods
 		this.geo = undefined;
 
+		// Grid manager
+		this.grid = undefined;
+
 		// Data gathering and processing
 		this.data = undefined;
 			
@@ -59,8 +62,8 @@
 			center: options.coords
 		});
 
-		// Set up data loader
-		self.data = new VIZI.DataOverpass();
+		// Set up grid manager
+		self.grid = VIZI.Grid.getInstance();
 
 		// Load city using promises
 
@@ -84,6 +87,14 @@
 			return self.initDOMEvents();
 		}).then(function() {
 			self.publish("loadingProgress", 0.4);
+
+			// Initialise grid manager
+			return self.initGrid();
+		}).then(function() {
+			self.publish("loadingProgress", 0.5);
+
+			// Set up data loader
+			self.data = new VIZI.DataOverpass();
 
 			// TODO: Work out a way to use progress event of each promises to increment loading progress
 			// Perhaps by looping through each promises individually and working out progress fraction by num. of promises / amount processed
@@ -164,6 +175,20 @@
 
 		this.domEvents.init().then(function(result) {
 			VIZI.Log("Finished intialising DOM events in " + (Date.now() - startTime) + "ms");
+
+			deferred.resolve();
+		});
+
+		return deferred.promise;
+	};
+
+	VIZI.City.prototype.initGrid = function() {
+		var startTime = Date.now();
+
+		var deferred = Q.defer();
+
+		this.grid.init(this.geo.center).then(function(result) {
+			VIZI.Log("Finished intialising grid manager in " + (Date.now() - startTime) + "ms");
 
 			deferred.resolve();
 		});

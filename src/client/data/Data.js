@@ -8,6 +8,9 @@
 		// Reference to geo class
 		this.geo = VIZI.Geo.getInstance();
 
+		// Reference to grid class
+		this.grid = VIZI.Grid.getInstance();
+
 		// URL of data source
 		this.url = "";
 
@@ -32,7 +35,7 @@
 		// Replace URL placeholders with parameter values
 		var url = this.url.replace(/\{([swne])\}/g, function(value, key) {
 			// Replace with paramter, otherwise keep existing value
-			return parameters[key] || value;
+			return parameters[key];
 		});
 
 		// Request data and fulfil promise 

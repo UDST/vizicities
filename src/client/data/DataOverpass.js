@@ -7,6 +7,10 @@
 
 		VIZI.Data.call(this);
 
+		// TODO: It's entirely possible that these queries are picking up duplicate ways. Need to look into it.
+		// TODO: Ways that cross over tile boundaries will likely get picked up by a query for each tile. Look into that.
+		// OSM Buildings handles this by not rendering items with an id that it already knows about
+		// https://github.com/kekscom/osmbuildings/blob/master/src/Data.js#L59
 		this.query = "[out:json];" +
 			"((" + 
 			"rel({s},{w},{n},{e})[waterway~%22riverbank|dock%22];" +
@@ -43,7 +47,8 @@
 
 		// TODO: Get bounds of area to retrieve data for
 		// - Likely an event from the geo or controls class as the view is changed
-		var bounds = self.geo.getBounds(self.geo.center, self.dataBoundsDistance);
+		// var bounds = self.geo.getBounds(self.geo.center, self.dataBoundsDistance);
+		var bounds = this.grid.boundsHighLonLat;
 
 		// TODO: Check cache for existing data
 
@@ -154,6 +159,8 @@
 		} else {
 			height = 0.1;
 		}
+
+		height *= this.geo.pixelsPerMeter;
 
 		return height;
 	};
