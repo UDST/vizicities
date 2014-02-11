@@ -94,6 +94,13 @@ The idea is that you'll eventually be able to easily use your own data and visua
 
 ViziCities can't happen without your help. We need people to submit bugs, suggest features, share how they're using ViziCities, and contribute code to the project. Sound like you? [Check out exactly how to get involved](https://github.com/robhawkes/vizicities/blob/master/CONTRIBUTING.md).
 
+### Suggestions
+
+There are a couple of things in particular that need your help:
+
+* Styling improvements (play with the lighting and materials, add shaders, make things look pretty)
+* Performance improvements (particularly with the Three.js object generation and rendering side)
+
 
 ## Contact & community
 
