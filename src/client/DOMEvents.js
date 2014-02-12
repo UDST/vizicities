@@ -2,6 +2,9 @@
 (function() {
 	"use strict";
 
+	// TODO: Work out if a DOMEvents class is needed
+	// - What else would go in here aside from resize?
+	// - Would resize be better suited elsewhere (like mouse and keyboard controls)?
 	VIZI.DOMEvents = function() {
 		VIZI.Log("Inititialising DOM events");
 
@@ -15,10 +18,6 @@
 		window.addEventListener( "resize", function(event) {
 			self.publish("resize", event);
 		}, false );
-
-		// Keyboard
-
-		// Mouse
 
 		return Q.fcall(function() {});
 	};

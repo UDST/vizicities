@@ -28,8 +28,11 @@
 		// Basic WebGL components (scene, camera, renderer, lights, etc)
 		this.webgl = undefined;
 
-		// DOM events (window resize, mouse, keyboard, etc)
+		// DOM events (window resize, etc)
 		this.domEvents = undefined;
+
+		// Controls (mouse, keyboard, Leap, etc)
+		this.controls = undefined;
 
 		// Core city-scene objects (floor, skybox, etc)
 		this.floor = undefined;
@@ -62,9 +65,6 @@
 			center: options.coords
 		});
 
-		// Set up grid manager
-		self.grid = VIZI.Grid.getInstance();
-
 		// Load city using promises
 
 		self.publish("loadingProgress", 0);
@@ -83,8 +83,15 @@
 		}).then(function() {
 			self.publish("loadingProgress", 0.3);
 
+			var promises = [];
+
 			// Initialise DOM events
-			return self.initDOMEvents();
+			promises.push(self.initDOMEvents());
+
+			// Initialise controls
+			promises.push(self.initControls());
+
+			return Q.allSettled(promises);
 		}).then(function() {
 			self.publish("loadingProgress", 0.4);
 
@@ -182,10 +189,29 @@
 		return deferred.promise;
 	};
 
+	VIZI.City.prototype.initControls = function() {
+		var startTime = Date.now();
+
+		var deferred = Q.defer();
+
+		this.controls = VIZI.Controls.getInstance();
+
+		this.controls.init().then(function(result) {
+			VIZI.Log("Finished intialising controls in " + (Date.now() - startTime) + "ms");
+
+			deferred.resolve();
+		});
+
+		return deferred.promise;
+	};
+
 	VIZI.City.prototype.initGrid = function() {
 		var startTime = Date.now();
 
 		var deferred = Q.defer();
+
+		// Set up grid manager
+		this.grid = VIZI.Grid.getInstance();
 
 		this.grid.init(this.geo.center).then(function(result) {
 			VIZI.Log("Finished intialising grid manager in " + (Date.now() - startTime) + "ms");
