@@ -130,6 +130,11 @@
 		tags.height = this.processHeight(tags);
 		tags.colour = this.processColour(tags);
 
+		// TODO: Calculate area
+		// getGeodesicArea from http://dev.openlayers.org/releases/OpenLayers-2.10/lib/OpenLayers/Geometry/LinearRing.js
+		// More info: http://gis.stackexchange.com/a/8496/14967
+		// tags.area;
+
 		ways.push({
 			coordinates: coordinates,
 			properties: tags

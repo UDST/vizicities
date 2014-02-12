@@ -6,6 +6,8 @@
 	// http://www.paulirish.com/2009/log-a-lightweight-wrapper-for-consolelog/
 	// http://benalman.com/projects/javascript-debug-console-log/
 
+	// TODO: Fix line numbers
+
 	// TODO: Update to use formatted output (colour, tables, style, etc)
 	//       - https://coderwall.com/p/fskzdw
 	//       - https://github.com/adamschwartz/log
