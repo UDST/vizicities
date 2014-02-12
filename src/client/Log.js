@@ -13,6 +13,10 @@
 	//       - https://github.com/adamschwartz/log
 
 	VIZI.Log = function() {
+		if (!VIZI.DEBUG) {
+			return;
+		}
+		
 		var args = Array.prototype.slice.call(arguments);
 
 		var timestamp = "[" + moment().format("HH:mm:ss.SSS") + "]";

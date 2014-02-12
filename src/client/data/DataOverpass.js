@@ -98,6 +98,8 @@
 		nodes[element.id] = this.geo.projection([element.lon, element.lat]);
 	};
 
+	// TODO: Validate polygon to make sure it's renderable (eg. complete, and no cross-overs)
+	// TODO: Use simplify.js to reduce complexity of polygons
 	VIZI.DataOverpass.prototype.processWay = function(nodes, ways, element) {
 		var self = this;
 

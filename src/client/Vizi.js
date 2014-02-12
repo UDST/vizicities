@@ -3,7 +3,8 @@
 	"use strict";
 
 	var VIZI = {
-		VERSION: 1.0
+		VERSION: 1.0,
+		DEBUG: false
 	};
 
 	// Output ASCII logo
