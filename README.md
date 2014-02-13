@@ -38,6 +38,7 @@ For more information you should start here:
 * Dynamic city loading using OpenStreetMap data
 * Buildings
 * Processing of geographic features into 3D objects using Web Workers
+* Mouse controls (zoom and pan)
 * Basic tests and build status using Travis CI
 
 ## Future features
