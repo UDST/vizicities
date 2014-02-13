@@ -79,6 +79,14 @@
 
 		// Forced render prevents annoying glitch when panning
 		// TODO: Stop this causing twice as many frames being rendered while panning
+		// - Perhaps aspects of .render() can be performed without updating the display
+		// - https://github.com/mrdoob/three.js/blob/master/src/renderers/WebGLRenderer.js#L3199
+		// TODO: If unavoidable, think about ways to reduce the performance impact of double-rendering
+		// - Removing post-processing during pan
+		// - Lowering quality / upscaling during pan
+		// - Enabling lower LOD during pan
+		// - Removing high-detailed objects during pan (buildings)
+		// - Pausing animations during pan (AI, live data, etc)
 		this.publish("render");
 	};
 
