@@ -58,12 +58,28 @@
 	};
 
 	VIZI.Camera.prototype.zoom = function(delta) {
+		var oldcameraRadius = this.cameraRadius;
+
 		this.cameraRadius += delta;
 
+		var cameraRadiusDiff = this.cameraRadius - oldcameraRadius;
+
 		// Cap zoom to bounds
-		this.cameraRadius = Math.max(Math.min(this.cameraRadius, 5000), 1000);
+		if (this.cameraRadius < 1000) {
+			this.cameraRadius = 1000;
+			cameraRadiusDiff = 1000 - oldcameraRadius;
+		}
+
+		if (this.cameraRadius > 5000) {
+			this.cameraRadius = 5000;
+			cameraRadiusDiff = 5000 - oldcameraRadius;
+		}
+		
+		this.camera.translateZ( cameraRadiusDiff );
 
 		this.updatePosition();
+
+		this.publish("render");
 	};
 
 	VIZI.Camera.prototype.pan = function(delta3d) {
