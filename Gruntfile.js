@@ -51,6 +51,7 @@ module.exports = function(grunt) {
 					'src/client/data/DataOverpass.js',
 					'src/client/Grid.js',
 					'src/client/controls/Mouse.js',
+					'src/client/controls/Keyboard.js',
 					'src/client/controls/Controls.js'
 				],
 				dest: 'build/vizi.js'

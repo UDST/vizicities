@@ -23,6 +23,7 @@
 		this.subscribe("resize", this.resize);
 		this.subscribe("zoomControl", this.zoom);
 		this.subscribe("panControl", this.pan);
+		this.subscribe("orbitControl", this.orbit);
 	};
 
 	VIZI.Camera.prototype.createCamera = function() {
@@ -83,11 +84,6 @@
 	};
 
 	VIZI.Camera.prototype.pan = function(delta3d) {
-		// TODO: Remove if it looks like this isn't breaking anything
-		// this.camera.position.x += delta3d.x;
-		// this.camera.position.z += delta3d.z;
-		// this.camera.updateMatrix();
-
 		this.target.position.x += delta3d.x;
 		this.target.position.z += delta3d.z;
 
@@ -103,6 +99,25 @@
 		// - Enabling lower LOD during pan
 		// - Removing high-detailed objects during pan (buildings)
 		// - Pausing animations during pan (AI, live data, etc)
+		this.publish("render");
+	};
+
+	VIZI.Camera.prototype.orbit = function(delta2d, theta, phi) {
+		// Round delta to next highest pixel to prevent jerkiness
+		this.theta = - ( delta2d.x * 0.5 ) + theta;
+		this.phi = ( delta2d.y * 0.5 ) + phi;
+
+		// Cap orbit to bounds
+		this.phi = Math.min( 175, Math.max( 65, this.phi ) );
+
+		// Let controls know that the cap has been hit
+		if (this.phi === 175 || this.phi === 65) {
+			this.publish("orbitControlCap");
+		}
+
+		this.updatePosition();
+		this.lookAtTarget();
+
 		this.publish("render");
 	};
 

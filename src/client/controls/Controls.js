@@ -9,18 +9,22 @@
 			_.extend(this, VIZI.Mediator);
 
 			this.mouse = undefined;
+			this.keyboard = undefined;
 		};
 
 		Controls.prototype.init = function(camera) {
 			this.mouse = VIZI.Mouse.getInstance(camera);
+			this.keyboard = VIZI.Keyboard.getInstance();
 
 			this.subscribe("update", this.onUpdate);
+			this.subscribe("orbitControlCap", this.orbitCapReset);
 
 			return Q.fcall(function() {});
 		};
 
 		Controls.prototype.onUpdate = function() {
 			var mouseState = this.mouse.state;
+			var keyboardState = this.keyboard.state;
 
 			// Zoom
 			if (mouseState.wheelDelta !== 0) {
@@ -28,12 +32,21 @@
 			}
 
 			// Pan
-			if (mouseState.buttons.left) {
+			if (mouseState.buttons.left && !keyboardState.keys.leftShift) {
 				this.publish("panControl", mouseState.pos3dDelta);
+			}
+
+			// Orbit
+			if (mouseState.buttons.left && keyboardState.keys.leftShift) {
+				this.publish("orbitControl", mouseState.downPos2dDelta, mouseState.camera.startTheta, mouseState.camera.startPhi);
 			}
 
 			// Zero deltas
 			this.mouse.resetDelta();
+		};
+
+		Controls.prototype.orbitCapReset = function() {
+			this.mouse.updateCamera();
 		};
 
 		var instance;
