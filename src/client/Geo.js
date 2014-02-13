@@ -13,7 +13,7 @@
 			this.tileSize = 256;
 			this.tileZoom = 16;
 
-			this.projection = this.setProjection();
+			this.projection = this.setProjection(options.center);
 
 			// Center of view (different to projection.center())
 			this.center = options.center || [0, 0];
@@ -23,9 +23,9 @@
 			this.pixelsPerMeter = this.setPixelsPerMeter();
 		};
 
-		Geo.prototype.setProjection = function() {
+		Geo.prototype.setProjection = function(coords) {
 			return d3.geo.mercator()
-				.center([0, 0]) // Geographic coordinates of map centre
+				.center(coords) // Geographic coordinates of map centre
 				.translate([0, 0]) // Pixel coordinates of .center()
 				// Scale is the pixel width of the entire world when projected using the mercator projection.
 				// So, if your json data had outlines for the whole world – spanning from lat/lng -180,90 to 

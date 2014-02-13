@@ -9,38 +9,38 @@
 
 		this.cameraRadius = 4100;
 		this.theta = 45; // Horizontal orbit
-		this.onMouseDownTheta = 45;
 		this.phi = 80; // Vertical oribt
-		this.onMouseDownPhi = 80;	
 
 		this.target = new THREE.Object3D();
 		this.updateTargetPositon(pos);
 
 		this.camera = this.createCamera();
-		this.update();
+		this.lookAtTarget();
 
 		this.publish("addToScene", this.camera);
 		this.publish("addToDat", this, {name: "Camera", properties: ["cameraRadius", "theta", "phi"]});
 
 		this.subscribe("resize", this.resize);
 		this.subscribe("zoomControl", this.zoom);
-
-		this.subscribe("update", this.update);
+		this.subscribe("panControl", this.pan);
 	};
 
 	VIZI.Camera.prototype.createCamera = function() {
 		VIZI.Log("Creating WebGL camera");
 
 		var camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 2, 40000 );
+		this.updatePosition(camera);
+
 		return camera;
 	};
 
 	// TODO: Why is a camera object being passed in?
-	VIZI.Camera.prototype.updatePosition = function() {
-		this.camera.position.x = this.target.position.x + this.cameraRadius * Math.sin( this.theta * Math.PI / 360 ) * Math.cos( this.phi * Math.PI / 360 );
-		this.camera.position.y = this.target.position.y + this.cameraRadius * Math.sin( this.phi * Math.PI / 360 );
-		this.camera.position.z = this.target.position.z + this.cameraRadius * Math.cos( this.theta * Math.PI / 360 ) * Math.cos( this.phi * Math.PI / 360 );
-		this.camera.updateMatrix();
+	VIZI.Camera.prototype.updatePosition = function(camera) {
+		camera = (camera) ? camera : this.camera;
+		camera.position.x = this.target.position.x + this.cameraRadius * Math.sin( this.theta * Math.PI / 360 ) * Math.cos( this.phi * Math.PI / 360 );
+		camera.position.y = this.target.position.y + this.cameraRadius * Math.sin( this.phi * Math.PI / 360 );
+		camera.position.z = this.target.position.z + this.cameraRadius * Math.cos( this.theta * Math.PI / 360 ) * Math.cos( this.phi * Math.PI / 360 );
+		camera.updateMatrix();
 	};
 
 	VIZI.Camera.prototype.updateTargetPositon = function(pos) {
@@ -61,12 +61,25 @@
 		this.cameraRadius += delta;
 
 		// Cap zoom to bounds
-		this.cameraRadius = Math.max(Math.min(this.cameraRadius, 8000), 1000);
+		this.cameraRadius = Math.max(Math.min(this.cameraRadius, 5000), 1000);
+
+		this.updatePosition();
 	};
 
-	VIZI.Camera.prototype.update = function() {
+	VIZI.Camera.prototype.pan = function(delta3d) {
+		// TODO: Remove if it looks like this isn't breaking anything
+		// this.camera.position.x += delta3d.x;
+		// this.camera.position.z += delta3d.z;
+		// this.camera.updateMatrix();
+
+		this.target.position.x += delta3d.x;
+		this.target.position.z += delta3d.z;
+
 		this.updatePosition();
-		this.lookAtTarget();
+
+		// Forced render prevents annoying glitch when panning
+		// TODO: Stop this causing twice as many frames being rendered while panning
+		this.publish("render");
 	};
 
 	VIZI.Camera.prototype.datChange = function() {

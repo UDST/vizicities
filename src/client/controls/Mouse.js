@@ -3,10 +3,14 @@
 	"use strict";
 
 	VIZI.Mouse = (function() {
-		var Mouse = function() {
+		var Mouse = function(camera) {
 			VIZI.Log("Inititialising mouse manager");
 
 			_.extend(this, VIZI.Mediator);
+
+			// Reference to camera for 3D projection
+			this.camera = camera;
+			this.projector = new THREE.Projector();
 
 			this.state = {
 				buttons: {
@@ -20,7 +24,11 @@
 				downPos3d: new THREE.Vector3(),
 				pos2dDelta: new THREE.Vector2(),
 				pos3dDelta: new THREE.Vector3(),
-				wheelDelta: 0
+				wheelDelta: 0,
+				camera: {
+					downTheta: this.camera.theta,
+					downPhi: this.camera.phi
+				}
 			};
 
 			this.initDOMEvents();
@@ -63,12 +71,24 @@
 				state.buttons.right = true;
 			}
 
+			state.pos2d.x = event.clientX;
+			state.pos2d.y = event.clientY;
+
 			state.downPos2d.x = event.clientX;
 			state.downPos2d.y = event.clientY;
 
-			// TODO: Update 3D position
+			var pos3d = this.mouseIn3d(state.downPos2d);
 
-			// this.publish("mouseDown", {pos2d: state.downPos2d});
+			state.pos3d.x = pos3d.x;
+			state.pos3d.y = pos3d.y;
+			state.pos3d.z = pos3d.z;
+
+			state.downPos3d.x = pos3d.x;
+			state.downPos3d.y = pos3d.y;
+			state.downPos3d.z = pos3d.z;
+
+			state.camera.downTheta = this.camera.theta;
+			state.camera.downPhi = this.camera.phi;
 		};
 
 		Mouse.prototype.onMouseMove = function(event) {
@@ -82,9 +102,15 @@
 			state.pos2d.x = event.clientX;
 			state.pos2d.y = event.clientY;
 
-			// TODO: Update 3D position
+			var pos3d = this.mouseIn3d(state.pos2d);
 
-			// this.publish("mouseMove", {pos2d: state.pos2d, delta: delta});
+			state.pos3dDelta.x = state.downPos3d.x - pos3d.x;
+			state.pos3dDelta.y = state.downPos3d.y - pos3d.y;
+			state.pos3dDelta.z = state.downPos3d.z - pos3d.z;	
+
+			state.pos3d.x = pos3d.x;
+			state.pos3d.y = pos3d.y;
+			state.pos3d.z = pos3d.z;
 		};
 
 		Mouse.prototype.onMouseUp = function(event) {
@@ -104,9 +130,7 @@
 				state.buttons.right = false;
 			}
 
-			// TODO: Update 3D position
-
-			// this.publish("mouseUp", {pos2d: state.pos2d, delta: delta});
+			// TODO: Reset mouse down positions?
 		};
 
 		Mouse.prototype.onMouseWheel = function(event) {
@@ -115,8 +139,6 @@
 			var state = this.state;
 			
 			state.wheelDelta += event.wheelDeltaY;
-
-			// this.publish("mouseWheel", {delta: delta});
 		};
 
 		Mouse.prototype.resetDelta = function() {
@@ -133,7 +155,25 @@
 		};
 
 		// TODO: Get working
-		Mouse.prototype.mouseIn3D = function(pos2d) {};
+		Mouse.prototype.mouseIn3d = function(pos2d) {
+			var camera = this.camera.camera;
+
+			var vector = new THREE.Vector3(
+				( pos2d.x / window.innerWidth ) * 2 - 1,
+				- ( pos2d.y / window.innerHeight ) * 2 + 1,
+				0.5
+			);
+
+			this.projector.unprojectVector( vector, camera );
+
+			var dir = vector.sub( camera.position ).normalize();
+
+			var distance = - camera.position.y / dir.y;
+
+			var pos = camera.position.clone().add( dir.multiplyScalar( distance ) );
+
+			return pos;
+		};
 
 		var instance;
 
@@ -143,9 +183,9 @@
 
 			// Method for getting an instance. It returns 
 			// a singleton instance of a singleton object
-			getInstance: function() {
+			getInstance: function(camera) {
 				if ( instance  ===  undefined )  {
-					instance = new Mouse();
+					instance = new Mouse(camera);
 				}
 
 				return instance;

@@ -196,7 +196,7 @@
 
 		this.controls = VIZI.Controls.getInstance();
 
-		this.controls.init().then(function(result) {
+		this.controls.init(this.webgl.camera).then(function(result) {
 			VIZI.Log("Finished intialising controls in " + (Date.now() - startTime) + "ms");
 
 			deferred.resolve();

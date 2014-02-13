@@ -11,8 +11,8 @@
 			this.mouse = undefined;
 		};
 
-		Controls.prototype.init = function() {
-			this.mouse = VIZI.Mouse.getInstance();
+		Controls.prototype.init = function(camera) {
+			this.mouse = VIZI.Mouse.getInstance(camera);
 
 			this.subscribe("update", this.onUpdate);
 
@@ -25,6 +25,11 @@
 			// Zoom
 			if (mouseState.wheelDelta !== 0) {
 				this.publish("zoomControl", -1 * mouseState.wheelDelta);
+			}
+
+			// Pan
+			if (mouseState.buttons.left) {
+				this.publish("panControl", mouseState.pos3dDelta);
 			}
 
 			// Zero deltas
