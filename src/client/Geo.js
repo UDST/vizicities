@@ -15,7 +15,7 @@
 
 			this.projection = this.setProjection(options.center);
 
-			// Center of view (different to projection.center())
+			// Center of view
 			this.center = options.center || [0, 0];
 			this.centerPixels = this.projection(this.center);
 			this.bounds = this.getBounds(this.center);

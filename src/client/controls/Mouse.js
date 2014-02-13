@@ -154,7 +154,6 @@
 			state.wheelDelta = 0;
 		};
 
-		// TODO: Get working
 		Mouse.prototype.mouseIn3d = function(pos2d) {
 			var camera = this.camera.camera;
 
