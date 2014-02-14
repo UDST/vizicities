@@ -18,10 +18,13 @@
 			// Tile size and zoom level comes from VIZI.Geo
 
 			// Tiles per direction for high detail
-			this.tilesPerDirectionHigh = 2;
+			this.tilesPerDirectionHigh = 1;
 
 			// Tiles per direction for low detail
 			this.tilesPerDirectionLow = 6;
+
+			// Calculated pixel tile size
+			this.tileSize = 0;
 
 			// Grid bounds for high detail (in TMS values)
 			this.boundsHigh = {};
@@ -37,6 +40,8 @@
 
 			// Debug grid model
 			this.gridModel = new THREE.Object3D();
+
+			this.subscribe("centerPositionChanged", this.onCenterChanged);
 		};
 
 		Grid.prototype.init = function(coords) {
@@ -58,9 +63,9 @@
 			var lonLatMax = this.tile2lonlat(Math.floor(this.centerTile[0])+1, Math.floor(this.centerTile[1])+1, this.geo.tileZoom);
 
 			// Why is this tilesize so random?
-			var tileSize = this.geo.projection(lonLatMax)[0] - this.geo.projection(lonLatMin)[0];
+			this.tileSize = this.geo.projection(lonLatMax)[0] - this.geo.projection(lonLatMin)[0];
 			
-			var tileGeom = new THREE.PlaneGeometry( tileSize, tileSize, 1, 1 );
+			var tileGeom = new THREE.PlaneGeometry( this.tileSize, this.tileSize, 1, 1 );
 			var tileCount = [this.boundsHigh.e-this.boundsHigh.w, this.boundsHigh.s-this.boundsHigh.n];
 			// Rows
 			for (var i = 0; i < tileCount[0]; i++) {
@@ -73,8 +78,8 @@
 					var position = this.geo.projection(this.tile2lonlat(tileCoords[0], tileCoords[1], this.geo.tileZoom));
 
 					tile.position.y = 10;
-					tile.position.x = position[0] + tileSize / 2;
-					tile.position.z = position[1] + tileSize / 2;
+					tile.position.x = position[0] + this.tileSize / 2;
+					tile.position.z = position[1] + this.tileSize / 2;
 					tile.rotation.x = - 90 * Math.PI / 180;
 
 					// this.publish("addToScene", tile);
@@ -131,6 +136,36 @@
 			};
 
 			return boundsLonLat;
+		};
+
+		Grid.prototype.onCenterChanged = function(centerPixels, centerLonLat, bounds) {
+			var centerTile = this.lonlat2tile(centerLonLat[0], centerLonLat[1], this.geo.tileZoom, true);
+
+			var gridDiff = [
+				Math.floor(centerTile[0]) - Math.floor(this.centerTile[0]),
+				Math.floor(centerTile[1]) - Math.floor(this.centerTile[1])
+			];
+
+			if (Math.abs(gridDiff[0]) > 0 || Math.abs(gridDiff[1]) > 0) {
+				//VIZI.Log("Update grid", gridDiff);
+
+				this.pos2d.x = centerPixels[0];
+				this.pos2d.y = centerPixels[1];
+
+				this.centerTile = centerTile;
+
+				this.boundsHigh = this.getBounds(this.tilesPerDirectionHigh);
+				this.boundsLow = this.getBounds(this.tilesPerDirectionLow);
+
+				this.boundsHighLonLat = this.getBoundsLonLat(this.boundsHigh);
+				this.boundsLowLonLat = this.getBoundsLonLat(this.boundsLow);
+
+				var position = this.geo.projection(this.tile2lonlat(Math.floor(this.centerTile[0]), Math.floor(this.centerTile[1]), this.geo.tileZoom));
+				this.gridModel.position.x = position[0] + this.tileSize / 2;
+				this.gridModel.position.z = position[1] + this.tileSize / 2;
+
+				this.publish("gridUpdated");
+			}
 		};
 
 		Grid.prototype.lonlat2tile = function(lon, lat, zoom, float) {

@@ -195,7 +195,10 @@
 		// Batch features
 		// 4 batches or below seems to stop the model.faces typed array from converting to a normal array
 		// Ideal 8 batches, if odd then subtract difference to make featuresPerBatch division clean
-		var batches = 8 - (features.length % 8);
+		// var batches = 8 - (features.length % 8);
+
+		// Use one batch while testing tile-loading feature
+		var batches = 1;
 		var featuresPerBatch = Math.ceil(features.length / batches);
 		var batchPromises = [];
 

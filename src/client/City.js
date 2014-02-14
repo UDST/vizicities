@@ -242,18 +242,10 @@
 
 		var deferred = Q.defer();
 
-		var objectManager = new VIZI.ObjectManager();
-		this.data.update().then(function(features) {
-			objectManager.processFeaturesWorker(features).then(function(result) {
-				VIZI.Log("Finished loading Overpass data in " + (Date.now() - startTime) + "ms");
-				deferred.resolve(objectManager);
-			}, undefined, function(progress) {
-				// Pass-through progress
-				deferred.notify(progress);
-			});
-		}, function(error) {
-			console.error(error.stack);
-		}).done();
+		this.data.update().done(function() {
+			VIZI.Log("Finished loading Overpass data in " + (Date.now() - startTime) + "ms");
+			deferred.resolve();
+		});
 
 		return deferred.promise;
 	};

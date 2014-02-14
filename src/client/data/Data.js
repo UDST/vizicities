@@ -11,6 +11,9 @@
 		// Reference to grid class
 		this.grid = VIZI.Grid.getInstance();
 
+		// Object manager
+		this.objectManager = new VIZI.ObjectManager();
+
 		// URL of data source
 		this.url = "";
 
@@ -27,23 +30,43 @@
 		this.FOOT_TO_METER = 0.3048;
 		this.INCH_TO_METER = 0.0254;
 		this.METERS_PER_LEVEL = 3;
+
+		this.subscribe("gridUpdated", this.update);
 	};
 
 	VIZI.Data.prototype.load = function(parameters) {
+		var self = this;
 		var deferred = Q.defer();
 
 		// Replace URL placeholders with parameter values
-		var url = this.url.replace(/\{([swne])\}/g, function(value, key) {
+		var url = self.url.replace(/\{([swne])\}/g, function(value, key) {
 			// Replace with paramter, otherwise keep existing value
 			return parameters[key];
 		});
 
+		VIZI.Log("Requesting URL", url);
+
 		// Request data and fulfil promise 
 		d3.json(url, function(error, data) {
+			VIZI.Log("Response for URL", url);
 			if (error) {
 				deferred.reject(new Error(error));
 			} else {
-				deferred.resolve(data);
+				if (data.elements.length === 0) {
+					deferred.reject(new Error("No buildings"));
+				}
+
+				var features = self.process(data);
+
+				// // TODO: Add data to cache
+				// // TODO: Send data to be rendered
+
+				self.objectManager.processFeaturesWorker(features).then(function() {
+					deferred.resolve();
+				}, undefined, function(progress) {
+					// Pass-through progress
+					deferred.notify(progress);
+				});
 			}
 		});
 

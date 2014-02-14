@@ -4,6 +4,8 @@
 
 	VIZI.Geo = (function() {
 		var Geo = function(options) {
+			_.extend(this, VIZI.Mediator);
+
 			// Meters per degree latitude
 			// Given radius of earth is 6378137 meters
 			// (2 * Math.PI / 360) * 6378137 = 111319.49079327357
@@ -21,6 +23,8 @@
 			this.bounds = this.getBounds(this.center);
 
 			this.pixelsPerMeter = this.setPixelsPerMeter();
+
+			this.subscribe("targetPositionChanged", this.onTargetChanged);
 		};
 
 		Geo.prototype.setProjection = function(coords) {
@@ -63,6 +67,14 @@
 			};
 
 			return bounds;
+		};
+
+		Geo.prototype.onTargetChanged = function(pos3d) {
+			this.centerPixels = [pos3d.x, pos3d.z];
+			this.center = this.projection.invert(this.centerPixels);
+			this.bounds = this.getBounds(this.center);
+
+			this.publish("centerPositionChanged", this.centerPixels, this.center, this.bounds);
 		};
 
 		Geo.prototype.decimalPlaces = function(num, places) {

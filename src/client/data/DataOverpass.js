@@ -13,18 +13,18 @@
 		// https://github.com/kekscom/osmbuildings/blob/master/src/Data.js#L59
 		this.query = "[out:json];" +
 			"((" + 
-			"rel({s},{w},{n},{e})[waterway~%22riverbank|dock%22];" +
-			"rel({s},{w},{n},{e})[waterway=%22canal%22][area=%22yes%22];" +
-			"rel({s},{w},{n},{e})[natural~%22water|scrub%22];" +
-			"rel({s},{w},{n},{e})[leisure~%22park|pitch%22];" +
-			"rel({s},{w},{n},{e})[landuse~%22grass|meadow|forest|commercial|retail|industrial|construction|brownfield%22];" +
-			");(._;way(r););(._;node(w););(" +
+			// "rel({s},{w},{n},{e})[waterway~%22riverbank|dock%22];" +
+			// "rel({s},{w},{n},{e})[waterway=%22canal%22][area=%22yes%22];" +
+			// "rel({s},{w},{n},{e})[natural~%22water|scrub%22];" +
+			// "rel({s},{w},{n},{e})[leisure~%22park|pitch%22];" +
+			// "rel({s},{w},{n},{e})[landuse~%22grass|meadow|forest|commercial|retail|industrial|construction|brownfield%22];" +
+			// ");(._;way(r););(._;node(w););(" +
 			"way({s},{w},{n},{e})[%22building%22];" +
-			"way({s},{w},{n},{e})[waterway~%22riverbank|dock%22];" +
-			"way({s},{w},{n},{e})[waterway=%22canal%22][area=%22yes%22];" +
-			"way({s},{w},{n},{e})[natural~%22water|scrub%22];" +
-			"way({s},{w},{n},{e})[leisure~%22park|pitch%22];" +
-			"way({s},{w},{n},{e})[landuse~%22grass|meadow|forest|commercial|retail|industrial|construction|brownfield%22];" +
+			// "way({s},{w},{n},{e})[waterway~%22riverbank|dock%22];" +
+			// "way({s},{w},{n},{e})[waterway=%22canal%22][area=%22yes%22];" +
+			// "way({s},{w},{n},{e})[natural~%22water|scrub%22];" +
+			// "way({s},{w},{n},{e})[leisure~%22park|pitch%22];" +
+			// "way({s},{w},{n},{e})[landuse~%22grass|meadow|forest|commercial|retail|industrial|construction|brownfield%22];" +
 			");(._;node(w);););out;";
 
 		// URL of data source
@@ -43,29 +43,38 @@
 		var self = this;
 		var deferred = Q.defer();
 
-		// TODO: Perform the following for each tile, rather than for a single large area
+		// TODO: Skip cached tiles
 
-		// TODO: Get bounds of area to retrieve data for
-		// - Likely an event from the geo or controls class as the view is changed
-		// var bounds = self.geo.getBounds(self.geo.center, self.dataBoundsDistance);
-		var bounds = this.grid.boundsHighLonLat;
+		// Load objects using promises
+		var promiseQueue = [];
 
-		// TODO: Check cache for existing data
-
-		self.load(bounds).then(function(data) {
-			if (data.elements.length === 0) {
-				deferred.reject(new Error("No buildings"));
+		var bounds = self.grid.boundsHigh;
+		var tileCount = [bounds.e-bounds.w, bounds.s-bounds.n];
+		// Rows
+		for (var i = 0; i < tileCount[0]; i++) {
+			// Columns
+			for (var j = 0; j < tileCount[1]; j++) {
+				var tileCoords = [bounds.w + j, bounds.n + i];
+				var tileBounds = {
+					n: bounds.n + i,
+					e: 1 + bounds.w + j,
+					s: 1 + bounds.n + i,
+					w: bounds.w + j
+				};
+				
+				var tileBoundsLonLat = self.grid.getBoundsLonLat(tileBounds);
+				promiseQueue.push(self.load(tileBoundsLonLat));
+				// self.load(tileBoundsLonLat);
 			}
+		}
 
-			var features = self.process(data);
+		// deferred.resolve();
 
-			// TODO: Add data to cache
-			// TODO: Send data to be rendered
+		Q.all(promiseQueue).done(function() {
+			deferred.resolve();
+		});
 
-			deferred.resolve(features);
-		}, function(error) {
-			deferred.reject(new Error(error));
-		}).done();
+		// TODO: Add data to cache
 
 		return deferred.promise;
 	};

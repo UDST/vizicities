@@ -42,6 +42,8 @@
 		camera.position.y = this.target.position.y + this.cameraRadius * Math.sin( this.phi * Math.PI / 360 );
 		camera.position.z = this.target.position.z + this.cameraRadius * Math.cos( this.theta * Math.PI / 360 ) * Math.cos( this.phi * Math.PI / 360 );
 		camera.updateMatrix();
+
+		this.publish("targetPositionChanged", this.target.position);
 	};
 
 	VIZI.Camera.prototype.updateTargetPositon = function(pos) {
