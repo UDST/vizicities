@@ -3,7 +3,7 @@
 	"use strict";
 
 	VIZI.DataOverpass = function() {
-		VIZI.Log("Inititialising building manager");
+		VIZI.Log("Inititialising Overpass API manager");
 
 		VIZI.Data.call(this);
 
@@ -44,6 +44,7 @@
 		var deferred = Q.defer();
 
 		// TODO: Skip cached tiles
+		// TODO: Tiles can have the same way so ignore ways already loaded
 
 		// Load objects using promises
 		var promiseQueue = [];
@@ -63,7 +64,9 @@
 				};
 				
 				var tileBoundsLonLat = self.grid.getBoundsLonLat(tileBounds);
-				promiseQueue.push(self.load(tileBoundsLonLat));
+
+				var cacheKey = tileCoords[0] + ":" + tileCoords[1];
+				promiseQueue.push(self.load(tileBoundsLonLat, cacheKey));
 				// self.load(tileBoundsLonLat);
 			}
 		}
@@ -72,7 +75,7 @@
 
 		Q.all(promiseQueue).done(function() {
 			deferred.resolve();
-		});
+		}, function(error) {});
 
 		// TODO: Add data to cache
 
@@ -147,6 +150,7 @@
 		// tags.area;
 
 		ways.push({
+			id: element.id,
 			coordinates: coordinates,
 			properties: tags
 		});

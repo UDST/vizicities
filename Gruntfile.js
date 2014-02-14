@@ -52,7 +52,8 @@ module.exports = function(grunt) {
 					'src/client/Grid.js',
 					'src/client/controls/Mouse.js',
 					'src/client/controls/Keyboard.js',
-					'src/client/controls/Controls.js'
+					'src/client/controls/Controls.js',
+					'src/client/Cache.js'
 				],
 				dest: 'build/vizi.js'
 			}

@@ -11,6 +11,13 @@
 		// Reference to grid class
 		this.grid = VIZI.Grid.getInstance();
 
+		// Cache
+		this.cache = new VIZI.Cache();
+
+		// Use IDs of processed features to prevent duplication on tile boundaries
+		// TODO: Remove ids from here when they're manually removed from view
+		this.processedIds = {};
+
 		// Object manager
 		this.objectManager = new VIZI.ObjectManager();
 
@@ -34,9 +41,16 @@
 		this.subscribe("gridUpdated", this.update);
 	};
 
-	VIZI.Data.prototype.load = function(parameters) {
+	VIZI.Data.prototype.load = function(parameters, cacheKey) {
 		var self = this;
 		var deferred = Q.defer();
+
+		// Check cache
+		// TODO: Process cached data but don't make XHR call
+		if (this.cache.get(cacheKey)) {
+			VIZI.Log("Skipping tile as already in cache:", cacheKey);
+			return;
+		}
 
 		// Replace URL placeholders with parameter values
 		var url = self.url.replace(/\{([swne])\}/g, function(value, key) {
@@ -58,10 +72,31 @@
 
 				var features = self.process(data);
 
-				// // TODO: Add data to cache
-				// // TODO: Send data to be rendered
+				// Add data to cache (including dupes on boundaries)
+				self.cache.add(cacheKey, features);
+				VIZI.Log("Added data to cache:", cacheKey);
 
-				self.objectManager.processFeaturesWorker(features).then(function() {
+				var uniqueFeatures = [];
+
+				// Skip duplicate features
+				_.each(features, function(feature) {
+					if (self.processedIds[feature.id]) {
+						VIZI.Log("Skipping duplicated feature");
+						return;
+					}
+
+					self.processedIds[feature.id] = true;
+					uniqueFeatures.push(feature);
+				});
+
+				// Reject promise if no features left to render
+				if (uniqueFeatures.length === 0) {
+					deferred.reject(new Error("No features left to pass to worker"));
+					return;
+				}
+
+				// TODO: Pass-through progress event
+				self.objectManager.processFeaturesWorker(uniqueFeatures).then(function() {
 					deferred.resolve();
 				}, undefined, function(progress) {
 					// Pass-through progress
