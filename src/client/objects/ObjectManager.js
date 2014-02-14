@@ -196,21 +196,25 @@
 		// 4 batches or below seems to stop the model.faces typed array from converting to a normal array
 		// Ideal 8 batches, if odd then subtract difference to make featuresPerBatch division clean
 		// var batches = 8 - (features.length % 8);
-
-		// Use one batch while testing tile-loading feature
 		var batches = 1;
-		var featuresPerBatch = Math.ceil(features.length / batches);
+
+		// Use all features while testing tile-loading
+		// var featuresPerBatch = Math.ceil(features.length / batches);
+
 		var batchPromises = [];
 
-		var i = batches;
-		while (i--) {
-			var startIndex = i * featuresPerBatch;
-			startIndex = (startIndex < 0) ? 0 : startIndex;
+		// var i = batches;
+		// while (i--) {
+		// var startIndex = i * featuresPerBatch;
+		// startIndex = (startIndex < 0) ? 0 : startIndex;
 
-			var featuresBatch = features.splice(startIndex, featuresPerBatch-1);
+		// var featuresBatch = features.splice(startIndex, featuresPerBatch-1);
 
-			batchPromises.push(this.workerPromise(worker, featuresBatch));
-		}
+		// batchPromises.push(this.workerPromise(worker, featuresBatch));
+		// }
+
+		// Process all features in one go while testing tile-loading
+		batchPromises.push(this.workerPromise(worker, features));
 
 		var loader = new THREE.JSONLoader();
 		var material = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors});

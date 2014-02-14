@@ -81,7 +81,7 @@
 				// Skip duplicate features
 				_.each(features, function(feature) {
 					if (self.processedIds[feature.id]) {
-						VIZI.Log("Skipping duplicated feature");
+						VIZI.Log("Skipping duplicated feature:", feature.id);
 						return;
 					}
 

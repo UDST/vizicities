@@ -137,7 +137,7 @@
 		});
 
 		if (dupe) {
-			VIZI.Log("Skipping feature as it has duplicate coordinates", coordinates);
+			VIZI.Log("Skipping feature as it has duplicate coordinates", element.id, coordinates);
 			return;
 		}
 
