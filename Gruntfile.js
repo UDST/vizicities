@@ -147,6 +147,9 @@ module.exports = function(grunt) {
 	// Build files and refresh content on file changes
 	grunt.registerTask('dev', ['default', 'notify:watch', 'watch']);
 
+	// Minify
+	grunt.registerTask('min', ['jshint', 'concat', 'uglify', 'notify:finish']);
+
 	// Run tests
 	grunt.registerTask('test', ['jshint', 'mocha_phantomjs']);
 	
