@@ -153,7 +153,7 @@
 
 			var state = this.state;
 			
-			state.wheelDelta += event.deltaY;
+			state.wheelDelta -= event.deltaY;
 		};
 
 		Mouse.prototype.resetDelta = function() {
