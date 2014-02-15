@@ -50,7 +50,7 @@
 				self.onMouseUp(event);
 			}, false);
 
-			document.addEventListener("mousewheel", function(event) {
+			document.addEventListener("wheel", function(event) {
 				self.onMouseWheel(event);
 			}, false);
 		};
@@ -153,7 +153,7 @@
 
 			var state = this.state;
 			
-			state.wheelDelta += event.wheelDeltaY;
+			state.wheelDelta -= event.deltaY;
 		};
 
 		Mouse.prototype.resetDelta = function() {
