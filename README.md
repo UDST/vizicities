@@ -80,6 +80,12 @@ ViziCities is at an incredibly early stage right now, but it's usable if you kno
 
 To start off, you'll need to build ViziCities and get an up-to-date JavaScript file.
 
+### Clone the ViziCities repo
+
+```
+git clone git@github.com:robhawkes/vizicities.git vizicities
+```
+
 #### [Install Node.js & NPM](http://nodejs.org/)
 ```
 brew install node
