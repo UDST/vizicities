@@ -87,6 +87,8 @@ git clone git@github.com:robhawkes/vizicities.git vizicities
 ```
 
 #### [Install Node.js & NPM](http://nodejs.org/)
+If you haven't already, [install Homebrew](http://brew.sh/) before going any further.
+
 ```
 brew install node
 ```
