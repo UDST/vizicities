@@ -59,41 +59,7 @@
 			this.boundsLowLonLat = this.getBoundsLonLat(this.boundsLow);
 
 			// Create debug model for grid
-			var lonLatMin = this.tile2lonlat(Math.floor(this.centerTile[0]), Math.floor(this.centerTile[1]), this.geo.tileZoom);
-			var lonLatMax = this.tile2lonlat(Math.floor(this.centerTile[0])+1, Math.floor(this.centerTile[1])+1, this.geo.tileZoom);
-
-			// Why is this tilesize so random?
-			this.tileSize = this.geo.projection(lonLatMax)[0] - this.geo.projection(lonLatMin)[0];
-			
-			var tileLineMat = new THREE.LineBasicMaterial( { color: 0xcc0000, linewidth: 6 } );
-			var tileLineGeom = new THREE.Geometry();
-
-			var vertices = tileLineGeom.vertices;
-			vertices.push(new THREE.Vector3(0, 0, 0));
-			vertices.push(new THREE.Vector3(this.tileSize, 0, 0));
-			vertices.push(new THREE.Vector3(this.tileSize, 0, this.tileSize));
-			vertices.push(new THREE.Vector3(0, 0, this.tileSize));
-			vertices.push(new THREE.Vector3(0, 0, 0));
-
-			tileLineGeom.computeLineDistances();
-
-			var tileCount = [this.boundsHigh.e-this.boundsHigh.w, this.boundsHigh.s-this.boundsHigh.n];
-			// Rows
-			for (var i = 0; i < tileCount[0]; i++) {
-				// Columns
-				for (var j = 0; j < tileCount[1]; j++) {
-					var tileCoords = [this.boundsHigh.w + j, this.boundsHigh.n + i];
-
-					var position = this.geo.projection(this.tile2lonlat(tileCoords[0], tileCoords[1], this.geo.tileZoom));
-
-					var tileLine = new THREE.Line(tileLineGeom, tileLineMat);
-					tileLine.position.y = 1;
-					tileLine.position.x = position[0];
-					tileLine.position.z = position[1];
-
-					this.gridModel.add(tileLine);
-				}
-			}
+			this.createDebug();
 
 			this.publish("addToScene", this.gridModel);
 
@@ -172,6 +138,68 @@
 				this.gridModel.position.z += this.tileSize * gridDiff[1];
 
 				this.publish("gridUpdated");
+			}
+		};
+
+		Grid.prototype.createDebug = function() {
+			var lonLatMin = this.tile2lonlat(Math.floor(this.centerTile[0]), Math.floor(this.centerTile[1]), this.geo.tileZoom);
+			var lonLatMax = this.tile2lonlat(Math.floor(this.centerTile[0])+1, Math.floor(this.centerTile[1])+1, this.geo.tileZoom);
+
+			// Why is this tilesize so random?
+			this.tileSize = this.geo.projection(lonLatMax)[0] - this.geo.projection(lonLatMin)[0];
+			
+			var tileLineMatHigh = new THREE.LineBasicMaterial( { color: 0xcc0000, linewidth: 6 } );
+			var tileLineMatLow = new THREE.LineBasicMaterial( { color: 0x0000cc, linewidth: 6 } );
+			
+			var tileLineGeom = new THREE.Geometry();
+
+			var vertices = tileLineGeom.vertices;
+			vertices.push(new THREE.Vector3(0, 0, 0));
+			vertices.push(new THREE.Vector3(this.tileSize, 0, 0));
+			vertices.push(new THREE.Vector3(this.tileSize, 0, this.tileSize));
+			vertices.push(new THREE.Vector3(0, 0, this.tileSize));
+			vertices.push(new THREE.Vector3(0, 0, 0));
+
+			tileLineGeom.computeLineDistances();
+
+			var i, j, tileCoords, position, tileLine;
+
+			// High
+			var tileCountHigh = [this.boundsHigh.e-this.boundsHigh.w, this.boundsHigh.s-this.boundsHigh.n];
+			// Rows
+			for (i = 0; i < tileCountHigh[0]; i++) {
+				// Columns
+				for (j = 0; j < tileCountHigh[1]; j++) {
+					tileCoords = [this.boundsHigh.w + j, this.boundsHigh.n + i];
+
+					position = this.geo.projection(this.tile2lonlat(tileCoords[0], tileCoords[1], this.geo.tileZoom));
+
+					tileLine = new THREE.Line(tileLineGeom, tileLineMatHigh);
+					tileLine.position.y = 2;
+					tileLine.position.x = position[0];
+					tileLine.position.z = position[1];
+
+					this.gridModel.add(tileLine);
+				}
+			}
+
+			// Low
+			var tileCountLow = [this.boundsLow.e-this.boundsLow.w, this.boundsLow.s-this.boundsLow.n];
+			// Rows
+			for (i = 0; i < tileCountLow[0]; i++) {
+				// Columns
+				for (j = 0; j < tileCountLow[1]; j++) {
+					tileCoords = [this.boundsLow.w + j, this.boundsLow.n + i];
+
+					position = this.geo.projection(this.tile2lonlat(tileCoords[0], tileCoords[1], this.geo.tileZoom));
+
+					tileLine = new THREE.Line(tileLineGeom, tileLineMatLow);
+					tileLine.position.y = 0.1;
+					tileLine.position.x = position[0];
+					tileLine.position.z = position[1];
+
+					this.gridModel.add(tileLine);
+				}
 			}
 		};
 
