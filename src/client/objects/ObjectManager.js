@@ -191,30 +191,34 @@
 		// Solution: https://speakerdeck.com/mourner/high-performance-data-visualizations?slide=51
 		// TODO: See if simply batching objects and creating them in the browser is less sluggish for the browser
 		// TODO: Work out why not every feature is being returned in the promises (about 10–20 less than expected)
+		// TODO: Come up with a method of chosing enough batches to avoid call stack exceeded errors (too many things to render)
+		//       while not using too many batches to cause problems with small numbers of features (eg. a single feature)
+		//  - Manhattan is a good test for this
 
 		// Batch features
 		// 4 batches or below seems to stop the model.faces typed array from converting to a normal array
 		// Ideal 8 batches, if odd then subtract difference to make featuresPerBatch division clean
-		// var batches = 8 - (features.length % 8);
-		var batches = 1;
+		var batchCount = (features.length < 100) ? 6 : 12;
+		var batchDiff = features.length % batchCount;
+		var batches = (features.length < batchCount) ? features.length : batchCount;
 
-		// Use all features while testing tile-loading
-		// var featuresPerBatch = Math.ceil(features.length / batches);
+		var featuresPerBatch = Math.floor(features.length / batches);
 
 		var batchPromises = [];
 
-		// var i = batches;
-		// while (i--) {
-		// var startIndex = i * featuresPerBatch;
-		// startIndex = (startIndex < 0) ? 0 : startIndex;
+		for (var i = 0; i < batches; i++) {
+			var startIndex = i * featuresPerBatch;
+			var endIndex = startIndex + featuresPerBatch;
+			
+			// Add diff if at end of batch
+			if (i === batches - 1) {
+				endIndex += batchDiff;
+			}
 
-		// var featuresBatch = features.splice(startIndex, featuresPerBatch-1);
+			var featuresBatch = features.slice(startIndex, endIndex);
 
-		// batchPromises.push(this.workerPromise(worker, featuresBatch));
-		// }
-
-		// Process all features in one go while testing tile-loading
-		batchPromises.push(this.workerPromise(worker, features));
+			batchPromises.push(this.workerPromise(worker, featuresBatch));
+		}
 
 		var loader = new THREE.JSONLoader();
 		var material = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors});

@@ -82,7 +82,6 @@
 					tile.position.z = position[1] + this.tileSize / 2;
 					tile.rotation.x = - 90 * Math.PI / 180;
 
-					// this.publish("addToScene", tile);
 					this.gridModel.add(tile);
 				}
 			}
@@ -147,7 +146,7 @@
 			];
 
 			if (Math.abs(gridDiff[0]) > 0 || Math.abs(gridDiff[1]) > 0) {
-				//VIZI.Log("Update grid", gridDiff);
+				VIZI.Log("Update grid", gridDiff);
 
 				this.pos2d.x = centerPixels[0];
 				this.pos2d.y = centerPixels[1];
@@ -160,9 +159,8 @@
 				this.boundsHighLonLat = this.getBoundsLonLat(this.boundsHigh);
 				this.boundsLowLonLat = this.getBoundsLonLat(this.boundsLow);
 
-				var position = this.geo.projection(this.tile2lonlat(Math.floor(this.centerTile[0]), Math.floor(this.centerTile[1]), this.geo.tileZoom));
-				this.gridModel.position.x = position[0] + this.tileSize / 2;
-				this.gridModel.position.z = position[1] + this.tileSize / 2;
+				this.gridModel.position.x += this.tileSize * gridDiff[0];
+				this.gridModel.position.z += this.tileSize * gridDiff[1];
 
 				this.publish("gridUpdated");
 			}
