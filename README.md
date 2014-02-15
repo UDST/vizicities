@@ -83,7 +83,7 @@ To start off, you'll need to build ViziCities and get an up-to-date JavaScript f
 #### Clone the ViziCities repo
 
 ```
-git clone git@github.com:robhawkes/vizicities.git vizicities
+git clone https://github.com/robhawkes/vizicities.git vizicities
 ```
 
 #### [Install Node.js & NPM](http://nodejs.org/)
