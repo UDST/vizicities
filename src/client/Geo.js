@@ -13,7 +13,7 @@
 			this.metersPerLat = 111319.49;
 
 			this.tileSize = 256;
-			this.tileZoom = 16;
+			this.tileZoom = 15;
 
 			this.projection = this.setProjection(options.center);
 

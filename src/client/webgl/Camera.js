@@ -7,7 +7,7 @@
 
 		_.extend(this, VIZI.Mediator);
 
-		this.cameraRadius = 4100;
+		this.cameraRadius = 1500;
 		this.theta = 45; // Horizontal orbit
 		this.phi = 80; // Vertical oribt
 
@@ -68,14 +68,16 @@
 		var cameraRadiusDiff = this.cameraRadius - oldcameraRadius;
 
 		// Cap zoom to bounds
-		if (this.cameraRadius < 1000) {
-			this.cameraRadius = 1000;
-			cameraRadiusDiff = 1000 - oldcameraRadius;
+		var zoomCapLow = 250;
+		if (this.cameraRadius < zoomCapLow) {
+			this.cameraRadius = zoomCapLow;
+			cameraRadiusDiff = zoomCapLow - oldcameraRadius;
 		}
 
-		if (this.cameraRadius > 5000) {
-			this.cameraRadius = 5000;
-			cameraRadiusDiff = 5000 - oldcameraRadius;
+		var zoomCapHigh = 2000;
+		if (this.cameraRadius > zoomCapHigh) {
+			this.cameraRadius = zoomCapHigh;
+			cameraRadiusDiff = zoomCapHigh - oldcameraRadius;
 		}
 		
 		this.camera.translateZ( cameraRadiusDiff );
