@@ -174,7 +174,7 @@
 
 		// Simplify coordinates
 		// TODO: Perform this in the worker thread
-		var simplifyTolerance = 3; // Three.js units
+		var simplifyTolerance = 1; // Three.js units
 		var simplifiedCoords = simplify(coordinates, simplifyTolerance);
 
 		// VIZI.Log("Original coord count:", coordinates.length);

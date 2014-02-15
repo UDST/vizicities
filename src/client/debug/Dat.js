@@ -15,6 +15,7 @@
 	VIZI.Dat.prototype.createGUI = function() {
 		VIZI.Log("Creating dat.GUI");
 		var gui = new dat.GUI();
+		gui.close();
 		return gui;
 	};
 
