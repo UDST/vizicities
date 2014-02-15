@@ -6,7 +6,10 @@ module.exports = function(grunt) {
 		pkg: grunt.file.readJSON('package.json'),
 		uglify: {
 			options: {
-				banner: '/*! ViziCities <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+				banner: '/*! ViziCities <%= grunt.template.today("yyyy-mm-dd") %> */\n',
+				beautify : {
+					ascii_only : true
+				}
 			},
 			build: {
 				src: 'build/vizi.js',
