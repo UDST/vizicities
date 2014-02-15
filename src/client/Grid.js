@@ -21,7 +21,7 @@
 			this.tilesPerDirectionHigh = 1;
 
 			// Tiles per direction for low detail
-			this.tilesPerDirectionLow = 6;
+			this.tilesPerDirectionLow = 3;
 
 			// Calculated pixel tile size
 			this.tileSize = 0;
@@ -65,24 +65,33 @@
 			// Why is this tilesize so random?
 			this.tileSize = this.geo.projection(lonLatMax)[0] - this.geo.projection(lonLatMin)[0];
 			
-			var tileGeom = new THREE.PlaneGeometry( this.tileSize, this.tileSize, 1, 1 );
+			var tileLineMat = new THREE.LineBasicMaterial( { color: 0xcc0000, linewidth: 6 } );
+			var tileLineGeom = new THREE.Geometry();
+
+			var vertices = tileLineGeom.vertices;
+			vertices.push(new THREE.Vector3(0, 0, 0));
+			vertices.push(new THREE.Vector3(this.tileSize, 0, 0));
+			vertices.push(new THREE.Vector3(this.tileSize, 0, this.tileSize));
+			vertices.push(new THREE.Vector3(0, 0, this.tileSize));
+			vertices.push(new THREE.Vector3(0, 0, 0));
+
+			tileLineGeom.computeLineDistances();
+
 			var tileCount = [this.boundsHigh.e-this.boundsHigh.w, this.boundsHigh.s-this.boundsHigh.n];
 			// Rows
 			for (var i = 0; i < tileCount[0]; i++) {
 				// Columns
 				for (var j = 0; j < tileCount[1]; j++) {
 					var tileCoords = [this.boundsHigh.w + j, this.boundsHigh.n + i];
-						
-					var tileMat = new THREE.MeshBasicMaterial({color: new THREE.Color(0xFFFFFF * Math.random()), transparent: true, opacity: 0.6});
-					var tile = new THREE.Mesh(tileGeom, tileMat);
+
 					var position = this.geo.projection(this.tile2lonlat(tileCoords[0], tileCoords[1], this.geo.tileZoom));
 
-					tile.position.y = 10;
-					tile.position.x = position[0] + this.tileSize / 2;
-					tile.position.z = position[1] + this.tileSize / 2;
-					tile.rotation.x = - 90 * Math.PI / 180;
+					var tileLine = new THREE.Line(tileLineGeom, tileLineMat);
+					tileLine.position.y = 1;
+					tileLine.position.x = position[0];
+					tileLine.position.z = position[1];
 
-					this.gridModel.add(tile);
+					this.gridModel.add(tileLine);
 				}
 			}
 
