@@ -21,7 +21,7 @@
 			this.tilesPerDirectionHigh = 1;
 
 			// Tiles per direction for low detail
-			this.tilesPerDirectionLow = 3;
+			this.tilesPerDirectionLow = 2;
 
 			// Calculated pixel tile size
 			this.tileSize = 0;

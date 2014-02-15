@@ -11,35 +11,68 @@
 		// TODO: Ways that cross over tile boundaries will likely get picked up by a query for each tile. Look into that.
 		// OSM Buildings handles this by not rendering items with an id that it already knows about
 		// https://github.com/kekscom/osmbuildings/blob/master/src/Data.js#L59
-		this.query = "[out:json];" +
+		// Good Overpass queries: https://raw2.github.com/bigr/map1/master/import_osm.eu1000
+		this.queryHigh = "[out:json];" +
 			"((" + 
-			// "rel({s},{w},{n},{e})[waterway~%22riverbank|dock%22];" +
-			// "rel({s},{w},{n},{e})[waterway=%22canal%22][area=%22yes%22];" +
-			// "rel({s},{w},{n},{e})[natural~%22water|scrub%22];" +
-			// "rel({s},{w},{n},{e})[leisure~%22park|pitch%22];" +
-			// "rel({s},{w},{n},{e})[landuse~%22grass|meadow|forest|commercial|retail|industrial|construction|brownfield%22];" +
-			// ");(._;way(r););(._;node(w););(" +
+			"rel({s},{w},{n},{e})[waterway~%22riverbank|dock%22];" +
+			"rel({s},{w},{n},{e})[waterway=%22canal%22][area=%22yes%22];" +
+			"rel({s},{w},{n},{e})[natural~%22water|scrub%22];" +
+			"rel({s},{w},{n},{e})[leisure~%22park|pitch%22];" +
+			"rel({s},{w},{n},{e})[landuse~%22grass|meadow|forest|commercial|retail|industrial|construction|brownfield%22];" +
+			");(._;way(r););(._;node(w););(" +
 			"way({s},{w},{n},{e})[%22building%22];" +
-			// "way({s},{w},{n},{e})[waterway~%22riverbank|dock%22];" +
-			// "way({s},{w},{n},{e})[waterway=%22canal%22][area=%22yes%22];" +
-			// "way({s},{w},{n},{e})[natural~%22water|scrub%22];" +
-			// "way({s},{w},{n},{e})[leisure~%22park|pitch%22];" +
-			// "way({s},{w},{n},{e})[landuse~%22grass|meadow|forest|commercial|retail|industrial|construction|brownfield%22];" +
+			"way({s},{w},{n},{e})[waterway~%22riverbank|dock%22];" +
+			"way({s},{w},{n},{e})[waterway=%22canal%22][area=%22yes%22];" +
+			"way({s},{w},{n},{e})[natural~%22water|scrub%22];" +
+			"way({s},{w},{n},{e})[leisure~%22park|pitch%22];" +
+			"way({s},{w},{n},{e})[landuse~%22grass|meadow|forest|commercial|retail|industrial|construction|brownfield%22];" +
+			");(._;node(w);););out;";
+
+		this.queryLow = "[out:json];" +
+			"((" + 
+			"rel({s},{w},{n},{e})[waterway~%22riverbank|dock%22];" +
+			"rel({s},{w},{n},{e})[waterway=%22canal%22][area=%22yes%22];" +
+			"rel({s},{w},{n},{e})[natural~%22water|scrub%22];" +
+			"rel({s},{w},{n},{e})[leisure~%22park|pitch%22];" +
+			"rel({s},{w},{n},{e})[landuse~%22grass|meadow|forest|commercial|retail|industrial|construction|brownfield%22];" +
+			");(._;way(r););(._;node(w););(" +
+			"way({s},{w},{n},{e})[waterway~%22riverbank|dock%22];" +
+			"way({s},{w},{n},{e})[waterway=%22canal%22][area=%22yes%22];" +
+			"way({s},{w},{n},{e})[natural~%22water|scrub%22];" +
+			"way({s},{w},{n},{e})[leisure~%22park|pitch%22];" +
+			"way({s},{w},{n},{e})[landuse~%22grass|meadow|forest|commercial|retail|industrial|construction|brownfield%22];" +
 			");(._;node(w);););out;";
 
 		// URL of data source
-		// Good Overpass queries: https://raw2.github.com/bigr/map1/master/import_osm.eu1000
-		// this.url = "http://overpass-api.de/api/interpreter?data=[out:json];(way[%22building%22]({s},{w},{n},{e});node(w);way[%22building:part%22=%22yes%22]({s},{w},{n},{e});node(w);relation[%22building%22]({s},{w},{n},{e});way(r);node(w););out;";
-		// this.url = "http://overpass-api.de/api/interpreter?data=[out:json];(way[%22building%22]({s},{w},{n},{e});node(w));out;";
-		// this.url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];(way[%22building%22]({s},{w},{n},{e});node(w));out;";
-		// this.url = "http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];((rel({s},{w},{n},{e})[waterway~%22riverbank|dock%22];rel({s},{w},{n},{e})[waterway=%22canal%22][area=%22yes%22];rel({s},{w},{n},{e})[natural=%22water%22];);(._;way(r););(._;node(w););(way({s},{w},{n},{e})[waterway~%22riverbank|dock%22];way({s},{w},{n},{e})[waterway=%22canal%22][area=%22yes%22];way({s},{w},{n},{e})[natural=%22water%22];);(._;node(w);););out;";
-		// this.url = "http://overpass-api.de/api/interpreter?data=[out:json];((rel({s},{w},{n},{e})[waterway~%22riverbank|dock%22];rel({s},{w},{n},{e})[waterway=%22canal%22][area=%22yes%22];rel({s},{w},{n},{e})[natural=%22water%22];);(._;way(r););(._;node(w););(way({s},{w},{n},{e})[waterway~%22riverbank|dock%22];way({s},{w},{n},{e})[waterway=%22canal%22][area=%22yes%22];way({s},{w},{n},{e})[natural=%22water%22];);(._;node(w);););out;";
-		this.url = "http://overpass-api.de/api/interpreter?data=" + this.query;
+		this.urlBase = "http://overpass-api.de/api/interpreter?data=";
+		// this.urlBase = "http://overpass.osm.rambler.ru/cgi/interpreter?data=";
+		this.urlHigh = this.urlBase + this.queryHigh;
+		this.urlLow = this.urlBase + this.queryLow;
 	};
 
 	VIZI.DataOverpass.prototype = Object.create( VIZI.Data.prototype );
 
 	VIZI.DataOverpass.prototype.update = function() {
+		var self = this;
+		var deferred = Q.defer();
+
+		var promiseQueue = [];
+		promiseQueue.push(self.updateByLevel(self.grid.boundsHigh, self.urlHigh));
+		// TODO: Re-enable low queries when loading performance and optimisation is sorted
+		// promiseQueue.push(self.updateByLevel(self.grid.boundsLow, self.urlLow));
+
+		Q.all(promiseQueue).done(function() {
+			deferred.resolve();
+		}, function(error) {
+			deferred.reject(error);
+		});
+
+		return deferred.promise;
+	};
+
+	// TODO: Send one big query for bounds and split into tiles on return
+	//  - Seems like the sending and receiving of XHR requests are expensive, not the processing
+	VIZI.DataOverpass.prototype.updateByLevel = function(bounds, url) {
 		var self = this;
 		var deferred = Q.defer();
 
@@ -49,7 +82,6 @@
 		// Load objects using promises
 		var promiseQueue = [];
 
-		var bounds = self.grid.boundsHigh;
 		var tileCount = [bounds.e-bounds.w, bounds.s-bounds.n];
 		// Rows
 		for (var i = 0; i < tileCount[0]; i++) {
@@ -66,16 +98,15 @@
 				var tileBoundsLonLat = self.grid.getBoundsLonLat(tileBounds);
 
 				var cacheKey = tileCoords[0] + ":" + tileCoords[1];
-				promiseQueue.push(self.load(tileBoundsLonLat, cacheKey));
-				// self.load(tileBoundsLonLat);
+				promiseQueue.push(self.load(url, tileBoundsLonLat, cacheKey));
 			}
 		}
 
-		// deferred.resolve();
-
 		Q.all(promiseQueue).done(function() {
 			deferred.resolve();
-		}, function(error) {});
+		}, function(error) {
+			deferred.reject(error);
+		});
 
 		// TODO: Add data to cache
 
@@ -118,7 +149,7 @@
 		var points = element.nodes;
 		var pointCount = points.length;
 
-		var tags = element.tags;
+		var tags = element.tags || {};
 		
 		// Not enough points to make an object
 		if (pointCount < 4) {

@@ -41,7 +41,7 @@
 		this.subscribe("gridUpdated", this.update);
 	};
 
-	VIZI.Data.prototype.load = function(parameters, cacheKey) {
+	VIZI.Data.prototype.load = function(url, parameters, cacheKey) {
 		var self = this;
 		var deferred = Q.defer();
 
@@ -53,21 +53,25 @@
 		}
 
 		// Replace URL placeholders with parameter values
-		var url = self.url.replace(/\{([swne])\}/g, function(value, key) {
+		url = url.replace(/\{([swne])\}/g, function(value, key) {
 			// Replace with paramter, otherwise keep existing value
 			return parameters[key];
 		});
 
 		VIZI.Log("Requesting URL", url);
 
-		// Request data and fulfil promise 
+		// Request data and fulfil promise
+		// TODO: Check that responses are being received asynchronously
+		//   - Not convinced as tile loader seems to deal with responses neartly in order
 		d3.json(url, function(error, data) {
 			VIZI.Log("Response for URL", url);
 			if (error) {
 				deferred.reject(new Error(error));
 			} else {
+				// No features
 				if (data.elements.length === 0) {
-					deferred.reject(new Error("No buildings"));
+					deferred.resolve();
+					return;
 				}
 
 				var features = self.process(data);
@@ -89,9 +93,10 @@
 					uniqueFeatures.push(feature);
 				});
 
-				// Reject promise if no features left to render
+				// End promise if no features left to render
 				if (uniqueFeatures.length === 0) {
-					deferred.reject(new Error("No features left to pass to worker"));
+					VIZI.Log("No features left to pass to worker");
+					deferred.resolve();
 					return;
 				}
 
