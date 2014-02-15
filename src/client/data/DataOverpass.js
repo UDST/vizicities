@@ -1,4 +1,4 @@
-/* globals window, _, VIZI, Q, d3 */
+/* globals window, _, VIZI, Q, d3, simplify */
 (function() {
 	"use strict";
 
@@ -172,6 +172,22 @@
 			return;
 		}
 
+		// Simplify coordinates
+		// TODO: Perform this in the worker thread
+		var simplifyTolerance = 3; // Three.js units
+		var simplifiedCoords = simplify(coordinates, simplifyTolerance);
+
+		// VIZI.Log("Original coord count:", coordinates.length);
+		// VIZI.Log("Simplified coord count:", simplifiedCoords.length);
+
+		// VIZI.Log("Original coord example:", coordinates[0], coordinates[1]);
+		// VIZI.Log("Simplified coord example:", simplifiedCoords[0], simplifiedCoords[1]);
+
+		// Not enough points to make an object
+		if (simplifiedCoords.length < 4) {
+			return;
+		}
+
 		tags.height = this.processHeight(tags);
 		tags.colour = this.processColour(tags);
 
@@ -182,7 +198,7 @@
 
 		ways.push({
 			id: element.id,
-			coordinates: coordinates,
+			coordinates: simplifiedCoords,
 			properties: tags
 		});
 	};
