@@ -1,4 +1,4 @@
-# ViziCities [![Build Status](https://magnum.travis-ci.com/robhawkes/vizicities.png?token=RuiyUr4VxmxkBfNHP9YA&branch=master)](https://magnum.travis-ci.com/robhawkes/vizicities)
+# ViziCities [0.1.0-pre] [![Build Status](https://magnum.travis-ci.com/robhawkes/vizicities.png?token=RuiyUr4VxmxkBfNHP9YA&branch=master)](https://magnum.travis-ci.com/robhawkes/vizicities)
 __Bringing cities to life using the power of open data and the Web__
 
 ![](http://f.cl.ly/items/0r0u0t1c2g1o3U1y3r2x/vizicities-combined-ssao.jpg)
@@ -31,18 +31,43 @@ For more information you should start here:
 * [Videos of various ViziCities experiments](https://vimeo.com/channels/vizicities)
 
 
-## Current features
+## Features
 
-### 0.1.0
+ViziCities is currently in a pre-alpha state, meaning things are changing rapidly and you should expect bugs.
 
-* Dynamic city loading using OpenStreetMap data
-* Buildings
+### 0.1.0-pre
+
+* Buildings, water (rivers, canals, etc), and green areas (parks, grass, forest, etc)
+* Dynamic data loading using the OpenStreetMap Overpass API (literally the entire world)
+* Accurate heights based on OpenStreetMap tags, if available
+* Loading of data using a TMS grid system
+* Caching of loaded grid data to prevent duplicated requests
 * Processing of geographic features into 3D objects using Web Workers
-* Mouse controls (zoom and pan)
+* Controls (zoom, pan and orbit)
 * Basic tests and build status using Travis CI
+* Grunt-based development environment
 
-## Future features
+### Future features
 
+* 3D road network
+* Static data visualisation layers (heatmaps, bar charts, etc)
+* Live data visualisation (tweets, public transport, etc)
+* AI vehicles and pedestrians
+* Local weather
+* Post processing (DoF, SSAO, etc)
+* 3D terrain
+* And much more&hellip;
+
+## Known issues
+
+ViziCities is not complete and there are likely many things that could be done better or simply need fixing. Here is a list of the major known issues:
+
+* Not all features from OpenStreetMap are being displayed (particularly relations)
+* Performance of tile-based loading mechanism is poor
+* Web Worker processing isn't efficient due to the way scripts and data are loaded
+* Caching is reset on page reload
+* XHR requests for data can take some time, causing visible delay
+* Performance issues with dense cities (eg. NYC)
 
 ## Getting started
 
@@ -75,37 +100,36 @@ grunt dev
 ```
 
 #### Serve examples using Grunt
+Open a new terminal tab or window, then type:
+
 ```
 cd /path/to/vizicities
 grunt serve
 ```
 
-Then open [http://127.0.0.1:8000/examples](http://127.0.0.1:8000/examples)
+Then open [http://localhost:8000/examples](http://localhost:8000/examples)
 
-### Data formats
-
-Visualising geographic features lies at the core of ViziCities. To make sure features render correctly you'll need to [use the correct data formats](https://github.com/robhawkes/vizicities/blob/master/DATA-FORMATTING.md).
 
 ### Using ViziCities
 
-The idea is that you'll eventually be able to easily use your own data and visualise any city in the world. Until then, [a built in example](https://github.com/robhawkes/vizicities/tree/master/examples) has been provided to give you a taster of what ViziCities can do.
+Use the [built in example](https://github.com/robhawkes/vizicities/tree/master/examples) to get an idea of what ViziCities can do. Change the coordinates to load a new part of the world (anywhere you want).
 
 
 ## Getting involved
 
-ViziCities can't happen without your help. We need people to submit bugs, suggest features, share how they're using ViziCities, and contribute code to the project. Sound like you? [Check out exactly how to get involved](https://github.com/robhawkes/vizicities/blob/master/CONTRIBUTING.md).
+ViziCities can't happen without your help. We need people to submit bugs, suggest features, share how they're using the project, and contribute code. Sound like you? [Check out exactly how to get involved](https://github.com/robhawkes/vizicities/blob/master/CONTRIBUTING.md).
 
 ### Suggestions
 
 There are a couple of things in particular that need your help:
 
 * Styling improvements (play with the lighting and materials, add shaders, make things look pretty)
-* Performance improvements (particularly with the Three.js object generation and rendering side)
+* Performance improvements (particularly with feature processing, generation and rendering)
 
 
 ## Contact & community
 
-Communicate with the ViziCities team via email ([hello@vizicities.com](mailto:hello@vizicities.com)) and Twitter ([@ViziCities](http://twitter.com/ViziCities)). All other discussion should happen in the [ViziCities Google Group](https://groups.google.com/forum/#!forum/vizicities) or [relevant GitHub issues page](https://github.com/robhawkes/vizicities/issues).
+Communicate with the ViziCities team via email ([hello@vizicities.com](mailto:hello@vizicities.com)) and Twitter ([@ViziCities](http://twitter.com/ViziCities)). All other discussion should happen in the [ViziCities Google Group](https://groups.google.com/forum/#!forum/vizicities), IRC (#vizicities on Freenode) or [relevant GitHub issues page](https://github.com/robhawkes/vizicities/issues).
 
 
 ## Contributors
@@ -113,11 +137,32 @@ Communicate with the ViziCities team via email ([hello@vizicities.com](mailto:he
 [Robin Hawkes](http://twitter.com/robhawkes), [Peter Smart](http://twitter.com/petewsmart), [Matthew Harrison-Jones](http://twitter.com/matt_hojo)
 
 
+## Libraries and resources used
+
+* [OpenStreetMap](http://openstreetmap.org) – Map data
+* [Three.js](http://threejs.org) – WebGL
+* [D3.js](http://d3js.org) – Geographic coordinate conversion
+* [Underscore.js](http://underscorejs.org) – General helpers
+* [Q](https://github.com/kriskowal/q) – Promises
+* [Catiline](http://catilinejs.com) – Web Workers
+* [Dat.gui](https://code.google.com/p/dat-gui) – Debug control panel
+* [FPSMeter](http://darsa.in/fpsmeter) – FPS meter
+* [Moment.js](http://momentjs.com) – Date processing
+* [Simplify.js](http://mourner.github.io/simplify-js) – Polygon simplification
+* [Grunt](http://gruntjs.com) – Build system
+
+
 ## FAQ
 
 ### What happened to all the cool features I saw in the blog posts?
 
 Over the past year [we've been producing experiments](http://rawkes.com/articles/vizicities-dev-diary-2) to prove that ViziCities is possible. These experiments, while working, were not robust and never intended for release. The version of ViziCities you see here is a solid foundation based on the lessons learnt from the previous experiments. It will eventually catch up with those experiments in regards to features.
+
+### What are the controls?
+
+* Zoom using the mouse wheel
+* Pan using the left mouse button
+* Orbit by holding left shift and using the left mouse button
 
 
 ## Copyright & license
