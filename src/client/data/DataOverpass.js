@@ -14,18 +14,18 @@
 		// Good Overpass queries: https://raw2.github.com/bigr/map1/master/import_osm.eu1000
 		this.queryHigh = "[out:json];" +
 			"((" + 
-			"rel({s},{w},{n},{e})[waterway~%22riverbank|dock%22];" +
-			"rel({s},{w},{n},{e})[waterway=%22canal%22][area=%22yes%22];" +
-			"rel({s},{w},{n},{e})[natural~%22water|scrub%22];" +
-			"rel({s},{w},{n},{e})[leisure~%22park|pitch%22];" +
-			"rel({s},{w},{n},{e})[landuse~%22grass|meadow|forest|commercial|retail|industrial|construction|brownfield%22];" +
-			");(._;way(r););(._;node(w););(" +
+			// "rel({s},{w},{n},{e})[waterway~%22riverbank|dock%22];" +
+			// "rel({s},{w},{n},{e})[waterway=%22canal%22][area=%22yes%22];" +
+			// "rel({s},{w},{n},{e})[natural~%22water|scrub%22];" +
+			// "rel({s},{w},{n},{e})[leisure~%22park|pitch%22];" +
+			// "rel({s},{w},{n},{e})[landuse~%22grass|meadow|forest%22];" +
+			// ");(._;way(r););(._;node(w););(" +
 			"way({s},{w},{n},{e})[%22building%22];" +
 			"way({s},{w},{n},{e})[waterway~%22riverbank|dock%22];" +
 			"way({s},{w},{n},{e})[waterway=%22canal%22][area=%22yes%22];" +
 			"way({s},{w},{n},{e})[natural~%22water|scrub%22];" +
 			"way({s},{w},{n},{e})[leisure~%22park|pitch%22];" +
-			"way({s},{w},{n},{e})[landuse~%22grass|meadow|forest|commercial|retail|industrial|construction|brownfield%22];" +
+			"way({s},{w},{n},{e})[landuse~%22grass|meadow|forest%22];" +
 			");(._;node(w);););out;";
 
 		this.queryLow = "[out:json];" +
@@ -247,6 +247,7 @@
 		} else if (tags["landuse"] && /commercial|retail/.test(tags["landuse"])) {
 			colour = 0xa9bbd6;
 		} else {
+			VIZI.Log("Setting default colour for feaure", tags);
 			colour = 0xFF0000;
 		}
 
