@@ -58,10 +58,11 @@
 			this.boundsHighLonLat = this.getBoundsLonLat(this.boundsHigh);
 			this.boundsLowLonLat = this.getBoundsLonLat(this.boundsLow);
 
-			// Create debug model for grid
-			this.createDebug();
-
-			this.publish("addToScene", this.gridModel);
+			if (VIZI.DEBUG) {
+				// Create debug model for grid
+				this.createDebug();
+				this.publish("addToScene", this.gridModel);
+			}
 
 			return Q.fcall(function() {});
 		};

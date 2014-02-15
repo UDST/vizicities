@@ -8,7 +8,7 @@
 		_.extend(this, VIZI.Mediator);
 
 		// Debug tools
-		this.dat = new VIZI.Dat();
+		this.dat = undefined;
 		this.fps = undefined;
 		this.rendererInfo = undefined;
 
@@ -148,8 +148,11 @@
 
 		var startTime = Date.now();
 
-		this.fps = new VIZI.FPS();
-		this.rendererInfo = new VIZI.RendererInfo();
+		if (VIZI.DEBUG) {
+			this.dat = new VIZI.Dat();
+			this.fps = new VIZI.FPS();
+			this.rendererInfo = new VIZI.RendererInfo();
+		}
 
 		VIZI.Log("Finished intialising debug tools in " + (Date.now() - startTime) + "ms");
 
