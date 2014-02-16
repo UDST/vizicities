@@ -1,4 +1,4 @@
-# ViziCities [0.1.0-pre] [![Build Status](https://magnum.travis-ci.com/robhawkes/vizicities.png?token=RuiyUr4VxmxkBfNHP9YA&branch=master)](https://magnum.travis-ci.com/robhawkes/vizicities)
+# ViziCities [0.1.0-pre] [![Build Status](https://travis-ci.org/robhawkes/vizicities.png?branch=master)](https://travis-ci.org/robhawkes/vizicities)
 __Bringing cities to life using the power of open data and the Web__
 
 ![http://vizicities.apps.rawk.es](http://f.cl.ly/items/2q1X082f3q0Z1k3R1r3j/Screen%20Shot%202014-02-15%20at%2017.00.54.png)
