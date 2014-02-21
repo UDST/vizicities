@@ -21,7 +21,7 @@
     "chai": "~1.9.0",
     "sinon": "~1.8.1",
     "sinon-chai": "~2.5.0"
-  }
+  },
   "repository" :
   { "type" : "git"
   , "url" : "https://github.com/robhawkes/vizicities.git"
