@@ -102,6 +102,8 @@ module.exports = function(grunt) {
 			server: {
 				options: {
 					port: port,
+					// change hostname to 0.0.0.0 to open it up
+                                        hostname: 'localhost',
 					base: '.',
 					keepalive: true,
 					debug: true
