@@ -53,6 +53,12 @@
 			options = {};
 		}
 
+		var hash = window.location.hash.replace('#', '');
+		var coordCheck = /^(\-?\d+(\.\d+)?),(\-?\d+(\.\d+)?)$/;
+		if (coordCheck.test(hash) && !_.has(options, 'coords')) {
+			options.coords = hash.split(',');
+		}
+
 		_.defaults(options, {
 			coords: [-0.01924, 51.50358]
 		});
