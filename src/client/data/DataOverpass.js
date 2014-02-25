@@ -1,4 +1,4 @@
-/* globals window, _, VIZI, Q, d3, simplify */
+/* globals window, _, VIZI, Q, d3, simplify, throat */
 (function() {
 	"use strict";
 
@@ -98,11 +98,18 @@
 				var tileBoundsLonLat = self.grid.getBoundsLonLat(tileBounds);
 
 				var cacheKey = tileCoords[0] + ":" + tileCoords[1];
-				promiseQueue.push(self.load(url, tileBoundsLonLat, cacheKey));
+
+				// TODO: Handle load promise without actually running the function
+				// - At the moment, the load function is run in at this point
+				promiseQueue.push([self.load, [url, tileBoundsLonLat, cacheKey]]);
 			}
 		}
 
-		Q.all(promiseQueue).done(function() {
+		// Use throat to limit simultaneous Overpass requests
+		// Without limitation the Overpass API will rate-limit
+		Q.all(promiseQueue.map(throat(2, function(promiseFunc) {
+			return promiseFunc[0].apply(self, promiseFunc[1]);
+		}))).done(function() {
 			deferred.resolve();
 		}, function(error) {
 			deferred.reject(error);

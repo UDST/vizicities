@@ -31,6 +31,7 @@ module.exports = function(grunt) {
 					'src/shared/vendor/fpsmeter.js',
 					'src/shared/vendor/moment.js',
 					'src/shared/vendor/simplify.js',
+					'src/shared/vendor/throat.js',
 					'src/client/Vizi.js',
 					'src/client/Log.js',
 					'src/client/Mediator.js',

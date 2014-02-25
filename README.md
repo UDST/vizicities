@@ -155,6 +155,7 @@ Communicate with the ViziCities team via email ([hello@vizicities.com](mailto:he
 * [D3.js](http://d3js.org) – Geographic coordinate conversion
 * [Underscore.js](http://underscorejs.org) – General helpers
 * [Q](https://github.com/kriskowal/q) – Promises
+* [Throat](https://github.com/ForbesLindesay/throat) - Limiting concurrency
 * [Catiline](http://catilinejs.com) – Web Workers
 * [Dat.gui](https://code.google.com/p/dat-gui) – Debug control panel
 * [FPSMeter](http://darsa.in/fpsmeter) – FPS meter
