@@ -2,7 +2,7 @@
 (function() {
 	"use strict";
 
-	VIZI.Camera = function(pos) {
+	VIZI.Camera = function(pos, capZoom, capOrbit) {
 		VIZI.Log("Inititialising WebGL camera");
 
 		_.extend(this, VIZI.Mediator);
@@ -10,6 +10,9 @@
 		this.cameraRadius = 1500;
 		this.theta = 45; // Horizontal orbit
 		this.phi = 80; // Vertical oribt
+
+		this.capZoom = (capZoom === false) ? false : true;
+		this.capOrbit = (capOrbit === false) ? false : true;
 
 		this.target = new THREE.Object3D();
 		this.updateTargetPositon(pos);
@@ -67,17 +70,19 @@
 
 		var cameraRadiusDiff = this.cameraRadius - oldcameraRadius;
 
+		if (this.capZoom) {
 		// Cap zoom to bounds
-		var zoomCapLow = 250;
-		if (this.cameraRadius < zoomCapLow) {
-			this.cameraRadius = zoomCapLow;
-			cameraRadiusDiff = zoomCapLow - oldcameraRadius;
-		}
+			var zoomCapLow = 250;
+			if (this.cameraRadius < zoomCapLow) {
+				this.cameraRadius = zoomCapLow;
+				cameraRadiusDiff = zoomCapLow - oldcameraRadius;
+			}
 
-		var zoomCapHigh = 2000;
-		if (this.cameraRadius > zoomCapHigh) {
-			this.cameraRadius = zoomCapHigh;
-			cameraRadiusDiff = zoomCapHigh - oldcameraRadius;
+			var zoomCapHigh = 2000;
+			if (this.cameraRadius > zoomCapHigh) {
+				this.cameraRadius = zoomCapHigh;
+				cameraRadiusDiff = zoomCapHigh - oldcameraRadius;
+			}
 		}
 		
 		this.camera.translateZ( cameraRadiusDiff );
@@ -111,12 +116,14 @@
 		this.theta = - ( delta2d.x * 0.5 ) + theta;
 		this.phi = ( delta2d.y * 0.5 ) + phi;
 
-		// Cap orbit to bounds
-		this.phi = Math.min( 175, Math.max( 65, this.phi ) );
+		if (this.capOrbit) {
+			// Cap orbit to bounds
+			this.phi = Math.min( 175, Math.max( 65, this.phi ) );
 
-		// Let controls know that the cap has been hit
-		if (this.phi === 175 || this.phi === 65) {
-			this.publish("orbitControlCap");
+			// Let controls know that the cap has been hit
+			if (this.phi === 175 || this.phi === 65) {
+				this.publish("orbitControlCap");
+			}
 		}
 
 		this.updatePosition();

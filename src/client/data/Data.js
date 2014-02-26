@@ -37,8 +37,6 @@
 		this.FOOT_TO_METER = 0.3048;
 		this.INCH_TO_METER = 0.0254;
 		this.METERS_PER_LEVEL = 3;
-
-		this.subscribe("gridUpdated", this.update);
 	};
 
 	VIZI.Data.prototype.load = function(url, parameters, cacheKey) {

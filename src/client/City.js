@@ -49,6 +49,8 @@
 		var startTime = Date.now();
 		var self = this;
 
+		var deferred = Q.defer();
+
 		if (!options) {
 			options = {};
 		}
@@ -85,7 +87,7 @@
 			self.publish("loadingProgress", 0.2);
 
 			// Initialise WebGL
-			return self.initWebGL();
+			return self.initWebGL(options);
 		}).then(function() {
 			self.publish("loadingProgress", 0.3);
 
@@ -130,7 +132,11 @@
 			self.publish("loadingComplete");
 
 			VIZI.Log("Finished loading city in " + (Date.now() - startTime) + "ms");
+
+			deferred.resolve();
 		});
+
+		return deferred.promise;
 	};
 
 	VIZI.City.prototype.initLoadingUI = function() {
@@ -166,14 +172,14 @@
 	};
 
 	// TODO: Move set up of core objects out to somewhere else
-	VIZI.City.prototype.initWebGL = function() {
+	VIZI.City.prototype.initWebGL = function(options) {
 		var startTime = Date.now();
 
 		var deferred = Q.defer();
 		
 		this.webgl = new VIZI.WebGL();
 
-		this.webgl.init(this.geo.centerPixels).then(function(result) {
+		this.webgl.init(this.geo.centerPixels, options.capZoom, options.capOrbit).then(function(result) {
 			VIZI.Log("Finished intialising WebGL in " + (Date.now() - startTime) + "ms");
 
 			deferred.resolve();

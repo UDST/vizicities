@@ -21,6 +21,7 @@
 			// "rel({s},{w},{n},{e})[landuse~%22grass|meadow|forest%22];" +
 			// ");(._;way(r););(._;node(w););(" +
 			"way({s},{w},{n},{e})[%22building%22];" +
+			"way({s},{w},{n},{e})[aerodrome=%22airport%22];" +
 			"way({s},{w},{n},{e})[waterway~%22riverbank|dock%22];" +
 			"way({s},{w},{n},{e})[waterway=%22canal%22][area=%22yes%22];" +
 			"way({s},{w},{n},{e})[natural~%22water|scrub%22];" +
@@ -46,8 +47,11 @@
 		// URL of data source
 		this.urlBase = "http://overpass-api.de/api/interpreter?data=";
 		// this.urlBase = "http://overpass.osm.rambler.ru/cgi/interpreter?data=";
+		// this.urlBase = "http://api.openstreetmap.fr/oapi/interpreter?data=";
 		this.urlHigh = this.urlBase + this.queryHigh;
 		this.urlLow = this.urlBase + this.queryLow;
+
+		this.subscribe("gridUpdated", this.update);
 	};
 
 	VIZI.DataOverpass.prototype = Object.create( VIZI.Data.prototype );
@@ -229,9 +233,11 @@
 			height = 6;
 		// } else if (tags["waterway"] || tags["natural"] && /water|scrub/.test(tags["natural"]) || tags["leisure"] && /park|pitch/.test(tags["leisure"]) || tags["landuse"] && /grass|meadow|commercial|retail|industrial|brownfield/.test(tags["landuse"])) {
 		} else if (tags["waterway"] || tags["natural"] === "water") {
-			height = 0.05;
+			height = 3;
+		} else if (tags["natural"] === "scrub" || tags["leisure"] && /park|pitch/.test(tags["leisure"]) || tags["landuse"] && /grass|meadow/.test(tags["landuse"])) {
+			height = 2;
 		} else {
-			height = 0.1;
+			height = 1;
 		}
 
 		height *= this.geo.pixelsPerMeter;
@@ -253,6 +259,8 @@
 			colour = 0xd8c7b5;
 		} else if (tags["landuse"] && /commercial|retail/.test(tags["landuse"])) {
 			colour = 0xa9bbd6;
+		} else if (tags["aerodrome"] === "airport") {
+			colour = 0xffffff;
 		} else {
 			VIZI.Log("Setting default colour for feaure", tags);
 			colour = 0xFF0000;

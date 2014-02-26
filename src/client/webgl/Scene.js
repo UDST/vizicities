@@ -16,6 +16,12 @@
 			VIZI.Log(object);
 			this.addToScene(object);
 		});
+
+		this.subscribe("removeFromScene", function(object) {
+			VIZI.Log("Scene remove object handler");
+			VIZI.Log(object);
+			this.removeFromScene(object);
+		});
 	};
 
 	VIZI.Scene.prototype.createScene = function() {
@@ -30,5 +36,15 @@
 	VIZI.Scene.prototype.addToScene = function(object) {
 		this.scene.add(object);
 		this.objects.push(object);
+	};
+
+	VIZI.Scene.prototype.removeFromScene = function(object) {
+		this.scene.remove(object);
+
+		// Remove object from objects array
+		var index = _.indexOf(this.objects, object);
+		if (index > -1) {
+			this.objects.splice(index, 1);
+		}
 	};
 }());
