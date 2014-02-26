@@ -7,6 +7,10 @@
 
 		_.extend(this, VIZI.Mediator);
 
+		// High resolution time
+		this.startTime = 0;
+		this.lastTickTime = 0;
+
 		this.stopLoop = false;
 
 		this.publish("addToDat", this, {name: "Loop", properties: ["start", "stop"]});
@@ -17,6 +21,7 @@
 	VIZI.Loop.prototype.start = function() {
 		VIZI.Log("Starting application loop");
 		this.stopLoop = false;
+		this.startTime = window.performance.now ? (window.performance.now() + window.performance.timing.navigationStart) : Date.now();
 		this.tick();
 	};
 
@@ -25,11 +30,21 @@
 		this.stopLoop = true;
 	};
 
-	VIZI.Loop.prototype.tick = function() {
+	VIZI.Loop.prototype.tick = function(timestamp) {
 		this.publish("fpsTickStart", "Main Loop");
+
+		var delta = timestamp - this.lastTickTime;
+
+		// if (timestamp < 1e12){
+		// // .. high resolution timer
+		// } else {
+		// // integer milliseconds since unix epoch
+		// }
 		
-		this.publish("update");
-		this.publish("render");
+		this.publish("update", delta);
+		this.publish("render", delta);
+
+		this.lastTickTime = timestamp;
 
 		if (!this.stopLoop) {
 			// Should probably be a bit more obvious that this comes from Three.js
