@@ -107,7 +107,7 @@
 
 		// Use throat to limit simultaneous Overpass requests
 		// Without limitation the Overpass API will rate-limit
-		Q.all(promiseQueue.map(throat(2, function(promiseFunc) {
+		Q.all(promiseQueue.map(throat(1, function(promiseFunc) {
 			return promiseFunc[0].apply(self, promiseFunc[1]);
 		}))).done(function() {
 			deferred.resolve();
