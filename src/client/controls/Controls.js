@@ -8,16 +8,21 @@
 
 			_.extend(this, VIZI.Mediator);
 
+			this.enabled = undefined;
+
 			this.mouse = undefined;
 			this.keyboard = undefined;
 		};
 
-		Controls.prototype.init = function(camera) {
-			this.mouse = VIZI.Mouse.getInstance(camera);
-			this.keyboard = VIZI.Keyboard.getInstance();
+		Controls.prototype.init = function(camera, options) {
+			if (options.enable) {
+				this.mouse = VIZI.Mouse.getInstance(camera);
+				this.keyboard = VIZI.Keyboard.getInstance();
 
-			this.subscribe("update", this.onUpdate);
-			this.subscribe("orbitControlCap", this.orbitCapReset);
+				this.subscribe("update", this.onUpdate);
+				this.subscribe("orbitControlCap", this.orbitCapReset);
+			}
+			this.enabled = options.enable;
 
 			return Q.fcall(function() {});
 		};

@@ -12,6 +12,9 @@
 		this.fps = undefined;
 		this.rendererInfo = undefined;
 
+		// Options
+		this.options = undefined;
+
 		// UI
 		this.ui = {};
 		this.ui.loading = undefined;
@@ -55,6 +58,8 @@
 			options = {};
 		}
 
+		this.options = options;
+
 		var hash = window.location.hash.replace('#', '');
 		var coordCheck = /^(\-?\d+(\.\d+)?),(\-?\d+(\.\d+)?)$/;
 		if (coordCheck.test(hash) && !_.has(options, 'coords')) {
@@ -66,7 +71,8 @@
 			capZoom: true,
 			capOrbit: true,
 			overpassGridUpdate: true,
-			overpassWayIntersect: false
+			overpassWayIntersect: false,
+			controls: { enable: true }
 		});
 
 		// Output city options
@@ -217,7 +223,7 @@
 
 		this.controls = VIZI.Controls.getInstance();
 
-		this.controls.init(this.webgl.camera).then(function(result) {
+		this.controls.init(this.webgl.camera, this.options.controls).then(function(result) {
 			VIZI.Log("Finished intialising controls in " + (Date.now() - startTime) + "ms");
 
 			deferred.resolve();
