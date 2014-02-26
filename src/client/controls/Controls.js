@@ -32,12 +32,12 @@
 			}
 
 			// Pan
-			if (mouseState.buttons.left && !keyboardState.keys.leftShift) {
+			if (mouseState.buttons.left && !keyboardState.keys.shift) {
 				this.publish("panControl", mouseState.pos3dDelta);
 			}
 
 			// Orbit
-			if (mouseState.buttons.left && keyboardState.keys.leftShift) {
+			if ((mouseState.buttons.left && keyboardState.keys.shift) || mouseState.buttons.middle) {
 				this.publish("orbitControl", mouseState.downPos2dDelta, mouseState.camera.startTheta, mouseState.camera.startPhi);
 			}
 

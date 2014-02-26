@@ -173,7 +173,7 @@ Over the past year [we've been producing experiments](http://rawkes.com/articles
 
 * Zoom using the mouse wheel
 * Pan using the left mouse button
-* Orbit by holding left shift and using the left mouse button
+* Orbit by holding shift and using the left mouse button, or using the middle mouse button
 
 
 ## Copyright & license

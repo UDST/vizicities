@@ -116,7 +116,7 @@
 			state.pos3d.y = pos3d.y;
 			state.pos3d.z = pos3d.z;
 
-			if (state.buttons.left) {
+			if (state.buttons.left || state.buttons.middle) {
 				state.downPos2dDelta.x = event.clientX - state.downPos2d.x;
 				state.downPos2dDelta.y = event.clientY - state.downPos2d.y;
 
