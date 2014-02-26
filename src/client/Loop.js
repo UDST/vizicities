@@ -21,7 +21,7 @@
 	VIZI.Loop.prototype.start = function() {
 		VIZI.Log("Starting application loop");
 		this.stopLoop = false;
-		this.startTime = window.performance.now ? (window.performance.now() + window.performance.timing.navigationStart) : Date.now();
+		this.startTime = (window.performance && window.performance.now) ? (window.performance.now() + window.performance.timing.navigationStart) : Date.now();
 		this.tick();
 	};
 
