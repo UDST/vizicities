@@ -19,6 +19,11 @@
 			self.publish("resize", event);
 		}, false );
 
+		// Hash change
+		window.addEventListener( "hashchange", function(event) {
+			self.publish("hashchange", event);
+		}, false );
+
 		return Q.fcall(function() {});
 	};
 }());

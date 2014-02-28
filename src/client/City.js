@@ -44,6 +44,8 @@
 		this.loop = undefined;
 
 		this.publish("addToDat", this, {name: "City", properties: ["init"]});
+
+		this.subscribe("hashchange", this.onHashchange);
 	};
 
 	VIZI.City.prototype.init = function(options) {
@@ -62,8 +64,8 @@
 
 		var hash = window.location.hash.replace('#', '');
 		var coordCheck = /^(\-?\d+(\.\d+)?),(\-?\d+(\.\d+)?)$/;
-		if (coordCheck.test(hash) && !_.has(options, 'coords')) {
-			options.coords = hash.split(',');
+		if (coordCheck.test(hash)) {
+			options.coords = hash.split(',').reverse();
 		}
 
 		_.defaults(options, {
@@ -283,4 +285,9 @@
 		// return deferred.promise;
 		return Q.fcall(function() {});
 	};
+
+	VIZI.City.prototype.onHashchange = function(){
+		window.location.reload();
+	};
+
 }());
