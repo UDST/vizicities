@@ -40,7 +40,7 @@ ViziCities is currently in a pre-alpha state, meaning things are changing rapidl
 
 ### 0.1.0-pre
 
-* Load anywhere in the world using coordinates in the URL (#lon,lat) ([like Oslo](http://vizicities.apps.rawk.es/demo.html#10.752245,59.913869))
+* Load anywhere in the world using coordinates in the URL (#lat,lon) ([like Oslo](http://vizicities.apps.rawk.es/demo.html#59.913869,10.752245))
 * Buildings, water (rivers, canals, etc), and green areas (parks, grass, forest, etc)
 * Dynamic data loading using the OpenStreetMap Overpass API (literally the entire world)
 * Accurate heights based on OpenStreetMap tags, if available
