@@ -2,10 +2,14 @@
 (function() {
 	"use strict";
 
-	VIZI.DataOverpass = function() {
+	VIZI.DataOverpass = function(options) {
 		VIZI.Log("Inititialising Overpass API manager");
 
 		VIZI.Data.call(this);
+
+		_.defaults(options, {
+			gridUpdate: true
+		});
 
 		// TODO: It's entirely possible that these queries are picking up duplicate ways. Need to look into it.
 		// TODO: Ways that cross over tile boundaries will likely get picked up by a query for each tile. Look into that.
@@ -21,7 +25,7 @@
 			// "rel({s},{w},{n},{e})[landuse~%22grass|meadow|forest%22];" +
 			// ");(._;way(r););(._;node(w););(" +
 			"way({s},{w},{n},{e})[%22building%22];" +
-			"way({s},{w},{n},{e})[aerodrome=%22airport%22];" +
+			"way({s},{w},{n},{e})[aeroway~%22aerodrome|runway%22];" +
 			"way({s},{w},{n},{e})[waterway~%22riverbank|dock%22];" +
 			"way({s},{w},{n},{e})[waterway=%22canal%22][area=%22yes%22];" +
 			"way({s},{w},{n},{e})[natural~%22water|scrub%22];" +
@@ -51,7 +55,9 @@
 		this.urlHigh = this.urlBase + this.queryHigh;
 		this.urlLow = this.urlBase + this.queryLow;
 
-		this.subscribe("gridUpdated", this.update);
+		if (options.gridUpdate) {
+			this.subscribe("gridUpdated", this.update);
+		}
 	};
 
 	VIZI.DataOverpass.prototype = Object.create( VIZI.Data.prototype );
@@ -124,9 +130,97 @@
 		return deferred.promise;
 	};
 
+	VIZI.DataOverpass.prototype.updateByWayIntersect = function(wayId) {
+		var self = this;
+		var deferred = Q.defer();
+
+		var url = this.urlBase + "[out:json];(way(" + wayId + "));(._;node(w););out;";
+
+		// Get way to intersect with
+		VIZI.Log("Requesting URL", url);
+
+		d3.json(url, function(error, data) {
+			VIZI.Log("Response for URL", url);
+			if (error) {
+				deferred.reject(new Error(error));
+			} else {
+				// No features
+				if (data.elements.length === 0) {
+					deferred.resolve();
+					return;
+				}
+
+				var way = self.process(data, false, false)[0];
+
+				VIZI.Log(way);
+				var coordinates = way.coordinates;
+
+				var tiles = {};
+
+				// Find tiles that intersect way
+				_.each(coordinates, function(coordinate) {
+					var tile = self.grid.lonlat2tile(coordinate[0], coordinate[1], self.geo.tileZoom);
+
+					if (!tiles[tile[1]]) {
+						tiles[tile[1]] = [];
+					}
+
+					if (_.indexOf(tiles[tile[1]], tile[0]) === -1) {
+						tiles[tile[1]].push(tile[0]);
+					}
+				});
+
+				VIZI.Log(tiles);
+
+				var promiseQueue = [];
+
+				_.each(tiles, function(tilesX, tileY) {
+					// Fill in gaps
+					var minX = _.min(tilesX);
+					var maxX = _.max(tilesX);
+
+					var tilesXFilled = _.range(minX, maxX + 1);
+
+					_.each(tilesXFilled, function(tileX) {
+						var tileBounds = {
+							n: Number(tileY),
+							e: tileX + 1,
+							s: Number(tileY) + 1,
+							w: tileX
+						};
+						
+						var tileBoundsLonLat = self.grid.getBoundsLonLat(tileBounds);
+
+						// VIZI.Log(tileBoundsLonLat);
+
+						var cacheKey = tileX + ":" + tileY;
+
+						// TODO: Handle load promise without actually running the function
+						// - At the moment, the load function is run in at this point
+						promiseQueue.push([self.load, [self.urlHigh, tileBoundsLonLat, cacheKey]]);
+					});
+				});
+
+				// Use throat to limit simultaneous Overpass requests
+				// Without limitation the Overpass API will rate-limit
+				Q.all(promiseQueue.map(throat(1, function(promiseFunc) {
+					return promiseFunc[0].apply(self, promiseFunc[1]);
+				}))).done(function() {
+					// deferred.resolve();
+				}, function(error) {
+					// deferred.reject(error);
+				});
+
+				deferred.resolve();
+			}
+		});
+
+		return deferred.promise;
+	};
+
 	// Process data (convert from Overpass format to a common ViziCities format)
 	// http://wiki.openstreetmap.org/wiki/Talk:Overpass_API/Language_Guide#JSON_Syntax
-	VIZI.DataOverpass.prototype.process = function(data) {
+	VIZI.DataOverpass.prototype.process = function(data, simple, project) {
 		var self = this;
 
 		var nodes = {};
@@ -137,10 +231,10 @@
 			// Find a way to do this without passing the node and way objects
 			switch (element.type) {
 				case "node":
-					self.processNode(nodes, element);
+					nodes[element.id] = self.processNode(nodes, element, project);
 					break;
 				case "way":
-					self.processWay(nodes, ways, element);
+					ways.push(self.processWay(nodes, element, simple));
 					break;
 			}
 		});
@@ -148,13 +242,13 @@
 		return ways;
 	};
 
-	VIZI.DataOverpass.prototype.processNode = function(nodes, element) {
-		nodes[element.id] = this.geo.projection([element.lon, element.lat]);
+	VIZI.DataOverpass.prototype.processNode = function(nodes, element, project) {
+		return (project === false) ? [element.lon, element.lat] : this.geo.projection([element.lon, element.lat]);
 	};
 
 	// TODO: Validate polygon to make sure it's renderable (eg. complete, and no cross-overs)
 	// TODO: Use simplify.js to reduce complexity of polygons
-	VIZI.DataOverpass.prototype.processWay = function(nodes, ways, element) {
+	VIZI.DataOverpass.prototype.processWay = function(nodes, element, simple) {
 		var self = this;
 
 		var points = element.nodes;
@@ -183,20 +277,22 @@
 			return;
 		}
 
-		// Simplify coordinates
-		// TODO: Perform this in the worker thread
-		var simplifyTolerance = 1; // Three.js units
-		var simplifiedCoords = simplify(coordinates, simplifyTolerance);
+		if (simple) {
+			// Simplify coordinates
+			// TODO: Perform this in the worker thread
+			var simplifyTolerance = 1; // Three.js units
+			coordinates = simplify(coordinates, simplifyTolerance);
 
-		// VIZI.Log("Original coord count:", coordinates.length);
-		// VIZI.Log("Simplified coord count:", simplifiedCoords.length);
+			// VIZI.Log("Original coord count:", coordinates.length);
+			// VIZI.Log("Simplified coord count:", simplifiedCoords.length);
 
-		// VIZI.Log("Original coord example:", coordinates[0], coordinates[1]);
-		// VIZI.Log("Simplified coord example:", simplifiedCoords[0], simplifiedCoords[1]);
+			// VIZI.Log("Original coord example:", coordinates[0], coordinates[1]);
+			// VIZI.Log("Simplified coord example:", simplifiedCoords[0], simplifiedCoords[1]);
 
-		// Not enough points to make an object
-		if (simplifiedCoords.length < 4) {
-			return;
+			// Not enough points to make an object
+			if (coordinates.length < 4) {
+				return;
+			}
 		}
 
 		tags.height = this.processHeight(tags);
@@ -207,11 +303,11 @@
 		// More info: http://gis.stackexchange.com/a/8496/14967
 		// tags.area;
 
-		ways.push({
+		return {
 			id: element.id,
-			coordinates: simplifiedCoords,
+			coordinates: coordinates,
 			properties: tags
-		});
+		};
 	};
 
 	VIZI.DataOverpass.prototype.processHeight = function(tags) {
@@ -230,12 +326,12 @@
 		} else if (tags["building"]) {
 			height = 10 + Math.random() * 10;
 		} else if (tags["landuse"] === "forest") {
-			height = 6;
+			height = 7;
 		// } else if (tags["waterway"] || tags["natural"] && /water|scrub/.test(tags["natural"]) || tags["leisure"] && /park|pitch/.test(tags["leisure"]) || tags["landuse"] && /grass|meadow|commercial|retail|industrial|brownfield/.test(tags["landuse"])) {
 		} else if (tags["waterway"] || tags["natural"] === "water") {
+			height = 4;
+		} else if (tags["natural"] === "scrub" || tags["leisure"] && /park|pitch/.test(tags["leisure"]) || tags["landuse"] && /grass|meadow/.test(tags["landuse"]) || tags["aeroway"] === "runway") {
 			height = 3;
-		} else if (tags["natural"] === "scrub" || tags["leisure"] && /park|pitch/.test(tags["leisure"]) || tags["landuse"] && /grass|meadow/.test(tags["landuse"])) {
-			height = 2;
 		} else {
 			height = 1;
 		}
@@ -259,8 +355,10 @@
 			colour = 0xd8c7b5;
 		} else if (tags["landuse"] && /commercial|retail/.test(tags["landuse"])) {
 			colour = 0xa9bbd6;
-		} else if (tags["aerodrome"] === "airport") {
+		} else if (tags["aeroway"] === "aerodrome") {
 			colour = 0xffffff;
+		} else if (tags["aeroway"] === "runway") {
+			colour = 0x666666;
 		} else {
 			VIZI.Log("Setting default colour for feaure", tags);
 			colour = 0xFF0000;

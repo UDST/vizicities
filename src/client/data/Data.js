@@ -72,7 +72,7 @@
 					return;
 				}
 
-				var features = self.process(data);
+				var features = self.process(data, true);
 
 				// Add data to cache (including dupes on boundaries)
 				self.cache.add(cacheKey, features);
@@ -82,6 +82,12 @@
 
 				// Skip duplicate features
 				_.each(features, function(feature) {
+					// Skip if feature is undefined
+					if (!feature) {
+						VIZI.Log("Skipping undefined feature");
+						return;
+					}
+
 					if (self.processedIds[feature.id]) {
 						VIZI.Log("Skipping duplicated feature:", feature.id);
 						return;

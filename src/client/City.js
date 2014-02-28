@@ -62,7 +62,11 @@
 		}
 
 		_.defaults(options, {
-			coords: [-0.01924, 51.50358]
+			coords: [-0.01924, 51.50358],
+			capZoom: true,
+			capOrbit: true,
+			overpassGridUpdate: true,
+			overpassWayIntersect: false
 		});
 
 		// Output city options
@@ -109,7 +113,9 @@
 			self.publish("loadingProgress", 0.5);
 
 			// Set up data loader
-			self.data = new VIZI.DataOverpass();
+			self.data = new VIZI.DataOverpass({
+				gridUpdate: options.overpassGridUpdate
+			});
 
 			// TODO: Work out a way to use progress event of each promises to increment loading progress
 			// Perhaps by looping through each promises individually and working out progress fraction by num. of promises / amount processed
@@ -121,7 +127,7 @@
 			promises.push(self.loadCoreObjects());
 
 			// Load data from the OSM Overpass API
-			promises.push(self.loadOverpass());
+			promises.push(self.loadOverpass(options.overpassWayIntersect));
 
 			return Q.allSettled(promises);
 		}).then(function (results) {
@@ -250,18 +256,25 @@
 		return Q.fcall(function() {});
 	};
 
-	VIZI.City.prototype.loadOverpass = function() {
+	VIZI.City.prototype.loadOverpass = function(wayIntersect) {
 		VIZI.Log("Loading data from OSM Overpass API");
 
 		var startTime = Date.now();
 
-		var deferred = Q.defer();
+		// var deferred = Q.defer();
 
-		this.data.update().done(function() {
-			VIZI.Log("Finished loading Overpass data in " + (Date.now() - startTime) + "ms");
-			deferred.resolve();
-		});
+		if (wayIntersect) {
+			this.data.updateByWayIntersect(wayIntersect).done(function() {
+				VIZI.Log("Finished loading Overpass data using way intersection in " + (Date.now() - startTime) + "ms");
+			});
+		} else {
+			this.data.update().done(function() {
+				VIZI.Log("Finished loading Overpass data in " + (Date.now() - startTime) + "ms");
+				// deferred.resolve();
+			});
+		}
 
-		return deferred.promise;
+		// return deferred.promise;
+		return Q.fcall(function() {});
 	};
 }());
