@@ -52,7 +52,7 @@
 
 			switch (keyCode) {
 				case 16:
-					key = "leftShift";
+					key = "shift";
 					break;
 				default:
 					key = false;
