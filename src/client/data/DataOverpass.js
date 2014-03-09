@@ -66,6 +66,9 @@
 		var self = this;
 		var deferred = Q.defer();
 
+		// Clear tiles out of bounds
+		self.clearTiles(self.grid.boundsLow);
+
 		var promiseQueue = [];
 		promiseQueue.push(self.updateByLevel(self.grid.boundsHigh, self.urlHigh));
 		// TODO: Re-enable low queries when loading performance and optimisation is sorted
@@ -85,9 +88,6 @@
 	VIZI.DataOverpass.prototype.updateByLevel = function(bounds, url) {
 		var self = this;
 		var deferred = Q.defer();
-
-		// TODO: Skip cached tiles
-		// TODO: Tiles can have the same way so ignore ways already loaded
 
 		// Load objects using promises
 		var promiseQueue = [];
@@ -109,8 +109,12 @@
 
 				var cacheKey = tileCoords[0] + ":" + tileCoords[1];
 
-				// TODO: Handle load promise without actually running the function
-				// - At the moment, the load function is run in at this point
+				// Skip tiles already in view
+				if (self.objects[cacheKey]) {
+					VIZI.Log("Skipping tile already in view", cacheKey);
+					continue;
+				}
+
 				promiseQueue.push([self.load, [url, tileBoundsLonLat, cacheKey]]);
 			}
 		}
@@ -125,9 +129,28 @@
 			deferred.reject(error);
 		});
 
-		// TODO: Add data to cache
-
 		return deferred.promise;
+	};
+
+	// Clear tiles out of bounds
+	VIZI.DataOverpass.prototype.clearTiles = function(bounds) {
+		var self = this;
+
+		_.each(self.objects, function(mesh, index) {
+			// Split index
+			var splitIndex = index.split(":");
+
+			// Tile is out of bounds
+			if (splitIndex[0] >= bounds.e || splitIndex[0] < bounds.w || splitIndex[1] >= bounds.s || splitIndex[1] < bounds.n) {
+				// Remove mesh from scene
+				VIZI.Log("Removing mesh from scene", index);
+				self.publish("removeFromScene", mesh);
+				delete self.objects[index];
+
+				// Remove processed feature IDs
+				delete self.processedIds[index];
+			}
+		});
 	};
 
 	VIZI.DataOverpass.prototype.updateByWayIntersect = function(wayId) {
@@ -277,10 +300,17 @@
 			return;
 		}
 
+		var area = this.processArea(coordinates);
+
+		// Skip objects too small
+		// if (area < 500) {
+		// return;
+		// }
+
 		if (simple) {
 			// Simplify coordinates
 			// TODO: Perform this in the worker thread
-			var simplifyTolerance = 1; // Three.js units
+			var simplifyTolerance = 3; // Three.js units
 			coordinates = simplify(coordinates, simplifyTolerance);
 
 			// VIZI.Log("Original coord count:", coordinates.length);
@@ -295,6 +325,7 @@
 			}
 		}
 
+		tags.area = area;
 		tags.height = this.processHeight(tags);
 		tags.colour = this.processColour(tags);
 
@@ -308,6 +339,22 @@
 			coordinates: coordinates,
 			properties: tags
 		};
+	};
+
+	// Not perfect but it's good enough for area-based logic
+	// http://www.mathopenref.com/coordpolygonarea2.html
+	VIZI.DataOverpass.prototype.processArea = function(points) {
+		var self = this;
+		var numPoints = points.length;
+		var area = 0;         // Accumulates area in the loop
+		var j = numPoints-1;  // The last vertex is the 'previous' one to the first
+
+		for (var i = 0; i < numPoints; i++) {
+			area = area + (points[j][0]+points[i][0]) * (points[j][1]-points[i][1]); 
+			j = i;  // j is previous vertex to i
+		}
+
+		return Math.abs((area/2) / self.geo.pixelsPerMeter);
 	};
 
 	VIZI.DataOverpass.prototype.processHeight = function(tags) {

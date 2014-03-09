@@ -5,8 +5,6 @@
 	VIZI.ObjectManager = function() {
 		_.extend(this, VIZI.Mediator);
 
-		this.objects = [];
-
 		this.combinedMaterial = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors});
 		this.combinedObjects = undefined;
 	};
@@ -18,8 +16,6 @@
 		var objects = _.map(features, this.processFeature);
 
 		VIZI.Log(Date.now() - startTime);
-
-		this.objects = objects;
 
 		this.combinedObjects = this.combineObjects(objects);
 
@@ -231,8 +227,11 @@
 
 		var self = this;
 
+		var combinedMesh;
 		Q.allSettled(batchPromises).then(function (promises) {
 			var totalReceivedTime = 0;
+
+			var combinedGeom = new THREE.Geometry();
 
 			_.each(promises, function (promise) {
 				if (promise.state === "fulfilled") {
@@ -268,14 +267,8 @@
 					// TODO: Stop this locking up the browser
 					// No visible lock up at all when removed
 					var geom = loader.parse(model);
-					var mesh = new THREE.Mesh(geom.geometry, material);
-
-					// http://stackoverflow.com/questions/20153705/three-js-wireframe-material-all-polygons-vs-just-edges
-					// TODO: Fix the performance drop that this causes (effectively double the objects in the scene)
-					var outline = new THREE.EdgesHelper( mesh, 0x222222 );
-					outline.material.linewidth = 1;
-
-					mesh.add(outline);
+					// var mesh = new THREE.Mesh(geom.geometry, material);
+					var mesh = new THREE.Mesh(geom.geometry);
 
 					// Use previously calculated offset to return merged mesh to correct position
 					// This allows frustum culling to work correctly
@@ -283,15 +276,39 @@
 					mesh.position.y = -1 * offset.y;
 					mesh.position.z = -1 * offset.z;
 
-					self.publish("addToScene", mesh);
+					THREE.GeometryUtils.merge(combinedGeom, mesh);
+
+					// self.publish("addToScene", mesh);
 				}
 			});
+
+			var offset = THREE.GeometryUtils.center( combinedGeom );
+
+			combinedMesh = new THREE.Mesh(combinedGeom, material);
+
+			// http://stackoverflow.com/questions/20153705/three-js-wireframe-material-all-polygons-vs-just-edges
+			// TODO: Fix the performance drop that this causes (effectively double the objects in the scene)
+			// - Looks like the outline counts as "points" in renderer.info
+			// - Also looks like they aren't being frustum culled for some reason
+			// https://github.com/mrdoob/three.js/blob/master/src/extras/helpers/EdgesHelper.js
+			var outline = new THREE.EdgesHelper( combinedMesh, 0x222222 );
+			outline.material.linewidth = 1;
+
+			combinedMesh.add(outline);
+
+			// Use previously calculated offset to return merged mesh to correct position
+			// This allows frustum culling to work correctly
+			combinedMesh.position.x = -1 * offset.x;
+			combinedMesh.position.y = -1 * offset.y;
+			combinedMesh.position.z = -1 * offset.z;
+
+			self.publish("addToScene", combinedMesh);
 			
 			VIZI.Log("Average output received time is " + (totalReceivedTime / batches) + "ms");
 			VIZI.Log("Overall worker time is " + (Date.now() - startTime) + "ms");
 		}).done(function() {
 			worker.close();
-			deferred.resolve();
+			deferred.resolve(combinedMesh);
 		});
 
 		return deferred.promise;

@@ -41,6 +41,20 @@
 	VIZI.Scene.prototype.removeFromScene = function(object) {
 		this.scene.remove(object);
 
+		// Clean up
+		// http://mrdoob.github.io/three.js/examples/webgl_test_memory.html
+		if (object.geometry) {
+			object.geometry.dispose();
+		}
+
+		if (object.material) {
+			object.material.dispose();
+		}
+
+		if (object.texture) {
+			object.texture.dispose();
+		}
+
 		// Remove object from objects array
 		var index = _.indexOf(this.objects, object);
 		if (index > -1) {

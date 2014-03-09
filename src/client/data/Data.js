@@ -14,6 +14,9 @@
 		// Cache
 		this.cache = new VIZI.Cache();
 
+		// Objects
+		this.objects = {};
+
 		// Use IDs of processed features to prevent duplication on tile boundaries
 		// TODO: Remove ids from here when they're manually removed from view
 		this.processedIds = {};
@@ -44,10 +47,15 @@
 		var deferred = Q.defer();
 
 		// Check cache
-		// TODO: Process cached data but don't make XHR call
-		if (this.cache.get(cacheKey)) {
-			VIZI.Log("Skipping tile as already in cache:", cacheKey);
-			return;
+		// TODO: Work out why this causes a lock-up
+		// - Might need to use typed arrays
+		var cachedFeatures = this.cache.get(cacheKey);
+		if (cachedFeatures) {
+			VIZI.Log("Loading tile from cache:", cacheKey);
+			self.loadProcess(cachedFeatures, cacheKey).done(function() {
+				deferred.resolve();
+			});
+			return deferred.promise;
 		}
 
 		// Replace URL placeholders with parameter values
@@ -59,8 +67,6 @@
 		VIZI.Log("Requesting URL", url);
 
 		// Request data and fulfil promise
-		// TODO: Check that responses are being received asynchronously
-		//   - Not convinced as tile loader seems to deal with responses neartly in order
 		d3.json(url, function(error, data) {
 			VIZI.Log("Response for URL", url);
 			if (error) {
@@ -78,40 +84,62 @@
 				self.cache.add(cacheKey, features);
 				VIZI.Log("Added data to cache:", cacheKey);
 
-				var uniqueFeatures = [];
-
-				// Skip duplicate features
-				_.each(features, function(feature) {
-					// Skip if feature is undefined
-					if (!feature) {
-						VIZI.Log("Skipping undefined feature");
-						return;
-					}
-
-					if (self.processedIds[feature.id]) {
-						VIZI.Log("Skipping duplicated feature:", feature.id);
-						return;
-					}
-
-					self.processedIds[feature.id] = true;
-					uniqueFeatures.push(feature);
-				});
-
-				// End promise if no features left to render
-				if (uniqueFeatures.length === 0) {
-					VIZI.Log("No features left to pass to worker");
+				self.loadProcess(features, cacheKey).done(function() {
 					deferred.resolve();
-					return;
-				}
-
-				// TODO: Pass-through progress event
-				self.objectManager.processFeaturesWorker(uniqueFeatures).then(function() {
-					deferred.resolve();
-				}, undefined, function(progress) {
-					// Pass-through progress
-					deferred.notify(progress);
 				});
 			}
+		});
+
+		return deferred.promise;
+	};
+
+	VIZI.Data.prototype.loadProcess = function(features, cacheKey) {
+		var self = this;
+		var deferred = Q.defer();
+
+		var uniqueFeatures = [];
+
+		// Skip duplicate features
+		_.each(features, function(feature) {
+			// Skip if feature is undefined
+			if (!feature) {
+				VIZI.Log("Skipping undefined feature");
+				return;
+			}
+
+			var existingId = _.find(self.processedIds, function(featureIds) {
+				return (_.indexOf(featureIds, feature.id) === -1) ? false : true;
+			});
+
+			// TODO: Double-check that this is 100% correct as there are a lot of duplicated feature messages showing up
+			if (existingId) {
+				VIZI.Log("Skipping duplicated feature");
+				return;
+			}
+
+			if (!self.processedIds[cacheKey]) {
+				self.processedIds[cacheKey] = [];
+			}
+
+			self.processedIds[cacheKey].push(feature.id);
+			uniqueFeatures.push(feature);
+		});
+
+		// End promise if no features left to render
+		if (uniqueFeatures.length === 0) {
+			VIZI.Log("No features left to pass to worker");
+			deferred.resolve();
+			return;
+		}
+
+		// TODO: Pass-through progress event
+		self.objectManager.processFeaturesWorker(uniqueFeatures).then(function(mesh) {
+			// Store reference to mesh for tile
+			self.objects[cacheKey] = mesh;
+			deferred.resolve();
+		}, undefined, function(progress) {
+			// Pass-through progress
+			deferred.notify(progress);
 		});
 
 		return deferred.promise;
