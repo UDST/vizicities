@@ -72,6 +72,7 @@
 			coords: [-0.01924, 51.50358],
 			capZoom: true,
 			capOrbit: true,
+			overpass: true,
 			overpassGridUpdate: true,
 			overpassWayIntersect: false,
 			controls: { enable: true }
@@ -120,11 +121,6 @@
 		}).then(function() {
 			self.publish("loadingProgress", 0.5);
 
-			// Set up data loader
-			self.data = new VIZI.DataOverpass({
-				gridUpdate: options.overpassGridUpdate
-			});
-
 			// TODO: Work out a way to use progress event of each promises to increment loading progress
 			// Perhaps by looping through each promises individually and working out progress fraction by num. of promises / amount processed
 
@@ -135,7 +131,13 @@
 			promises.push(self.loadCoreObjects());
 
 			// Load data from the OSM Overpass API
-			promises.push(self.loadOverpass(options.overpassWayIntersect));
+			// Set up data loader
+			if (options.overpass) {
+				self.data = new VIZI.DataOverpass({
+					gridUpdate: options.overpassGridUpdate
+				});
+				promises.push(self.loadOverpass(options.overpassWayIntersect));
+			}
 
 			return Q.allSettled(promises);
 		}).then(function (results) {
