@@ -114,7 +114,7 @@
 			// TODO: Double-check that this is 100% correct as there are a lot of duplicated feature messages showing up
 			if (existingId) {
 				VIZI.Log("Skipping duplicated feature");
-				return;
+				deferred.resolve();
 			}
 
 			if (!self.processedIds[cacheKey]) {
@@ -129,7 +129,6 @@
 		if (uniqueFeatures.length === 0) {
 			VIZI.Log("No features left to pass to worker");
 			deferred.resolve();
-			return;
 		}
 
 		// TODO: Pass-through progress event

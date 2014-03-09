@@ -403,7 +403,7 @@
 		} else if (tags["landuse"] && /commercial|retail/.test(tags["landuse"])) {
 			colour = 0xa9bbd6;
 		} else if (tags["aeroway"] === "aerodrome") {
-			colour = 0xffffff;
+			colour = 0xeeeeee;
 		} else if (tags["aeroway"] === "runway") {
 			colour = 0x666666;
 		} else {
