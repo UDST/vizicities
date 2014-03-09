@@ -20,7 +20,7 @@
 
 	VIZI.Renderer.prototype.createRenderer = function() {
 		var renderer = new THREE.WebGLRenderer({
-			antialias: false
+			antialias: true
 		});
 
 		renderer.setSize( window.innerWidth, window.innerHeight );

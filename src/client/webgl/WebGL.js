@@ -42,39 +42,47 @@
 	VIZI.WebGL.prototype.addLights = function() {
 		VIZI.Log("Adding lights to scene");
 
-		var ambientLight = new THREE.AmbientLight( 0x404040 );
-		THREE.ColorConverter.setHSV( ambientLight.color, 0.1, 0.1, 0.4 );
+		// var ambientLight = new THREE.AmbientLight( 0xeeeeee );
+		// THREE.ColorConverter.setHSV( ambientLight.color, 0.1, 0.1, 0.4 );
 
-		this.lights.push(ambientLight);
-		this.publish("addToScene", ambientLight);
+		// this.lights.push(ambientLight);
+		// this.publish("addToScene", ambientLight);
 
-		var directionalLight = new THREE.DirectionalLight( 0xffffff );
-		THREE.ColorConverter.setHSV( directionalLight.color, 0.1, 0.1, 0.55 );
-		directionalLight.position.x = 1000;
-		directionalLight.position.y = 1000;
-		directionalLight.position.z = 750;
-		directionalLight.position.normalize();
+		var directionalLight = new THREE.DirectionalLight( 0x999999 );
+		directionalLight.intesity = 0.1;
+		// THREE.ColorConverter.setHSV( directionalLight.color, 0.1, 0.1, 0.55 );
+		directionalLight.position.x = 1;
+		directionalLight.position.y = 1;
+		directionalLight.position.z = 1;
+		// directionalLight.position.normalize();
 
 		this.lights.push(directionalLight);
 		this.publish("addToScene", directionalLight);
 
-		var directionalLight2 = new THREE.DirectionalLight( 0x808080 );
-		THREE.ColorConverter.setHSV( directionalLight2.color, 0.1, 0.1, 0.5 );
-		directionalLight2.position.x = - 1000;
-		directionalLight2.position.y = 1000;
-		directionalLight2.position.z = - 750;
-		directionalLight2.position.normalize();
+		// var helper1 = new THREE.DirectionalLightHelper(directionalLight, 50);
+		// this.publish("addToScene", helper1);
+
+		var directionalLight2 = new THREE.DirectionalLight( 0x999999 );
+		directionalLight2.intesity = 0.1;
+		// THREE.ColorConverter.setHSV( directionalLight2.color, 0.1, 0.1, 0.5 );
+		directionalLight2.position.x = -1;
+		directionalLight2.position.y = 1;
+		directionalLight2.position.z = -1;
+		// directionalLight2.position.normalize();
 
 		this.lights.push(directionalLight2);
 		this.publish("addToScene", directionalLight2);
 
-		var hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.65 );
-		THREE.ColorConverter.setHSV( hemiLight.color, 0.6, 0.35, 0.7 );
-		THREE.ColorConverter.setHSV( hemiLight.groundColor, 0.095, 0.5, 0.6 );
-		hemiLight.position.set( 0, 600, 0 );
+		// var helper2 = new THREE.DirectionalLightHelper(directionalLight2, 50);
+		// this.publish("addToScene", helper2);
 
-		this.lights.push(hemiLight);
-		this.publish("addToScene", hemiLight);
+		// var hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.65 );
+		// THREE.ColorConverter.setHSV( hemiLight.color, 0.6, 0.35, 0.7 );
+		// THREE.ColorConverter.setHSV( hemiLight.groundColor, 0.095, 0.5, 0.6 );
+		// hemiLight.position.set( 0, 600, 0 );
+
+		// this.lights.push(hemiLight);
+		// this.publish("addToScene", hemiLight);
 	};
 
 	// Global helpers (move elsewhere?)

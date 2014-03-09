@@ -344,7 +344,7 @@
 	VIZI.DataOverpass.prototype.processColour = function(tags) {
 		var colour;
 		if (tags["building"] || tags["building:part"]) {
-			colour = 0xEEEEEE;
+			colour = 0xffffff;
 		} else if (tags["waterway"] || tags["natural"] === "water") {
 			colour = 0x6DCCFF;
 		} else if (tags["landuse"] === "forest") {

@@ -221,7 +221,13 @@
 		}
 
 		var loader = new THREE.JSONLoader();
-		var material = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors});
+		var material = new THREE.MeshLambertMaterial({
+			vertexColors: THREE.VertexColors,
+			ambient: 0xffffff,
+			// color: 0xffffff,
+			emissive: 0xcccccc,
+			shading: THREE.FlatShading,
+		});
 
 		var self = this;
 
@@ -263,6 +269,12 @@
 					// No visible lock up at all when removed
 					var geom = loader.parse(model);
 					var mesh = new THREE.Mesh(geom.geometry, material);
+
+					// http://stackoverflow.com/questions/20153705/three-js-wireframe-material-all-polygons-vs-just-edges
+					var outline = new THREE.EdgesHelper( mesh, 0x222222 );
+					outline.material.linewidth = 1;
+
+					mesh.add(outline);
 
 					// Use previously calculated offset to return merged mesh to correct position
 					// This allows frustum culling to work correctly
