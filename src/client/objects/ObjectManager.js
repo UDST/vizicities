@@ -271,6 +271,7 @@
 					var mesh = new THREE.Mesh(geom.geometry, material);
 
 					// http://stackoverflow.com/questions/20153705/three-js-wireframe-material-all-polygons-vs-just-edges
+					// TODO: Fix the performance drop that this causes (effectively double the objects in the scene)
 					var outline = new THREE.EdgesHelper( mesh, 0x222222 );
 					outline.material.linewidth = 1;
 
