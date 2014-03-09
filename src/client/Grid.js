@@ -21,7 +21,8 @@
 			this.tilesPerDirectionHigh = 1;
 
 			// Tiles per direction for low detail
-			this.tilesPerDirectionLow = 3;
+			// TODO: Make this lower when rivers and larger features are added to their own layer, otherwise they pop out of view when cleaning up
+			this.tilesPerDirectionLow = 5;
 
 			// Calculated pixel tile size
 			this.tileSize = 0;
