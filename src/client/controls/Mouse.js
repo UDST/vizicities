@@ -50,12 +50,13 @@
 				self.onMouseUp(event);
 			}, false);
 
-			document.addEventListener("wheel", function(event) {
-				self.onMouseWheel(event);
-			}, false);
+			// Prefer wheel event, but fallback to mousewheel event if necessary
+			var wheel_event = "wheel"; 
+			if (window.onwheel === undefined) {
+				wheel_event = "mousewheel"; 
+			}
 
-			// Safari
-			document.addEventListener("mousewheel", function(event) {
+			document.addEventListener(wheel_event, function(event) {
 				self.onMouseWheel(event);
 			}, false);
 
@@ -159,7 +160,18 @@
 
 			var state = this.state;
 
-			state.wheelDelta -= event.deltaY !== undefined ? event.deltaY : event.wheelDeltaY;
+			// Wheel event 
+			if (event.deltaY !== undefined) {
+
+				state.wheelDelta -= event.deltaY;
+			
+			// MouseWheel Event 
+			} else {
+
+				state.wheelDelta += event.wheelDeltaY;
+
+			}
+
 		};
 
 		Mouse.prototype.resetDelta = function() {
