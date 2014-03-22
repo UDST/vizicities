@@ -53,6 +53,12 @@
 			document.addEventListener("wheel", function(event) {
 				self.onMouseWheel(event);
 			}, false);
+
+			// Safari
+			document.addEventListener("mousewheel", function(event) {
+				self.onMouseWheel(event);
+			}, false);
+
 		};
 
 		Mouse.prototype.onMouseDown = function(event) {
@@ -152,8 +158,8 @@
 			event.preventDefault();
 
 			var state = this.state;
-			
-			state.wheelDelta -= event.deltaY;
+
+			state.wheelDelta -= event.deltaY !== undefined ? event.deltaY : event.wheelDeltaY;
 		};
 
 		Mouse.prototype.resetDelta = function() {
