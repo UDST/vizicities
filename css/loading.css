@@ -1,8 +1,17 @@
 #ui-loading-container {
 	display: flex;
+	display: -webkit-box;
 	flex-direction: column;
+
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+
 	align-items: center;
+	-webkit-box-align: center;
+
 	justify-content: center;
+	-webkit-box-pack: center;
+
 	opacity: 1;
 	-webkit-transition: all 0.3s linear;
 	-moz-transition: all 0.3s linear;
@@ -21,8 +30,15 @@
 	width: 5em;
 	height: 5em;
 	display: flex;
+
 	align-items: center;
+
 	justify-content: center;
+
+	display: -webkit-box;
+	-webkit-box-align: center;
+	-webkit-box-pack: center;
+
 	border: .5em solid #f5f5f5;
 	border-radius: 100%;
 	position: relative;
@@ -57,7 +73,11 @@
 	width: 1em;
 	position: relative;
 	display: flex;
+	display: -webkit-box;
+
 	justify-content: center;
+	-webkit-box-pack: center;
+
 	border-radius: 100%;
 	border: 1.3em solid #f5f5f5;
 }
