@@ -70,8 +70,7 @@
 
 		_.defaults(options, {
 			coords: [-0.01924, 51.50358],
-			capZoom: true,
-			capOrbit: true,
+			camera: {},
 			overpass: true,
 			overpassGridUpdate: true,
 			overpassWayIntersect: false,
@@ -192,10 +191,12 @@
 		var startTime = Date.now();
 
 		var deferred = Q.defer();
-		
 		this.webgl = new VIZI.WebGL();
 
-		this.webgl.init(this.geo.centerPixels, options.capZoom, options.capOrbit).then(function(result) {
+		_.defaults(options.camera, {
+			target: this.geo.centerPixels
+		});
+		this.webgl.init(options).then(function(result) {
 			VIZI.Log("Finished intialising WebGL in " + (Date.now() - startTime) + "ms");
 
 			deferred.resolve();
