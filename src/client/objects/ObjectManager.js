@@ -33,7 +33,7 @@
 		});
 		return deferred.promise;
 	};
-	
+
 	// ##########################################
 	// Web Worker Loader
 	// ##########################################
@@ -49,7 +49,7 @@
 	// TODO: Build objects as BufferGeometry for very easy export and messaging out of worker
 	// http://stackoverflow.com/questions/18262868/transforming-geometry-to-buffergeometry
 	// https://github.com/mrdoob/three.js/blob/f396baf5876eb41bcd2ee34eb65b1f97bb92d530/examples/js/exporters/BufferGeometryExporter.js
-	
+
 	VIZI.ObjectManager.prototype.processFeaturesWorker = function(features) {
 		VIZI.Log("Processing features using worker");
 
@@ -86,7 +86,7 @@
 				var combinedGeom = new THREE.Geometry();
 
 				var count = 0;
-				
+
 				// TODO: Work out how to put feature-specific object generation in here
 				//       - eg. Buildings, rivers, roads, etc.
 				_.each(features, function(feature) {
@@ -98,7 +98,7 @@
 					// if (area < 200) {
 					// return;
 					// }
-					
+
 					var offset = [];
 					var coords = feature.coordinates;
 					var shape = new THREE.Shape();
@@ -122,6 +122,64 @@
 					var extrudeSettings = { amount: height, bevelEnabled: false };
 					var geom = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 
+					// Check if this shape only has four points, allowing us
+					// to do roof shortcuts
+					if (shape.curves.length === 4) {
+
+						// Roof geometry
+						var roof = new THREE.Geometry();
+
+						// Grab the points from the shape
+						var points = shape.extractPoints();
+
+						// Figure out the roof height
+						var roofHeight = -(height / 2);
+
+						// Figure out the center points
+						var center1 = points.shape[0].clone().lerp(points.shape[1], 0.5);
+						var center2 = points.shape[2].clone().lerp(points.shape[3], 0.5);
+
+						// Create the vertices
+						var vertices = [
+							new THREE.Vector3(points.shape[0].x, points.shape[0].y, 0),
+							new THREE.Vector3(center1.x,         center1.y,         roofHeight),
+							new THREE.Vector3(points.shape[1].x, points.shape[1].y, 0),
+							new THREE.Vector3(points.shape[2].x, points.shape[2].y, 0),
+							new THREE.Vector3(center2.x,         center2.y,         roofHeight),
+							new THREE.Vector3(points.shape[3].x, points.shape[3].y, 0),
+						];
+
+						// Ensure the points are clockwise
+						var clockwise = THREE.Shape.Utils.isClockWise(vertices);
+						if (!clockwise) {
+							vertices = vertices.reverse();
+						}
+
+						roof.vertices = vertices;
+
+						// Side 1
+						roof.faces.push(new THREE.Face3(3, 4, 1));
+						roof.faces.push(new THREE.Face3(3, 1, 2));
+
+						// Front/Back
+						roof.faces.push(new THREE.Face3(4, 3, 5));
+						roof.faces.push(new THREE.Face3(1, 0, 2));
+
+						// Side 2
+						roof.faces.push(new THREE.Face3(0, 1, 4));
+						roof.faces.push(new THREE.Face3(0, 4, 5));
+
+						// We aren't generating actual UVs, but the exporter needs
+						// some placeholder points
+						_.each(roof.faces, function() {
+							roof.faceVertexUvs[0].push([false, false, false]);
+						});
+
+						// Add to the building geometry
+						THREE.GeometryUtils.merge(geom, roof);
+
+					}
+
 					var elementColour = (properties.colour) ? new THREE.Color(properties.colour) : colour;
 					applyVertexColors( geom, elementColour );
 
@@ -137,13 +195,17 @@
 					// Flip buildings as they are up-side down
 					mesh.rotation.x = 90 * Math.PI / 180;
 
+
 					THREE.GeometryUtils.merge(combinedGeom, mesh);
 
 					count++;
+
 				});
+
 
 				// Move merged geom to 0,0 and return offset
 				var offset = THREE.GeometryUtils.center( combinedGeom );
+
 
 				var timeTaken = Date.now() - startTime;
 				var exportedGeom = exporter.parse(combinedGeom);
@@ -151,6 +213,7 @@
 				// The size of this seems to be the problem
 				// Work out how to reduce it
 				var outputSize = JSON.stringify(exportedGeom).length;
+
 
 				// Convert exported geom into a typed array
 				var verticesArray = new Float64Array( exportedGeom.vertices );
@@ -160,6 +223,7 @@
 				// https://github.com/mrdoob/three.js/blob/master/examples/js/exporters/GeometryExporter.js#L231
 				var uvsArray = new Float64Array( exportedGeom.uvs[0] );
 				var facesArray = new Float64Array( exportedGeom.faces );
+
 
 				// Store geom typed array as Three.js model object
 				var model = {
@@ -205,7 +269,7 @@
 		for (var i = 0; i < batches; i++) {
 			var startIndex = i * featuresPerBatch;
 			var endIndex = startIndex + featuresPerBatch;
-			
+
 			// Add diff if at end of batch
 			if (i === batches - 1) {
 				endIndex += batchDiff;
@@ -303,7 +367,7 @@
 			combinedMesh.position.z = -1 * offset.z;
 
 			self.publish("addToScene", combinedMesh);
-			
+
 			VIZI.Log("Average output received time is " + (totalReceivedTime / batches) + "ms");
 			VIZI.Log("Overall worker time is " + (Date.now() - startTime) + "ms");
 		}).done(function() {
@@ -318,7 +382,7 @@
 
 	VIZI.ObjectManager.prototype.combineObjects = function(objects) {
 		var combinedGeom = new THREE.Geometry();
-		
+
 		_.each(objects, function(object) {
 			if (!object.object) {
 				return;
@@ -328,7 +392,7 @@
 		});
 
 		combinedGeom.computeFaceNormals();
-		
+
 		return new THREE.Mesh( combinedGeom, this.combinedMaterial );
 	};
 }());
