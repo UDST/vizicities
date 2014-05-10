@@ -21,9 +21,6 @@
 		// TODO: Remove ids from here when they're manually removed from view
 		this.processedIds = {};
 
-		// Object manager
-		this.objectManager = new VIZI.ObjectManager();
-
 		// URL of data source
 		this.url = "";
 
@@ -134,7 +131,7 @@
 		}
 
 		// TODO: Pass-through progress event
-		self.objectManager.processFeaturesWorker(uniqueFeatures).then(function(mesh) {
+		self.generateFeatures(uniqueFeatures).then(function(mesh) {
 			// Store reference to mesh for tile
 			self.objects[cacheKey] = mesh;
 			deferred.resolve();
@@ -148,6 +145,7 @@
 
 	VIZI.Data.prototype.update = function() {};
 	VIZI.Data.prototype.process = function(data) {};
+	VIZI.Data.prototype.generateFeatures = function(uniqueFeatures) {};
 
 	VIZI.Data.prototype.checkDuplicateCoords = function(prev, current) {
 		var dupe = false;

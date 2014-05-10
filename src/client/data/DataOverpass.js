@@ -11,6 +11,8 @@
 			gridUpdate: true
 		});
 
+		this.objectManager = new VIZI.ObjectManagerOverpass();
+
 		// TODO: It's entirely possible that these queries are picking up duplicate ways. Need to look into it.
 		// TODO: Ways that cross over tile boundaries will likely get picked up by a query for each tile. Look into that.
 		// OSM Buildings handles this by not rendering items with an id that it already knows about
@@ -31,6 +33,7 @@
 			"way({s},{w},{n},{e})[natural~%22water|scrub%22];" +
 			"way({s},{w},{n},{e})[leisure~%22park|pitch%22];" +
 			"way({s},{w},{n},{e})[landuse~%22grass|meadow|forest%22];" +
+			"way({s},{w},{n},{e})[highway~%22motorway|trunk|primary|secondary|tertiary|motorway_link|primary_link|secondary_link|tertiary_link|road%22];" +
 			");(._;node(w);););out;";
 
 		this.queryLow = "[out:json];" +
@@ -280,7 +283,8 @@
 		var tags = element.tags || {};
 
 		// Not enough points to make an object
-		if (pointCount < 4) {
+		// Ignore if a road
+		if (!tags["highway"] && pointCount < 4) {
 			return;
 		}
 
@@ -307,7 +311,8 @@
 		// return;
 		// }
 
-		if (simple) {
+		// Ignore if a road
+		if (!tags["highway"] && simple) {
 			// Simplify coordinates
 			// TODO: Perform this in the worker thread
 			var simplifyTolerance = 3; // Three.js units
@@ -425,5 +430,19 @@
 		}
 
 		return colour;
+	};
+
+	VIZI.DataOverpass.prototype.generateFeatures = function(features) {
+		var self = this;
+		var deferred = Q.defer();
+		
+		self.objectManager.processFeaturesWorker(features).then(function(mesh) {
+			deferred.resolve(mesh);
+		}, undefined, function(progress) {
+			// Pass-through progress
+			deferred.notify(progress);
+		});
+
+		return deferred.promise;
 	};
 }());
