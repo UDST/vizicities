@@ -17,7 +17,7 @@
 		// https://github.com/kekscom/osmbuildings/blob/master/src/Data.js#L59
 		// Good Overpass queries: https://raw2.github.com/bigr/map1/master/import_osm.eu1000
 		this.queryHigh = "[out:json];" +
-			"((" + 
+			"((" +
 			// "rel({s},{w},{n},{e})[waterway~%22riverbank|dock%22];" +
 			// "rel({s},{w},{n},{e})[waterway=%22canal%22][area=%22yes%22];" +
 			// "rel({s},{w},{n},{e})[natural~%22water|scrub%22];" +
@@ -34,7 +34,7 @@
 			");(._;node(w);););out;";
 
 		this.queryLow = "[out:json];" +
-			"((" + 
+			"((" +
 			"rel({s},{w},{n},{e})[waterway~%22riverbank|dock%22];" +
 			"rel({s},{w},{n},{e})[waterway=%22canal%22][area=%22yes%22];" +
 			"rel({s},{w},{n},{e})[natural~%22water|scrub%22];" +
@@ -104,7 +104,7 @@
 					s: 1 + bounds.n + i,
 					w: bounds.w + j
 				};
-				
+
 				var tileBoundsLonLat = self.grid.getBoundsLonLat(tileBounds);
 
 				var cacheKey = tileCoords[0] + ":" + tileCoords[1];
@@ -211,7 +211,7 @@
 							s: Number(tileY) + 1,
 							w: tileX
 						};
-						
+
 						var tileBoundsLonLat = self.grid.getBoundsLonLat(tileBounds);
 
 						// VIZI.Log(tileBoundsLonLat);
@@ -278,7 +278,7 @@
 		var pointCount = points.length;
 
 		var tags = element.tags || {};
-		
+
 		// Not enough points to make an object
 		if (pointCount < 4) {
 			return;
@@ -328,6 +328,7 @@
 		tags.area = area;
 		tags.height = this.processHeight(tags);
 		tags.colour = this.processColour(tags);
+		tags.roof   = this.processRoof(tags);
 
 		// TODO: Calculate area
 		// getGeodesicArea from http://dev.openlayers.org/releases/OpenLayers-2.10/lib/OpenLayers/Geometry/LinearRing.js
@@ -350,7 +351,7 @@
 		var j = numPoints-1;  // The last vertex is the 'previous' one to the first
 
 		for (var i = 0; i < numPoints; i++) {
-			area = area + (points[j][0]+points[i][0]) * (points[j][1]-points[i][1]); 
+			area = area + (points[j][0]+points[i][0]) * (points[j][1]-points[i][1]);
 			j = i;  // j is previous vertex to i
 		}
 
@@ -386,6 +387,18 @@
 		height *= this.geo.pixelsPerMeter;
 
 		return height;
+	};
+
+	VIZI.DataOverpass.prototype.processRoof = function(tags) {
+		var roof = {
+				shape  : 'flat',
+		};
+
+		if (tags["roof:shape"] !== undefined) {
+			roof.shape = tags["roof:shape"];
+		}
+
+		return roof;
 	};
 
 	VIZI.DataOverpass.prototype.processColour = function(tags) {
