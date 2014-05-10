@@ -1,7 +1,7 @@
 # ViziCities [0.1.0-pre] [![Build Status](https://travis-ci.org/robhawkes/vizicities.png?branch=master)](https://travis-ci.org/robhawkes/vizicities)
 __Bringing cities to life using the power of open data and the Web__
 
-![http://vizicities.apps.rawk.es](http://f.cl.ly/items/2q1X082f3q0Z1k3R1r3j/Screen%20Shot%202014-02-15%20at%2017.00.54.png)
+![http://vizicities.apps.rawk.es](http://cl.ly/VS9H/Screen%20Shot%202014-05-10%20at%2016.04.54.png)
 
 [ViziCities](http://vizicities.com) is a 3D city and data visualisation platform, powered by WebGL. Its purpose is to change the way you look at cities and the data contained within them. It is the brainchild of [Robin Hawkes](http://twitter.com/robhawkes) and [Peter Smart](http://twitter.com/petewsmart) &mdash; [get in touch](#contact--community) if you'd like to discuss the project with them in more detail.
 
