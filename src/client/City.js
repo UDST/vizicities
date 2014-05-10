@@ -102,6 +102,11 @@
 			// Initialise WebGL
 			return self.initWebGL(options);
 		}).then(function() {
+			self.publish("loadingProgress", 0.25);
+
+			// Initialise attribution UI
+			return self.initAttributionUI();
+		}).then(function() {
 			self.publish("loadingProgress", 0.3);
 
 			var promises = [];
@@ -148,6 +153,22 @@
 			self.publish("loadingComplete");
 
 			VIZI.Log("Finished loading city in " + (Date.now() - startTime) + "ms");
+
+			deferred.resolve();
+		});
+
+		return deferred.promise;
+	};
+
+	VIZI.City.prototype.initAttributionUI = function() {
+		var startTime = Date.now();
+
+		var deferred = Q.defer();
+
+		this.ui.attribution = new VIZI.Attribution();
+
+		this.ui.attribution.init().then(function(result) {
+			VIZI.Log("Finished intialising attribution UI in " + (Date.now() - startTime) + "ms");
 
 			deferred.resolve();
 		});
