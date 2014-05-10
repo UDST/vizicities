@@ -50,9 +50,16 @@
 				self.onMouseUp(event);
 			}, false);
 
-			document.addEventListener("wheel", function(event) {
+			// Prefer wheel event, but fallback to mousewheel event if necessary
+			var wheel_event = "wheel"; 
+			if (window.onwheel === undefined) {
+				wheel_event = "mousewheel"; 
+			}
+
+			document.addEventListener(wheel_event, function(event) {
 				self.onMouseWheel(event);
 			}, false);
+
 		};
 
 		Mouse.prototype.onMouseDown = function(event) {
@@ -152,8 +159,19 @@
 			event.preventDefault();
 
 			var state = this.state;
+
+			// Wheel event 
+			if (event.deltaY !== undefined) {
+
+				state.wheelDelta -= event.deltaY;
 			
-			state.wheelDelta -= event.deltaY;
+			// MouseWheel Event 
+			} else {
+
+				state.wheelDelta += event.wheelDeltaY;
+
+			}
+
 		};
 
 		Mouse.prototype.resetDelta = function() {
