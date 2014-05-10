@@ -95,7 +95,7 @@ module.exports = function(grunt) {
 				files: [ 'Gruntfile.js', 'src/**', 'examples/**' ],
 				tasks: 'default',
 				options: {
-					livereload: true
+					livereload: 35730
 				}
 			}
 		},
@@ -104,7 +104,7 @@ module.exports = function(grunt) {
 				options: {
 					port: port,
 					// change hostname to 0.0.0.0 to open it up
-                                        hostname: 'localhost',
+          hostname: 'localhost',
 					base: '.',
 					keepalive: true,
 					debug: true

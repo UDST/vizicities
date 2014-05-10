@@ -220,7 +220,6 @@
 		var material = new THREE.MeshLambertMaterial({
 			vertexColors: THREE.VertexColors,
 			ambient: 0xffffff,
-			// color: 0xffffff,
 			emissive: 0xcccccc,
 			shading: THREE.FlatShading,
 		});
@@ -291,10 +290,11 @@
 			// - Looks like the outline counts as "points" in renderer.info
 			// - Also looks like they aren't being frustum culled for some reason
 			// https://github.com/mrdoob/three.js/blob/master/src/extras/helpers/EdgesHelper.js
-			var outline = new THREE.EdgesHelper( combinedMesh, 0x222222 );
-			outline.material.linewidth = 1;
-
-			combinedMesh.add(outline);
+			if (VIZI.ENABLE_OUTLINES) {
+				var outline = new THREE.EdgesHelper( combinedMesh, 0x222222 );
+				outline.material.linewidth = 1;
+				combinedMesh.add(outline);
+			}
 
 			// Use previously calculated offset to return merged mesh to correct position
 			// This allows frustum culling to work correctly
