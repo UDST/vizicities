@@ -33,7 +33,7 @@
 			"way({s},{w},{n},{e})[natural~%22water|scrub%22];" +
 			"way({s},{w},{n},{e})[leisure~%22park|pitch%22];" +
 			"way({s},{w},{n},{e})[landuse~%22grass|meadow|forest%22];" +
-			"way({s},{w},{n},{e})[highway~%22motorway|trunk|primary|secondary|tertiary|motorway_link|primary_link|secondary_link|tertiary_link|road%22];" +
+			((VIZI.ENABLE_ROADS) ? "way({s},{w},{n},{e})[highway~%22motorway|trunk|primary|secondary|tertiary|motorway_link|primary_link|secondary_link|tertiary_link|road%22];" : "") +
 			");(._;node(w);););out;";
 
 		this.queryLow = "[out:json];" +
@@ -436,7 +436,7 @@
 		var self = this;
 		var deferred = Q.defer();
 		
-		self.objectManager.processFeaturesWorker(features).then(function(mesh) {
+		self.objectManager.processFeaturesWorker(features, self.geo.pixelsPerMeter).then(function(mesh) {
 			deferred.resolve(mesh);
 		}, undefined, function(progress) {
 			// Pass-through progress

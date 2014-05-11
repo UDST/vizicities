@@ -22,11 +22,11 @@
 		this.publish("addToScene", this.combinedObjects);
 	};
 
-	VIZI.ObjectManager.prototype.workerPromise = function(worker, features) {
+	VIZI.ObjectManager.prototype.workerPromise = function(worker, features, pixelsPerMeter) {
 		var deferred = Q.defer();
 
 		var startTime = Date.now();
-		worker.process(features).then(function(data) {
+		worker.process([features, pixelsPerMeter]).then(function(data) {
 			var timeToSend = data.startTime - startTime;
 			var timeToArrive = Date.now() - data.timeSent;
 			deferred.resolve({data: data, timeToArrive: timeToArrive, timeToSend: timeToSend});
