@@ -2,20 +2,30 @@
 (function() {
 	"use strict";
 
-	VIZI.Camera = function(pos, capZoom, capOrbit) {
+	VIZI.Camera = function(options) {
 		VIZI.Log("Inititialising WebGL camera");
 
 		_.extend(this, VIZI.Mediator);
 
-		this.cameraRadius = 1500;
-		this.theta = 45; // Horizontal orbit
-		this.phi = 80; // Vertical oribt
-
-		this.capZoom = (capZoom === false) ? false : true;
-		this.capOrbit = (capOrbit === false) ? false : true;
+		_.defaults(options, {
+			cameraRadius: 1500,
+			theta: 45,
+			phi: 80,
+			cameraFov: 40,
+			near: 2,
+			far: 40000,
+			capZoom: true,
+			capOrbit: true,
+			zoomCapLow: 250,
+			zoomCapHigh: 2000,
+			orbitCapLow: 65,
+			orbitCapHigh: 175,
+			target: [0, 0],
+		});
 
 		this.target = new THREE.Object3D();
-		this.updateTargetPositon(pos);
+
+		this.load(options);
 
 		this.camera = this.createCamera();
 		this.lookAtTarget();
@@ -32,7 +42,7 @@
 	VIZI.Camera.prototype.createCamera = function() {
 		VIZI.Log("Creating WebGL camera");
 
-		var camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 2, 40000 );
+		var camera = new THREE.PerspectiveCamera(this.options.cameraFov, window.innerWidth / window.innerHeight, this.options.near, this.options.far);
 		this.updatePosition(camera);
 
 		return camera;
@@ -41,9 +51,9 @@
 	// TODO: Why is a camera object being passed in?
 	VIZI.Camera.prototype.updatePosition = function(camera) {
 		camera = (camera) ? camera : this.camera;
-		camera.position.x = this.target.position.x + this.cameraRadius * Math.sin( this.theta * Math.PI / 360 ) * Math.cos( this.phi * Math.PI / 360 );
-		camera.position.y = this.target.position.y + this.cameraRadius * Math.sin( this.phi * Math.PI / 360 );
-		camera.position.z = this.target.position.z + this.cameraRadius * Math.cos( this.theta * Math.PI / 360 ) * Math.cos( this.phi * Math.PI / 360 );
+		camera.position.x = this.target.position.x + this.options.cameraRadius * Math.sin( this.theta * Math.PI / 360 ) * Math.cos( this.phi * Math.PI / 360 );
+		camera.position.y = this.target.position.y + this.options.cameraRadius * Math.sin( this.phi * Math.PI / 360 );
+		camera.position.z = this.target.position.z + this.options.cameraRadius * Math.cos( this.theta * Math.PI / 360 ) * Math.cos( this.phi * Math.PI / 360 );
 		camera.updateMatrix();
 
 		this.publish("targetPositionChanged", this.target.position);
@@ -64,27 +74,27 @@
 	};
 
 	VIZI.Camera.prototype.zoom = function(delta) {
-		var oldcameraRadius = this.cameraRadius;
+		var oldcameraRadius = this.options.cameraRadius;
 
-		this.cameraRadius += delta;
+		this.options.cameraRadius += delta;
 
-		var cameraRadiusDiff = this.cameraRadius - oldcameraRadius;
+		var cameraRadiusDiff = this.options.cameraRadius - oldcameraRadius;
 
-		if (this.capZoom) {
+		if (this.options.capZoom) {
 		// Cap zoom to bounds
-			var zoomCapLow = 250;
-			if (this.cameraRadius < zoomCapLow) {
-				this.cameraRadius = zoomCapLow;
+			var zoomCapLow = this.options.zoomCapLow;
+			if (this.options.cameraRadius < zoomCapLow) {
+				this.options.cameraRadius = zoomCapLow;
 				cameraRadiusDiff = zoomCapLow - oldcameraRadius;
 			}
 
-			var zoomCapHigh = 2000;
-			if (this.cameraRadius > zoomCapHigh) {
-				this.cameraRadius = zoomCapHigh;
+			var zoomCapHigh = this.options.zoomCapHigh;
+			if (this.options.cameraRadius > zoomCapHigh) {
+				this.options.cameraRadius = zoomCapHigh;
 				cameraRadiusDiff = zoomCapHigh - oldcameraRadius;
 			}
 		}
-		
+
 		this.camera.translateZ( cameraRadiusDiff );
 
 		this.updatePosition();
@@ -116,12 +126,12 @@
 		this.theta = - ( delta2d.x * 0.5 ) + theta;
 		this.phi = ( delta2d.y * 0.5 ) + phi;
 
-		if (this.capOrbit) {
+		if (this.options.capOrbit) {
 			// Cap orbit to bounds
-			this.phi = Math.min( 175, Math.max( 65, this.phi ) );
+			this.phi = Math.min( this.options.orbitCapHigh, Math.max( this.options.orbitCapLow, this.phi ) );
 
 			// Let controls know that the cap has been hit
-			if (this.phi === 175 || this.phi === 65) {
+			if (this.phi === this.options.orbitCapHigh || this.phi === this.options.orbitCapLow) {
 				this.publish("orbitControlCap");
 			}
 		}
@@ -136,4 +146,27 @@
 		this.updatePosition();
 		this.lookAtTarget();
 	};
+
+	VIZI.Camera.prototype.serialize = function() {
+
+		this.options.theta = this.theta;
+		this.options.phi = this.phi;
+		this.options.target[0] = this.target.position.x;
+		this.options.target[1] = this.target.position.z;
+
+		return this.options;
+	};
+
+	VIZI.Camera.prototype.load = function(serialized) {
+		this.options = serialized;
+		this.theta = this.options.theta;
+		this.phi = this.options.phi;
+
+		this.updateTargetPositon(this.options.target);
+		if (this.camera) {
+			this.camera.updateProjectionMatrix();
+			this.updatePosition();
+		}
+	};
+
 }());
