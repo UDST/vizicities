@@ -13,6 +13,11 @@
 
 		this.renderer = this.createRenderer();
 
+		//oculus renderer
+		if(VIZI.ENABLE_OCULUS){
+			this.riftCam = new THREE.OculusRiftEffect(this.renderer);
+		}
+
 		// Listeners
 		this.subscribe("render", this.render);
 		this.subscribe("resize", this.resize);
@@ -42,7 +47,12 @@
 
 	VIZI.Renderer.prototype.render = function() {
 		this.publish("fpsTickStart", "render");
-		this.renderer.render( this.scene, this.camera );
+		if(VIZI.ENABLE_OCULUS){
+			this.riftCam.render(this.scene, this.camera );
+		}
+		else{
+			this.renderer.render( this.scene, this.camera );
+		}
 		this.publish("updateRendererInfo", this.renderer.info);
 		this.publish("fpsTickEnd", "render");
 	};

@@ -20,6 +20,11 @@
 		this.camera = this.createCamera();
 		this.lookAtTarget();
 
+		//set up variables for oculus rendering
+		this.viewAngle = 0;
+		this.bodyAxis = new THREE.Vector3(0, 1, 0);
+		this.bodyAngle = 0;
+
 		this.publish("addToScene", this.camera);
 		this.publish("addToDat", this, {name: "Camera", properties: ["cameraRadius", "theta", "phi"]});
 
@@ -27,6 +32,11 @@
 		this.subscribe("zoomControl", this.zoom);
 		this.subscribe("panControl", this.pan);
 		this.subscribe("orbitControl", this.orbit);
+		if(VIZI.ENABLE_OCULUS)
+		{
+			this.subscribe("oculusControl", this.oculus);
+			this.subscribe("firstPersonControl", this.firstPerson);
+		}
 	};
 
 	VIZI.Camera.prototype.createCamera = function() {
@@ -73,6 +83,11 @@
 		if (this.capZoom) {
 		// Cap zoom to bounds
 			var zoomCapLow = 250;
+			//if the oculus is enabled allow users to zoom in to street level
+			if(VIZI.ENABLE_OCULUS){
+				zoomCapLow = 10;
+			}
+
 			if (this.cameraRadius < zoomCapLow) {
 				this.cameraRadius = zoomCapLow;
 				cameraRadiusDiff = zoomCapLow - oldcameraRadius;
@@ -84,7 +99,7 @@
 				cameraRadiusDiff = zoomCapHigh - oldcameraRadius;
 			}
 		}
-		
+
 		this.camera.translateZ( cameraRadiusDiff );
 
 		this.updatePosition();
@@ -129,6 +144,63 @@
 		this.updatePosition();
 		this.lookAtTarget();
 
+		this.publish("render");
+	};
+
+	VIZI.Camera.prototype.oculus = function(quatValues) {
+		// make a quaternion for the the body angle rotated about the Y axis.
+		var quat = new THREE.Quaternion();
+		quat.setFromAxisAngle(this.bodyAxis, this.bodyAngle);
+
+		// make a quaternion for the current orientation of the Rift
+		var quatCam = new THREE.Quaternion(quatValues.x, quatValues.y, quatValues.z, quatValues.w);
+
+		// multiply the body rotation by the Rift rotation.
+		quat.multiply(quatCam);
+
+		// Make a vector pointing along the Z axis and rotate it accoring to the combined look/body angle.
+		var xzVector = new THREE.Vector3(0, 0, 1);
+		xzVector.applyQuaternion(quat);
+
+		// Compute the X/Z angle based on the combined look/body angle.  This will be used for FPS style movement controls
+		// so you can steer with a combination of the keyboard and by moving your head.
+		this.viewAngle = Math.atan2(xzVector.z, xzVector.x) + Math.PI;
+
+		// Apply the combined look/body angle to the camera.
+		this.camera.quaternion.copy(quat);
+
+		//this.updatePosition();
+		//this.lookAtTarget();
+
+		this.publish("render");
+	};
+
+	VIZI.Camera.prototype.firstPerson = function(keys) {
+		//movement step
+		var step = 10;
+
+		//move in the requested direction(s), base movement on view angle
+		if(keys.up){
+			this.target.position.x += Math.cos(this.viewAngle) * step;
+			this.target.position.z += Math.sin(this.viewAngle) * step;
+		}
+
+		if(keys.down){
+			this.target.position.x -= Math.cos(this.viewAngle) * step;
+			this.target.position.z -= Math.sin(this.viewAngle) * step;
+		}
+
+		if(keys.left){
+			this.target.position.x -= Math.cos(this.viewAngle + Math.PI/2) * step;
+      this.target.position.z -= Math.sin(this.viewAngle + Math.PI/2) * step;
+		}
+
+		if(keys.right){
+			this.target.position.x += Math.cos(this.viewAngle + Math.PI/2) * step;
+      this.target.position.z += Math.sin(this.viewAngle + Math.PI/2) * step;
+		}
+
+		this.updatePosition();
 		this.publish("render");
 	};
 

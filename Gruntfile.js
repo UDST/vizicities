@@ -25,6 +25,8 @@ module.exports = function(grunt) {
 					'src/shared/vendor/q.js',
 					'src/shared/vendor/three/three.js',
 					'src/shared/vendor/three/ColorConverter.js',
+					'src/shared/vendor/three/RiftCamera.js',
+					'src/shared/vendor/OculusBridge.js',
 					'src/shared/vendor/d3.js',
 					'src/shared/vendor/catiline.js',
 					'src/shared/vendor/dat.gui.js',
@@ -158,6 +160,6 @@ module.exports = function(grunt) {
 
 	// Run tests
 	grunt.registerTask('test', ['jshint', 'mocha_phantomjs']);
-	
+
 	grunt.task.run('notify_hooks');
 };
