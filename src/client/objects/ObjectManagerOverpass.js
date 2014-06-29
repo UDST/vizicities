@@ -60,7 +60,7 @@
         var createExtrudedObject = function(feature) {
           var properties = feature.properties;
 
-          // var area = properties.area;
+          // var area = properties["vizicities:area"];
 
           // // Skip if building area is too small
           // if (area < 200) {
@@ -84,10 +84,31 @@
             }
           });
 
+          // Add holes
+          if (feature.holes && feature.holes.length > 0) {
+            _.each(feature.holes, function(hole, index) {
+              var holePath = new THREE.Path();
+              _.each(hole, function(coord, index) {
+                // Move if first coordinate
+                if (index === 0) {
+                  holePath.moveTo( coord[0] + offset[0], coord[1] + offset[1] );
+                } else {
+                  holePath.lineTo( coord[0] + offset[0], coord[1] + offset[1] );
+                }
+              });
+              shape.holes.push(holePath);
+            });
+          }
+
           // Height value is in meters
           var height = properties.height;
 
-          var extrudeSettings = { amount: height, bevelEnabled: false };
+          var minHeight = 0;
+          if (properties.minHeight) {
+            minHeight = properties.minHeight;
+          }
+
+          var extrudeSettings = { amount: height - minHeight, bevelEnabled: false };
           var geom = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 
           // Check if this shape only has four points, allowing us
@@ -290,7 +311,12 @@
           var properties = feature.properties;
 
           var mesh;
-          if (properties["highway"]) {
+
+          // Building takes priority over highway
+          // Avoids conflicts with ways like 231879501
+          if (properties["building"]) {
+            mesh = createExtrudedObject(feature);
+          } else if (properties["highway"]) {
             mesh = createRoadObject(feature);
           } else {
             mesh = createExtrudedObject(feature);

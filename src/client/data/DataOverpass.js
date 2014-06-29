@@ -20,13 +20,11 @@
 		// Good Overpass queries: https://raw2.github.com/bigr/map1/master/import_osm.eu1000
 		this.queryHigh = "[out:json];" +
 			"((" +
-			// "rel({s},{w},{n},{e})[waterway~%22riverbank|dock%22];" +
-			// "rel({s},{w},{n},{e})[waterway=%22canal%22][area=%22yes%22];" +
-			// "rel({s},{w},{n},{e})[natural~%22water|scrub%22];" +
-			// "rel({s},{w},{n},{e})[leisure~%22park|pitch%22];" +
-			// "rel({s},{w},{n},{e})[landuse~%22grass|meadow|forest%22];" +
-			// ");(._;way(r););(._;node(w););(" +
+			"rel({s},{w},{n},{e})[%22building%22];" +
+			"rel({s},{w},{n},{e})[type=%22building%22];" +
+			");(._;way(r););(._;node(w););(" +
 			"way({s},{w},{n},{e})[%22building%22];" +
+			"way({s},{w},{n},{e})[%22building:part%22];" +
 			"way({s},{w},{n},{e})[aeroway~%22aerodrome|runway%22];" +
 			"way({s},{w},{n},{e})[waterway~%22riverbank|dock%22];" +
 			"way({s},{w},{n},{e})[waterway=%22canal%22][area=%22yes%22];" +
@@ -246,65 +244,62 @@
 
 	// Process data (convert from Overpass format to a common ViziCities format)
 	// http://wiki.openstreetmap.org/wiki/Talk:Overpass_API/Language_Guide#JSON_Syntax
+	// Heavily based on the OSMBuildings approach
+	// https://github.com/kekscom/osmbuildings/blob/c68e6d87e52de0260e6b2d2f6660d550b79b4915/src/import/OSMXAPI.js
+	// TODO: Process relations before adding ways to output
+	// Aims to avoid clashes like with way 139726525
 	VIZI.DataOverpass.prototype.process = function(data, simple, project) {
 		var self = this;
 
 		var nodes = {};
-		var ways = [];
+		var ways = {};
+		var result = [];
 
 		var elements = data.elements;
+		var way;
 		_.each(elements, function(element) {
 			// Find a way to do this without passing the node and way objects
 			switch (element.type) {
 				case "node":
-					nodes[element.id] = self.processNode(nodes, element, project);
+					self.processNode(nodes, element, project);
 					break;
 				case "way":
-					ways.push(self.processWay(nodes, element, simple));
+					self.processWay(result, ways, nodes, element, simple);
 					break;
+				case "relation":
+					self.processRelation(result, ways, nodes, element);
 			}
 		});
 
-		return ways;
+		return result;
 	};
 
 	VIZI.DataOverpass.prototype.processNode = function(nodes, element, project) {
-		return (project === false) ? [element.lon, element.lat] : this.geo.projection([element.lon, element.lat]);
+		nodes[element.id] = (project === false) ? [element.lon, element.lat] : this.geo.projection([element.lon, element.lat]);
 	};
 
 	// TODO: Validate polygon to make sure it's renderable (eg. complete, and no cross-overs)
-	// TODO: Use simplify.js to reduce complexity of polygons
-	VIZI.DataOverpass.prototype.processWay = function(nodes, element, simple) {
+	// TODO: Don't peform unnecessary logic and tagging for non-building ways
+	VIZI.DataOverpass.prototype.processWay = function(result, ways, nodes, element, simple) {
 		var self = this;
-
-		var points = element.nodes;
-		var pointCount = points.length;
 
 		var tags = element.tags || {};
 
-		// Not enough points to make an object
-		// Ignore if a road
-		if (!tags["highway"] && pointCount < 4) {
-			return;
-		}
+		var coordinates = self.createOutline(nodes, element.nodes);
 
-		var coordinates = [];
-		var dupe = false;
-		_.each(points, function(point, index) {
-			// Shouldn"t duplicate any points apart from first and last
-			if (index < pointCount-1 && self.checkDuplicateCoords(coordinates, nodes[point])) {
-				dupe = true;
-			}
-
-			coordinates.push(nodes[point]);
-		});
-
-		if (dupe) {
+		if (!coordinates) {
 			VIZI.Log("Skipping feature as it has duplicate coordinates", element.id, coordinates);
 			return;
 		}
 
-		var area = this.processArea(coordinates);
+		// Not enough points to make an object
+		// Ignore if a road
+		if (!tags["highway"] && coordinates.length < 4) {
+			VIZI.Log("Skipping feature as it hasn't enough coordinates", element.id, coordinates);
+			return;
+		}
+
+		var area = self.processArea(coordinates);
 
 		// Skip objects too small
 		// if (area < 500) {
@@ -330,21 +325,146 @@
 			}
 		}
 
-		tags.area = area;
+		tags["vizicities:area"] = area;
 		tags.height = this.processHeight(tags);
+
+		if (tags["min_height"] || tags["building:min_height"] || tags["min_levels"] || tags["building:min_levels"]) {
+			tags.minHeight = this.processMinHeight(tags);
+		}
+
 		tags.colour = this.processColour(tags);
-		tags.roof   = this.processRoof(tags);
+		tags.roof = this.processRoof(tags);
 
 		// TODO: Calculate area
 		// getGeodesicArea from http://dev.openlayers.org/releases/OpenLayers-2.10/lib/OpenLayers/Geometry/LinearRing.js
 		// More info: http://gis.stackexchange.com/a/8496/14967
 		// tags.area;
 
-		return {
+		var way = {
 			id: element.id,
 			coordinates: coordinates,
 			properties: tags
 		};
+
+		ways[way.id] = way;
+
+		if (self.isResult(way)) {
+			way.coordinates = self.makeWinding(way.coordinates, self.clockwise);
+			result.push(way);
+		}
+	};
+
+	VIZI.DataOverpass.prototype.processRelation = function(result, ways, nodes, element) {
+		var self = this;
+
+		if (element.tags.type !== "multipolygon" && element.tags.type !== "building") {
+			return;
+		}
+
+		var relationWays = self.getRelationWays(element.members, ways);
+		if (relationWays) {
+			// relItem = filterItem(relation);
+			var outerWay = relationWays.outer;
+			outerWay.coordinates = self.makeWinding(outerWay.coordinates, self.clockwise);
+			if (outerWay) {
+				var holes = [];
+
+				_.each(relationWays.inner, function(innerWay, index) {
+					if (innerWay.coordinates) {
+						// Simplify coordinates
+						// TODO: Perform this in the worker thread
+						var simplifyTolerance = 3; // Three.js units
+						var coordinates = simplify(innerWay.coordinates, simplifyTolerance);
+
+						// Not enough points to make an object
+						if (coordinates.length < 4) {
+							return;
+						}
+
+						// Adding to the beginning seems to result in better holes
+						// Using push causes all sorts of problems
+						// TODO: Fix problems on buildings like Houses of Parliament
+						holes.unshift(self.makeWinding(coordinates, self.counterClockwise));
+					}
+				});
+
+				if (holes.length) {
+					outerWay.holes = holes;
+				}
+
+				_.extend(outerWay.properties, element.tags);
+
+				// Remove old tags
+				outerWay.properties.height = null;
+
+				if (outerWay.properties.minHeight) {
+					outerWay.properties.minHeight = null;
+				}
+
+				outerWay.properties.colour = null;
+				outerWay.properties.roof = null;
+
+				// Reprocess tags
+				// TODO: Remove the need for this duplication
+				outerWay.properties.height = self.processHeight(outerWay.properties);
+
+				if (outerWay.properties.minHeight) {
+					outerWay.properties.minHeight = self.processMinHeight(outerWay.properties);
+				}
+
+				outerWay.properties.colour = self.processColour(outerWay.properties);
+				outerWay.properties.roof = self.processRoof(outerWay.properties);
+
+				result.push(outerWay);
+			}
+		}
+	};
+
+	// From: https://github.com/kekscom/osmbuildings/blob/c68e6d87e52de0260e6b2d2f6660d550b79b4915/src/import/OSMXAPI.js#L39
+	VIZI.DataOverpass.prototype.getRelationWays = function(members, ways) {
+		var m, outer, inner = [];
+		for (var i = 0, il = members.length; i < il; i++) {
+			m = members[i];
+			if (m.type !== 'way' || !ways[m.ref]) {
+				continue;
+			}
+			if (!m.role || m.role === 'outer') {
+				outer = ways[m.ref];
+				continue;
+			}
+			if (m.role === 'inner' || m.role === 'enclave') {
+				inner.push(ways[m.ref]);
+				continue;
+			}
+		}
+
+		// allows tags to be attached to relation - instead of outer way
+		if (outer) {
+			return { outer:outer, inner:inner };
+		}
+	};
+
+	VIZI.DataOverpass.prototype.createOutline = function(nodes, elementNodes) {
+		var self = this;
+		
+		var nodeCount = elementNodes.length;
+
+		var coordinates = [];
+		var dupe = false;
+		_.each(elementNodes, function(node, index) {
+			// Shouldn"t duplicate any points apart from first and last
+			if (index < nodeCount-1 && self.checkDuplicateCoords(coordinates, nodes[node])) {
+				dupe = true;
+			}
+
+			coordinates.push(nodes[node]);
+		});
+
+		if (dupe) {
+			return false;
+		}
+
+		return coordinates;
 	};
 
 	// Not perfect but it's good enough for area-based logic
@@ -394,9 +514,30 @@
 		return height;
 	};
 
+	// TODO: Condense this into a single height method
+	VIZI.DataOverpass.prototype.processMinHeight = function(tags) {
+		// Distance conversion
+		// From: https://github.com/kekscom/osmbuildings/blob/master/src/Import.js#L39
+		var height;
+		var scalingFactor = (tags["building"] === "office") ? 1.45 : 1;
+		if (tags["min_height"]) {
+			height = this.toMeters(tags["min_height"]);
+		} else if (!height && tags["building:min_height"]) {
+			height = this.toMeters(tags["building:min_height"]);
+		} else if (!height && tags["min_levels"]) {
+			height = tags["min_levels"] * this.METERS_PER_LEVEL * scalingFactor <<0;
+		} else if (!height && tags["building:min_levels"]) {
+			height = tags["building:min_levels"] * this.METERS_PER_LEVEL * scalingFactor <<0;
+		}
+
+		height *= this.geo.pixelsPerMeter;
+
+		return height;
+	};
+
 	VIZI.DataOverpass.prototype.processRoof = function(tags) {
 		var roof = {
-				shape  : 'flat',
+			shape: "flat",
 		};
 
 		if (tags["roof:shape"] !== undefined) {
@@ -444,5 +585,17 @@
 		});
 
 		return deferred.promise;
+	};
+
+	// Is the element suitable to be outputted as a result?
+	// Highway has area dependency to avoid trouble with closed ways they are described as highways (like 134405951)
+	// TODO: Detect if it isn't a result, rather than checking all tags to see if it is
+	VIZI.DataOverpass.prototype.isResult = function(element) {
+		var tags = element.properties;
+		
+		return (
+			tags && 
+			(tags["building"] || tags["building:part"] || tags["waterway"] || tags["natural"] || tags["landuse"] || tags["leisure"] || tags["aeroway"] || (tags["highway"] && !tags["area"]))
+		);
 	};
 }());
