@@ -10,7 +10,7 @@
     this.combinedMaterial = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors});
     this.combinedObjects = undefined;
 
-    this.objectAnimations = [];
+    this.objectAnimations = {};
 
     // Listeners
     this.subscribe("update", this.animate);
@@ -412,6 +412,7 @@
       ambient: 0xffffff,
       emissive: 0xcccccc,
       shading: THREE.FlatShading,
+      transparent: true
     });
 
     var self = this;
@@ -508,10 +509,19 @@
       combinedMesh.position.z = -1 * offset.z;
 
       // Initial scale for animation
+      // Negative valie prevents error:
+      // Matrix3.getInverse(): can't invert matrix, determinant is 0
       combinedMesh.scale.y = -0.01;
 
       // Add to animation queue
-      self.objectAnimations[combinedMesh.id] = combinedMesh;
+      self.objectAnimations[combinedMesh.id] = {
+        mesh: combinedMesh,
+        startTime: null,
+        duration: 2000,
+        startValue: -0.01,
+        endValue: 1,
+        currentValue: -0.01
+      };
 
       self.publish("addToScene", combinedMesh);
 
@@ -525,17 +535,40 @@
     return deferred.promise;
   };
 
-  VIZI.ObjectManagerOverpass.prototype.animate = function(delta) {
+  VIZI.ObjectManagerOverpass.prototype.animate = function(delta, lastTickTime) {
     var self = this;
 
     // Percentage increase per second
-    var scale = 2 * (delta / 1000);
+    // var scaleValue = 2 * (delta / 1000);
+    // var easedValue = VIZI.Animation.easing.cubicInOut();
 
-    _.each(self.objectAnimations, function(mesh, index) {
-      mesh.scale.y += scale;
+    _.each(self.objectAnimations, function(animation, index) {
+      // Set start time
+      if (!animation.startTime) {
+        animation.startTime = lastTickTime;
+      }
 
-      if (mesh.scale.y > 1) {
-        mesh.scale.y = 1;
+      // t is the current time, starting at zero. d is the duration in time. b and c are the starting and ending values.
+      var t = VIZI.Animation.easing.cubicInOut((lastTickTime - animation.startTime) / animation.duration);
+      var easedValue = animation.startValue + t*(animation.endValue-animation.startValue);
+
+      // console.log(easedValue);
+
+      // Update mesh values
+      var mesh = animation.mesh;
+      
+      mesh.scale.y = easedValue;
+      mesh.material.opacity = easedValue;
+
+      // Update animation
+      animation.currentValue = easedValue;
+
+      if (mesh.scale.y > animation.endValue) {
+        // Cap mesh values
+        mesh.scale.y = animation.endValue;
+        mesh.material.opacity = animation.endValue;
+
+        // Remove animation
         delete self.objectAnimations[index];
       }
     });

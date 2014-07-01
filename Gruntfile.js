@@ -35,6 +35,7 @@ module.exports = function(grunt) {
 					'src/client/Vizi.js',
 					'src/client/Log.js',
 					'src/client/Mediator.js',
+					'src/client/Animation.js',
 					'src/client/debug/Dat.js',
 					'src/client/debug/FPS.js',
 					'src/client/debug/RendererInfo.js',
