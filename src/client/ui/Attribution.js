@@ -45,6 +45,10 @@
 
     attributionDOM.innerHTML = "<a href='https://www.openstreetmap.org/copyright'>Data &copy; OpenStreetMap contributors</a> | <a href='http://github.com/robhawkes/vizicities'>Powered by ViziCities</a>";
 
+    attributionDOM.style.background = "rgba(255, 255, 255, 0.6)";
+    attributionDOM.style.borderRadius = "3px 0 0";
+    attributionDOM.style.padding = "3px 5px";
+
     this.domContainer.appendChild(attributionDOM);
 
     return attributionDOM;
