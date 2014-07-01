@@ -9,6 +9,11 @@
 
     this.combinedMaterial = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors});
     this.combinedObjects = undefined;
+
+    this.objectAnimations = [];
+
+    // Listeners
+    this.subscribe("update", this.animate);
   };
 
   VIZI.ObjectManagerOverpass.prototype = Object.create( VIZI.ObjectManager.prototype );
@@ -459,6 +464,7 @@
           // TODO: Stop this locking up the browser
           // No visible lock up at all when removed
           var geom = loader.parse(model);
+
           // var mesh = new THREE.Mesh(geom.geometry, material);
           var mesh = new THREE.Mesh(geom.geometry);
 
@@ -476,6 +482,8 @@
 
       var offset = THREE.GeometryUtils.center( combinedGeom );
 
+      combinedGeom.applyMatrix( new THREE.Matrix4().makeTranslation(0, -1 * offset.y, 0) );
+
       combinedMesh = new THREE.Mesh(combinedGeom, material);
 
       // http://stackoverflow.com/questions/20153705/three-js-wireframe-material-all-polygons-vs-just-edges
@@ -492,8 +500,18 @@
       // Use previously calculated offset to return merged mesh to correct position
       // This allows frustum culling to work correctly
       combinedMesh.position.x = -1 * offset.x;
-      combinedMesh.position.y = -1 * offset.y;
+
+      // Removed for scale center to be correct
+      // Offset with applyMatrix above
+      // combinedMesh.position.y = -1 * offset.y;
+
       combinedMesh.position.z = -1 * offset.z;
+
+      // Initial scale for animation
+      combinedMesh.scale.y = -0.01;
+
+      // Add to animation queue
+      self.objectAnimations[combinedMesh.id] = combinedMesh;
 
       self.publish("addToScene", combinedMesh);
 
@@ -505,5 +523,21 @@
     });
 
     return deferred.promise;
+  };
+
+  VIZI.ObjectManagerOverpass.prototype.animate = function(delta) {
+    var self = this;
+
+    // Percentage increase per second
+    var scale = 2 * (delta / 1000);
+
+    _.each(self.objectAnimations, function(mesh, index) {
+      mesh.scale.y += scale;
+
+      if (mesh.scale.y > 1) {
+        mesh.scale.y = 1;
+        delete self.objectAnimations[index];
+      }
+    });
   };
 }());
