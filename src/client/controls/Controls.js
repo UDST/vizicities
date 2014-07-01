@@ -14,10 +14,10 @@
 			this.keyboard = undefined;
 		};
 
-		Controls.prototype.init = function(camera, options) {
+		Controls.prototype.init = function(domElement, camera, options) {
 			if (options.enable) {
-				this.mouse = VIZI.Mouse.getInstance(camera);
-				this.keyboard = VIZI.Keyboard.getInstance();
+				this.mouse = VIZI.Mouse.getInstance(domElement, camera);
+				this.keyboard = VIZI.Keyboard.getInstance(domElement);
 
 				this.subscribe("update", this.onUpdate);
 				this.subscribe("orbitControlCap", this.orbitCapReset);

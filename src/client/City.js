@@ -31,7 +31,8 @@
 		// Basic WebGL components (scene, camera, renderer, lights, etc)
 		this.webgl = undefined;
 
-		// DOM events (window resize, etc)
+		// DOM - elements and events (window resize, etc)
+		this.domElement = undefined;
 		this.domEvents = undefined;
 
 		// Controls (mouse, keyboard, Leap, etc)
@@ -60,7 +61,7 @@
 			options = {};
 		}
 
-		this.options = options;
+		self.options = options;
 
 		var hash = window.location.hash.replace('#', '');
 		var coordCheck = /^(\-?\d+(\.\d+)?),(\-?\d+(\.\d+)?)$/;
@@ -86,12 +87,15 @@
 			center: options.coords
 		});
 
+		// Store DOM reference
+		self.domElement = self.options.domElement;
+
 		// Load city using promises
 
 		self.publish("loadingProgress", 0);
 
 		// Initialise loading UI
-		this.initLoadingUI().then(function() {
+		self.initLoadingUI().then(function() {
 			self.publish("loadingProgress", 0.1);
 
 			// Initialise debug tools
@@ -183,7 +187,7 @@
 
 		this.ui.loading = new VIZI.Loading();
 
-		this.ui.loading.init().then(function(result) {
+		this.ui.loading.init(this.domElement).then(function(result) {
 			VIZI.Log("Finished intialising loading UI in " + (Date.now() - startTime) + "ms");
 
 			deferred.resolve();
@@ -216,7 +220,7 @@
 		
 		this.webgl = new VIZI.WebGL();
 
-		this.webgl.init(this.geo.centerPixels, options.capZoom, options.capOrbit).then(function(result) {
+		this.webgl.init(this.domElement, this.geo.centerPixels, options.capZoom, options.capOrbit).then(function(result) {
 			VIZI.Log("Finished intialising WebGL in " + (Date.now() - startTime) + "ms");
 
 			deferred.resolve();
@@ -248,7 +252,7 @@
 
 		this.controls = VIZI.Controls.getInstance();
 
-		this.controls.init(this.webgl.camera, this.options.controls).then(function(result) {
+		this.controls.init(this.domElement, this.webgl.camera, this.options.controls).then(function(result) {
 			VIZI.Log("Finished intialising controls in " + (Date.now() - startTime) + "ms");
 
 			deferred.resolve();

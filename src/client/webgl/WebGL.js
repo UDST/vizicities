@@ -15,8 +15,8 @@
 		this.lights = [];
 	};
 
-	VIZI.WebGL.prototype.init = function(cameraTargetPos, capZoom, capOrbit) {
-		this.domContainer = this.createDOMContainer();
+	VIZI.WebGL.prototype.init = function(domElement, cameraTargetPos, capZoom, capOrbit) {
+		this.domContainer = this.createDOMContainer(domElement);
 		this.scene = new VIZI.Scene();
 		this.camera = new VIZI.Camera(cameraTargetPos, capZoom, capOrbit);
 		this.renderer = new VIZI.Renderer(this.scene, this.camera, this.domContainer);
@@ -27,13 +27,13 @@
 		return Q.fcall(function() {});
 	};
 
-	VIZI.WebGL.prototype.createDOMContainer = function() {
+	VIZI.WebGL.prototype.createDOMContainer = function(domElement) {
 		VIZI.Log("Creating WebGL DOM container");
 
 		var container = document.createElement("div");
-		container.id = "webgl-container";
+		container.classList.add("vizicities-webgl-container");
 
-		document.body.appendChild(container);
+		domElement.appendChild(container);
 
 		return container;
 	};
