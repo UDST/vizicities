@@ -3,7 +3,7 @@
 	"use strict";
 
 	VIZI.Mouse = (function() {
-		var Mouse = function(camera) {
+		var Mouse = function(domElement, camera) {
 			VIZI.Log("Inititialising mouse manager");
 
 			_.extend(this, VIZI.Mediator);
@@ -32,21 +32,21 @@
 				}
 			};
 
-			this.initDOMEvents();
+			this.initDOMEvents(domElement);
 		};
 
-		Mouse.prototype.initDOMEvents = function() {
+		Mouse.prototype.initDOMEvents = function(domElement) {
 			var self = this;
 
-			document.addEventListener("mousedown", function(event) {
+			domElement.addEventListener("mousedown", function(event) {
 				self.onMouseDown(event);
 			}, false);
 
-			document.addEventListener("mousemove", function(event) {
+			domElement.addEventListener("mousemove", function(event) {
 				self.onMouseMove(event);
 			}, false);
 
-			document.addEventListener("mouseup", function(event) {
+			domElement.addEventListener("mouseup", function(event) {
 				self.onMouseUp(event);
 			}, false);
 
@@ -56,7 +56,7 @@
 				wheel_event = "mousewheel"; 
 			}
 
-			document.addEventListener(wheel_event, function(event) {
+			domElement.addEventListener(wheel_event, function(event) {
 				self.onMouseWheel(event);
 			}, false);
 
@@ -229,9 +229,9 @@
 
 			// Method for getting an instance. It returns 
 			// a singleton instance of a singleton object
-			getInstance: function(camera) {
+			getInstance: function(domElement, camera) {
 				if ( instance  ===  undefined )  {
-					instance = new Mouse(camera);
+					instance = new Mouse(domElement, camera);
 				}
 
 				return instance;

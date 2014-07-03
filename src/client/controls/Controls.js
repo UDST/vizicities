@@ -15,10 +15,10 @@
 			this.bridge = undefined;
 		};
 
-		Controls.prototype.init = function(camera, options) {
+		Controls.prototype.init = function(domElement, camera, options) {
 			if (options.enable) {
-				this.mouse = VIZI.Mouse.getInstance(camera);
-				this.keyboard = VIZI.Keyboard.getInstance();
+				this.mouse = VIZI.Mouse.getInstance(domElement, camera);
+				this.keyboard = VIZI.Keyboard.getInstance(domElement);
 				if(VIZI.ENABLE_OCULUS){
 						VIZI.Log("Connecting to Oculus Bridge");
 						this.bridge = new OculusBridge(

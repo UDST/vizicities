@@ -40,11 +40,11 @@
 		// } else {
 		// // integer milliseconds since unix epoch
 		// }
-		
-		this.publish("update", delta);
-		this.publish("render", delta);
 
 		this.lastTickTime = timestamp;
+		
+		this.publish("update", delta, this.lastTickTime);
+		this.publish("render", delta, this.lastTickTime);
 
 		if (!this.stopLoop) {
 			// Should probably be a bit more obvious that this comes from Three.js

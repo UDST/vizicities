@@ -1,4 +1,4 @@
-/* globals window, _, VIZI, Q, d3 */
+/* globals window, _, VIZI, THREE, Q, d3 */
 (function() {
 	"use strict";
 
@@ -31,6 +31,10 @@
 		// Degrees latitude for each data tile
 		// Default to roughly around 550m
 		this.dataTileSize = 0.005;
+
+		// Winding
+		this.clockwise = "cw";
+		this.counterClockwise = "ccw";
 
 		// Distance constants
 		this.YARD_TO_METER = 0.9144;
@@ -156,6 +160,16 @@
 		});
 
 		return dupe;
+	};
+
+	// Enforce a polygon winding direcetion. Needed for proper backface culling.
+	VIZI.Data.prototype.makeWinding = function(points, direction) {
+		var winding = THREE.Shape.Utils.isClockWise(points) ? this.clockwise : this.counterClockwise;
+		if (winding === direction) {
+			return points;
+		} else {
+			return points.reverse();
+		}
 	};
 
 	// Convert string distance value into meters

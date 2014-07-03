@@ -12,18 +12,20 @@
 		this.domIndicator = undefined;
 	};
 
-	VIZI.Loading.prototype.init = function() {
-		this.domContainer = this.createDOMContainer();
+	VIZI.Loading.prototype.init = function(domElement) {
+		this.domContainer = this.createDOMContainer(domElement);
 		this.domTimer = this.createDOMTimer();
 		this.domIndicator = this.createDOMIndicator();
 
 		this.subscribe("loadingProgress", this.progress);
-		this.subscribe("loadingComplete", this.remove);
+		this.subscribe("loadingComplete", function() {
+			this.remove(domElement);
+		});
 
 		return Q.fcall(function() {});
 	};
 
-	VIZI.Loading.prototype.createDOMContainer = function() {
+	VIZI.Loading.prototype.createDOMContainer = function(domElement) {
 		VIZI.Log("Creating loading UI DOM container");
 
 		var container = document.createElement("div");
@@ -37,7 +39,7 @@
 		container.style.width = "100%";
 		container.style.zIndex = 9999;
 
-		document.body.appendChild(container);
+		domElement.appendChild(container);
 
 		return container;
 	};
@@ -88,7 +90,7 @@
 		this.domIndicator.style.transform = "translate3d(" + position + ", 0, 0)";
 	};
 
-	VIZI.Loading.prototype.remove = function() {
+	VIZI.Loading.prototype.remove = function(domElement) {
 		var self = this;
 
 		setTimeout(function() {
@@ -97,7 +99,7 @@
 
 		setTimeout(function() {
 			VIZI.Log("Removing loading UI DOM container");
-			document.body.removeChild(self.domContainer);
+			domElement.removeChild(self.domContainer);
 		}, 2000);
 	};
 }());

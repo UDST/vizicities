@@ -9,6 +9,11 @@
 
     this.combinedMaterial = new THREE.MeshLambertMaterial({vertexColors: THREE.VertexColors});
     this.combinedObjects = undefined;
+
+    this.objectAnimations = {};
+
+    // Listeners
+    this.subscribe("update", this.animate);
   };
 
   VIZI.ObjectManagerOverpass.prototype = Object.create( VIZI.ObjectManager.prototype );
@@ -60,7 +65,7 @@
         var createExtrudedObject = function(feature) {
           var properties = feature.properties;
 
-          // var area = properties.area;
+          // var area = properties["vizicities:area"];
 
           // // Skip if building area is too small
           // if (area < 200) {
@@ -84,10 +89,31 @@
             }
           });
 
+          // Add holes
+          if (feature.holes && feature.holes.length > 0) {
+            _.each(feature.holes, function(hole, index) {
+              var holePath = new THREE.Path();
+              _.each(hole, function(coord, index) {
+                // Move if first coordinate
+                if (index === 0) {
+                  holePath.moveTo( coord[0] + offset[0], coord[1] + offset[1] );
+                } else {
+                  holePath.lineTo( coord[0] + offset[0], coord[1] + offset[1] );
+                }
+              });
+              shape.holes.push(holePath);
+            });
+          }
+
           // Height value is in meters
           var height = properties.height;
 
-          var extrudeSettings = { amount: height, bevelEnabled: false };
+          var minHeight = 0;
+          if (properties.minHeight) {
+            minHeight = properties.minHeight;
+          }
+
+          var extrudeSettings = { amount: height - minHeight, bevelEnabled: false };
           var geom = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 
           // Check if this shape only has four points, allowing us
@@ -290,7 +316,12 @@
           var properties = feature.properties;
 
           var mesh;
-          if (properties["highway"]) {
+
+          // Building takes priority over highway
+          // Avoids conflicts with ways like 231879501
+          if (properties["building"]) {
+            mesh = createExtrudedObject(feature);
+          } else if (properties["highway"]) {
             mesh = createRoadObject(feature);
           } else {
             mesh = createExtrudedObject(feature);
@@ -381,6 +412,7 @@
       ambient: 0xffffff,
       emissive: 0xcccccc,
       shading: THREE.FlatShading,
+      transparent: true
     });
 
     var self = this;
@@ -433,6 +465,7 @@
           // TODO: Stop this locking up the browser
           // No visible lock up at all when removed
           var geom = loader.parse(model);
+
           // var mesh = new THREE.Mesh(geom.geometry, material);
           var mesh = new THREE.Mesh(geom.geometry);
 
@@ -450,6 +483,8 @@
 
       var offset = THREE.GeometryUtils.center( combinedGeom );
 
+      combinedGeom.applyMatrix( new THREE.Matrix4().makeTranslation(0, -1 * offset.y, 0) );
+
       combinedMesh = new THREE.Mesh(combinedGeom, material);
 
       // http://stackoverflow.com/questions/20153705/three-js-wireframe-material-all-polygons-vs-just-edges
@@ -466,8 +501,27 @@
       // Use previously calculated offset to return merged mesh to correct position
       // This allows frustum culling to work correctly
       combinedMesh.position.x = -1 * offset.x;
-      combinedMesh.position.y = -1 * offset.y;
+
+      // Removed for scale center to be correct
+      // Offset with applyMatrix above
+      // combinedMesh.position.y = -1 * offset.y;
+
       combinedMesh.position.z = -1 * offset.z;
+
+      // Initial scale for animation
+      // Negative valie prevents error:
+      // Matrix3.getInverse(): can't invert matrix, determinant is 0
+      combinedMesh.scale.y = -0.01;
+
+      // Add to animation queue
+      self.objectAnimations[combinedMesh.id] = {
+        mesh: combinedMesh,
+        startTime: null,
+        duration: 2000,
+        startValue: -0.01,
+        endValue: 1,
+        currentValue: -0.01
+      };
 
       self.publish("addToScene", combinedMesh);
 
@@ -479,5 +533,44 @@
     });
 
     return deferred.promise;
+  };
+
+  VIZI.ObjectManagerOverpass.prototype.animate = function(delta, lastTickTime) {
+    var self = this;
+
+    // Percentage increase per second
+    // var scaleValue = 2 * (delta / 1000);
+    // var easedValue = VIZI.Animation.easing.cubicInOut();
+
+    _.each(self.objectAnimations, function(animation, index) {
+      // Set start time
+      if (!animation.startTime) {
+        animation.startTime = lastTickTime;
+      }
+
+      // t is the current time, starting at zero. d is the duration in time. b and c are the starting and ending values.
+      var t = VIZI.Animation.easing.cubicInOut((lastTickTime - animation.startTime) / animation.duration);
+      var easedValue = animation.startValue + t*(animation.endValue-animation.startValue);
+
+      // console.log(easedValue);
+
+      // Update mesh values
+      var mesh = animation.mesh;
+      
+      mesh.scale.y = easedValue;
+      mesh.material.opacity = easedValue;
+
+      // Update animation
+      animation.currentValue = easedValue;
+
+      if (mesh.scale.y > animation.endValue) {
+        // Cap mesh values
+        mesh.scale.y = animation.endValue;
+        mesh.material.opacity = animation.endValue;
+
+        // Remove animation
+        delete self.objectAnimations[index];
+      }
+    });
   };
 }());

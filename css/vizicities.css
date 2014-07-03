@@ -1,0 +1,9 @@
+/* Extending defaults from Attribution.js */
+.ui-attribution a {
+  color: #222;
+  text-decoration: none;
+}
+
+  .ui-attribution a:hover {
+    text-decoration: underline;
+  }
