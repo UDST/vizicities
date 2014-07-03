@@ -1,9 +1,9 @@
-/* Extending defaults from Attribution.js */
-.ui-attribution a {
+/* Extending defaults from Attribution.js and OSMEdit.js */
+.ui-attribution a, .ui-osm-edit a {
   color: #222;
   text-decoration: none;
 }
 
-  .ui-attribution a:hover {
+  .ui-attribution a:hover, .ui-osm-edit a:hover {
     text-decoration: underline;
   }

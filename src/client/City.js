@@ -18,6 +18,8 @@
 		// UI
 		this.ui = {};
 		this.ui.loading = undefined;
+		this.ui.attribution = undefined;
+		this.ui.osmEdit = undefined;
 
 		// Geo methods
 		this.geo = undefined;
@@ -101,15 +103,23 @@
 			// Initialise debug tools
 			return self.initDebug();
 		}).then(function() {
-			self.publish("loadingProgress", 0.2);
+			self.publish("loadingProgress", 0.15);
 
-			// Initialise WebGL
-			return self.initWebGL(options);
+			// Initialise attribution and OSM edit UI
+			var promises = [];
+
+			// Initialise DOM events
+			promises.push(self.initAttributionUI());
+
+			// Initialise controls
+			promises.push(self.initOSMEditUI());
+
+			return Q.allSettled(promises);
 		}).then(function() {
 			self.publish("loadingProgress", 0.25);
 
-			// Initialise attribution UI
-			return self.initAttributionUI();
+			// Initialise WebGL
+			return self.initWebGL(options);
 		}).then(function() {
 			self.publish("loadingProgress", 0.3);
 
@@ -173,6 +183,22 @@
 
 		this.ui.attribution.init().then(function(result) {
 			VIZI.Log("Finished intialising attribution UI in " + (Date.now() - startTime) + "ms");
+
+			deferred.resolve();
+		});
+
+		return deferred.promise;
+	};
+
+	VIZI.City.prototype.initOSMEditUI = function() {
+		var startTime = Date.now();
+
+		var deferred = Q.defer();
+
+		this.ui.osmEdit = new VIZI.OSMEdit();
+
+		this.ui.osmEdit.init().then(function(result) {
+			VIZI.Log("Finished intialising OSM edit UI in " + (Date.now() - startTime) + "ms");
 
 			deferred.resolve();
 		});
