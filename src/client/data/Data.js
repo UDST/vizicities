@@ -131,7 +131,7 @@
 		if (uniqueFeatures.length === 0) {
 			VIZI.Log("No features left to pass to worker");
 			deferred.resolve();
-			return;
+			return deferred.promise;
 		}
 
 		// TODO: Pass-through progress event
