@@ -78,7 +78,8 @@
 			overpass: true,
 			overpassGridUpdate: true,
 			overpassWayIntersect: false,
-			controls: { enable: true }
+			controls: { enable: true },
+			tiltShift: { enable: false, blur: 5, focus: 0.5 }
 		});
 
 		// Output city options
@@ -246,7 +247,7 @@
 		
 		this.webgl = new VIZI.WebGL();
 
-		this.webgl.init(this.domElement, this.geo.centerPixels, options.capZoom, options.capOrbit).then(function(result) {
+		this.webgl.init(this.domElement, this.geo.centerPixels, options.capZoom, options.capOrbit, options.tiltShift).then(function(result) {
 			VIZI.Log("Finished intialising WebGL in " + (Date.now() - startTime) + "ms");
 
 			deferred.resolve();

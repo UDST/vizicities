@@ -15,11 +15,12 @@
 		this.lights = [];
 	};
 
-	VIZI.WebGL.prototype.init = function(domElement, cameraTargetPos, capZoom, capOrbit) {
+	VIZI.WebGL.prototype.init = function(domElement, cameraTargetPos, capZoom, capOrbit, tiltShift) {
 		this.domContainer = this.createDOMContainer(domElement);
 		this.scene = new VIZI.Scene();
 		this.camera = new VIZI.Camera(cameraTargetPos, capZoom, capOrbit);
 		this.renderer = new VIZI.Renderer(this.scene, this.camera, this.domContainer);
+		this.tiltShift = new VIZI.TiltShift(this.scene, this.camera, this.renderer, tiltShift);
 
 		this.lights = [];
 		this.addLights();
