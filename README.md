@@ -69,7 +69,132 @@ ViziCities is not complete and there are many things that could be done better o
 
 ## Getting started
 
-Step-by-step instructions on how to get up and running with your first visualisation.
+Here are some step-by-step instructions on how to get up and running with your first visualisation. You can also [use this JSBin](http://jsbin.com/guqojerova/6/edit) to see the example running and play with the code.
+
+The first step is to download the [latest ViziCities build files](https://github.com/vizicities/vizicities/tree/0.2.0/build) (JS & CSS).
+
+Once you've done that then set up the basic HTML and include the ViziCities files:
+
+```
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <title>ViziCities - Basic Example</title>
+
+  <style type="text/css">
+    html, body {
+      height: 100%;
+      width: 100%;
+    }
+    
+    #vizicities-viewport {
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+
+  <link rel="stylesheet" type="text/css" href="vizi.css">
+</head>
+<body>
+  <div id="vizicities-viewport"></div>
+  <script src="vizi.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
+```
+
+At this point you can initialise ViziCities in a new script (`main.js` in this example):
+
+```
+var world = new VIZI.World({
+  viewport: document.querySelector("#vizicities-viewport"),
+  center: new VIZI.LatLon(51.50358, -0.01924)
+});
+```
+
+And add some controls:
+
+```
+var controls = new VIZI.ControlsMap(world.camera);
+```
+
+Let's add a basemap using the Blueprint API:
+
+```
+var mapConfig = {
+  input: {
+    type: "BlueprintInputMapTiles",
+    options: {
+      tilePath: "https://a.tiles.mapbox.com/v3/examples.map-i86l3621/{z}/{x}/{y}@2x.png"
+    }
+  },
+  output: {
+    type: "BlueprintOutputImageTiles",
+    options: {
+      grids: [{
+        zoom: 13,
+        tilesPerDirection: 5,
+        cullZoom: 11
+      }]
+    }
+  },
+  triggers: [{
+    triggerObject: "output",
+    triggerName: "initialised",
+    triggerArguments: ["tiles"],
+    actionObject: "input",
+    actionName: "requestTiles",
+    actionArguments: ["tiles"],
+    actionOutput: {
+      tiles: "tiles" // actionArg: triggerArg
+    }
+  }, {
+    triggerObject: "output",
+    triggerName: "gridUpdated",
+    triggerArguments: ["tiles"],
+    actionObject: "input",
+    actionName: "requestTiles",
+    actionArguments: ["tiles"],
+    actionOutput: {
+      tiles: "tiles" // actionArg: triggerArg
+    }
+  }, {
+    triggerObject: "input",
+    triggerName: "tileReceived",
+    triggerArguments: ["image", "tile"],
+    actionObject: "output",
+    actionName: "outputImageTile",
+    actionArguments: ["image", "tile"],
+    actionOutput: {
+      image: "image", // actionArg: triggerArg
+      tile: "tile"
+    }
+  }]
+};
+
+var switchboardMap = new VIZI.BlueprintSwitchboard(mapConfig);
+switchboardMap.addToWorld(world);
+```
+
+The last step is to to set up the update and render loop:
+
+```
+var clock = new VIZI.Clock();
+
+var update = function() {
+  var delta = clock.getDelta();
+
+  world.onTick(delta);
+  world.render();
+
+  window.requestAnimationFrame(update);
+};
+
+update();
+```
+
+Load the HTML page in a browser and enjoy your awesome 3D view of London!
 
 
 ## Using ViziCities? Please attribute it

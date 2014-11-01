@@ -124,6 +124,8 @@ module.exports = function(grunt) {
   grunt.registerTask("default", ["test"]);
 
   // Testing
+  // TODO: If tests keep failing randomly on Travis then move back to Phantom
+  // - Just means absolute zero chance of WebGL testing then
   grunt.registerTask("test", ["jshint", "mocha_slimer"]);
 
   // Build
