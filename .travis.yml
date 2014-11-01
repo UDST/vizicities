@@ -6,7 +6,7 @@ env:
 addons:
   firefox: "25.0"
 before_script:
-  - "sh -e /etc/init.d/xvfb start"
+  - "sh -e /etc/init.d/xvfb-run start"
   - "echo 'Installing Slimer'"
   - "wget http://download.slimerjs.org/releases/0.9.3/slimerjs-0.9.3.zip"
   - "unzip slimerjs-0.9.3.zip"
