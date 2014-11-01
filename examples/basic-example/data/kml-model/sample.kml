@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://earth.google.com/kml/2.1">
+<Placemark>
+	<name>SketchUp Model of Macky Auditorium</name>
+	<description>University of Colorado, Boulder; model created by Noël Nemcik.</description>
+	<LookAt>
+		<longitude>-105.2727379358738</longitude>
+		<latitude>40.01000594412381</latitude>
+		<altitude>0</altitude>
+		<range>127.2393107680517</range>
+		<tilt>65.74454495876547</tilt>
+		<heading>-27.70337734057933</heading>
+	</LookAt>
+	<Model id="model_4">
+		<altitudeMode>relativeToGround</altitudeMode>
+		<Location>
+			<longitude>-105.272774533734</longitude>
+			<latitude>40.009993372683</latitude>
+			<altitude>0</altitude>
+		</Location>
+		<Orientation>
+			<heading>0</heading>
+			<tilt>0</tilt>
+			<roll>0</roll>
+		</Orientation>
+		<Scale>
+			<x>1</x>
+			<y>1</y>
+			<z>1</z>
+		</Scale>
+		<Link>
+			<href>files/CU Macky.dae</href>
+		</Link>
+	</Model>
+</Placemark>
+</kml>

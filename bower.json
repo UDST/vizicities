@@ -1,0 +1,41 @@
+{
+  "name": "vizicities",
+  "version": "0.2.0",
+  "authors": [
+    "Robin Hawkes <rob@vizicities.com>"
+  ],
+  "description": "3D city and data visualisation platform",
+  "main": [
+    "build/vizi.min.js",
+    "build/vizi-worker.min.js"
+  ],
+  "keywords": [
+    "mapping",
+    "geography",
+    "cities",
+    "urban",
+    "data",
+    "dataviz",
+    "3d"
+  ],
+  "license": "MIT",
+  "homepage": "http://vizicities.com",
+  "ignore": [
+    "**/.*",
+    "*.md",
+    "node_modules",
+    "bower_components",
+    "examples",
+    "src",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "underscore": "~1.7.0",
+    "threejs": "*",
+    "wildemitter": "HenrikJoreteg/wildemitter#~1.0.1",
+    "proj4": "~2.3.3",
+    "d3": "~3.4.13",
+    "operative": "https://github.com/padolsey/operative/archive/0-4-rc1.zip"
+  }
+}
