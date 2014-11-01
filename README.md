@@ -86,7 +86,7 @@ The ViziCities repo has been moved away from Robin's personal account and now re
 It's pretty easy to do, [GitHub even wrote about how to do it](https://help.github.com/articles/changing-a-remote-s-url/). Running the following command within your ViziCities directory should be enough for most people:
 
 ```
-git remote set-url origin https://github.com/vizicities/vizicities.git
+git remote set-url origin git@github.com:vizicities/vizicities.git
 ```
 
 ## Getting involved
