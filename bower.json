@@ -26,6 +26,8 @@
   "ignore": [
     "**/.*",
     "*.md",
+    "Gruntfile.js",
+    "package.json",
     "node_modules",
     "bower_components",
     "examples",
