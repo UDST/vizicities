@@ -69,6 +69,8 @@ ViziCities is not complete and there are many things that could be done better o
 
 ## Getting started
 
+Step-by-step instructions on how to get up and running with your first visualisation.
+
 
 ## Using ViziCities? Please attribute it
 
