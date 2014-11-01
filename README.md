@@ -75,7 +75,7 @@ The first step is to download the [latest ViziCities build files](https://github
 
 Once you've done that then set up the basic HTML and include the ViziCities files:
 
-```
+```html
 <!DOCTYPE html>
 <html>
 <head>
@@ -106,7 +106,7 @@ Once you've done that then set up the basic HTML and include the ViziCities file
 
 At this point you can initialise ViziCities in a new script (`main.js` in this example):
 
-```
+```javascript
 var world = new VIZI.World({
   viewport: document.querySelector("#vizicities-viewport"),
   center: new VIZI.LatLon(51.50358, -0.01924)
@@ -115,13 +115,13 @@ var world = new VIZI.World({
 
 And add some controls:
 
-```
+```javascript
 var controls = new VIZI.ControlsMap(world.camera);
 ```
 
 Let's add a basemap using the Blueprint API:
 
-```
+```javascript
 var mapConfig = {
   input: {
     type: "BlueprintInputMapTiles",
@@ -179,7 +179,7 @@ switchboardMap.addToWorld(world);
 
 The last step is to to set up the update and render loop:
 
-```
+```javascript
 var clock = new VIZI.Clock();
 
 var update = function() {
