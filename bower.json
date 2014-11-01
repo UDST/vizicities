@@ -7,7 +7,10 @@
   "description": "3D city and data visualisation platform",
   "main": [
     "build/vizi.min.js",
-    "build/vizi-worker.min.js"
+    "build/vizi-worker.min.js",
+    "build/vizi.js",
+    "build/vizi-worker.js",
+    "build/vizi.css"
   ],
   "keywords": [
     "mapping",
