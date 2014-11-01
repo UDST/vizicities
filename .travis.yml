@@ -1,17 +1,6 @@
 language: node_js
 node_js:
   - "0.10"
-env:
-  - SLIMERJSLAUNCHER=$(which firefox) DISPLAY=:99.0 PATH=$TRAVIS_BUILD_DIR/slimerjs:$PATH
-addons:
-  firefox: "25.0"
-before_script:
-  - "sh -e /etc/init.d/xvfb-run start"
-  - "echo 'Installing Slimer'"
-  - "wget http://download.slimerjs.org/releases/0.9.3/slimerjs-0.9.3.zip"
-  - "unzip slimerjs-0.9.3.zip"
-  - "mv slimerjs-0.9.3 ./slimerjs"
-  - slimerjs --version
 before_install:
   - npm install -g grunt-cli
 notifications:

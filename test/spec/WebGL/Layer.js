@@ -9,7 +9,8 @@ describe("VIZI.Layer", function() {
       viewport: document.createElement("div"),
       camera: new VIZI.Camera({
         aspect: 1024 / 768
-      })
+      }),
+      suppressRenderer: true
     });
   });
 

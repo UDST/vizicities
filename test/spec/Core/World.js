@@ -8,7 +8,8 @@ describe("VIZI.World", function() {
       viewport: viewport,
       camera: new VIZI.Camera({
         aspect: 1024 / 768
-      })
+      }),
+      suppressRenderer: true
     });
   });
 

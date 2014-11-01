@@ -17,7 +17,8 @@
     
     _.defaults(self.options, {
       antialias: false,
-      fogColour: 0xffffff
+      fogColour: 0xffffff,
+      suppressRenderer: false
     });
 
     if (!self.options.viewport) {
@@ -61,9 +62,22 @@
   VIZI.Scene.prototype.createRenderer = function() {
     var self = this;
 
-    var renderer = new THREE.WebGLRenderer({
-      antialias: self.options.antialias
-    });
+    var renderer;
+
+    if (self.options.suppressRenderer) {
+      // Mock renderer for tests
+      // TODO: Should really remove this or fix the tests
+      renderer = {
+        setSize: function(){},
+        setClearColor: function(){},
+        render: function(){},
+        domElement: document.createElement("canvas")
+      };
+    } else {
+      renderer = new THREE.WebGLRenderer({
+        antialias: self.options.antialias
+      });
+    }
 
     renderer.setSize(self.options.viewport.clientWidth, self.options.viewport.clientHeight);
     renderer.setClearColor(self.scene.fog.color, 1);

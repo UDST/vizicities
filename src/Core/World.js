@@ -18,7 +18,8 @@
     _.defaults(self.options, {
       crs: VIZI.CRS.EPSG3857,
       center: new VIZI.LatLon(51.50358, -0.01924),
-      zoom: 16
+      zoom: 16,
+      suppressRenderer: false // Set true for tests
     });
 
     if (!self.options.viewport) {
@@ -38,7 +39,9 @@
     // TODO: Ability to override this with a scene passed into the options
     // TODO: Pass-through options that tweak scene (antialias, etc)
     self.scene = new VIZI.Scene({
-      viewport: self.options.viewport
+      viewport: self.options.viewport,
+      // TODO: Remove this when running WebGL tests on Travis is solved
+      suppressRenderer: self.options.suppressRenderer
     });
 
     self.camera = self.options.camera || new VIZI.Camera({
