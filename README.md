@@ -1,7 +1,7 @@
 # ViziCities 0.2.0 [Codename: Hamlet] [![Build Status](https://travis-ci.org/vizicities/vizicities.png?branch=0.2.0)](https://travis-ci.org/vizicities/vizicities)
 __JavaScript 3D city and data visualisation platform__
 
-![http://vizicities.apps.rawk.es](http://cl.ly/VS9H/Screen%20Shot%202014-05-10%20at%2016.04.54.png)
+[![](http://cl.ly/VS9H/Screen%20Shot%202014-05-10%20at%2016.04.54.png)](http://vizicities.com)
 
 [ViziCities](http://vizicities.com) is a 3D city and data visualisation platform, powered by WebGL. Its purpose is to change the way you look at cities and the data contained within them. It is the brainchild of [Robin Hawkes](http://twitter.com/robhawkes) and [Peter Smart](http://twitter.com/petewsmart) &mdash; [get in touch](#contact--community) if you'd like to discuss the project in more detail.
 
@@ -10,6 +10,15 @@ __JavaScript 3D city and data visualisation platform__
 * Find out more about what you can do with ViziCities [on the website](http://vizicities.com)
 * Play with the [interactive ViziCities examples](http://vizicities.com/examples)
 * Read [the documentation](http://dev.vizicities.com) and learn how to make something with ViziCities
+
+
+## Quick install
+
+Already know what you're doing? Awesome! ViziCities is [installable through Bower](http://bower.io/) so you can quickly get up and running.
+
+```
+bower install -p vizicities
+```
 
 
 ## Changes since 0.1.0-pre
