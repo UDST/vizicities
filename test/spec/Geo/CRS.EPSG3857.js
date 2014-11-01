@@ -24,15 +24,15 @@ describe("VIZI.CRS.EPSG3857", function() {
     var projectedCoords = crs.project(coords);
     var unprojectedCoords = crs.unproject({x: projectedCoords[0], y: projectedCoords[1]});
 
-    expect(unprojectedCoords[0].toFixed(10)).to.equal(coords.lon.toFixed(10));
-    expect(unprojectedCoords[1].toFixed(10)).to.equal(coords.lat.toFixed(10));
+    expect(Math.round(unprojectedCoords[0])).to.equal(Math.round(coords.lon));
+    expect(Math.round(unprojectedCoords[1])).to.equal(Math.round(coords.lat));
 
     coords = new VIZI.LatLon(51.504014489538584, -0.016307830810546875);
     projectedCoords = crs.project(coords);
     unprojectedCoords = crs.unproject({x: projectedCoords[0], y: projectedCoords[1]});
 
-    expect(unprojectedCoords[0].toFixed(10)).to.equal(coords.lon.toFixed(10));
-    expect(unprojectedCoords[1].toFixed(10)).to.equal(coords.lat.toFixed(10));
+    expect(Math.round(unprojectedCoords[0])).to.equal(Math.round(coords.lon));
+    expect(Math.round(unprojectedCoords[1])).to.equal(Math.round(coords.lat));
   });
 
   it("can calculate correct resolution for given zoom", function() {
