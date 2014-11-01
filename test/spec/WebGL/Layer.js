@@ -65,6 +65,9 @@ describe("VIZI.Layer", function() {
 
     expect(spy).to.have.been.calledWith(layer);
     expect(newLayerCount).to.equal(oldLayerCount + 1);
+
+    world.addLayer.restore();
+    spy = undefined;
   });
 
   it("can add object to layer", function() {
@@ -78,6 +81,9 @@ describe("VIZI.Layer", function() {
 
     expect(spy).to.have.been.calledWith(object);
     expect(newChildrenCount).to.equal(oldChildrenCount + 1);
+
+    layer.add.restore();
+    spy = undefined;
   });
 
   it("can remove object from layer", function() {
@@ -97,5 +103,8 @@ describe("VIZI.Layer", function() {
 
     expect(spy).to.have.been.calledWith(object);
     expect(newChildrenCount).to.equal(oldChildrenCount);
+
+    layer.remove.restore();
+    spy = undefined;
   });
 });

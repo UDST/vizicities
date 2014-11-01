@@ -58,6 +58,9 @@ describe("VIZI.BlueprintOutputDebugPoints", function() {
     
     expect(output.world).to.equal(world);
     expect(spy).to.have.been.called;
+
+    output.init.restore();
+    spy = undefined;
   });
 
   it("can emit event on initialisation", function() {
@@ -67,5 +70,7 @@ describe("VIZI.BlueprintOutputDebugPoints", function() {
     output.onAdd(world);
 
     expect(spy).to.have.been.called;
+
+    spy = undefined;
   });
 });

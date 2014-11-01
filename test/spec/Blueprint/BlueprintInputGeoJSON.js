@@ -28,7 +28,9 @@ describe("VIZI.BlueprintInputGeoJSON", function() {
 
     expect(spy).to.have.been.called;
 
+    input2.requestData.restore();
     input2 = undefined;
+    spy = undefined;
   });
 
   it("can send event after receiving data", function() {
@@ -44,9 +46,10 @@ describe("VIZI.BlueprintInputGeoJSON", function() {
     setTimeout(function() {
       expect(spy).to.have.been.called;
       expect(spy.args[0].length).to.equal(1);
-    }, 500);
 
-    input2 = undefined;
+      input2 = undefined;
+      spy = undefined;
+    }, 500);
   });
 
   it("can request tiles", function() {
@@ -65,7 +68,9 @@ describe("VIZI.BlueprintInputGeoJSON", function() {
 
     expect(spy).to.have.been.calledWith(tiles);
 
+    input2.requestTiles.restore();
     input2 = undefined;
+    spy = undefined;
   });
 
   // TODO: Find a better way than using setTimeout
@@ -87,8 +92,9 @@ describe("VIZI.BlueprintInputGeoJSON", function() {
     setTimeout(function() {
       expect(spy).to.have.been.called;
       expect(spy.args[0].length).to.equal(2);
-    }, 500);
 
-    input2 = undefined;
+      input2 = undefined;
+      spy = undefined;
+    }, 500);
   });
 });

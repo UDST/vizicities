@@ -111,6 +111,9 @@ describe("VIZI.Camera", function() {
     camera.lookAt(target);
 
     expect(spy).to.have.been.called;
+
+    camera.camera.lookAt.restore()
+    spy = undefined;
   });
 
   it("can change camera aspect ratio", function() {

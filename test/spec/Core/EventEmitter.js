@@ -25,5 +25,7 @@ describe("VIZI.EventEmitter", function() {
     emitter.emit("test_topic", message);
 
     expect(spy).to.have.been.calledWith(message);
+
+    spy = undefined;
   });
 });

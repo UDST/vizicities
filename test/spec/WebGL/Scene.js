@@ -125,6 +125,9 @@ describe("VIZI.Scene", function() {
 
     expect(spy).to.have.been.called;
     expect(spy).to.have.been.calledWith(camera);
+
+    scene.render.restore();
+    spy = undefined;
   });
 
   // TODO: Disabled until WebGL in Slimer can be solved

@@ -82,5 +82,6 @@ describe("VIZI.ControlsFirstPerson", function() {
     expect(spy).to.have.been.calledWith(delta);
 
     controls.controls.update.restore();
+    spy = undefined;
   });
 });

@@ -46,6 +46,9 @@ describe("VIZI.BlueprintInputMapTiles", function() {
     input.requestTiles(tiles);
 
     expect(spy).to.have.been.calledWith(tiles);
+
+    input.requestTiles.restore();
+    spy = undefined;
   });
 
   // TODO: Find a better way than using setTimeout
@@ -65,8 +68,9 @@ describe("VIZI.BlueprintInputMapTiles", function() {
       expect(spy).to.have.been.called;
       expect(spy.args[0].length).to.equal(2);
       expect(spy.args[0][0].nodeName).to.equal("IMG");
-    }, 500);
 
-    input2 = undefined;
+      input2 = undefined;
+      spy = undefined;
+    }, 500);
   });
 });

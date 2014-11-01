@@ -105,6 +105,8 @@ describe("VIZI.ControlsMap", function() {
     controls.moveTo(point);
 
     expect(spy).to.have.been.called;
+
+    spy = undefined;
   });
 
   it("can fire an event on zoom", function() {
@@ -119,6 +121,8 @@ describe("VIZI.ControlsMap", function() {
     var newDistance = controls.getZoom();
 
     expect(spy).to.have.been.called;
+
+    spy = undefined;
   });
 
   it("can update controls on tick", function() {
@@ -130,5 +134,6 @@ describe("VIZI.ControlsMap", function() {
     expect(spy).to.have.been.calledWith(delta);
 
     controls.controls.update.restore();
+    spy = undefined;
   });
 });

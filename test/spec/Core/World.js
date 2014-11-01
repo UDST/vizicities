@@ -193,6 +193,9 @@ describe("VIZI.World", function() {
     expect(newCenter.lat).to.not.equal(oldCenter.lat);
     expect(newCenter.lon).to.not.equal(oldCenter.lon);
     expect(newZoom).to.not.equal(oldZoom);
+
+    world.updateView.restore();
+    spy = undefined;
   });
 
   it("can send an event when view is updated", function() {
@@ -205,6 +208,8 @@ describe("VIZI.World", function() {
     world.updateView(center, zoom);
 
     expect(spy).to.have.been.calledWith(center, zoom);
+
+    spy = undefined;
   });
 
   it("can project from WGS84 coordinates to pixel position relative to world origin", function() {
@@ -260,6 +265,9 @@ describe("VIZI.World", function() {
     pixelsPerMeter = world.pixelsPerMeter(latLon, zoom);
 
     expect(spy).to.have.been.calledWith(latLon, zoom);
+
+    world.pixelsPerMeter.restore();
+    spy = undefined;
   });
 
   it("can provide the same value when projecting and unprojecting the same coordinates", function() {
@@ -295,6 +303,9 @@ describe("VIZI.World", function() {
     expect(spy).to.have.been.called;
     expect(spy).to.have.been.calledWith(layer.object);
     expect(newChildren).to.equal(oldChildren + 1);
+
+    world.scene.add.restore();
+    spy = undefined;
   });
 
   it("can add a switchboard to the world", function() {
@@ -424,6 +435,7 @@ describe("VIZI.World", function() {
     expect(spy).to.have.been.called;
 
     world.switchboards[0].onTick.restore();
+    spy = undefined;
   });
 
   it("can render scene", function () {
@@ -434,6 +446,7 @@ describe("VIZI.World", function() {
     expect(spy).to.have.been.called;
 
     world.scene.render.restore();
+    spy = undefined;
   });
 
   it("can update world center with specific WGS84 coordinate", function() {
@@ -522,6 +535,7 @@ describe("VIZI.World", function() {
     expect(spy).to.have.been.calledWith(projectedTarget);
 
     world.camera.lookAt.restore();
+    spy = undefined;
   });
 
   it("can make camera look at a pixel position", function () {
@@ -539,6 +553,7 @@ describe("VIZI.World", function() {
     expect(spy).to.have.been.calledWith(target);
 
     world.camera.lookAt.restore();
+    spy = undefined;
   });
 
   it("can update world center on control event", function() {
@@ -551,6 +566,9 @@ describe("VIZI.World", function() {
     expect(spy).to.be.calledWith(point);
     expect(world.center.lat).to.equal(pointLatLon.lat);
     expect(world.center.lon).to.equal(pointLatLon.lon);
+
+    world.moveToPoint.restore();
+    spy = undefined;
   });
 
   it("can update world zoom on control event", function() {
@@ -561,7 +579,11 @@ describe("VIZI.World", function() {
     VIZI.Messenger.emit("controls:zoom", distance);
 
     expect(spy).to.be.calledWith(zoom);
+
     expect(world.zoom).to.equal(zoom);
+
+    world.zoomTo.restore();
+    spy = undefined;
   });
 
   it("can update camera and renderer on window resize", function() {
@@ -576,5 +598,11 @@ describe("VIZI.World", function() {
 
     expect(spy1).to.have.been.called;
     expect(spy2).to.have.been.called;
+
+    world.scene.resize.restore();
+    world.camera.changeAspect.restore();
+
+    spy1 = undefined;
+    spy2 = undefined;
   });
 });

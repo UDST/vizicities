@@ -235,6 +235,9 @@ describe("VIZI.BlueprintSwitchboard", function() {
     switchboard.addToWorld(world);
 
     expect(spy).to.be.called;
+
+    switchboard.output.addToWorld.restore();
+    spy = undefined;
   });
 
   it("can process config and map inputs with outputs", function() {
@@ -247,6 +250,11 @@ describe("VIZI.BlueprintSwitchboard", function() {
 
     setTimeout(function() {
       expect(spy2).to.be.called;
+
+      switchboard.input.requestTiles.restore();
+      switchboard.output.outputImageTile.restore();
+      spy1 = undefined;
+      spy2 = undefined;
     }, 500);
   });
 
@@ -257,5 +265,8 @@ describe("VIZI.BlueprintSwitchboard", function() {
     switchboard.onTick(delta);
 
     expect(spy).to.have.been.called;
+
+    switchboard.output.onTick.restore();
+    spy = undefined;
   });
 });
