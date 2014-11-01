@@ -96,7 +96,7 @@ ViziCities can't happen without your help. We need people to submit bugs, sugges
 
 ## Contact & community
 
-Communicate with the ViziCities team via email ([hello@vizicities.com](mailto:hello@vizicities.com)) and Twitter ([@ViziCities](http://twitter.com/ViziCities)). All other discussion should happen in the [ViziCities Google Group](https://groups.google.com/forum/#!forum/vizicities) or [relevant GitHub issues page](https://github.com/robhawkes/vizicities/issues).
+Communicate with the ViziCities team via email ([hello@vizicities.com](mailto:hello@vizicities.com)) and Twitter ([@ViziCities](http://twitter.com/ViziCities)). All other discussion should happen in the [ViziCities Google Group](https://groups.google.com/forum/#!forum/vizicities) or [relevant GitHub issues page](https://github.com/vizicities/vizicities/issues).
 
 
 ## Libraries used
