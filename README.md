@@ -69,7 +69,7 @@ ViziCities is not complete and there are many things that could be done better o
 
 ## Getting started
 
-Here are some step-by-step instructions on how to get up and running with your first visualisation. You can also [use this JSBin](http://jsbin.com/guqojerova/7/edit) to see the example running and play with the code.
+Here are some step-by-step instructions on how to get up and running with your first visualisation. You can also [use this JSBin](http://jsbin.com/guqojerova/7/edit?html,js,output) to see the example running and play with the code.
 
 The first step is to download the [latest ViziCities build files](https://github.com/vizicities/vizicities/tree/0.2.0/build) (JS & CSS).
 
