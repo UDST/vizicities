@@ -100,7 +100,7 @@ module.exports = function(grunt) {
       options: {
         xvfb: (process.env.TRAVIS === "true"),
         reporter: "Dot",
-        timeout: 5000,
+        timeout: 20000,
         run: true
       },
       all: {
