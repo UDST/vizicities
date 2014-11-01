@@ -24,8 +24,8 @@ describe("VIZI.CRS.EPSG3857", function() {
     var projectedCoords = crs.project(coords);
     var unprojectedCoords = crs.unproject({x: projectedCoords[0], y: projectedCoords[1]});
 
-    expect(unprojectedCoords[0]).to.equal(coords.lon);
-    expect(unprojectedCoords[1]).to.equal(coords.lat);
+    expect(unprojectedCoords[0].toFixed(10)).to.equal(coords.lon.toFixed(10));
+    expect(unprojectedCoords[1].toFixed(10)).to.equal(coords.lat.toFixed(10));
 
     coords = new VIZI.LatLon(51.504014489538584, -0.016307830810546875);
     projectedCoords = crs.project(coords);

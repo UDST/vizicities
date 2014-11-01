@@ -40,7 +40,8 @@ describe("VIZI.World", function() {
         aspect: 1024 / 768
       }),
       crs: VIZI.CRS.EPSG900913,
-      center: new VIZI.LatLon(50, 1)
+      center: new VIZI.LatLon(50, 1),
+      suppressRenderer: true
     });
 
     expect(world2.options).to.exist;
