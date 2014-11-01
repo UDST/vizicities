@@ -33,7 +33,7 @@
     "test",
     "tests"
   ],
-  "dependencies": {
+  "devDependencies": {
     "underscore": "~1.7.0",
     "threejs": "*",
     "wildemitter": "HenrikJoreteg/wildemitter#~1.0.1",
