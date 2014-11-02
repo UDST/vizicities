@@ -16,9 +16,18 @@ __JavaScript 3D city and data visualisation platform__
 
 Already know what you're doing? Awesome! ViziCities is [installable through Bower](http://bower.io/) so you can quickly get up and running.
 
+```bash
+$ bower install -p vizicities
 ```
-bower install -p vizicities
-```
+
+
+## ViziCities examples
+
+Here are some examples of ViziCities and how it's being used to help people.
+
+* [Data journalism piece](http://interaktiv.morgenpost.de/tempelhofer-feld/) from the Beliner Morgenpost
+
+**Built something with ViziCities?** [Get in touch](hello@vizicities.com), we'd love to showcase it here for everyone else to see and learn from.
 
 
 ## Changes since 0.1.0-pre
@@ -78,7 +87,7 @@ ViziCities is not complete and there are many things that could be done better o
 
 ## Getting started
 
-Here are some step-by-step instructions on how to get up and running with your first visualisation. You can also [use this JSBin](http://jsbin.com/guqojerova/7/edit?html,js,output) to see the example running and play with the code.
+Here are some step-by-step instructions on how to get up and running with your first visualisation, a 3D basemap. You can also [use this JSBin](http://jsbin.com/guqojerova/7/edit?html,js,output) to see the example running and play with the code.
 
 The first step is to download the [latest ViziCities build files](https://github.com/vizicities/vizicities/tree/0.2.0/build) (JS & CSS).
 
@@ -219,8 +228,8 @@ The ViziCities repo has been moved away from Robin's personal account and now re
 
 It's pretty easy to do, [GitHub even wrote about how to do it](https://help.github.com/articles/changing-a-remote-s-url/). Running the following command within your ViziCities directory should be enough for most people:
 
-```
-git remote set-url origin git@github.com:vizicities/vizicities.git
+```bash
+$ git remote set-url origin git@github.com:vizicities/vizicities.git
 ```
 
 ## Getting involved
