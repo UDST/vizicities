@@ -97,7 +97,8 @@ var buildingsConfig = {
         zoom: 15,
         tilesPerDirection: 1,
         cullZoom: 13
-      }]
+      }],
+      workerURL: "../../build/vizi-worker.min.js"
     }
   },
   triggers: [{
