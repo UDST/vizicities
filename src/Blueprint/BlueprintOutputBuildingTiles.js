@@ -23,6 +23,10 @@
 
     VIZI.BlueprintOutput.call(self, options);
 
+    _.defaults(self.options, {
+      workerURL: "vizi-worker.min.js"
+    });
+
     // Triggers and actions reference
     self.triggers = [
       {name: "initialised", arguments: ["tiles"]},
@@ -50,9 +54,8 @@
   VIZI.BlueprintOutputBuildingTiles.prototype.init = function() {
     var self = this;
 
-    // TODO: Fix reference to vizi-worker.min.js (pass by option?)
     self.worker = operative(self.outputBuildingTileWorker, [
-      "../../build/vizi-worker.min.js"
+      self.options.workerURL
     ]);
 
     // Create grids
