@@ -36,7 +36,7 @@ Numerous lessons were learnt after releasing 0.1.0-pre to the public, so much so
 
 ### Blueprint API
 
-Data input and visualisation output is now controlled by the [Blueprint API](http://dev.vizicities.com). It's based on the concept of triggers and actions; much like Zapier or IFTTT, just instead for geographic data visualisation. It underpins the entire system for 0.2.0 and it completely changes the way you pull data into ViziCities and how you output it. A lot of hard work went into formulation and construction it &mdash; we're incredibly proud of it!
+Data input and visualisation output is now controlled by the [Blueprint API](http://dev.vizicities.com). It's based on the concept of triggers and actions; much like Zapier or IFTTT, just instead for geographic data visualisation. It underpins the entire system for 0.2.0 and it completely changes the way you pull data into ViziCities and how you output it. A lot of hard work went into formulating and constructing it &mdash; we're incredibly proud of it!
 
 In short, the Blueprint API has 3 parts; an input, an output and a mapping configuration. Neither the input nor the output know about each other or care about each others data structure. Everything is neatly brought together by a configuration object that describes which input to use, which output to use, as well as how and, more importantly, when to map the data between them.
 
