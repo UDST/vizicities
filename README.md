@@ -1,4 +1,4 @@
-# ViziCities [0.1.0-pre] [![Build Status](https://travis-ci.org/robhawkes/vizicities.png?branch=master)](https://travis-ci.org/robhawkes/vizicities)
+# ViziCities [0.1.0-pre] [![Build Status](https://travis-ci.org/vizicities/vizicities.png?branch=master)](https://travis-ci.org/vizicities/vizicities)
 __Bringing cities to life using the power of open data and the Web__
 
 ![http://vizicities.apps.rawk.es](http://cl.ly/VS9H/Screen%20Shot%202014-05-10%20at%2016.04.54.png)
@@ -84,7 +84,7 @@ To start off, you'll need to build ViziCities and get an up-to-date JavaScript f
 #### Clone the ViziCities repo
 
 ```
-git clone https://github.com/robhawkes/vizicities.git vizicities
+git clone https://github.com/vizicities/vizicities.git vizicities
 ```
 
 #### [Install Node.js & NPM](http://nodejs.org/)
@@ -124,12 +124,12 @@ Then open [http://localhost:8000/examples](http://localhost:8000/examples)
 
 ### Using ViziCities
 
-Use the [built in example](https://github.com/robhawkes/vizicities/tree/master/examples) to get an idea of what ViziCities can do. Change the coordinates to load a new part of the world (anywhere you want).
+Use the [built in example](https://github.com/vizicities/vizicities/tree/master/examples) to get an idea of what ViziCities can do. Change the coordinates to load a new part of the world (anywhere you want).
 
 
 ## Getting involved
 
-ViziCities can't happen without your help. We need people to submit bugs, suggest features, share how they're using the project, and contribute code. Sound like you? [Check out exactly how to get involved](https://github.com/robhawkes/vizicities/blob/master/CONTRIBUTING.md).
+ViziCities can't happen without your help. We need people to submit bugs, suggest features, share how they're using the project, and contribute code. Sound like you? [Check out exactly how to get involved](https://github.com/vizicities/vizicities/blob/master/CONTRIBUTING.md).
 
 ### Suggestions
 
@@ -141,7 +141,7 @@ There are a couple of things in particular that need your help:
 
 ## Contact & community
 
-Communicate with the ViziCities team via email ([hello@vizicities.com](mailto:hello@vizicities.com)) and Twitter ([@ViziCities](http://twitter.com/ViziCities)). All other discussion should happen in the [ViziCities Google Group](https://groups.google.com/forum/#!forum/vizicities), IRC (#vizicities on Freenode) or [relevant GitHub issues page](https://github.com/robhawkes/vizicities/issues).
+Communicate with the ViziCities team via email ([hello@vizicities.com](mailto:hello@vizicities.com)) and Twitter ([@ViziCities](http://twitter.com/ViziCities)). All other discussion should happen in the [ViziCities Google Group](https://groups.google.com/forum/#!forum/vizicities), IRC (#vizicities on Freenode) or [relevant GitHub issues page](https://github.com/vizicities/vizicities/issues).
 
 
 ## Contributors
