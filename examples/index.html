@@ -2,24 +2,23 @@
 
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>ViziCities Demo</title>
+	<meta charset="utf-8">
+	<title>ViziCities Architecture Example</title>
 
-  <link href="reset.css" rel="stylesheet" type="text/css">
+	<link href="reset.css" rel="stylesheet" type="text/css">
 
-  <link href="../css/vizicities.css" rel="stylesheet" type="text/css">
-  <link href="../css/loading.css" rel="stylesheet" type="text/css">
-  
-  <style type="text/css">
-    html, body {
-      height: 100%;
-      overflow: hidden;
-    }
+	<link href="../css/loading.css" rel="stylesheet" type="text/css">
 
-    body {
-      background: #ccc;
-    }
-  </style>
+	<style type="text/css">
+		html, body {
+			height: 100%;
+			overflow: hidden;
+		}
+
+		body {
+			background: #ccc;
+		}
+	</style>
 </head>
 <body>
   <div id="vizicities-container"></div>
@@ -32,6 +31,9 @@
 
     VIZI.ENABLE_OUTLINES = false;
     VIZI.ENABLE_ROADS = true;
+
+		//toggle oculus rendering
+		VIZI.ENABLE_OCULUS = false;
 
     var city = new VIZI.City();
     city.init({

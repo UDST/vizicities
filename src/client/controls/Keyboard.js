@@ -55,6 +55,18 @@
 				case 16:
 					key = "shift";
 					break;
+				case 38:
+					key = "up";
+					break;
+				case 40:
+					key = "down";
+					break;
+				case 37:
+					key = "left";
+					break;
+				case 39:
+					key = "right";
+					break;
 				default:
 					key = false;
 			}
@@ -65,10 +77,10 @@
 		var instance;
 
 		// an emulation of static variables and methods
-		var _static = {   
+		var _static = {
 			name: "VIZI.Keyboard",
 
-			// Method for getting an instance. It returns 
+			// Method for getting an instance. It returns
 			// a singleton instance of a singleton object
 			getInstance: function(domElement) {
 				if ( instance  ===  undefined )  {
