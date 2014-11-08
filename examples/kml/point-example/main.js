@@ -4,15 +4,15 @@ var world = new VIZI.World({
 
 var controls = new VIZI.ControlsMap(world.camera);
 
-var gpxConfig = {
+var kmlConfig = {
   input: {
-    type: "BlueprintInputGPX",
+    type: "BlueprintInputKML",
     options: {
-      path: "./data/sample.gpx"
+      path: "./data/sample.kml"
     }
   },
   output: {
-    type: "BlueprintOutputDebugLines",
+    type: "BlueprintOutputDebugPoints",
     options: {}
   },
   triggers: [{
@@ -26,26 +26,25 @@ var gpxConfig = {
   }, {
     triggerObject: "input",
     triggerName: "dataReceived",
-    triggerArguments: ["gpx"],
+    triggerArguments: ["kml"],
     actionObject: "output",
-    actionName: "outputLines",
+    actionName: "outputPoints",
     actionArguments: ["data"],
     actionOutput: {
       data: {
         process: "map",
-        itemsObject: "gpx",
-        itemsProperties: "trk.trkseg.trkpt",
+        itemsObject: "kml",
+        itemsProperties: "document.placemark",
         transformation: {
-          coordinates: ["@lon", "@lat"],
-          height: "ele"
+          coordinates: "point.coordinates[0]"
         }
       }
     }
   }]
 };
 
-var switchboardGPX = new VIZI.BlueprintSwitchboard(gpxConfig);
-switchboardGPX.addToWorld(world);
+var switchboardKML = new VIZI.BlueprintSwitchboard(kmlConfig);
+switchboardKML.addToWorld(world);
 
 var mapConfig = {
   input: {

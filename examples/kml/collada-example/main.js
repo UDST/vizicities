@@ -1,19 +1,22 @@
 var world = new VIZI.World({
-  viewport: document.querySelector("#vizicities-viewport")
+  viewport: document.querySelector("#vizicities-viewport"),
+  center: new VIZI.LatLon(40.01000594412381, -105.2727379358738)
 });
 
 var controls = new VIZI.ControlsMap(world.camera);
 
-var gpxConfig = {
+var colladaConfig = {
   input: {
-    type: "BlueprintInputGPX",
+    type: "BlueprintInputKML",
     options: {
-      path: "./data/sample.gpx"
+      path: "./data/sample.kml"
     }
   },
   output: {
-    type: "BlueprintOutputDebugLines",
-    options: {}
+    type: "BlueprintOutputCollada",
+    options: {
+      modelPathPrefix: "./data/"
+    }
   },
   triggers: [{
     triggerObject: "output",
@@ -26,26 +29,26 @@ var gpxConfig = {
   }, {
     triggerObject: "input",
     triggerName: "dataReceived",
-    triggerArguments: ["gpx"],
+    triggerArguments: ["kml"],
     actionObject: "output",
-    actionName: "outputLines",
-    actionArguments: ["data"],
+    actionName: "outputCollada",
+    actionArguments: ["collada"],
     actionOutput: {
-      data: {
+      collada: {
         process: "map",
-        itemsObject: "gpx",
-        itemsProperties: "trk.trkseg.trkpt",
+        itemsObject: "kml",
+        itemsProperties: "placemark.model",
         transformation: {
-          coordinates: ["@lon", "@lat"],
-          height: "ele"
+          coordinates: ["location.longitude", "location.latitude"],
+          modelPath: "link.href"
         }
       }
     }
   }]
 };
 
-var switchboardGPX = new VIZI.BlueprintSwitchboard(gpxConfig);
-switchboardGPX.addToWorld(world);
+var switchboardCollada = new VIZI.BlueprintSwitchboard(colladaConfig);
+switchboardCollada.addToWorld(world);
 
 var mapConfig = {
   input: {
