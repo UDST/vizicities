@@ -115,7 +115,7 @@ var gpxConfig = {
         itemsProperties: "trk.trkseg.trkpt",
         transformation: {
           coordinates: ["@lon", "@lat"],
-          height: "extensions.gpxtpx:trackpointextension.gpxtpx:hr"
+          height: "ele"
         }
       }
     }
