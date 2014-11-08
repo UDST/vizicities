@@ -17119,8 +17119,10 @@ THREE.OrbitControls = function ( object, domElement ) {
 	}
 
 	function getZoomScale() {
+		// Reduce zoom speed when using touch control
+    var zoomSpeed = (state === STATE.TOUCH_DOLLY) ? scope.zoomSpeed : scope.zoomSpeed * 0.7;
 
-		return Math.pow( 0.95, scope.zoomSpeed );
+		return Math.pow( 0.95, zoomSpeed );
 
 	}
 
