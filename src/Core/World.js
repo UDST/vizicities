@@ -41,7 +41,8 @@
     self.scene = new VIZI.Scene({
       viewport: self.options.viewport,
       // TODO: Remove this when running WebGL tests on Travis is solved
-      suppressRenderer: self.options.suppressRenderer
+      suppressRenderer: self.options.suppressRenderer,
+      threejsRenderer: self.options.threejsRenderer   
     });
 
     self.camera = self.options.camera || new VIZI.Camera({
