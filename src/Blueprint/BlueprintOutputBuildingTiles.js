@@ -142,7 +142,6 @@
     // Find grid
     var gridHash = self.grids[tile.z];
 
-    var loader = new THREE.JSONLoader();
     var material = new THREE.MeshLambertMaterial({
       color: 0xeeeeee,
       ambient: 0xffffff,
