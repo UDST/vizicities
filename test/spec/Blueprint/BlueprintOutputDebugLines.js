@@ -10,7 +10,7 @@ describe("VIZI.BlueprintOutputDebugLines", function() {
       camera: new VIZI.Camera({
         aspect: 1024 / 768
       }),
-      suppressRenderer: true
+      renderer : { headless: true }
     });
 
     config = {

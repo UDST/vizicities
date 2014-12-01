@@ -9,7 +9,7 @@ describe("VIZI.World", function() {
       camera: new VIZI.Camera({
         aspect: 1024 / 768
       }),
-      suppressRenderer: true
+      renderer : { headless: true }
     });
   });
 
@@ -41,7 +41,7 @@ describe("VIZI.World", function() {
       }),
       crs: VIZI.CRS.EPSG900913,
       center: new VIZI.LatLon(50, 1),
-      suppressRenderer: true
+      renderer : { headless: true }
     });
 
     expect(world2.options).to.exist;
@@ -439,13 +439,13 @@ describe("VIZI.World", function() {
   });
 
   it("can render scene", function () {
-    var spy = new sinon.spy(world.scene, "render");
+    var spy = new sinon.spy(world.renderer, "render");
 
     world.render();
 
     expect(spy).to.have.been.called;
 
-    world.scene.render.restore();
+    world.renderer.render.restore();
     spy = undefined;
   });
 
@@ -587,7 +587,7 @@ describe("VIZI.World", function() {
   });
 
   it("can update camera and renderer on window resize", function() {
-    var spy1 = new sinon.spy(world.scene, "resize");
+    var spy1 = new sinon.spy(world.renderer, "resize");
     var spy2 = new sinon.spy(world.camera, "changeAspect");
 
     // Fake window resize dimensions
@@ -599,7 +599,7 @@ describe("VIZI.World", function() {
     expect(spy1).to.have.been.called;
     expect(spy2).to.have.been.called;
 
-    world.scene.resize.restore();
+    world.renderer.resize.restore();
     world.camera.changeAspect.restore();
 
     spy1 = undefined;

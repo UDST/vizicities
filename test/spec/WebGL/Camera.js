@@ -2,9 +2,7 @@ describe("VIZI.Camera", function() {
   var camera;
 
   before(function() {
-    camera = new VIZI.Camera({
-      aspect: 1024 / 768
-    });
+    camera = new VIZI.Camera();
   });
 
   it("exists in VIZI namespace", function() {
@@ -31,10 +29,6 @@ describe("VIZI.Camera", function() {
     expect(camera.changeAspect).to.exist;
   });
 
-  it("throws error when missing aspect option", function() {
-    expect(function() { new VIZI.Camera(); }).to.throw(Error);
-  });
-
   it("sets default options when some are missing", function() {
     expect(camera.options).to.exist;
     expect(camera.options).to.be.a.object;
@@ -46,36 +40,35 @@ describe("VIZI.Camera", function() {
   });
 
   it("can override default options", function() {
-    var override = new VIZI.Camera({
-      aspect: 1024 / 768,
-      fov: 20,
-      near: 10,
-      far: 800,
-      position: new VIZI.Point(100, 100, 100),
-      target: new VIZI.Point(500, 0, 0)
+    var temp = new VIZI.Camera({
+      aspect   : 1024 / 768,
+      fov      : 20,
+      near     : 10,
+      far      : 800,
+      position : new VIZI.Point(100, 100, 100),
+      target   : new VIZI.Point(500, 0, 0)
     });
 
-    expect(override.options).to.exist;
-    expect(override.options).to.be.a.object;
-    expect(camera.options).to.have.property("fov");
-    expect(camera.options).to.have.property("near");
-    expect(camera.options).to.have.property("far");
-    expect(camera.options).to.have.property("position");
-    expect(camera.options).to.have.property("target");
+    expect(temp.options).to.exist;
+    expect(temp.options).to.be.a.object;
+    expect(temp.options).to.have.property("aspect");
+    expect(temp.options).to.have.property("fov");
+    expect(temp.options).to.have.property("near");
+    expect(temp.options).to.have.property("far");
+    expect(temp.options).to.have.property("position");
+    expect(temp.options).to.have.property("target");
 
-    expect(override.options.fov).to.equal(20);
-    expect(override.options.near).to.equal(10);
-    expect(override.options.far).to.equal(800);
+    expect(temp.options.fov).to.equal(20);
+    expect(temp.options.near).to.equal(10);
+    expect(temp.options.far).to.equal(800);
 
-    expect(override.options.position.x).to.equal(100);
-    expect(override.options.position.y).to.equal(100);
-    expect(override.options.position.z).to.equal(100);
+    expect(temp.options.position.x).to.equal(100);
+    expect(temp.options.position.y).to.equal(100);
+    expect(temp.options.position.z).to.equal(100);
 
-    expect(override.options.target.x).to.equal(500);
-    expect(override.options.target.y).to.equal(0);
-    expect(override.options.target.z).to.equal(0);
-
-    override = undefined;
+    expect(temp.options.target.x).to.equal(500);
+    expect(temp.options.target.y).to.equal(0);
+    expect(temp.options.target.z).to.equal(0);
   });
 
   it("can move to pixel position", function() {
