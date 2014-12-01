@@ -12,27 +12,31 @@
     if (VIZI.DEBUG) console.log("Initialising VIZI.Camera");
 
     var self = this;
-
     self.options = options || {};
-    
+
     _.defaults(self.options, {
-      fov: 40,
-      near: 2,
-      far: 40000,
-      position: new VIZI.Point(260, 600, 550),
-      target: new VIZI.Point()
+      aspect   : 1/2,
+      fov      : 40,
+      near     : 2,
+      far      : 40000,
+      position : new VIZI.Point(260, 600, 550),
+      target   : new VIZI.Point(0, 0, 0)
     });
 
-    if (!self.options.aspect) {
-      throw new Error("Required aspect option missing");
-    }
-
-    self.camera = new THREE.PerspectiveCamera(self.options.fov, self.options.aspect, self.options.near, self.options.far);
+    self.camera = new THREE.PerspectiveCamera(
+      self.options.fov, self.options.aspect,
+      self.options.near, self.options.far
+    );
 
     // It's assumed that you'd want to do this after adding a camera
     // TODO: Consider if calling lookAt() here is a step too far and should be left to the user
     self.moveTo(self.options.position);
     self.lookAt(self.options.target);
+  };
+
+  VIZI.Camera.prototype.init = function(options) {
+    if (options.viewport !== undefined)
+      this.changeAspect(options.viewport.clientWidth / options.viewport.clientHeight);
   };
 
   VIZI.Camera.prototype.addToScene = function(scene) {

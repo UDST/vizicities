@@ -16,10 +16,9 @@
     self.options = options || {};
     
     _.defaults(self.options, {
-      crs: VIZI.CRS.EPSG3857,
-      center: new VIZI.LatLon(51.50358, -0.01924),
-      zoom: 16,
-      suppressRenderer: false // Set true for tests
+      crs    : VIZI.CRS.EPSG3857,
+      center : new VIZI.LatLon(51.50358, -0.01924),
+      zoom   : 16
     });
 
     if (!self.options.viewport) {
@@ -36,17 +35,28 @@
     self.switchboards = [];
     self.layers = [];
 
-    // TODO: Ability to override this with a scene passed into the options
-    // TODO: Pass-through options that tweak scene (antialias, etc)
-    self.scene = new VIZI.Scene({
-      viewport: self.options.viewport,
-      // TODO: Remove this when running WebGL tests on Travis is solved
-      suppressRenderer: self.options.suppressRenderer
-    });
+    self.renderer = (self.options.renderer instanceof VIZI.Renderer ?
+      self.options.renderer : new VIZI.Renderer(self.options.renderer));
 
-    self.camera = self.options.camera || new VIZI.Camera({
-      aspect: self.options.viewport.clientWidth / self.options.viewport.clientHeight
-    });
+    self.scene = (self.options.scene instanceof VIZI.Scene ?
+      self.options.scene : new VIZI.Scene(self.options.scene));
+
+    self.camera = (self.options.camera instanceof VIZI.Camera ?
+      self.options.camera : new VIZI.Camera(self.options.camera));
+
+    // Initialize all core objects
+    var initOptions = {
+      viewport : self.options.viewport,
+      renderer : self.renderer,
+      scene    : self.scene,
+      camera   : self.camera
+    };
+    if (typeof self.renderer.init === "function")
+      self.renderer.init(initOptions);
+    if (typeof self.scene.init === "function")
+      self.scene.init(initOptions);
+    if (typeof self.camera.init === "function")
+      self.camera.init(initOptions);
 
     self.camera.addToScene(self.scene);
 
@@ -134,7 +144,7 @@
   // Render current world state
   VIZI.World.prototype.render = function() {
     var self = this;
-    self.scene.render(self.camera);
+    self.renderer.render(self.scene, self.camera);
   };
 
   // Centralised method to handle variable changes and firing of events
@@ -158,7 +168,7 @@
     var aspect = width / height;
     self.camera.changeAspect(aspect);
 
-    self.scene.resize(width, height);
+    self.renderer.resize(width, height);
   };
 
   VIZI.World.prototype.moveToLatLon = function(latLon) {
