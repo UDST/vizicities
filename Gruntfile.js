@@ -111,7 +111,17 @@ module.exports = function(grunt) {
         },
         src: ["test/*.html"]
       }
-    }
+    },
+    connect: {
+      dev: {
+        options: {
+          port: 8989,
+          keepalive: true,
+          base: "./",
+          open: (grunt.option("no-browser") ? false : "http://localhost:8989/examples/basic-example/index.html")
+        }
+      }
+    },
   });
 
   // Load the plugins
@@ -119,6 +129,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-mocha-slimer");
   grunt.loadNpmTasks("grunt-contrib-concat");
   grunt.loadNpmTasks("grunt-contrib-uglify");
+  grunt.loadNpmTasks("grunt-contrib-connect");
 
   // Default task(s).
   grunt.registerTask("default", ["test"]);
@@ -127,6 +138,9 @@ module.exports = function(grunt) {
   // TODO: If tests keep failing randomly on Travis then move back to Phantom
   // - Just means absolute zero chance of WebGL testing then
   grunt.registerTask("test", ["jshint", "mocha_slimer"]);
+
+  // Development
+  grunt.registerTask("dev", ["connect:dev"]);
 
   // Build
   grunt.registerTask("build", ["concat:vizicities", "uglify:vizicities", "concat:bower", "concat:bower_min"]);
