@@ -14,6 +14,9 @@
   //     // tilePath: "http://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.json"
   //   }
   // }
+
+  var tileURLRegex = /\{([zxy])\}/g;
+
   VIZI.BlueprintInputGeoJSON = function(options) {
     var self = this;
 
@@ -80,7 +83,8 @@
     if (VIZI.DEBUG) console.log("Requesting tiles", tiles);
 
     _.each(tiles, function(tile, key) {
-      var url = self.options.tilePath.replace(/\{([zxy])\}/g, function(value, key) {
+      tileURLRegex.lastIndex = 0;
+      var url = self.options.tilePath.replace(tileURLRegex, function(value, key) {
         // Replace with paramter, otherwise keep existing value
         return tile[key];
       });
