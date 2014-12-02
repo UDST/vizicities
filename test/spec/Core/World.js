@@ -17,13 +17,9 @@ describe("VIZI.World", function() {
     expect(VIZI.World).to.exist;
   });
 
-  // This test cannot be ran without a non-headless renderer.
-  // It will throw but not due to being headless.
-  if (ViziTestsWebGLSupported) {
-    it("throws error when missing viewport element", function() {
-      expect(function() { new VIZI.World(); }).to.throw(Error);
-    });
-  }
+  it("throws error when missing viewport element", function() {
+    expect(function() { new VIZI.World(); }).to.throw(Error);
+  });
 
   it("sets default options when some are missing", function() {
     expect(world.options).to.exist;

@@ -76,10 +76,12 @@ describe("VIZI.Renderer", function() {
     expect(temp.options.fogColour).to.equal(0x000000);
   });
 
-  it("can create a renderer that is added to the viewport", function() {
-    expect(viewportDOM.children.length).to.equal(1);
-    expect(viewportDOM.firstChild.nodeName).to.equal("CANVAS");
-  });
+  if (ViziTestsWebGLSupported) {
+    it("can create a renderer that is added to the viewport", function() {
+      expect(viewportDOM.children.length).to.equal(1);
+      expect(viewportDOM.firstChild.nodeName).to.equal("CANVAS");
+    });
+  }
 
   it("can render when passed scene and camera", function() {
     var spy = new sinon.spy(renderer, "render");
