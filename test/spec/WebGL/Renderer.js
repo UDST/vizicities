@@ -29,7 +29,7 @@ describe("VIZI.Renderer", function() {
 
   // This test cannot be ran without a non-headless renderer.
   // It will throw but not due to being headless.
-  if (!ViziTestsWebGLSupported) {
+  if (ViziTestsWebGLSupported) {
     it("throws error when init is missing viewport", function() {
       expect(function() {
         var temp = new VIZI.Renderer();
