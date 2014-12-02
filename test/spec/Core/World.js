@@ -9,7 +9,7 @@ describe("VIZI.World", function() {
       camera: new VIZI.Camera({
         aspect: 1024 / 768
       }),
-      renderer : { headless: true }
+      renderer : { headless: !ViziTestsWebGLSupported }
     });
   });
 
@@ -17,9 +17,13 @@ describe("VIZI.World", function() {
     expect(VIZI.World).to.exist;
   });
 
-  it("throws error when missing viewport element", function() {
-    expect(function() { new VIZI.World(); }).to.throw(Error);
-  });
+  // This test cannot be ran without a non-headless renderer.
+  // It will throw but not due to being headless.
+  if (!ViziTestsWebGLSupported) {
+    it("throws error when missing viewport element", function() {
+      expect(function() { new VIZI.World(); }).to.throw(Error);
+    });
+  }
 
   it("sets default options when some are missing", function() {
     expect(world.options).to.exist;
@@ -41,7 +45,7 @@ describe("VIZI.World", function() {
       }),
       crs: VIZI.CRS.EPSG900913,
       center: new VIZI.LatLon(50, 1),
-      renderer : { headless: true }
+      renderer : { headless: !ViziTestsWebGLSupported }
     });
 
     expect(world2.options).to.exist;

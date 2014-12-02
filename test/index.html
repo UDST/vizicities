@@ -18,6 +18,24 @@
         mocha.reporter("html");
         expect = chai.expect;
         assert = chai.assert;
+
+        // Detect WebGL support by the test runner.
+        // This variable will be used in the spec tests.
+        var ViziTestsWebGLSupported = (function() {
+          try {
+            var canvas = document.createElement("canvas");
+            var ctx = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+            var exts = ctx.getSupportedExtensions();
+            return true;
+          } catch (e) {
+            console.error(e);
+            return false;
+          }
+        })();
+
+        console.log("");
+        console.log("WebGL supported for ViciCities tests:", ViziTestsWebGLSupported);
+        console.log("");
       </script>
 
       <!-- ViziCities source files -->

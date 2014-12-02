@@ -9,7 +9,7 @@ describe("VIZI.BlueprintSwitchboard", function() {
       camera: new VIZI.Camera({
         aspect: 1024 / 768
       }),
-      renderer : { headless: true }
+      renderer : { headless: !ViziTestsWebGLSupported }
     });
 
     config = {

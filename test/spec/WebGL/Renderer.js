@@ -7,7 +7,7 @@ describe("VIZI.Renderer", function() {
   before(function() {
     viewportDOM = document.createElement("div")
 
-    renderer = new VIZI.Renderer();
+    renderer = new VIZI.Renderer({ headless : !ViziTestsWebGLSupported });
     renderer.init({ viewport : viewportDOM });
   });
 
@@ -27,12 +27,16 @@ describe("VIZI.Renderer", function() {
     expect(renderer.resize).to.exist;
   });
 
-  it("throws error when init is missing viewport", function() {
-    expect(function() {
-      var temp = new VIZI.Renderer();
-      temp.init({});
-    }).to.throw(Error);
-  });
+  // This test cannot be ran without a non-headless renderer.
+  // It will throw but not due to being headless.
+  if (!ViziTestsWebGLSupported) {
+    it("throws error when init is missing viewport", function() {
+      expect(function() {
+        var temp = new VIZI.Renderer();
+        temp.init({});
+      }).to.throw(Error);
+    });
+  }
 
   it("throws error when rendering without scene", function() {
     expect(function() {
