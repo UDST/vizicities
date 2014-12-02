@@ -7,71 +7,86 @@
 // - https://github.com/jscs-dev/node-jscs
 
 module.exports = function(grunt) {
-  // Project configuration.
+
+  // Configure dependencies that are embedded into the build
+  var dependencies = [
+    "bower_components/d3/d3.js",
+    "bower_components/operative/dist/operative.js",
+    "bower_components/proj4/dist/proj4-src.js",
+    "bower_components/underscore/underscore.js",
+    "bower_components/wildemitter/wildemitter-bare.js",
+  ];
+  var dependenciesWorker = [
+    "bower_components/proj4/dist/proj4-src.js",
+    "bower_components/underscore/underscore.js",
+  ];
+
+  // grunt command line flag '--no-threejs' to skip embedding three.js
+  // Note that vizi-worker.js will always get three embedded to it.
+  // It is executed inside  a WebWorker so it wont interfere if
+  // the app has selected a different revision of three.js.
+  var includeThreeJs = !grunt.option("no-threejs");
+  if (includeThreeJs)
+    dependencies.push("bower_components/threejs/build/three.js");
+  dependenciesWorker.push("bower_components/threejs/build/three.js");
+
+  // Banner
+  var viziBanner = "/*! ViziCities - v<%= pkg.version %> - <%= grunt.template.today('yyyy-mm-dd') %> */\n";
+
+  // Configure tasks
   grunt.initConfig({
+
     pkg: grunt.file.readJSON("package.json"),
-    uglify: {
+
+    clean: {
+      build : ["build/dependencies*"]
+    },
+
+    concat: {
       vizicities: {
-        options: {
-          banner: "/*! ViziCities - v<%= pkg.version %> - " +
-          "<%= grunt.template.today('yyyy-mm-dd') %> */\n",
-          beautify : {
-            ascii_only : true
-          }
-        },
         files: {
-          "build/vizi.min.js": ["build/vizi.js"]
+          "build/vizi.js"        : ["src/Vizi.js", "src/Core/*.js", "src/Geo/CRS.js", "src/WebGL/*.js", "src/Controls/Controls.js", "src/**/*.js"],
+          "build/vizi-worker.js" : ["src/Vizi.js", "src/Geo/CRS.js", "src/Geo/**/*.js", "src/Geometry/**/*.js"]
         }
       },
-      vizicities_worker: {
-        options: {
-          banner: "/*! ViziCities - v<%= pkg.version %> - " +
-          "<%= grunt.template.today('yyyy-mm-dd') %> */\n",
-          beautify : {
-            ascii_only : true
-          }
-        },
+      dependencies: {
         files: {
-          "build/vizi-worker.min.js": ["build/vizi-worker.js"]
+          "build/dependencies.js"        : dependencies,
+          "build/dependencies-worker.js" : dependenciesWorker,
+        }
+      },
+      build: {
+        options: { stripBanners: false, banner: viziBanner },
+        files: {
+          "build/vizi.js"        : ["build/dependencies.js", "build/vizi.js"],
+          "build/vizi-worker.js" : ["build/dependencies-worker.js", "build/vizi-worker.js"]
+        }
+      },
+      build_min: {
+        options: { stripBanners: true, banner: viziBanner },
+        files: {
+          "build/vizi.min.js"        : ["build/dependencies.min.js", "build/vizi.min.js"],
+          "build/vizi-worker.min.js" : ["build/dependencies-worker.min.js", "build/vizi-worker.min.js"]
         }
       }
     },
-    concat: {
+
+    uglify: {
+      options: { beautify : { ascii_only : true } },
       vizicities: {
-        src: ["src/Vizi.js", "src/Core/*.js", "src/Geo/CRS.js", "src/WebGL/*.js", "src/Controls/Controls.js", "src/**/*.js"],
-        dest: "build/vizi.js"
+        files: { 
+          "build/vizi.min.js"        : ["build/vizi.js"],
+          "build/vizi-worker.min.js" : ["build/vizi-worker.js"]
+        }
       },
-      bower: {
-        options: {
-          stripBanners: true,
-          banner: "/*! ViziCities - v<%= pkg.version %> - " +
-          "<%= grunt.template.today('yyyy-mm-dd') %> */\n"
-        },
-        src: ["bower_components/**/*min.js", "bower_components/proj4/dist/proj4-src.js", "bower_components/wildemitter/wildemitter-bare.js", "build/vizi.js"],
-        dest: "build/vizi.js"
-      },
-      bower_min: {
-        src: ["bower_components/**/*min.js", "bower_components/proj4/dist/proj4.js", "bower_components/wildemitter/wildemitter-bare.js", "build/vizi.min.js"],
-        dest: "build/vizi.min.js"
-      },
-      vizicities_worker: {
-        src: ["src/Vizi.js", "src/Geo/CRS.js", "src/Geo/**/*.js", "src/Geometry/**/*.js"],
-        dest: "build/vizi-worker.js"
-      },
-      bower_worker: {
-        options: {
-          stripBanners: true,
-          banner: "/*! ViziCities - v<%= pkg.version %> - " +
-          "<%= grunt.template.today('yyyy-mm-dd') %> */\n"
-        },
-        src: ["bower_components/underscore/*min.js", "bower_components/threejs/**/*min.js", "bower_components/proj4/dist/proj4-src.js", "build/vizi-worker.js"],
-        dest: "build/vizi-worker.js"
-      },
-      bower_worker_min: {
-        src: ["bower_components/underscore/*min.js", "bower_components/threejs/**/*min.js", "bower_components/proj4/dist/proj4-src.js", "build/vizi-worker.min.js"],
-        dest: "build/vizi-worker.min.js"
-      },
+      dependencies: {
+        files: { 
+          "build/dependencies.min.js"        : ["build/dependencies.js"],
+          "build/dependencies-worker.min.js" : ["build/dependencies-worker.js"]
+        }
+      }
     },
+
     jshint: {
       options: {
         force: true,
@@ -96,6 +111,7 @@ module.exports = function(grunt) {
       },
       files: ["src/**"]
     },
+
     mocha_slimer: {
       options: {
         xvfb: (process.env.TRAVIS === "true"),
@@ -112,13 +128,14 @@ module.exports = function(grunt) {
         src: ["test/*.html"]
       }
     },
+
     connect: {
       dev: {
         options: {
           port: 8989,
           keepalive: true,
           base: "./",
-          open: (grunt.option("no-browser") ? false : "http://localhost:8989/examples/basic-example/index.html")
+          open: (grunt.option("no-browser") ? false : "http://localhost:8989/test")
         }
       }
     },
@@ -126,10 +143,11 @@ module.exports = function(grunt) {
 
   // Load the plugins
   grunt.loadNpmTasks("grunt-contrib-jshint");
-  grunt.loadNpmTasks("grunt-mocha-slimer");
+  grunt.loadNpmTasks("grunt-contrib-clean");
   grunt.loadNpmTasks("grunt-contrib-concat");
   grunt.loadNpmTasks("grunt-contrib-uglify");
   grunt.loadNpmTasks("grunt-contrib-connect");
+  grunt.loadNpmTasks("grunt-mocha-slimer");
 
   // Default task(s).
   grunt.registerTask("default", ["test"]);
@@ -137,12 +155,24 @@ module.exports = function(grunt) {
   // Testing
   // TODO: If tests keep failing randomly on Travis then move back to Phantom
   // - Just means absolute zero chance of WebGL testing then
-  grunt.registerTask("test", ["jshint", "mocha_slimer"]);
+  grunt.registerTask("test", [
+    "jshint",
+    "mocha_slimer"
+  ]);
 
   // Development
-  grunt.registerTask("dev", ["connect:dev"]);
+  grunt.registerTask("dev", [
+    "connect:dev"
+  ]);
 
   // Build
-  grunt.registerTask("build", ["concat:vizicities", "uglify:vizicities", "concat:bower", "concat:bower_min"]);
-  grunt.registerTask("build_worker", ["concat:vizicities_worker", "uglify:vizicities_worker", "concat:bower_worker", "concat:bower_worker_min"]);
+  grunt.registerTask("build", [
+    "concat:vizicities",
+    "concat:dependencies",
+    "uglify:vizicities",
+    "uglify:dependencies",
+    "concat:build",
+    "concat:build_min",
+    "clean:build"
+  ]);
 };
