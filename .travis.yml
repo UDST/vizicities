@@ -3,6 +3,8 @@ node_js:
   - "0.10"
 before_install:
   - npm install -g grunt-cli
+  - npm install -g bower
+  - bower install
 notifications:
   webhooks:
     urls:
