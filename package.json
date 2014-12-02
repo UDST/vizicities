@@ -8,7 +8,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "grunt test --verbose"
+    "test": "grunt build && grunt build_worker && grunt test --verbose"
   },
   "repository": {
     "type": "git",
