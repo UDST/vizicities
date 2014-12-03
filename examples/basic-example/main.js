@@ -1,6 +1,6 @@
 var world = new VIZI.World({
-  viewport: document.querySelector("#vizicities-viewport")
-  // center: new VIZI.LatLon(40.01000594412381, -105.2727379358738) // Collada
+  viewport: document.querySelector("#vizicities-viewport"),
+  center: new VIZI.LatLon(40.742766592577496, -74.00731522962627) // Collada
 });
 
 var controls = new VIZI.ControlsMap(world.camera);
@@ -135,7 +135,8 @@ var buildingsConfig = {
         itemsProperties: "features",
         transformation: {
           outline: "geometry.coordinates",
-          height: "properties.height"
+          height: "properties.height",
+          min_height: "properties.min_height"
         }
       },
       tile: "tile"
