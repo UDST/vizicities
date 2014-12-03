@@ -92,7 +92,15 @@
           console.warn(error);
           return;
         }
-        
+
+        //filter out unwanted (e.g. manually modeled) buildings
+        if (self.options.omitBuildings) {
+          var omitBuildings = self.options.omitBuildings;
+          data.features = _.reject(data.features, function(feature) {
+            return _.contains(omitBuildings, feature.id);
+          });  
+        }
+          
         self.emit("tileReceived", data, tile);
       });
     });
