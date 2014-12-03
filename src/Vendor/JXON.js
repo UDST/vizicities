@@ -53,7 +53,10 @@ var JXON = new (function () {
         oNode = oParentNode.childNodes.item(nItem);
         if (oNode.nodeType === 4) { sCollectedTxt += oNode.nodeValue; } /* nodeType is "CDATASection" (4) */
         else if (oNode.nodeType === 3) { sCollectedTxt += oNode.nodeValue.trim(); } /* nodeType is "Text" (3) */
-        else if (oNode.nodeType === 1 && !oNode.prefix) { aCache.push(oNode); } /* nodeType is "Element" (1) */
+        // Removed "&& !oNode.prefix" as per namespace note on MDN
+        // https://developer.mozilla.org/en-US/docs/JXON
+        // else if (oNode.nodeType === 1 && !oNode.prefix) { aCache.push(oNode); } /* nodeType is "Element" (1) */
+        else if (oNode.nodeType === 1) { aCache.push(oNode); } /* nodeType is "Element" (1) */
       }
     }
 
