@@ -5,7 +5,10 @@
 /**
  * Blueprint switchboard
  * @author Robin Hawkes - vizicities.com
- */  
+ */
+
+  var arrayIndexRegEx = /\[(\d+)\]/,
+      arrayIndexRegExG = /\[(\d+)\]/g;
 
   VIZI.BlueprintSwitchboard = function(config) {
     var self = this;
@@ -150,18 +153,18 @@
   // Also retreives the value for "exampleObj.geometry[0]"
   VIZI.BlueprintSwitchboard.prototype.getValueByKeys = function(object, keys) {
     var output = object;
-    
+
     _.each(keys, function(key) {
       if (!output) return null;
 
       // Check for array reference in key
-      if (/\[(\d+)\]/.test(key)) {
+      if (arrayIndexRegEx.test(key)) {
         var arrayKey = key.split("[")[0];
-
-        var arrayIndexRegEx = /\[(\d+)\]/g;
         var arrayIndex;
 
-        while ((arrayIndex = arrayIndexRegEx.exec(key)) !== null) {
+        arrayIndexRegExG.lastIndex = 0;
+
+        while ((arrayIndex = arrayIndexRegExG.exec(key)) !== null) {
           output = output[arrayKey][arrayIndex[1]];
         }
       // Else, assume key is not an array
