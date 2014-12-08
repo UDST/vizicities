@@ -21,12 +21,17 @@
       suppressRenderer: false
     });
 
-    if (!self.options.viewport) {
-      throw new Error("Required viewport option missing");
-    }
+    if(self.options.threejs) {
+      self.scene = self.options.threejs.scene;
+      self.renderer = self.options.threejs.renderer;
+    } else {
+      if (!self.options.viewport) {
+        throw new Error("Required viewport option missing");
+      }
 
-    self.scene = self.createScene();
-    self.renderer = self.createRenderer();
+      self.scene = self.createScene();
+      self.renderer = self.createRenderer();
+    }
   };
 
   VIZI.Scene.prototype.createScene = function() {
