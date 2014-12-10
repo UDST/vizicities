@@ -24,7 +24,16 @@
     VIZI.BlueprintOutput.call(self, options);
 
     _.defaults(self.options, {
+      materialType: "MeshLambertMaterial",
+      materialOptions: {},
       workerURL: "vizi-worker.min.js"
+    });
+
+    _.defaults(self.options.materialOptions, {
+      color: 0xeeeeee,
+      ambient: 0xffffff,
+      emissive: 0xcccccc,
+      shading: THREE.FlatShading
     });
 
     // Triggers and actions reference
@@ -142,12 +151,12 @@
     // Find grid
     var gridHash = self.grids[tile.z];
 
-    var material = new THREE.MeshLambertMaterial({
-      color: 0xeeeeee,
-      ambient: 0xffffff,
-      emissive: 0xcccccc,
-      shading: THREE.FlatShading
-    });
+    var materialType = self.options.materialType;
+    if (!materialType || typeof THREE[materialType] !== "function") {
+      materialType = "MeshLambertMaterial";
+    }
+
+    var material = new THREE[materialType](self.options.materialOptions);
 
     // Load buildings in a Web Worker
     self.worker(self.world.origin, self.world.originZoom, self.options, buildings).then(function(result) {
