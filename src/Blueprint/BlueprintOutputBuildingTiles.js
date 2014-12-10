@@ -353,7 +353,7 @@
       // TODO: Don't have random height logic in here
       var height = (feature.height) ? feature.height : 5 + Math.random() * 10;
 
-      var minHeight = (feature.min_height) ? feature.min_height : 0;
+      var minHeight = (feature.minHeight) ? feature.minHeight : 0;
 
       // TODO: Add floor/level-based heights
       // << rounds the height down
