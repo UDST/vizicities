@@ -371,9 +371,11 @@
       if (!minHeight && !options.preserveGroundFaces) {
         // Remove down-facing floor faces
         for (var i = geom.faces.length - 1; i >= 0; i--) {
-          if (geom.faces[i].normal.z === 1) {
+          if (Math.abs(geom.faces[i].normal.z - 1) < Number.EPSILON) {
             geom.faces.splice(i, 1);
             geom.faceVertexUvs[0].splice(i, 1);
+          } else {
+
           }
         }
       }
