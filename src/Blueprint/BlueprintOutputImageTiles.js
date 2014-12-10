@@ -23,12 +23,23 @@
 
     VIZI.BlueprintOutput.call(self, options);
 
+    _.defaults(self.options, {
+      materialType: "MeshBasicMaterial",
+      materialOptions: {}
+    });
+
+    _.defaults(self.options.materialOptions, {
+      // color: 0x00FF00,
+      depthWrite: false,
+      transparent: true
+    });
+
     // Triggers and actions reference
     self.triggers = [
       {name: "initialised", arguments: ["tiles"]},
       {name: "gridUpdated", arguments: ["tiles"]}
     ];
-    
+
     self.actions = [
       {name: "outputImageTile", arguments: ["image", "tile"]}
     ];
@@ -165,12 +176,15 @@
     // TODO: Set this to renderer.getMaxAnisotropy() / 4
     texture.anisotropy = 4;
 
-    var material = new THREE.MeshBasicMaterial({
-      // color: 0x00FF00,
-      map: texture,
-      depthWrite: false,
-      transparent: true
-    });
+    var materialType = self.options.materialType;
+    if (!materialType || typeof THREE[materialType] !== "function") {
+      materialType = "MeshLambertMaterial";
+    }
+
+    var materialOptions = _.clone(self.options.materialOptions);
+    materialOptions.map = texture;
+
+    var material = new THREE[materialType](materialOptions);
 
     // Update material otherwise canvas shows up black
     material.needsUpdate = true;
