@@ -353,14 +353,17 @@
       // TODO: Don't have random height logic in here
       var height = (feature.height) ? feature.height : 5 + Math.random() * 10;
 
+      var minHeight = (feature.min_height) ? feature.min_height : 0;
+
       // TODO: Add floor/level-based heights
       // << rounds the height down
       // var height = (feature.height * metersPerLevel * scalingFactor << 0);
       
       // Multiply height in meters by pixels per meter ratio at latitude
       height *= ppm.y;
+      minHeight *= ppm.y;
 
-      var extrudeSettings = { amount: height, bevelEnabled: false };
+      var extrudeSettings = { amount: height - minHeight, bevelEnabled: false };
       
       var geom = new THREE.ExtrudeGeometry( shape, extrudeSettings );
       geom.computeFaceNormals();
