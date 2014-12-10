@@ -136,7 +136,7 @@ var buildingsConfig = {
         transformation: {
           outline: "geometry.coordinates",
           height: "properties.height",
-          min_height: "properties.min_height"
+          minHeight: "properties.min_height"
         }
       },
       tile: "tile"

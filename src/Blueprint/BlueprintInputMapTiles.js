@@ -13,6 +13,9 @@
   //     tilePath: "https://a.tiles.mapbox.com/v3/examples.map-i86l3621/{z}/{x}/{y}@2x.png"
   //   }
   // }
+
+  var tileURLRegex = /\{([zxy])\}/g;
+
   VIZI.BlueprintInputMapTiles = function(options) {
     var self = this;
 
@@ -53,7 +56,8 @@
     if (VIZI.DEBUG) console.log("Requesting tiles", tiles);
 
     _.each(tiles, function(tile, key) {
-      var url = self.options.tilePath.replace(/\{([zxy])\}/g, function(value, key) {
+      tileURLRegex.lastIndex = 0;
+      var url = self.options.tilePath.replace(tileURLRegex, function(value, key) {
         // Replace with paramter, otherwise keep existing value
         return tile[key];
       });

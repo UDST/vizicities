@@ -14,6 +14,14 @@ describe("VIZI.CRS", function() {
     expect(crs.tileSize).to.equal(256);
   });
 
+  it("has an undefined projection property", function() {
+    expect(crs.projection).to.be.undefined;
+  });
+
+  it("has an undefined inverseProjection property", function() {
+    expect(crs.inverseProjection).to.be.undefined;
+  });
+
   it("has a latLonToPoint method", function() {
     expect(crs.latLonToPoint).to.exist;
   });
@@ -52,6 +60,10 @@ describe("VIZI.CRS", function() {
 
   it("has a convertTile method", function() {
     expect(crs.convertTile).to.exist;
+  });
+
+  it("has a setProjection method", function() {
+    expect(crs.setProjection).to.exist;
   });
 
   it("has a project method", function() {
