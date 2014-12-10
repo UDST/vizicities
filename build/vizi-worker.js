@@ -1,4 +1,4 @@
-/*! ViziCities - v0.2.0 - 2014-11-02 */
+/*! ViziCities - v0.2.0 - 2014-12-10 */
 //     Underscore.js 1.7.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -6341,6 +6341,8 @@ if (typeof window === undefined) {
   VIZI.CRS = {
     code: undefined,
     tileSize: 256,
+    projection: undefined,
+    inverseProjection: undefined,
 
     // Project WGS84 coordinates into pixel positions
     // TODO: Project non-EPSG:3857 CRS into EPSG:3857 for pixel coords
@@ -6490,16 +6492,29 @@ if (typeof window === undefined) {
       return new VIZI.Point(tile.x, (Math.pow(2, zoom) - 1) - tile.y);
     },
 
+    setProjection: function(code) {
+      var self = this;
+      if (code === undefined) {
+        code = self.code;
+      }
+      if (!self.projection || code !== self.code) {
+        self.projection = new proj4.Proj(self.code);
+        self.inverseProjection = proj4(self.projection).inverse;
+      }
+    },
+
     // Convert WGS84 coordinates into CRS
     project: function(latLon) {
       var self = this;
-      return proj4(self.code, [latLon.lon, latLon.lat]);
+      self.setProjection();
+      return proj4(self.projection, [latLon.lon, latLon.lat]);
     },
 
     // Convert CRS into WGS84 coordinates
     unproject: function(point) {
       var self = this;
-      return proj4(self.code).inverse([point.x, point.y]);
+      self.setProjection();
+      return self.inverseProjection([point.x, point.y]);
     },
 
     // Map resolution (meters per pixel) for a given zoom
