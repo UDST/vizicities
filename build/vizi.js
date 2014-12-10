@@ -6783,6 +6783,8 @@ if (typeof window === undefined) {
   VIZI.CRS = {
     code: undefined,
     tileSize: 256,
+    projection: undefined,
+    inverseProjection: undefined,
 
     // Project WGS84 coordinates into pixel positions
     // TODO: Project non-EPSG:3857 CRS into EPSG:3857 for pixel coords
@@ -6932,16 +6934,29 @@ if (typeof window === undefined) {
       return new VIZI.Point(tile.x, (Math.pow(2, zoom) - 1) - tile.y);
     },
 
+    setProjection: function(code) {
+      var self = this;
+      if (code === undefined) {
+        code = self.code;
+      }
+      if (!self.projection || code !== self.code) {
+        self.projection = new proj4.Proj(self.code);
+        self.inverseProjection = proj4(self.projection).inverse;
+      }
+    },
+
     // Convert WGS84 coordinates into CRS
     project: function(latLon) {
       var self = this;
-      return proj4(self.code, [latLon.lon, latLon.lat]);
+      self.setProjection();
+      return proj4(self.projection, [latLon.lon, latLon.lat]);
     },
 
     // Convert CRS into WGS84 coordinates
     unproject: function(point) {
       var self = this;
-      return proj4(self.code).inverse([point.x, point.y]);
+      self.setProjection();
+      return self.inverseProjection([point.x, point.y]);
     },
 
     // Map resolution (meters per pixel) for a given zoom
@@ -7670,6 +7685,9 @@ if (typeof window === undefined) {
   //     // tilePath: "http://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.json"
   //   }
   // }
+
+  var tileURLRegex = /\{([zxy])\}/g;
+
   VIZI.BlueprintInputGeoJSON = function(options) {
     var self = this;
 
@@ -7736,7 +7754,8 @@ if (typeof window === undefined) {
     if (VIZI.DEBUG) console.log("Requesting tiles", tiles);
 
     _.each(tiles, function(tile, key) {
-      var url = self.options.tilePath.replace(/\{([zxy])\}/g, function(value, key) {
+      tileURLRegex.lastIndex = 0;
+      var url = self.options.tilePath.replace(tileURLRegex, function(value, key) {
         // Replace with paramter, otherwise keep existing value
         return tile[key];
       });
@@ -7852,6 +7871,9 @@ if (typeof window === undefined) {
   //     tilePath: "https://a.tiles.mapbox.com/v3/examples.map-i86l3621/{z}/{x}/{y}@2x.png"
   //   }
   // }
+
+  var tileURLRegex = /\{([zxy])\}/g;
+
   VIZI.BlueprintInputMapTiles = function(options) {
     var self = this;
 
@@ -7892,7 +7914,8 @@ if (typeof window === undefined) {
     if (VIZI.DEBUG) console.log("Requesting tiles", tiles);
 
     _.each(tiles, function(tile, key) {
-      var url = self.options.tilePath.replace(/\{([zxy])\}/g, function(value, key) {
+      tileURLRegex.lastIndex = 0;
+      var url = self.options.tilePath.replace(tileURLRegex, function(value, key) {
         // Replace with paramter, otherwise keep existing value
         return tile[key];
       });
@@ -8090,7 +8113,6 @@ if (typeof window === undefined) {
     // Find grid
     var gridHash = self.grids[tile.z];
 
-    var loader = new THREE.JSONLoader();
     var material = new THREE.MeshLambertMaterial({
       color: 0xeeeeee,
       ambient: 0xffffff,
@@ -8100,30 +8122,13 @@ if (typeof window === undefined) {
 
     // Load buildings in a Web Worker
     self.worker(self.world.origin, self.world.originZoom, buildings).then(function(result) {
-      var model = result.model;
       var offset = result.offset;
+      var geom = new THREE.BufferGeometry();
+      geom.addAttribute('position', new THREE.BufferAttribute(result.position, 3));
+      geom.addAttribute('normal', new THREE.BufferAttribute(result.normal, 3));
+      geom.addAttribute('uv', new THREE.BufferAttribute(result.uv, 2));
 
-      // Convert typed data back to arrays
-      model.vertices = Array.apply( [], model.vertices );
-      model.normals = Array.apply( [], model.normals );
-      // Wrap UVs within an array
-      // https://github.com/mrdoob/three.js/blob/master/examples/js/exporters/GeometryExporter.js#L231
-      model.uvs = [ Array.apply( [], model.uvs ) ];
-      
-      // Keep getting a "Maximum call stack size exceeded" error here
-      //model.faces = Array.apply( [], model.faces );
-      var faces = [];
-      _.each(model.faces, function(face) {
-        faces.push(face);
-      });
-
-      model.faces = faces;
-
-      // TODO: Stop this locking up the browser
-      // No visible lock up at all when removed
-      var geom = loader.parse(model);
-
-      var mesh = new THREE.Mesh(geom.geometry, material);
+      var mesh = new THREE.Mesh(geom, material);
 
       // Use previously calculated offset to return merged mesh to correct position
       // This allows frustum culling to work correctly
@@ -8334,30 +8339,22 @@ if (typeof window === undefined) {
     // Move merged geom to 0,0 and return offset
     var offset = combinedGeom.center();
 
-    var exportedGeom = combinedGeom.toJSON();
-
-    // Convert exported geom into a typed array
-    var verticesArray = new Float64Array( exportedGeom.data.vertices );
-    var normalsArray = new Float64Array( exportedGeom.data.normals );
-    // var colorsArray = new Float64Array( exportedGeom.colors );
-    // Seems to be manually set to have 1 array in the uvs array
-    // https://github.com/mrdoob/three.js/blob/master/examples/js/exporters/GeometryExporter.js#L231
-    var uvsArray = new Float64Array( exportedGeom.data.uvs[0] );
-    var facesArray = new Float64Array( exportedGeom.data.faces );
+    //TODO: save a more compact model using indices. Requires replacing fromGeometry with custom code
+    var exportedGeom = new THREE.BufferGeometry();
+    exportedGeom.fromGeometry(combinedGeom);
 
     // Store geom typed array as Three.js model object
     var model = {
-      metadata: exportedGeom.metadata,
-      colors: exportedGeom.colors,
-      vertices: verticesArray,
-      normals: normalsArray,
-      uvs: uvsArray,
-      faces: facesArray
+      offset: offset
     };
 
-    var data = {model: model, offset: offset};
+    var transfers = [];
+    exportedGeom.attributesKeys.forEach(function (key) {
+      model[key] = exportedGeom.attributes[key].array;
+      transfers.push(model[key].buffer);
+    });
 
-    deferred.transferResolve(data, [model.vertices.buffer, model.normals.buffer, model.uvs.buffer, model.faces.buffer]);
+    deferred.transferResolve(model, transfers);
   };
 
   VIZI.BlueprintOutputBuildingTiles.prototype.onAdd = function(world) {
