@@ -14,7 +14,7 @@
 
     VIZI.Controls.call(self, camera, options);
 
-    self.controls = new THREE.MapControls(camera.camera);
+    self.controls = new THREE.MapControls(camera.camera, self.options.viewport);
     self.controls.maxPolarAngle = 1.5533430342749535; // 89 degrees
 
     self.controls.addEventListener("start", function(event) {

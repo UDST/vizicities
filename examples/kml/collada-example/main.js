@@ -3,7 +3,9 @@ var world = new VIZI.World({
   center: new VIZI.LatLon(40.01000594412381, -105.2727379358738)
 });
 
-var controls = new VIZI.ControlsMap(world.camera);
+var controls = new VIZI.ControlsMap(world.camera, {
+  viewport: world.options.viewport
+});
 
 var colladaConfig = {
   input: {

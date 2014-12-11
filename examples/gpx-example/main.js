@@ -2,7 +2,9 @@ var world = new VIZI.World({
   viewport: document.querySelector("#vizicities-viewport")
 });
 
-var controls = new VIZI.ControlsMap(world.camera);
+var controls = new VIZI.ControlsMap(world.camera, {
+  viewport: world.options.viewport
+});
 
 var gpxConfig = {
   input: {

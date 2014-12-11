@@ -13,7 +13,7 @@
 
     VIZI.Controls.call(self, camera, options);
 
-    self.controls = new THREE.FirstPersonControls(camera.camera);
+    self.controls = new THREE.FirstPersonControls(camera.camera, self.options.viewport);
 
     self.controls.movementSpeed = 750;
     self.controls.lookSpeed = 0.075;
