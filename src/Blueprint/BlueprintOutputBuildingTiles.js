@@ -30,7 +30,7 @@
     // Triggers and actions reference
     self.triggers = [
       {name: "initialised", arguments: ["tiles"]},
-      {name: "gridUpdated", arguments: ["tiles"]}
+      {name: "gridUpdated", arguments: ["tiles", "newTiles"]}
     ];
 
     self.actions = [
@@ -82,17 +82,28 @@
     grid.on("moved", function(tiles, diff) {
       if (VIZI.DEBUG) console.log("Grid moved", tiles, diff);
 
+      // TODO: Check whether this is enough to remove references to the old mesh
+      var oldMeshes = gridOutput.meshes;
+      var newTiles = [];
+      gridOutput.meshes = {};
+      tiles.forEach(function (tile) {
+        var key = tile.x + '/' + tile.y;
+        if (oldMeshes.hasOwnProperty(key)) {
+          gridOutput.meshes[key] = oldMeshes[key];
+          delete oldMeshes[key];
+        } else {
+          newTiles.push(tile);
+        }
+      });
+
       // TODO: Animate building heights before removing them
-      _.each(gridOutput.meshes, function(mesh) {
+      _.forEach(oldMeshes, function (mesh) {
         self.remove(mesh);
       });
 
-      // TODO: Check whether this is enough to remove references to the old mesh
-      gridOutput.meshes = [];
-
       // Only emit update event if grid is enabled
       if (!grid.disable) {
-        self.emit("gridUpdated", tiles);
+        self.emit("gridUpdated", tiles, newTiles);
       }
     });
 
@@ -103,7 +114,7 @@
         mesh.visible = false;
       });
     });
-    
+
     // TODO: Either remove previous tiles or prevent event if grid hasn't moved
     // There's a huge hang-up when zooming in due to re-loading and processing tiles
     grid.on("enabled", function() {
@@ -122,7 +133,7 @@
     if (VIZI.DEBUG) console.log("Grid initialised", tiles);
 
     gridOutput.grid = grid;
-    gridOutput.meshes = [];
+    gridOutput.meshes = {};
 
     return gridOutput;
   };
@@ -141,6 +152,12 @@
 
     // Find grid
     var gridHash = self.grids[tile.z];
+    var tileKey = tile.x + '/' + tile.y;
+
+    if (gridHash.meshes[tileKey]) {
+      // This mesh is already loaded
+      return;
+    }
 
     var material = new THREE.MeshLambertMaterial({
       color: 0xeeeeee,
@@ -165,7 +182,7 @@
       mesh.position.y = -1 * offset.y;
       mesh.position.z = -1 * offset.z;
 
-      gridHash.meshes.push(mesh);
+      gridHash.meshes[tileKey] = mesh;
 
       // TODO: Make sure coordinate space is right
       self.add(mesh);
@@ -289,7 +306,7 @@
     // Proxy world pixelPerMeter
     // TODO: Find a better way so this doesn't have to be duplicated for every Blueprint
     var pixelsPerMeter = function(latLon, zoom) {
-      zoom = zoom || originZoom; 
+      zoom = zoom || originZoom;
       return crs.pixelsPerMeter(latLon, zoom);
     };
 

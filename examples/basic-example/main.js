@@ -116,12 +116,12 @@ var buildingsConfig = {
   }, {
     triggerObject: "output",
     triggerName: "gridUpdated",
-    triggerArguments: ["tiles"],
+    triggerArguments: ["tiles", "newTiles"],
     actionObject: "input",
     actionName: "requestTiles",
-    actionArguments: ["tiles"],
+    actionArguments: ["newTiles"],
     actionOutput: {
-      tiles: "tiles" // actionArg: triggerArg
+      newTiles: "newTiles" // actionArg: triggerArg
     }
   }, {
     triggerObject: "input",
