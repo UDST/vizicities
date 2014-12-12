@@ -119,9 +119,9 @@ var buildingsConfig = {
     triggerArguments: ["tiles", "newTiles"],
     actionObject: "input",
     actionName: "requestTiles",
-    actionArguments: ["newTiles"],
+    actionArguments: ["tiles"],
     actionOutput: {
-      newTiles: "newTiles" // actionArg: triggerArg
+      tiles: "newTiles" // actionArg: triggerArg
     }
   }, {
     triggerObject: "input",
