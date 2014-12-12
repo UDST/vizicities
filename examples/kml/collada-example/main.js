@@ -106,12 +106,12 @@ var mapConfig = {
   }, {
     triggerObject: "output",
     triggerName: "gridUpdated",
-    triggerArguments: ["tiles"],
+    triggerArguments: ["tiles", "newTiles"],
     actionObject: "input",
     actionName: "requestTiles",
     actionArguments: ["tiles"],
     actionOutput: {
-      tiles: "tiles" // actionArg: triggerArg
+      tiles: "newTiles" // actionArg: triggerArg
     }
   }, {
     triggerObject: "input",
