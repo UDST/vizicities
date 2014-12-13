@@ -165,8 +165,6 @@
   VIZI.BlueprintOutputImageTiles.prototype.createGridObject = function(grid, output) {
     var self = this;
 
-    var x, y;
-
     var materialType = self.options.materialType;
     if (!materialType || typeof THREE[materialType] !== "function") {
       materialType = "MeshLambertMaterial";
@@ -175,6 +173,8 @@
     var materialOptions = _.clone(self.options.materialOptions);
 
     var materials = [];
+
+    var x, y;
 
     for (x = 0; x < grid.tileCount.x; x++) {
       for (y = 0; y < grid.tileCount.y; y++) {
@@ -194,11 +194,13 @@
 
     // Why is this tilesize so random?
     // TODO: Work out if the tilesize not being a proper square for square-shaped bounding coordinates is a problem (eg. 4825.486315913922, 4825.486315915361)
-    var size = [Math.abs(geoBounds.ne.x - geoBounds.sw.x), Math.abs(geoBounds.ne.y - geoBounds.sw.y)];
+    var xMeshSize = Math.abs(geoBounds.ne.x - geoBounds.sw.x);
+    var yMeshSize = Math.abs(geoBounds.ne.y - geoBounds.sw.y);
 
-    var xSize = size[0] / grid.tileCount.x;
-    var ySize = size[1] / grid.tileCount.y;
-    var geom = new THREE.PlaneBufferGeometry(xSize, ySize, 1, 1);
+    var xTileSize = xMeshSize / grid.tileCount.x;
+    var yTileSize = yMeshSize / grid.tileCount.y;
+
+    var geom = new THREE.PlaneBufferGeometry(xTileSize, yTileSize, 1, 1);
 
     var gridMesh = new THREE.Object3D();
 
@@ -206,10 +208,10 @@
     for (y = 0; y < grid.tileCount.y; y++) {
       for (x = 0; x < grid.tileCount.x; x++) {
         var mesh = new THREE.Mesh(geom, materials[meshes.length]);
-        mesh.position.x = (x - grid.tileCount.x / 2 + 0.5) * xSize;
-        mesh.position.y = -(y - grid.tileCount.y / 2 + 0.5) * ySize;
+        mesh.position.x = (x - grid.tileCount.x / 2 + 0.5) * xMeshSize;
+        mesh.position.y = -(y - grid.tileCount.y / 2 + 0.5) * yMeshSize;
         mesh.renderDepth = grid.tileZoom * -1;
-        //mesh.rotation.x = -90 * Math.PI / 180;
+
         gridMesh.add(mesh);
         meshes.push(mesh);
       }
@@ -218,10 +220,8 @@
     // Hacky method for forcing render depth / layers using tile zoom
     gridMesh.renderDepth = grid.tileZoom * -1;
 
-    var centerPos = [geoBounds.sw.x + (size[0] / 2), geoBounds.sw.y - (size[1] / 2)];
-
-    gridMesh.position.x = centerPos[0];
-    gridMesh.position.z = centerPos[1];
+    gridMesh.position.x = geoBounds.sw.x + (xMeshSize / 2);
+    gridMesh.position.z = geoBounds.sw.y - (yMeshSize / 2);
 
     // Flip to horizontal
     gridMesh.rotation.x = -90 * Math.PI / 180;
