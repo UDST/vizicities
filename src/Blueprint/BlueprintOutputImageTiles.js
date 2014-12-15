@@ -208,8 +208,8 @@
     for (y = 0; y < grid.tileCount.y; y++) {
       for (x = 0; x < grid.tileCount.x; x++) {
         var mesh = new THREE.Mesh(geom, materials[meshes.length]);
-        mesh.position.x = (x - grid.tileCount.x / 2 + 0.5) * xMeshSize;
-        mesh.position.y = -(y - grid.tileCount.y / 2 + 0.5) * yMeshSize;
+        mesh.position.x = (x - grid.tileCount.x / 2 + 0.5) * xTileSize;
+        mesh.position.y = -(y - grid.tileCount.y / 2 + 0.5) * yTileSize;
         mesh.renderDepth = grid.tileZoom * -1;
 
         gridMesh.add(mesh);
