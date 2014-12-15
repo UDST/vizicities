@@ -84,8 +84,11 @@
 
     var grid = new VIZI.BlueprintHelperTileGrid(self.world, gridOptions);
 
-    grid.on("moved", function(tiles, diff) {
-      if (VIZI.DEBUG) console.log("Grid moved", tiles, diff);
+    function updateTiles(tiles) {
+      // Only emit update event if grid is enabled
+      if (grid.disable) {
+        return;
+      }
 
       var oldImages = gridOutput.images;
       var newTiles = [];
@@ -113,6 +116,12 @@
         material.needsUpdate = true;
       });
 
+      self.emit("gridUpdated", tiles, newTiles);
+    }
+
+    grid.on("moved", function(tiles, diff) {
+      if (VIZI.DEBUG) console.log("Grid moved", tiles, diff);
+
       // TODO: This whole tile size calculation probably only needs doing once
       var geoBounds = {
         ne: self.world.project(new VIZI.LatLon(grid.boundsLatLon.n, grid.boundsLatLon.e)),
@@ -126,10 +135,7 @@
       gridOutput.mesh.position.x += (size[0] / grid.tileCount.x) * diff.x;
       gridOutput.mesh.position.z += (size[1] / grid.tileCount.y) * diff.y;
 
-      // Only emit update event if grid is enabled
-      if (!grid.disable) {
-        self.emit("gridUpdated", tiles, newTiles);
-      }
+      updateTiles(tiles);
     });
 
     grid.on("disabled", function() {
@@ -141,7 +147,7 @@
     grid.on("enabled", function() {
       if (VIZI.DEBUG) console.log("Grid enabled");
 
-      self.emit("gridUpdated", grid.tiles);
+      updateTiles(grid.tiles);
 
       gridOutput.mesh.visible = true;
     });
