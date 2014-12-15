@@ -157,6 +157,10 @@
   // TODO: Use cached tile if available
   // TODO: Animate building heights on load
   VIZI.BlueprintOutputBuildingTiles.prototype.outputBuildingTile = function(buildings, tile) {
+    if (!buildings.length) {
+        return;
+    }
+
     var self = this;
 
     // Find grid
