@@ -180,6 +180,9 @@
       for (y = 0; y < grid.tileCount.y; y++) {
         var material = new THREE[materialType](materialOptions);
 
+        // Make material invisible until it has an image loaded
+        material.opacity = 0;
+
         // Update material otherwise canvas shows up black
         material.needsUpdate = true;
 
