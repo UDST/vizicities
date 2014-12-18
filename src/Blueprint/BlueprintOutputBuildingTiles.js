@@ -149,7 +149,7 @@
 
   // Building
   // {
-  //   outline: [...],
+  //   outline: [[outerCoords], [innerCoords], [innerCoords], ...],
   //   height: 123
   // }
 
@@ -202,97 +202,6 @@
     }, function(failure) {
       // ...
     });
-
-    // Dead code from move to Web Worker processor (31/10/2014)
-
-    // var combinedGeom = new THREE.Geometry();
-
-    // // TODO: Remove manual, hard-baked height-related stuff
-    // var metersPerLevel = 3;
-
-    // // TODO: Remove forced office scaling
-    // var scalingFactor = 1.45;
-    // // var scalingFactor = (tags["building"] === "office") ? 1.45 : 1;
-
-    // // Local pixels per meter - set once per tile
-    // var pixelsPerMeter;
-
-    // _.each(buildings, function(feature) {
-    //   var offset = new VIZI.Point();
-    //   var shape = new THREE.Shape();
-
-    //   // TODO: Don't manually use first set of coordinates (index 0)
-    //   _.each(feature.outline[0], function(coord, index) {
-    //     var latLon = new VIZI.LatLon(coord[1], coord[0]);
-    //     var geoCoord = self.world.project(latLon);
-
-    //     // Set local pixels per meter if not set
-    //     if (pixelsPerMeter === undefined) {
-    //       pixelsPerMeter = self.world.pixelsPerMeter(latLon);
-    //     }
-
-    //     if (offset.length === 0) {
-    //       offset.x = -1 * geoCoord.x;
-    //       offset.y = -1 * geoCoord.y;
-    //     }
-
-    //     // Move if first coordinate
-    //     if (index === 0) {
-    //       shape.moveTo( geoCoord.x + offset.x, geoCoord.y + offset.y );
-    //     } else {
-    //       shape.lineTo( geoCoord.x + offset.x, geoCoord.y + offset.y );
-    //     }
-    //   });
-
-    //   // TODO: Don't have random height logic in here
-    //   var height = (feature.height) ? feature.height : 5 + Math.random() * 10;
-
-    //   // TODO: Add floor/level-based heights
-    //   // << rounds the height down
-    //   // var height = (feature.height * metersPerLevel * scalingFactor << 0);
-      
-    //   // Multiply height in meters by pixels per meter ratio at latitude
-    //   height *= pixelsPerMeter.y;
-
-    //   var extrudeSettings = { amount: height, bevelEnabled: false };
-      
-    //   var geom = new THREE.ExtrudeGeometry( shape, extrudeSettings );
-    //   geom.computeFaceNormals();
-      
-    //   var mesh = new THREE.Mesh(geom);
-
-    //   mesh.position.y = height;
-
-    //   // Offset
-    //   mesh.position.x = -1 * offset.x;
-    //   mesh.position.z = -1 * offset.y;
-
-    //   // Flip as they are up-side down
-    //   mesh.rotation.x = 90 * Math.PI / 180;
-
-    //   mesh.matrixAutoUpdate && mesh.updateMatrix();
-    //   combinedGeom.merge(mesh.geometry, mesh.matrix);
-    // });
-
-    // // Move merged geom to 0,0 and return offset
-    // var offset = combinedGeom.center();
-
-    // var combinedMesh = new THREE.Mesh(combinedGeom, material);
-
-    // // Use previously calculated offset to return merged mesh to correct position
-    // // This allows frustum culling to work correctly
-    // combinedMesh.position.x = -1 * offset.x;
-
-    // // Removed for scale center to be correct
-    // // Offset with applyMatrix above
-    // combinedMesh.position.y = -1 * offset.y;
-
-    // combinedMesh.position.z = -1 * offset.z;
-
-    // gridHash.meshes.push(combinedMesh);
-
-    // TODO: Make sure coordinate space is right
-    // self.add(combinedMesh);
   };
 
   // TODO: Is this running before the Blueprint is initialised and taking up unnecessary memory?
@@ -339,8 +248,11 @@
       var offset = new VIZI.Point();
       var shape = new THREE.Shape();
 
-      // TODO: Don't manually use first set of coordinates (index 0)
-      _.each(feature.outline[0], function(coord, index) {
+      var outer = feature.outline.shift();
+      var inners = feature.outline;
+
+      // Create outer shape
+      _.each(outer, function(coord, index) {
         var latLon = new VIZI.LatLon(coord[1], coord[0]);
         var geoCoord = project(latLon);
 
@@ -360,6 +272,25 @@
         } else {
           shape.lineTo( geoCoord.x + offset.x, geoCoord.y + offset.y );
         }
+      });
+
+      // Create inner shapes (holes)
+      _.each(inners, function(inner, index) {
+        var innerPath = new THREE.Path();
+        
+        _.each(inner, function(coord, index) {
+          var latLon = new VIZI.LatLon(coord[1], coord[0]);
+          var geoCoord = project(latLon);
+
+          // Move if first coordinate
+          if (index === 0) {
+            innerPath.moveTo( geoCoord.x + offset.x, geoCoord.y + offset.y );
+          } else {
+            innerPath.lineTo( geoCoord.x + offset.x, geoCoord.y + offset.y );
+          }
+        });
+
+        shape.holes.push(innerPath);
       });
 
       // TODO: Don't have random height logic in here
