@@ -5,7 +5,7 @@
 /**
  * Blueprint debug lines output
  * @author Robin Hawkes - vizicities.com
- */  
+ */
 
   // output: {
   //   type: "BlueprintOutputDebugLines",
@@ -16,7 +16,15 @@
 
     VIZI.BlueprintOutput.call(self, options);
 
-    _.defaults(self.options, {});
+    _.defaults(self.options, {
+      materialType: "LineBasicMaterial",
+      materialOptions: {}
+    });
+
+    _.defaults(self.options.materialOptions, {
+      color: 0xff0000,
+      linewidth: 3
+    });
 
     // Triggers and actions reference
     self.triggers = [
@@ -46,10 +54,13 @@
   VIZI.BlueprintOutputDebugLines.prototype.outputLines = function(data) {
     var self = this;
 
-    var material = new THREE.LineBasicMaterial({
-      color: 0xff0000,
-      linewidth: 3
-    });
+    var materialType = self.options.materialType;
+    if (!materialType || typeof THREE[materialType] !== "function") {
+      materialType = "LineBasicMaterial";
+    }
+
+    var materialOptions = _.clone(self.options.materialOptions);
+    var material = new THREE[materialType](materialOptions);
 
     var geom = new THREE.Geometry();
 
