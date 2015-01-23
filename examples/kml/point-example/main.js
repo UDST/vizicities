@@ -38,7 +38,7 @@ var kmlConfig = {
         itemsObject: "kml",
         itemsProperties: "document.placemark",
         transformation: {
-          coordinates: "point.coordinates[0]"
+          coordinates: ["point.coordinates[0]", "point.coordinates[1]"]
         }
       }
     }
