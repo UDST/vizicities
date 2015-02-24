@@ -8,7 +8,6 @@ __JavaScript 3D city and data visualisation platform__
 **Important links**
 
 * Find out more about what you can do with ViziCities [on the website](http://vizicities.com)
-* Play with the [interactive ViziCities examples](http://vizicities.com/examples)
 * Read [the documentation](http://dev.vizicities.com) and learn how to make something with ViziCities
 
 
