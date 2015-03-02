@@ -26,7 +26,8 @@
     _.defaults(self.options, {
       materialType: "MeshLambertMaterial",
       materialOptions: {},
-      workerURL: "vizi-worker.min.js"
+      workerURL: "vizi-worker.min.js",
+      name: "Building tiles"
     });
 
     _.defaults(self.options.materialOptions, {
@@ -45,6 +46,8 @@
     self.actions = [
       {name: "outputBuildingTile", arguments: ["buildings", "tile"]}
     ];
+
+    self.name = self.options.name;
 
     // Grids
     // {16: {

@@ -36,6 +36,18 @@
     self.switchboards = [];
     self.layers = [];
 
+    // Add UI container
+    // TODO: Move into a separate UI class
+    var uiContainer = document.createElement("div");
+
+    // Styling is adding via vizicities.css
+    uiContainer.classList.add("vizicities-ui");
+    self.options.viewport.appendChild(uiContainer);
+
+    // Set up layer UI
+    // TODO: Make this togglable via an option 
+    self.layersUI = new VIZI.LayersUI(self.layers);
+
     // TODO: Ability to override this with a scene passed into the options
     // TODO: Pass-through options that tweak scene (antialias, etc)
     self.scene = new VIZI.Scene({
@@ -114,6 +126,9 @@
 
     self.layers.push(layer);
     self.scene.add(layer.object);
+
+    // Update layers UI
+    self.layersUI.onChange();
   };
 
   VIZI.World.prototype.addSwitchboard = function(switchboard) {

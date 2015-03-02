@@ -38,7 +38,7 @@ module.exports = function(grunt) {
     },
     concat: {
       vizicities: {
-        src: ["src/Vizi.js", "src/Core/*.js", "src/Geo/CRS.js", "src/WebGL/*.js", "src/Controls/Controls.js", "src/**/*.js"],
+        src: ["src/Vizi.js", "src/Core/*.js", "src/Geo/CRS.js", "src/WebGL/*.js", "src/Controls/Controls.js", "src/UI/*.js", "src/**/*.js"],
         dest: "build/vizi.js"
       },
       bower: {

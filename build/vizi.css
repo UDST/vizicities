@@ -20,3 +20,13 @@
     color: #2bb2ed;
     text-decoration: underline;
   }
+
+.vizicities-ui {
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 200px;
+  z-index: 9998;
+}
+
+  .vizicities-ui .vizicities-layers-ui {}

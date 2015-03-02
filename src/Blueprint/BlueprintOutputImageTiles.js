@@ -25,7 +25,8 @@
 
     _.defaults(self.options, {
       materialType: "MeshBasicMaterial",
-      materialOptions: {}
+      materialOptions: {},
+      name: "Image tiles"
     });
 
     _.defaults(self.options.materialOptions, {
@@ -43,6 +44,8 @@
     self.actions = [
       {name: "outputImageTile", arguments: ["image", "tile"]}
     ];
+
+    self.name = self.options.name;
 
     // Grids
     // {16: {

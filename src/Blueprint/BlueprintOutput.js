@@ -25,6 +25,8 @@
     // [{name: "actionName", arguments: ["argName1", "argName2"]}, ...]
     self.actions = [];
 
+    self.name = "";
+
     // TODO: How do you ensure the layer abides by fustrum culling when inner objects are referencing the world coordinate space
     // self.layer = new VIZI.Layer();
   };
