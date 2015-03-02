@@ -5,6 +5,9 @@
  * @author Robin Hawkes - vizicities.com
  */
 
+// TODO: Sort out scoping issues
+// TODO: Work out a neater structure for defining the render method
+
 (function() {
   "use strict";
 
@@ -21,9 +24,9 @@
         var layers = self.props.layers.map(function(layer) {
           var visibilityButton;
           if (layer.hidden) {
-            visibilityButton = <button onClick={self.props.onShow.bind(scope, layer.id)}>Show</button>
+            visibilityButton = <button onClick={self.props.onShow.bind(scope, layer.object.id)}>Show</button>
           } else {
-            visibilityButton = <button onClick={self.props.onHide.bind(scope, layer.id)}>Hide</button>
+            visibilityButton = <button onClick={self.props.onHide.bind(scope, layer.object.id)}>Hide</button>
           }
           
           return (

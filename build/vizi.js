@@ -7351,8 +7351,8 @@ if (typeof window === undefined) {
  * @author Robin Hawkes - vizicities.com
  */
 
- // TODO: Sort out scoping issues
- // TODO: Work out a neater structure for defining the render method
+// TODO: Sort out scoping issues
+// TODO: Work out a neater structure for defining the render method
 
 (function() {
   "use strict";

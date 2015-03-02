@@ -36,6 +36,7 @@
     "grunt-contrib-jshint": "^0.10.0",
     "grunt-contrib-uglify": "^0.6.0",
     "grunt-mocha-slimer": "0.0.2",
+    "grunt-react": "^0.10.0",
     "mocha": "^1.21.5",
     "sinon": "^1.10.3",
     "sinon-chai": "^2.6.0"
