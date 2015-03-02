@@ -7366,25 +7366,29 @@ if (typeof window === undefined) {
     self.layerControl = React.createClass({displayName: "layerControl",
       render: function() {
         var self = this;
-        
+          
+        // TODO: De-dupe checkbox setup
         var layers = self.props.layers.map(function(layer) {
           var visibilityButton;
           if (layer.hidden) {
-            visibilityButton = React.createElement("button", {onClick: self.props.onShow.bind(scope, layer.object.id)}, "Show")
+            visibilityButton = React.createElement("input", {type: "checkbox", onClick: self.props.onShow.bind(scope, layer.object.id)})
           } else {
-            visibilityButton = React.createElement("button", {onClick: self.props.onHide.bind(scope, layer.object.id)}, "Hide")
+            visibilityButton = React.createElement("input", {type: "checkbox", checked: true, onClick: self.props.onHide.bind(scope, layer.object.id)})
           }
           
           return (
-            React.createElement("li", null, 
-              layer.name, " ", visibilityButton
+            React.createElement("li", {key: layer.object.id}, 
+              visibilityButton, " ", layer.name
             )
           );
         });
         
         return (
-          React.createElement("ul", {className: "vizicities-layers-ui"}, 
-            layers
+          React.createElement("section", {className: "vizicities-layers-ui"}, 
+            React.createElement("h2", null, "Layers"), 
+            React.createElement("ul", null, 
+              layers
+            )
           )
         );
       }

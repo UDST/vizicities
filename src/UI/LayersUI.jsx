@@ -20,26 +20,30 @@
     self.layerControl = React.createClass({
       render: function() {
         var self = this;
-        
+          
+        // TODO: De-dupe checkbox setup
         var layers = self.props.layers.map(function(layer) {
           var visibilityButton;
           if (layer.hidden) {
-            visibilityButton = <button onClick={self.props.onShow.bind(scope, layer.object.id)}>Show</button>
+            visibilityButton = <input type="checkbox" onClick={self.props.onShow.bind(scope, layer.object.id)}></input>
           } else {
-            visibilityButton = <button onClick={self.props.onHide.bind(scope, layer.object.id)}>Hide</button>
+            visibilityButton = <input type="checkbox" checked onClick={self.props.onHide.bind(scope, layer.object.id)}></input>
           }
           
           return (
-            <li>
-              {layer.name} {visibilityButton}
+            <li key={layer.object.id}>
+              {visibilityButton} {layer.name}
             </li>
           );
         });
         
         return (
-          <ul className="vizicities-layers-ui">
-            {layers}
-          </ul>
+          <section className="vizicities-layers-ui">
+            <h2>Layers</h2>
+            <ul>
+              {layers}
+            </ul>
+          </section>
         );
       }
     });
