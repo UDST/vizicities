@@ -22,34 +22,41 @@
   }
 
 .vizicities-ui {
+  height: 100%;
   position: absolute;
-  right: 0;
-  top: 0;
-  width: 200px;
+  pointer-events: none;
   z-index: 9998;
+  width: 100%;
 }
 
   .vizicities-ui .vizicities-layers-ui {
     background: #fff;
+    border-radius: 3px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
     font-family: Arial, Verdana, sans-serif;
     font-size: 16px;
+    pointer-events: auto;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    width: 200px;
   }
 
     .vizicities-ui .vizicities-layers-ui h2 {
       font-size: 20px;
       margin: 0;
-      padding: 20px 20px 0;
+      padding: 15px 15px 0;
     }
 
     .vizicities-ui .vizicities-layers-ui ul {
       list-style: none;
       margin: 0;
-      padding: 10px 0 15px;
+      padding: 10px 0 10px;
     }
 
     .vizicities-ui .vizicities-layers-ui li {
       margin: 0;
-      padding: 5px 20px;
+      padding: 5px 15px;
     }
 
     .vizicities-ui .vizicities-layers-ui li input {
