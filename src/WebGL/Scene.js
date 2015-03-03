@@ -75,7 +75,8 @@
       };
     } else {
       renderer = new THREE.WebGLRenderer({
-        antialias: self.options.antialias
+        antialias: self.options.antialias,
+        domElement: document.createElement("canvas")
       });
     }
 

@@ -4,8 +4,11 @@ describe("VIZI.ControlsOrbit", function() {
 
   // TODO: Use VIZI.Camera
   before(function() {
+    var fakeViewport = document.body;
+    fakeViewport.appendChild(document.createElement("canvas"));
+    
     camera = new VIZI.Camera({aspect: 1024 / 768})
-    controls = new VIZI.ControlsOrbit(camera);
+    controls = new VIZI.ControlsOrbit(camera, {viewport: fakeViewport});
   });
 
   it("exists in VIZI namespace", function() {

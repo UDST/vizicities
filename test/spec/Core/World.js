@@ -3,7 +3,7 @@ describe("VIZI.World", function() {
   var viewport;
 
   before(function() {
-    viewport = document.createElement("div");
+    viewport = document.body;
     world = new VIZI.World({
       viewport: viewport,
       camera: new VIZI.Camera({
