@@ -55,11 +55,11 @@ module.exports = function(grunt) {
           banner: "/*! ViziCities - v<%= pkg.version %> - " +
           "<%= grunt.template.today('yyyy-mm-dd') %> */\n"
         },
-        src: ["bower_components/**/*min.js", "bower_components/proj4/dist/proj4-src.js", "bower_components/wildemitter/wildemitter-bare.js", "build/vizi.js"],
+        src: ["bower_components/**/*min.js", "bower_components/proj4/dist/proj4-src.js", "bower_components/wildemitter/wildemitter-bare.js", "build/vizi.js", "!bower_components/react/react-with-addons.min.js"],
         dest: "build/vizi.js"
       },
       bower_min: {
-        src: ["bower_components/**/*min.js", "bower_components/proj4/dist/proj4.js", "bower_components/wildemitter/wildemitter-bare.js", "build/vizi.min.js"],
+        src: ["bower_components/**/*min.js", "bower_components/proj4/dist/proj4.js", "bower_components/wildemitter/wildemitter-bare.js", "build/vizi.min.js", "!bower_components/react/react-with-addons.min.js"],
         dest: "build/vizi.min.js"
       },
       vizicities_worker: {
