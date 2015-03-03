@@ -7207,12 +7207,17 @@ if (typeof window === undefined) {
   VIZI.Layer.prototype.hide = function() {
     var self = this;
     self.object.visible = false;
-  };
+    self.onHide();
+  };  
 
   VIZI.Layer.prototype.show = function() {
     var self = this;
     self.object.visible = true;
+    self.onShow();
   };
+
+  VIZI.Layer.prototype.onHide = function() {};
+  VIZI.Layer.prototype.onShow = function() {};
 
   VIZI.Layer.prototype.applyVertexColors = function( geom, colour ) {
     geom.faces.forEach( function( f ) {
@@ -7400,6 +7405,7 @@ if (typeof window === undefined) {
     }
 
     self.panels = [];
+    self.hidden = false;
 
     self.infoUI = React.createClass({displayName: "infoUI",
       render: function() {
@@ -7415,8 +7421,10 @@ if (typeof window === undefined) {
 
           // TODO: Scale margin-top offset based on camera zoom so panel stays above the object
           // TODO: Or, base the screen position on the top of the object bounding box
+          // TODO: Set z-index based on object distance from camera
           var style = {
-            transform: "translateX(calc(" + screenPos.x + "px - 50%)) translateY(calc(" + screenPos.y + "px - 50%))"
+            transform: "translateX(calc(" + screenPos.x + "px - 50%)) translateY(calc(" + screenPos.y + "px - 50%))",
+            display: (scope.hidden) ? "none" : "block"
           }
 
           return (
@@ -7451,6 +7459,18 @@ if (typeof window === undefined) {
     return panel;
   };
 
+  VIZI.InfoUI2D.prototype.onHide = function() {
+    var self = this;
+    self.hidden = true;
+    self.onChange();
+  };
+
+  VIZI.InfoUI2D.prototype.onShow = function() {
+    var self = this;
+    self.hidden = false;
+    self.onChange();
+  };
+
   VIZI.InfoUI2D.prototype.onChange = function() {
     var self = this;
 
@@ -7478,6 +7498,7 @@ if (typeof window === undefined) {
 
     self.layer = layer;
     self.scale = scale || [];
+    self.hidden = false;
 
     // Check that key UI container exists
     if (!document.querySelector(".vizicities-ui .vizicities-key-ui")) {
@@ -7491,7 +7512,6 @@ if (typeof window === undefined) {
       render: function() {
         var self = this;
           
-        // TODO: De-dupe checkbox setup
         var scale = self.props.scale.map(function(scale) {
           var style = {
             background: scale.colour
@@ -7505,9 +7525,12 @@ if (typeof window === undefined) {
         });
 
         var className = "vizicities-ui-item vizicities-key-ui-item";
+        var containerStyle = {
+          display: (scope.hidden) ? "none" : "block"
+        }
         
         return (
-          React.createElement("section", {className: className}, 
+          React.createElement("section", {className: className, style: containerStyle}, 
             React.createElement("header", null, 
               React.createElement("h2", null, scope.layer.name, " key")
             ), 
@@ -7519,6 +7542,18 @@ if (typeof window === undefined) {
       }
     });
 
+    self.onChange();
+  };
+
+  VIZI.KeyUIColourScale.prototype.onHide = function() {
+    var self = this;
+    self.hidden = true;
+    self.onChange();
+  };
+
+  VIZI.KeyUIColourScale.prototype.onShow = function() {
+    var self = this;
+    self.hidden = false;
     self.onChange();
   };
 
@@ -8822,6 +8857,16 @@ if (typeof window === undefined) {
     self.add(combinedMesh);
   };
 
+  VIZI.BlueprintOutputChoropleth.prototype.onHide = function() {
+    var self = this;
+    self.keyUI.onHide();
+  };
+
+  VIZI.BlueprintOutputChoropleth.prototype.onShow = function() {
+    var self = this;
+    self.keyUI.onShow();
+  };
+
   VIZI.BlueprintOutputChoropleth.prototype.onAdd = function(world) {
     var self = this;
     self.world = world;
@@ -8922,6 +8967,8 @@ if (typeof window === undefined) {
         self.add(dae);
 
         // Create info panel
+        // TODO: Work out a way to pass in custom text for the info panel or
+        // make it obvcious that you can only use the data avaiable.
         self.infoUI.addPanel(dae, dae.id);
       });
     });
@@ -8935,6 +8982,16 @@ if (typeof window === undefined) {
     // and actual scene / camera position.
     self.infoUI.onChange();
   }
+
+  VIZI.BlueprintOutputCollada.prototype.onHide = function() {
+    var self = this;
+    self.infoUI.onHide();
+  };
+
+  VIZI.BlueprintOutputCollada.prototype.onShow = function() {
+    var self = this;
+    self.infoUI.onShow();
+  };
 
   VIZI.BlueprintOutputCollada.prototype.onAdd = function(world) {
     var self = this;

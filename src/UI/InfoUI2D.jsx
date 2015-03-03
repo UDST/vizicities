@@ -26,6 +26,7 @@
     }
 
     self.panels = [];
+    self.hidden = false;
 
     self.infoUI = React.createClass({
       render: function() {
@@ -43,7 +44,8 @@
           // TODO: Or, base the screen position on the top of the object bounding box
           // TODO: Set z-index based on object distance from camera
           var style = {
-            transform: "translateX(calc(" + screenPos.x + "px - 50%)) translateY(calc(" + screenPos.y + "px - 50%))"
+            transform: "translateX(calc(" + screenPos.x + "px - 50%)) translateY(calc(" + screenPos.y + "px - 50%))",
+            display: (scope.hidden) ? "none" : "block"
           }
 
           return (
@@ -76,6 +78,18 @@
     self.onChange();
 
     return panel;
+  };
+
+  VIZI.InfoUI2D.prototype.onHide = function() {
+    var self = this;
+    self.hidden = true;
+    self.onChange();
+  };
+
+  VIZI.InfoUI2D.prototype.onShow = function() {
+    var self = this;
+    self.hidden = false;
+    self.onChange();
   };
 
   VIZI.InfoUI2D.prototype.onChange = function() {

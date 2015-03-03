@@ -177,6 +177,16 @@
     self.add(combinedMesh);
   };
 
+  VIZI.BlueprintOutputChoropleth.prototype.onHide = function() {
+    var self = this;
+    self.keyUI.onHide();
+  };
+
+  VIZI.BlueprintOutputChoropleth.prototype.onShow = function() {
+    var self = this;
+    self.keyUI.onShow();
+  };
+
   VIZI.BlueprintOutputChoropleth.prototype.onAdd = function(world) {
     var self = this;
     self.world = world;

@@ -44,12 +44,17 @@
   VIZI.Layer.prototype.hide = function() {
     var self = this;
     self.object.visible = false;
-  };
+    self.onHide();
+  };  
 
   VIZI.Layer.prototype.show = function() {
     var self = this;
     self.object.visible = true;
+    self.onShow();
   };
+
+  VIZI.Layer.prototype.onHide = function() {};
+  VIZI.Layer.prototype.onShow = function() {};
 
   VIZI.Layer.prototype.applyVertexColors = function( geom, colour ) {
     geom.faces.forEach( function( f ) {

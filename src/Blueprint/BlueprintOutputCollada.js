@@ -108,6 +108,16 @@
     self.infoUI.onChange();
   }
 
+  VIZI.BlueprintOutputCollada.prototype.onHide = function() {
+    var self = this;
+    self.infoUI.onHide();
+  };
+
+  VIZI.BlueprintOutputCollada.prototype.onShow = function() {
+    var self = this;
+    self.infoUI.onShow();
+  };
+
   VIZI.BlueprintOutputCollada.prototype.onAdd = function(world) {
     var self = this;
     self.world = world;
