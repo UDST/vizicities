@@ -92,7 +92,8 @@
         self.add(dae);
 
         // Create info panel
-        // TODO: Work out a way to pass in custom text for the info panel
+        // TODO: Work out a way to pass in custom text for the info panel or
+        // make it obvcious that you can only use the data avaiable.
         self.infoUI.addPanel(dae, dae.id);
       });
     });
