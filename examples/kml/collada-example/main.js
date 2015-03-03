@@ -17,7 +17,8 @@ var colladaConfig = {
   output: {
     type: "BlueprintOutputCollada",
     options: {
-      modelPathPrefix: "./data/"
+      modelPathPrefix: "./data/",
+      infoUI: true
     }
   },
   triggers: [{
