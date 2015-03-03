@@ -22,6 +22,7 @@
     _.defaults(self.options, {
       colourRange: ["#ffffe5","#f7fcb9","#d9f0a3","#addd8e","#78c679","#41ab5d","#238443","#006837","#004529"],
       layer: 10,
+      keyUI: true,
       name: "Choropleth"
     });
 
@@ -36,10 +37,8 @@
 
     self.name = self.options.name;
 
-    // Set up key UI
-    self.keyUI = new VIZI.KeyUIColourScale(self);
-
     self.world;
+    self.keyUI;
   };
 
   VIZI.BlueprintOutputChoropleth.prototype = Object.create( VIZI.BlueprintOutput.prototype );
@@ -47,6 +46,11 @@
   // Initialise instance and start automated processes
   VIZI.BlueprintOutputChoropleth.prototype.init = function() {
     var self = this;
+
+    // Set up key UI
+    if (self.options.keyUI) {
+      self.keyUI = new VIZI.KeyUIColourScale(self);
+    }
 
     self.emit("initialised");
   };
@@ -103,8 +107,10 @@
         }
       });
 
-      self.keyUI.scale = keyScale;
-      self.keyUI.onChange();
+      if (self.keyUI) {
+        self.keyUI.scale = keyScale;
+        self.keyUI.onChange();
+      }
     }
 
     var combinedGeom = new THREE.Geometry();
@@ -179,12 +185,18 @@
 
   VIZI.BlueprintOutputChoropleth.prototype.onHide = function() {
     var self = this;
-    self.keyUI.onHide();
+
+    if (self.keyUI) {
+      self.keyUI.onHide();
+    }
   };
 
   VIZI.BlueprintOutputChoropleth.prototype.onShow = function() {
     var self = this;
-    self.keyUI.onShow();
+
+    if (self.keyUI) {
+      self.keyUI.onShow();
+    }
   };
 
   VIZI.BlueprintOutputChoropleth.prototype.onAdd = function(world) {
