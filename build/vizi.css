@@ -32,7 +32,7 @@
   .vizicities-ui .vizicities-layers-ui {
     background: #fff;
     border-radius: 3px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
     font-family: Arial, Verdana, sans-serif;
     font-size: 16px;
     pointer-events: auto;
