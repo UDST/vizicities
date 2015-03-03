@@ -39,7 +39,9 @@
         
         return (
           <section className="vizicities-layers-ui">
-            <h2>Layers</h2>
+            <header>
+              <h2>Layers</h2>
+            </header>
             <ul>
               {layers}
             </ul>
