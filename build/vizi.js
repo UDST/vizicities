@@ -7358,6 +7358,77 @@ if (typeof window === undefined) {
 /* globals window, _, React, VIZI */
 
 /**
+ * Key colour-scale UI class
+ * @author Robin Hawkes - vizicities.com
+ */
+
+// TODO: Sort out scoping issues
+// TODO: Work out a neater structure for defining the render method
+
+(function() {
+  "use strict";
+
+  VIZI.KeyUIColourScale = function(layer, scale) {
+    var self = this;
+    var scope = self;
+
+    self.layer = layer;
+    self.scale = scale || [];
+
+    // Check that key UI container exists
+    if (!document.querySelector(".vizicities-ui .vizicities-key-ui")) {
+      var keyUIContainer = document.createElement("section");
+      keyUIContainer.classList.add("vizicities-key-ui");
+
+      document.querySelector(".vizicities-ui").appendChild(keyUIContainer);
+    }
+
+    self.key = React.createClass({displayName: "key",
+      render: function() {
+        var self = this;
+          
+        // TODO: De-dupe checkbox setup
+        var scale = self.props.scale.map(function(scale) {
+          var style = {
+            background: scale.colour
+          };
+          
+          return (
+            React.createElement("li", {key: scale.colour}, 
+              React.createElement("span", {className: "scale-icon", style: style}), " ", scale.key
+            )
+          );
+        });
+
+        var className = "vizicities-ui-item vizicities-key-ui-item";
+        
+        return (
+          React.createElement("section", {className: className}, 
+            React.createElement("header", null, 
+              React.createElement("h2", null, scope.layer.name, " key")
+            ), 
+            React.createElement("ul", null, 
+              scale
+            )
+          )
+        );
+      }
+    });
+
+    self.onChange();
+  };
+
+  VIZI.KeyUIColourScale.prototype.onChange = function() {
+    var self = this;
+
+    var Key = self.key;
+
+    React.render(React.createElement(Key, {scale: self.scale}), document.querySelector(".vizicities-key-ui"));
+  };
+})();
+/* globals window, _, React, VIZI */
+
+/**
  * Layers UI class
  * @author Robin Hawkes - vizicities.com
  */
@@ -7395,7 +7466,7 @@ if (typeof window === undefined) {
         });
         
         return (
-          React.createElement("section", {className: "vizicities-layers-ui"}, 
+          React.createElement("section", {className: "vizicities-ui-item vizicities-layers-ui"}, 
             React.createElement("header", null, 
               React.createElement("h2", null, "Layers")
             ), 
@@ -8506,6 +8577,9 @@ if (typeof window === undefined) {
 
     self.name = self.options.name;
 
+    // Set up key UI
+    self.keyUI = new VIZI.KeyUIColourScale(self);
+
     self.world;
   };
 
@@ -8552,6 +8626,26 @@ if (typeof window === undefined) {
       var scaleColour = d3.scale.quantile()
         .domain([lo, hi])
         .range(self.options.colourRange);
+
+      var breakCount = scaleColour.range().length;
+      var keyScale = scaleColour.range().map(function(value, index) {
+        var key;
+        if (index === 0) {
+          key = Number(lo.toFixed(2)) + " - " + Number(scaleColour.quantiles()[index].toFixed(2));
+        } else if (index === breakCount - 1) {
+          key = Number(scaleColour.quantiles()[index-1].toFixed(2)) + " - " + Number(hi.toFixed(2));
+        } else {
+          key = Number(scaleColour.quantiles()[index-1].toFixed(2)) + " - " + Number(scaleColour.quantiles()[index].toFixed(2));
+        }
+
+        return {
+          colour: value,
+          key: key
+        }
+      });
+
+      self.keyUI.scale = keyScale;
+      self.keyUI.onChange();
     }
 
     var combinedGeom = new THREE.Geometry();

@@ -38,7 +38,7 @@
         });
         
         return (
-          <section className="vizicities-layers-ui">
+          <section className="vizicities-ui-item vizicities-layers-ui">
             <header>
               <h2>Layers</h2>
             </header>

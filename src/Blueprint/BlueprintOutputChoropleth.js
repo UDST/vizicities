@@ -36,6 +36,9 @@
 
     self.name = self.options.name;
 
+    // Set up key UI
+    self.keyUI = new VIZI.KeyUIColourScale(self);
+
     self.world;
   };
 
@@ -82,6 +85,26 @@
       var scaleColour = d3.scale.quantile()
         .domain([lo, hi])
         .range(self.options.colourRange);
+
+      var breakCount = scaleColour.range().length;
+      var keyScale = scaleColour.range().map(function(value, index) {
+        var key;
+        if (index === 0) {
+          key = Number(lo.toFixed(2)) + " - " + Number(scaleColour.quantiles()[index].toFixed(2));
+        } else if (index === breakCount - 1) {
+          key = Number(scaleColour.quantiles()[index-1].toFixed(2)) + " - " + Number(hi.toFixed(2));
+        } else {
+          key = Number(scaleColour.quantiles()[index-1].toFixed(2)) + " - " + Number(scaleColour.quantiles()[index].toFixed(2));
+        }
+
+        return {
+          colour: value,
+          key: key
+        }
+      });
+
+      self.keyUI.scale = keyScale;
+      self.keyUI.onChange();
     }
 
     var combinedGeom = new THREE.Geometry();
