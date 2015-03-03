@@ -41,6 +41,7 @@
 
           // TODO: Scale margin-top offset based on camera zoom so panel stays above the object
           // TODO: Or, base the screen position on the top of the object bounding box
+          // TODO: Set z-index based on object distance from camera
           var style = {
             transform: "translateX(calc(" + screenPos.x + "px - 50%)) translateY(calc(" + screenPos.y + "px - 50%))"
           }

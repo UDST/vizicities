@@ -105,7 +105,9 @@
       width: 10px;
     }
 
-  .vizicities-ui .vizicities-info-ui-2d-layer {}
+  .vizicities-ui .vizicities-info-ui-2d-layer {
+    display: absolute;
+  }
 
     .vizicities-ui .vizicities-info-ui-2d-layer-item {
       background: #222;
