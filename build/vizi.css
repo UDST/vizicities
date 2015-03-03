@@ -45,6 +45,10 @@
   }
 
   .vizicities-ui .vizicities-layers-ui {
+    display: absolute;
+  }
+
+  .vizicities-ui .vizicities-layers-ui-item {
     background: #fff;
     border-radius: 3px;
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
@@ -57,20 +61,24 @@
     width: 200px;
   }
 
-    .vizicities-ui .vizicities-layers-ui ul {
+    .vizicities-ui .vizicities-layers-ui-item ul {
       list-style: none;
       margin: 0;
       padding: 10px 0 10px;
     }
 
-    .vizicities-ui .vizicities-layers-ui li {
+    .vizicities-ui .vizicities-layers-ui-item li {
       margin: 0;
       padding: 5px 15px;
     }
 
-    .vizicities-ui .vizicities-layers-ui li input {
+    .vizicities-ui .vizicities-layers-ui-item li input {
       vertical-align: text-bottom;
     }
+  
+  .vizicities-ui .vizicities-key-ui {
+    display: absolute;
+  }
 
   .vizicities-ui .vizicities-key-ui-item {
     background: #fff;
@@ -124,3 +132,25 @@
       text-align: center;
       text-transform: uppercase;
     }
+  
+  .vizicities-ui .vizicities-description-ui {
+    display: absolute;
+  }
+
+    .vizicities-ui .vizicities-description-ui-item {
+      background: #fff;
+      border-radius: 3px;
+      bottom: 20px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+      font-family: Arial, Verdana, sans-serif;
+      font-size: 16px;
+      pointer-events: auto;
+      position: absolute;
+      left: 20px;
+      width: 400px;
+    }
+
+      .vizicities-ui .vizicities-description-ui-item p {
+        line-height: 1.5em;
+        margin: 15px;
+      }

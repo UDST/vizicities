@@ -8,6 +8,11 @@ var controls = new VIZI.ControlsMap(world.camera, {
   viewport: world.options.viewport
 });
 
+var descriptionUI = new VIZI.DescriptionUI({
+  title: "Basic example",
+  body: "This is a basic example showing a 2D basemap, 3D building tiles and a choropleth of population density."
+});
+
 var mapConfig = {
   input: {
     type: "BlueprintInputMapTiles",

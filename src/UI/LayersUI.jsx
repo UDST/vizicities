@@ -17,6 +17,14 @@
 
     self.layers = layers;
 
+    // Check that UI container exists
+    if (!document.querySelector(".vizicities-ui .vizicities-layers-ui")) {
+      var container = document.createElement("section");
+      container.classList.add("vizicities-layers-ui");
+
+      document.querySelector(".vizicities-ui").appendChild(container);
+    }
+
     self.layerControl = React.createClass({
       render: function() {
         var self = this;
@@ -38,7 +46,7 @@
         });
         
         return (
-          <section className="vizicities-ui-item vizicities-layers-ui">
+          <section className="vizicities-ui-item vizicities-layers-ui-item">
             <header>
               <h2>Layers</h2>
             </header>
@@ -88,6 +96,6 @@
 
     var LayerControl = self.layerControl;
 
-    React.render(<LayerControl layers={self.layers} onHide={self.onHideLayer} onShow={self.onShowLayer} />, document.querySelector(".vizicities-ui"));
+    React.render(<LayerControl layers={self.layers} onHide={self.onHideLayer} onShow={self.onShowLayer} />, document.querySelector(".vizicities-layers-ui"));
   };
 })();

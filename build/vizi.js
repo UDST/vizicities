@@ -7380,6 +7380,61 @@ if (typeof window === undefined) {
 /* globals window, _, React, VIZI */
 
 /**
+ * Description UI class
+ * @author Robin Hawkes - vizicities.com
+ */
+
+// TODO: Sort out scoping issues
+// TODO: Work out a neater structure for defining the render method
+
+(function() {
+  "use strict";
+
+  VIZI.DescriptionUI = function(options) {
+    var self = this;
+    var scope = self;
+
+    self.options = options || {};
+
+    _.defaults(options, {});
+
+    // Check that UI container exists
+    if (!document.querySelector(".vizicities-ui .vizicities-description-ui")) {
+      var container = document.createElement("section");
+      container.classList.add("vizicities-description-ui");
+
+      document.querySelector(".vizicities-ui").appendChild(container);
+    }
+
+    self.description = React.createClass({displayName: "description",
+      render: function() {
+        var self = this;
+          
+        return (
+          React.createElement("section", {className: "vizicities-ui-item vizicities-description-ui-item"}, 
+            React.createElement("header", null, 
+              React.createElement("h2", null, self.props.title)
+            ), 
+            React.createElement("p", null, self.props.body)
+          )
+        );
+      }
+    });
+
+    self.onChange();
+  };
+
+  VIZI.DescriptionUI.prototype.onChange = function() {
+    var self = this;
+
+    var Description = self.description;
+
+    React.render(React.createElement(Description, {title: self.options.title, body: self.options.body}), document.querySelector(".vizicities-description-ui"));
+  };
+})();
+/* globals window, _, React, VIZI */
+
+/**
  * 2D info UI class
  * @author Robin Hawkes - vizicities.com
  */
@@ -7584,6 +7639,14 @@ if (typeof window === undefined) {
 
     self.layers = layers;
 
+    // Check that UI container exists
+    if (!document.querySelector(".vizicities-ui .vizicities-layers-ui")) {
+      var container = document.createElement("section");
+      container.classList.add("vizicities-layers-ui");
+
+      document.querySelector(".vizicities-ui").appendChild(container);
+    }
+
     self.layerControl = React.createClass({displayName: "layerControl",
       render: function() {
         var self = this;
@@ -7605,7 +7668,7 @@ if (typeof window === undefined) {
         });
         
         return (
-          React.createElement("section", {className: "vizicities-ui-item vizicities-layers-ui"}, 
+          React.createElement("section", {className: "vizicities-ui-item vizicities-layers-ui-item"}, 
             React.createElement("header", null, 
               React.createElement("h2", null, "Layers")
             ), 
@@ -7655,7 +7718,7 @@ if (typeof window === undefined) {
 
     var LayerControl = self.layerControl;
 
-    React.render(React.createElement(LayerControl, {layers: self.layers, onHide: self.onHideLayer, onShow: self.onShowLayer}), document.querySelector(".vizicities-ui"));
+    React.render(React.createElement(LayerControl, {layers: self.layers, onHide: self.onHideLayer, onShow: self.onShowLayer}), document.querySelector(".vizicities-layers-ui"));
   };
 })();
 /* globals window, _, VIZI */
