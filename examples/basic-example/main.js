@@ -1,5 +1,6 @@
 var world = new VIZI.World({
-  viewport: document.querySelector("#vizicities-viewport")
+  viewport: document.querySelector("#vizicities-viewport"),
+  layersUI: true
   // center: new VIZI.LatLon(40.01000594412381, -105.2727379358738) // Collada
 });
 

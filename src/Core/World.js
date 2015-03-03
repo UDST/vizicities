@@ -19,7 +19,8 @@
       crs: VIZI.CRS.EPSG3857,
       center: new VIZI.LatLon(51.50358, -0.01924),
       zoom: 16,
-      suppressRenderer: false // Set true for tests
+      suppressRenderer: false, // Set true for tests
+      layersUI: true
     });
 
     if (!self.options.viewport) {
@@ -45,8 +46,9 @@
     self.options.viewport.appendChild(uiContainer);
 
     // Set up layer UI
-    // TODO: Make this togglable via an option 
-    self.layersUI = new VIZI.LayersUI(self.layers);
+    if (self.options.layersUI) {
+      self.layersUI = new VIZI.LayersUI(self.layers);
+    }
 
     // TODO: Ability to override this with a scene passed into the options
     // TODO: Pass-through options that tweak scene (antialias, etc)
@@ -128,7 +130,9 @@
     self.scene.add(layer.object);
 
     // Update layers UI
-    self.layersUI.onChange();
+    if (self.layersUI) {
+      self.layersUI.onChange();
+    }
   };
 
   VIZI.World.prototype.addSwitchboard = function(switchboard) {
