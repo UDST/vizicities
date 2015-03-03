@@ -18,6 +18,7 @@
     self.layer = layer;
     self.scale = scale || [];
     self.hidden = false;
+    self.closed = false;
 
     // Check that key UI container exists
     if (!document.querySelector(".vizicities-ui .vizicities-key-ui")) {
@@ -44,13 +45,15 @@
         });
 
         var className = "vizicities-ui-item vizicities-key-ui-item";
+        className += (scope.closed) ? " closed" : "";
+
         var containerStyle = {
           display: (scope.hidden) ? "none" : "block"
         }
         
         return (
           <section className={className} style={containerStyle}>
-            <header>
+            <header onClick={self.props.onToggleClosed.bind(scope)}>
               <h2>{scope.layer.name} key</h2>
             </header>
             <ul>
@@ -76,11 +79,18 @@
     self.onChange();
   };
 
+  VIZI.KeyUIColourScale.prototype.onToggleClosed = function() {
+    var self = this;
+    
+    self.closed = (self.closed) ? false : true;
+    self.onChange();
+  };
+
   VIZI.KeyUIColourScale.prototype.onChange = function() {
     var self = this;
 
     var Key = self.key;
 
-    React.render(<Key scale={self.scale} />, document.querySelector(".vizicities-key-ui"));
+    React.render(<Key scale={self.scale} onToggleClosed={self.onToggleClosed} />, document.querySelector(".vizicities-key-ui"));
   };
 })();

@@ -16,6 +16,7 @@
     var scope = self;
 
     self.layers = layers;
+    self.closed = false;
 
     // Check that UI container exists
     if (!document.querySelector(".vizicities-ui .vizicities-layers-ui")) {
@@ -44,10 +45,13 @@
             </li>
           );
         });
+
+        var className = "vizicities-ui-item vizicities-layers-ui-item";
+        className += (scope.closed) ? " closed" : "";
         
         return (
-          <section className="vizicities-ui-item vizicities-layers-ui-item">
-            <header>
+          <section className={className}>
+            <header onClick={self.props.onToggleClosed.bind(scope)}>
               <h2>Layers</h2>
             </header>
             <ul>
@@ -91,11 +95,18 @@
     self.onChange();
   };
 
+  VIZI.LayersUI.prototype.onToggleClosed = function() {
+    var self = this;
+    
+    self.closed = (self.closed) ? false : true;
+    self.onChange();
+  };
+
   VIZI.LayersUI.prototype.onChange = function() {
     var self = this;
 
     var LayerControl = self.layerControl;
 
-    React.render(<LayerControl layers={self.layers} onHide={self.onHideLayer} onShow={self.onShowLayer} />, document.querySelector(".vizicities-layers-ui"));
+    React.render(<LayerControl layers={self.layers} onHide={self.onHideLayer} onShow={self.onShowLayer} onToggleClosed={self.onToggleClosed} />, document.querySelector(".vizicities-layers-ui"));
   };
 })();

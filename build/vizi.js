@@ -7398,6 +7398,8 @@ if (typeof window === undefined) {
 
     _.defaults(options, {});
 
+    self.closed = false;
+
     // Check that UI container exists
     if (!document.querySelector(".vizicities-ui .vizicities-description-ui")) {
       var container = document.createElement("section");
@@ -7409,10 +7411,13 @@ if (typeof window === undefined) {
     self.description = React.createClass({displayName: "description",
       render: function() {
         var self = this;
+
+        var className = "vizicities-ui-item vizicities-description-ui-item";
+        className += (scope.closed) ? " closed" : "";
           
         return (
-          React.createElement("section", {className: "vizicities-ui-item vizicities-description-ui-item"}, 
-            React.createElement("header", null, 
+          React.createElement("section", {className: className}, 
+            React.createElement("header", {onClick: self.props.onToggleClosed.bind(scope)}, 
               React.createElement("h2", null, self.props.title)
             ), 
             React.createElement("p", null, self.props.body)
@@ -7424,12 +7429,19 @@ if (typeof window === undefined) {
     self.onChange();
   };
 
+  VIZI.DescriptionUI.prototype.onToggleClosed = function() {
+    var self = this;
+    
+    self.closed = (self.closed) ? false : true;
+    self.onChange();
+  };
+
   VIZI.DescriptionUI.prototype.onChange = function() {
     var self = this;
 
     var Description = self.description;
 
-    React.render(React.createElement(Description, {title: self.options.title, body: self.options.body}), document.querySelector(".vizicities-description-ui"));
+    React.render(React.createElement(Description, {title: self.options.title, body: self.options.body, onToggleClosed: self.onToggleClosed}), document.querySelector(".vizicities-description-ui"));
   };
 })();
 /* globals window, _, React, VIZI */
@@ -7554,6 +7566,7 @@ if (typeof window === undefined) {
     self.layer = layer;
     self.scale = scale || [];
     self.hidden = false;
+    self.closed = false;
 
     // Check that key UI container exists
     if (!document.querySelector(".vizicities-ui .vizicities-key-ui")) {
@@ -7580,13 +7593,15 @@ if (typeof window === undefined) {
         });
 
         var className = "vizicities-ui-item vizicities-key-ui-item";
+        className += (scope.closed) ? " closed" : "";
+
         var containerStyle = {
           display: (scope.hidden) ? "none" : "block"
         }
         
         return (
           React.createElement("section", {className: className, style: containerStyle}, 
-            React.createElement("header", null, 
+            React.createElement("header", {onClick: self.props.onToggleClosed.bind(scope)}, 
               React.createElement("h2", null, scope.layer.name, " key")
             ), 
             React.createElement("ul", null, 
@@ -7612,12 +7627,19 @@ if (typeof window === undefined) {
     self.onChange();
   };
 
+  VIZI.KeyUIColourScale.prototype.onToggleClosed = function() {
+    var self = this;
+    
+    self.closed = (self.closed) ? false : true;
+    self.onChange();
+  };
+
   VIZI.KeyUIColourScale.prototype.onChange = function() {
     var self = this;
 
     var Key = self.key;
 
-    React.render(React.createElement(Key, {scale: self.scale}), document.querySelector(".vizicities-key-ui"));
+    React.render(React.createElement(Key, {scale: self.scale, onToggleClosed: self.onToggleClosed}), document.querySelector(".vizicities-key-ui"));
   };
 })();
 /* globals window, _, React, VIZI */
@@ -7638,6 +7660,7 @@ if (typeof window === undefined) {
     var scope = self;
 
     self.layers = layers;
+    self.closed = false;
 
     // Check that UI container exists
     if (!document.querySelector(".vizicities-ui .vizicities-layers-ui")) {
@@ -7666,10 +7689,13 @@ if (typeof window === undefined) {
             )
           );
         });
+
+        var className = "vizicities-ui-item vizicities-layers-ui-item";
+        className += (scope.closed) ? " closed" : "";
         
         return (
-          React.createElement("section", {className: "vizicities-ui-item vizicities-layers-ui-item"}, 
-            React.createElement("header", null, 
+          React.createElement("section", {className: className}, 
+            React.createElement("header", {onClick: self.props.onToggleClosed.bind(scope)}, 
               React.createElement("h2", null, "Layers")
             ), 
             React.createElement("ul", null, 
@@ -7713,12 +7739,19 @@ if (typeof window === undefined) {
     self.onChange();
   };
 
+  VIZI.LayersUI.prototype.onToggleClosed = function() {
+    var self = this;
+    
+    self.closed = (self.closed) ? false : true;
+    self.onChange();
+  };
+
   VIZI.LayersUI.prototype.onChange = function() {
     var self = this;
 
     var LayerControl = self.layerControl;
 
-    React.render(React.createElement(LayerControl, {layers: self.layers, onHide: self.onHideLayer, onShow: self.onShowLayer}), document.querySelector(".vizicities-layers-ui"));
+    React.render(React.createElement(LayerControl, {layers: self.layers, onHide: self.onHideLayer, onShow: self.onShowLayer, onToggleClosed: self.onToggleClosed}), document.querySelector(".vizicities-layers-ui"));
   };
 })();
 /* globals window, _, VIZI */

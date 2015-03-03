@@ -19,6 +19,8 @@
 
     _.defaults(options, {});
 
+    self.closed = false;
+
     // Check that UI container exists
     if (!document.querySelector(".vizicities-ui .vizicities-description-ui")) {
       var container = document.createElement("section");
@@ -30,10 +32,13 @@
     self.description = React.createClass({
       render: function() {
         var self = this;
+
+        var className = "vizicities-ui-item vizicities-description-ui-item";
+        className += (scope.closed) ? " closed" : "";
           
         return (
-          <section className="vizicities-ui-item vizicities-description-ui-item">
-            <header>
+          <section className={className}>
+            <header onClick={self.props.onToggleClosed.bind(scope)}>
               <h2>{self.props.title}</h2>
             </header>
             <p>{self.props.body}</p>
@@ -45,11 +50,18 @@
     self.onChange();
   };
 
+  VIZI.DescriptionUI.prototype.onToggleClosed = function() {
+    var self = this;
+    
+    self.closed = (self.closed) ? false : true;
+    self.onChange();
+  };
+
   VIZI.DescriptionUI.prototype.onChange = function() {
     var self = this;
 
     var Description = self.description;
 
-    React.render(<Description title={self.options.title} body={self.options.body} />, document.querySelector(".vizicities-description-ui"));
+    React.render(<Description title={self.options.title} body={self.options.body} onToggleClosed={self.onToggleClosed} />, document.querySelector(".vizicities-description-ui"));
   };
 })();
