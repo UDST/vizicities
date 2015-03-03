@@ -7186,6 +7186,17 @@ if (typeof window === undefined) {
     self.object.remove(object);
   };
 
+  // UI handlers
+  VIZI.Layer.prototype.hide = function() {
+    var self = this;
+    self.object.visible = false;
+  };
+
+  VIZI.Layer.prototype.show = function() {
+    var self = this;
+    self.object.visible = true;
+  };
+
   VIZI.Layer.prototype.applyVertexColors = function( geom, colour ) {
     geom.faces.forEach( function( f ) {
       var n = ( f instanceof THREE.Face3 ) ? 3 : 4;
@@ -7407,7 +7418,7 @@ if (typeof window === undefined) {
     });
     
     if (layer) {
-      layer.object.visible = false;
+      layer.hide();
       layer.hidden = true;
     }
     
@@ -7422,7 +7433,7 @@ if (typeof window === undefined) {
     });
     
     if (layer) {
-      layer.object.visible = true;
+      layer.show();
       layer.hidden = false;
     }
     

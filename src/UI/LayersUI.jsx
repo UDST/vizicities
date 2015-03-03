@@ -61,7 +61,7 @@
     });
     
     if (layer) {
-      layer.object.visible = false;
+      layer.hide();
       layer.hidden = true;
     }
     
@@ -76,7 +76,7 @@
     });
     
     if (layer) {
-      layer.object.visible = true;
+      layer.show();
       layer.hidden = false;
     }
     
