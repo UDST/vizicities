@@ -6782,6 +6782,23 @@ if (typeof window === undefined) {
 
     self.camera.lookAt(point);
   };
+
+  // From: http://stackoverflow.com/a/27412386/997339
+  VIZI.World.prototype.worldPositionTo2D = function(position) {
+    var self = this;
+
+    var vector3 = position.clone();
+
+    // Map to normalized device coordinate (NDC) space
+    vector3.project(self.camera.camera);
+
+    // Map to 2D screen space
+    var position2D = new VIZI.Point();
+    position2D.x = Math.round((vector3.x + 1) * self.options.viewport.clientWidth / 2),
+    position2D.y = Math.round((-vector3.y + 1) * self.options.viewport.clientHeight / 2);
+    
+    return position2D;
+  };
 })();
 /* globals window, _, VIZI, proj4 */
 
@@ -7354,6 +7371,93 @@ if (typeof window === undefined) {
   };
 
   VIZI.Controls.prototype = Object.create( VIZI.EventEmitter.prototype );
+})();
+/* globals window, _, React, VIZI */
+
+/**
+ * 2D info UI class
+ * @author Robin Hawkes - vizicities.com
+ */
+
+// TODO: Sort out scoping issues
+// TODO: Work out a neater structure for defining the render method
+
+(function() {
+  "use strict";
+
+  VIZI.InfoUI2D = function(world) {
+    var self = this;
+    var scope = self;
+
+    self.world = world;
+
+    // Check that 2D info UI container exists
+    if (!document.querySelector(".vizicities-ui .vizicities-info-ui-2d")) {
+      var infoUIContainer = document.createElement("section");
+      infoUIContainer.classList.add("vizicities-info-ui-2d");
+
+      document.querySelector(".vizicities-ui").appendChild(infoUIContainer);
+    }
+
+    self.panels = [];
+
+    self.infoUI = React.createClass({displayName: "infoUI",
+      render: function() {
+        var self = this;
+        
+        var panels = self.props.panels.map(function(panel) {
+          var bounds = new THREE.Box3().setFromObject(panel.object);
+          
+          var offsetPos = panel.object.position.clone();
+          offsetPos.y = bounds.max.y;
+
+          var screenPos = scope.world.worldPositionTo2D(offsetPos);
+
+          // TODO: Scale margin-top offset based on camera zoom so panel stays above the object
+          // TODO: Or, base the screen position on the top of the object bounding box
+          var style = {
+            transform: "translateX(calc(" + screenPos.x + "px - 50%)) translateY(calc(" + screenPos.y + "px - 50%))"
+          }
+
+          return (
+            React.createElement("div", {key: panel.id, style: style, className: "vizicities-info-ui-2d-layer-item"}, panel.text)
+          );
+        });
+        
+        return (
+          React.createElement("section", {className: "vizicities-info-ui-2d-layer"}, 
+            panels
+          )
+        );
+      }
+    });
+
+    self.onChange();
+  };
+
+  VIZI.InfoUI2D.prototype.addPanel = function(object, text) {
+    var self = this;
+
+    var panel = {
+      id: object.id,
+      object: object,
+      text: text
+    };
+
+    self.panels.push(panel);
+
+    self.onChange();
+
+    return panel;
+  };
+
+  VIZI.InfoUI2D.prototype.onChange = function() {
+    var self = this;
+
+    var InfoUI = self.infoUI;
+
+    React.render(React.createElement(InfoUI, {panels: self.panels}), document.querySelector(".vizicities-info-ui-2d"));
+  };
 })();
 /* globals window, _, React, VIZI */
 
@@ -8760,6 +8864,7 @@ if (typeof window === undefined) {
     self.name = self.options.name;
 
     self.world;
+    self.infoUI;
   };
 
   VIZI.BlueprintOutputCollada.prototype = Object.create( VIZI.BlueprintOutput.prototype );
@@ -8767,6 +8872,9 @@ if (typeof window === undefined) {
   // Initialise instance and start automated processes
   VIZI.BlueprintOutputCollada.prototype.init = function() {
     var self = this;
+
+    // Set up info UI
+    self.infoUI = new VIZI.InfoUI2D(self.world);
 
     self.emit("initialised");
   };
@@ -8812,9 +8920,21 @@ if (typeof window === undefined) {
         // }
 
         self.add(dae);
+
+        // Create info panel
+        self.infoUI.addPanel(dae, dae.id);
       });
     });
   };
+
+  VIZI.BlueprintOutputCollada.prototype.onTick = function(delta) {
+    var self = this;
+
+    // Update panel positions
+    // TODO: Work out how to remove the visible lag between panel position
+    // and actual scene / camera position.
+    self.infoUI.onChange();
+  }
 
   VIZI.BlueprintOutputCollada.prototype.onAdd = function(world) {
     var self = this;

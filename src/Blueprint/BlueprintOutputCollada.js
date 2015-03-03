@@ -34,6 +34,7 @@
     self.name = self.options.name;
 
     self.world;
+    self.infoUI;
   };
 
   VIZI.BlueprintOutputCollada.prototype = Object.create( VIZI.BlueprintOutput.prototype );
@@ -41,6 +42,9 @@
   // Initialise instance and start automated processes
   VIZI.BlueprintOutputCollada.prototype.init = function() {
     var self = this;
+
+    // Set up info UI
+    self.infoUI = new VIZI.InfoUI2D(self.world);
 
     self.emit("initialised");
   };
@@ -86,9 +90,21 @@
         // }
 
         self.add(dae);
+
+        // Create info panel
+        self.infoUI.addPanel(dae, dae.id);
       });
     });
   };
+
+  VIZI.BlueprintOutputCollada.prototype.onTick = function(delta) {
+    var self = this;
+
+    // Update panel positions
+    // TODO: Work out how to remove the visible lag between panel position
+    // and actual scene / camera position.
+    self.infoUI.onChange();
+  }
 
   VIZI.BlueprintOutputCollada.prototype.onAdd = function(world) {
     var self = this;

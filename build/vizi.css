@@ -23,6 +23,7 @@
 
 .vizicities-ui {
   height: 100%;
+  overflow: hidden;
   position: absolute;
   pointer-events: none;
   z-index: 9998;
@@ -102,4 +103,22 @@
       height: 10px;
       margin-right: 5px;
       width: 10px;
+    }
+
+  .vizicities-ui .vizicities-info-ui-2d-layer {}
+
+    .vizicities-ui .vizicities-info-ui-2d-layer-item {
+      background: #222;
+      border-radius: 3px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+      color: #fff;
+      font-family: Helvetica Neue, Arial, Verdana, sans-serif;
+      font-size: 12px;
+      font-weight: 200;
+      letter-spacing: 1px;
+      margin-top: -40px;
+      padding: 6px 8px;
+      position: absolute;
+      text-align: center;
+      text-transform: uppercase;
     }
