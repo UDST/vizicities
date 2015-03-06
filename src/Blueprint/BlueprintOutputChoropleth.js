@@ -161,6 +161,10 @@
       // Make choropleth element clickable
       // TODO: Should this reference the geom.id or mesh.id?
       self.world.addPickable(mesh, geom.id);
+
+      VIZI.Messenger.on("picked:" + geom.id, function() {
+        console.log("Picked:", geom.id);
+      });
     });
 
     // Move merged geom to 0,0 and return offset

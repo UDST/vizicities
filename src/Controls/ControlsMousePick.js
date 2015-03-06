@@ -64,8 +64,14 @@
 
     // Highlight picked object
     // self.options.scene.highlightPickable(id);
+
+    var ref = self.options.scene.getPickable(id);
+
+    if (!ref) {
+      return;
+    }
     
-    // TODO: Emit event with picked id (for other modules to reference from)
-    console.log("Picked:", id, self.pixelBuffer);
+    // Emit event with picked id (for other modules to reference from)
+    VIZI.Messenger.emit("picked:" + ref.id);
   };
 })();

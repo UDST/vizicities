@@ -178,6 +178,11 @@
     // TODO: Update mesh in picking scene
   };
 
+  VIZI.Scene.prototype.getPickable = function(id) {
+    var self = this;
+    return self.pickingRef[id];
+  };
+
   // VIZI.Scene.prototype.highlightPickable = function(id) {
   //   var self = this;
   //   var pick = self.pickingRef[id];

@@ -7415,6 +7415,11 @@ if (typeof window === undefined) {
     // TODO: Update mesh in picking scene
   };
 
+  VIZI.Scene.prototype.getPickable = function(id) {
+    var self = this;
+    return self.pickingRef[id];
+  };
+
   // VIZI.Scene.prototype.highlightPickable = function(id) {
   //   var self = this;
   //   var pick = self.pickingRef[id];
@@ -9101,6 +9106,10 @@ if (typeof window === undefined) {
       // Make choropleth element clickable
       // TODO: Should this reference the geom.id or mesh.id?
       self.world.addPickable(mesh, geom.id);
+
+      VIZI.Messenger.on("picked:" + geom.id, function() {
+        console.log("Picked:", geom.id);
+      });
     });
 
     // Move merged geom to 0,0 and return offset
@@ -10184,9 +10193,15 @@ if (typeof window === undefined) {
 
     // Highlight picked object
     // self.options.scene.highlightPickable(id);
+
+    var ref = self.options.scene.getPickable(id);
+
+    if (!ref) {
+      return;
+    }
     
-    // TODO: Emit event with picked id (for other modules to reference from)
-    console.log("Picked:", id, self.pixelBuffer);
+    // Emit event with picked id (for other modules to reference from)
+    VIZI.Messenger.emit("picked:" + ref.id);
   };
 })();
 /* globals window, _, VIZI, THREE */
