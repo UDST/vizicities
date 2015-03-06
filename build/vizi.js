@@ -6574,7 +6574,8 @@ if (typeof window === undefined) {
       center: new VIZI.LatLon(51.50358, -0.01924),
       zoom: 16,
       suppressRenderer: false, // Set true for tests
-      layersUI: true
+      layersUI: true,
+      picking: false
     });
 
     if (!self.options.viewport) {
@@ -6609,7 +6610,8 @@ if (typeof window === undefined) {
     self.scene = new VIZI.Scene({
       viewport: self.options.viewport,
       // TODO: Remove this when running WebGL tests on Travis is solved
-      suppressRenderer: self.options.suppressRenderer
+      suppressRenderer: self.options.suppressRenderer,
+      picking: self.options.picking
     });
 
     self.camera = self.options.camera || new VIZI.Camera({
@@ -6687,6 +6689,11 @@ if (typeof window === undefined) {
     if (self.layersUI) {
       self.layersUI.onChange();
     }
+  };
+
+  VIZI.World.prototype.addPickable = function(mesh, id) {
+    var self = this;
+    self.scene.addPickable(mesh, id);
   };
 
   VIZI.World.prototype.addSwitchboard = function(switchboard) {
@@ -7248,7 +7255,8 @@ if (typeof window === undefined) {
     _.defaults(self.options, {
       antialias: false,
       fogColour: 0xffffff,
-      suppressRenderer: false
+      suppressRenderer: false,
+      picking: false
     });
 
     if (!self.options.viewport) {
@@ -7257,6 +7265,47 @@ if (typeof window === undefined) {
 
     self.scene = self.createScene();
     self.renderer = self.createRenderer();
+
+    self.pickingScene;
+    self.pickingTexture;
+    self.pickingMaterial;
+    self.pickingGeom;
+    self.pickingMesh;
+    self.pickingColourID;
+    self.pickingColour;
+    self.pickingRef;
+    // self.pickingHighlightScene;
+    // self.pickingHighlightMaterial;
+    // self.pickingHighlightMesh;
+    
+    if (self.options.picking) {
+      self.pickingScene = new THREE.Scene();
+      
+      self.pickingTexture = new THREE.WebGLRenderTarget(self.options.viewport.clientWidth, self.options.viewport.clientHeight);
+      self.pickingTexture.generateMipmaps = false;
+
+      self.pickingMaterial = new THREE.MeshBasicMaterial({
+        vertexColors: THREE.VertexColors,
+        // TODO: Remove reliance on making things double-sided to make up for meshes created with incorrect wising
+        side: THREE.DoubleSide
+      });
+
+      self.pickingGeom = new THREE.Geometry();
+      self.pickingMesh;
+
+      // self.pickingHighlightScene = new THREE.Scene();
+      // self.pickingHighlightMaterial = new THREE.MeshBasicMaterial({
+      //   color: 0xff0000,
+      //   depthWrite: false,
+      //   // TODO: Remove reliance on making things double-sided to make up for meshes created with incorrect wising
+      //   side: THREE.DoubleSide
+      // });
+      
+      // Start at 1 because default pixel value is 0 (black)
+      self.pickingColourID = 1;
+      self.pickingColour = new THREE.Color();
+      self.pickingRef = {};
+    }
   };
 
   VIZI.Scene.prototype.createScene = function() {
@@ -7327,6 +7376,65 @@ if (typeof window === undefined) {
     self.scene.add(object);
   };
 
+  VIZI.Scene.prototype.addPickable = function(mesh, id) {
+    var self = this;
+    
+    // Generate unique colour
+    self.pickingColour.setHex(self.pickingColourID);
+
+    // Apply colour to geom
+    // TODO: Does this cause issues with anything else using the geom reference?
+    self.applyVertexColors(mesh.geometry, self.pickingColour);
+
+    // Remove mesh from picking scene
+    self.pickingScene.remove(self.pickingMesh);
+
+    // Add geom to merged geom
+    self.pickingGeom.merge(mesh.geometry, mesh.matrix);
+
+    // Store reference to id and colour
+    self.pickingRef[self.pickingColourID] = {
+      id: id,
+      mesh: mesh
+    };
+
+    self.pickingMesh = new THREE.Mesh(self.pickingGeom, self.pickingMaterial);
+
+    // Update mesh in picking scene
+    self.pickingScene.add(self.pickingMesh);
+
+    // Increment picking colour ID
+    self.pickingColourID++;
+  };
+
+  VIZI.Scene.prototype.removePickable = function(id) {
+    var self = this;
+
+    // TODO: Remove pickable geom from merged geom
+    // TODO: Remove reference to id and colour
+    // TODO: Update mesh in picking scene
+  };
+
+  // VIZI.Scene.prototype.highlightPickable = function(id) {
+  //   var self = this;
+  //   var pick = self.pickingRef[id];
+
+  //   if (!pick) {
+  //     return;
+  //   }
+
+  //   if (self.pickingHighlightMesh) {
+  //     self.pickingHighlightScene.remove(self.pickingHighlightMesh);
+  //   }
+
+  //   self.pickingHighlightMesh = new THREE.Mesh(pick.mesh.geometry, self.pickingHighlightMaterial);
+  //   self.pickingHighlightMesh.position.copy(pick.mesh.position);
+  //   self.pickingHighlightMesh.rotation.copy(pick.mesh.rotation);
+  //   self.pickingHighlightMesh.scale.copy(pick.mesh.scale);
+    
+  //   self.pickingHighlightScene.add(self.pickingHighlightMesh);
+  // };
+
   VIZI.Scene.prototype.remove = function(object) {
     var self = this;
     self.scene.remove(object);
@@ -7343,12 +7451,56 @@ if (typeof window === undefined) {
       throw new Error("Camera is required for render");
     }
 
+    // self.renderer.autoClear = false;
+
     self.renderer.render(self.scene, camera.camera);
+    // self.renderer.render(self.pickingScene, camera.camera);
+    // self.renderer.clearDepth();
+    // self.renderPickingHighlight(camera);
   };
 
+  VIZI.Scene.prototype.renderPicking = function(camera) {
+    var self = this;
+
+    if (!self.pickingScene) {
+      throw new Error("Picking scene is required for render");
+    }
+
+    if (!camera) {
+      throw new Error("Camera is required for render");
+    }
+
+    self.renderer.render(self.pickingScene, camera.camera, self.pickingTexture);
+  };
+
+  // VIZI.Scene.prototype.renderPickingHighlight = function(camera) {
+  //   var self = this;
+
+  //   if (!self.pickingHighlightScene) {
+  //     throw new Error("Picking highlight scene is required for render");
+  //   }
+
+  //   if (!camera) {
+  //     throw new Error("Camera is required for render");
+  //   }
+
+  //   self.renderer.render(self.pickingHighlightScene, camera.camera);
+  // };
+
+  // TODO: Update picking scene on resize
   VIZI.Scene.prototype.resize = function(width, height) {
     var self = this;
     self.renderer.setSize(width, height);
+  };
+
+  // TODO: This is duplicated from VIZI.Layer, find a way to merge
+  VIZI.Scene.prototype.applyVertexColors = function( geom, colour ) {
+    geom.faces.forEach( function( f ) {
+      var n = ( f instanceof THREE.Face3 ) ? 3 : 4;
+      for( var j = 0; j < n; j ++ ) {
+        f.vertexColors[ j ] = colour;
+      }
+    } );
   };
 })();
 /* globals window, _, VIZI */
@@ -8945,6 +9097,10 @@ if (typeof window === undefined) {
 
       mesh.matrixAutoUpdate && mesh.updateMatrix();
       combinedGeom.merge(mesh.geometry, mesh.matrix);
+
+      // Make choropleth element clickable
+      // TODO: Should this reference the geom.id or mesh.id?
+      self.world.addPickable(mesh, geom.id);
     });
 
     // Move merged geom to 0,0 and return offset
@@ -9960,6 +10116,77 @@ if (typeof window === undefined) {
   VIZI.ControlsMap.prototype.onTick = function(delta) {
     var self = this;
     self.controls.update(delta);
+  };
+})();
+/* globals window, _, VIZI */
+
+/**
+ * Mouse picking controls class
+ * @author Robin Hawkes - vizicities.com
+ */
+
+(function() {
+  "use strict";
+
+  VIZI.ControlsMousePick = function(camera, options) {
+    var self = this;
+
+    VIZI.Controls.call(self, camera, options);
+
+    if (!self.options.scene) {
+      throw new Error("Required scene option missing");
+    }
+
+    self.camera = camera;
+    self.pixelBuffer = new Uint8Array(4);
+
+    self.options.scene.options.viewport.addEventListener("click", self.onMouseClick.bind(self), false);
+  };
+
+  VIZI.ControlsMousePick.prototype = Object.create( VIZI.Controls.prototype );
+
+  VIZI.ControlsMousePick.prototype.onMouseClick = function(event) {
+    var self = this;
+
+    event.preventDefault();
+
+    var screenPos = new VIZI.Point(event.clientX, event.clientY);
+    var viewportOffset = new VIZI.Point(
+      self.options.scene.options.viewport.offsetLeft,
+      self.options.scene.options.viewport.offsetTop
+    );
+
+    var relativePos = screenPos.subtract(viewportOffset);
+
+    self.pick(relativePos);
+  };
+
+  // TODO: Fix issue where ID is being picked up even when clicking outside of objects within scene
+  VIZI.ControlsMousePick.prototype.pick = function(pos) {
+    var self = this;
+
+    if (!pos) {
+      console.log("No position given for picking");
+      return;
+    }
+
+    // Render picking scene
+    self.options.scene.renderPicking(self.camera);
+
+    // Get the gl buffer
+    var gl = self.options.scene.renderer.getContext();
+
+    // Read pixel under the mouse into buffer
+    gl.readPixels(pos.x, self.options.scene.pickingTexture.height - pos.y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, self.pixelBuffer);
+
+    // Get picked object
+    var id = (self.pixelBuffer[0] << 16) | (self.pixelBuffer[1] << 8) | (self.pixelBuffer[2]);
+
+    // Highlight picked object
+    // self.options.scene.highlightPickable(id);
+    
+    // TODO: Emit event with picked id (for other modules to reference from)
+    console.log("Picked:", id, self.pixelBuffer);
   };
 })();
 /* globals window, _, VIZI, THREE */

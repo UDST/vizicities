@@ -157,6 +157,10 @@
 
       mesh.matrixAutoUpdate && mesh.updateMatrix();
       combinedGeom.merge(mesh.geometry, mesh.matrix);
+
+      // Make choropleth element clickable
+      // TODO: Should this reference the geom.id or mesh.id?
+      self.world.addPickable(mesh, geom.id);
     });
 
     // Move merged geom to 0,0 and return offset

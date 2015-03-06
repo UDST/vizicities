@@ -20,7 +20,8 @@
       center: new VIZI.LatLon(51.50358, -0.01924),
       zoom: 16,
       suppressRenderer: false, // Set true for tests
-      layersUI: true
+      layersUI: true,
+      picking: false
     });
 
     if (!self.options.viewport) {
@@ -55,7 +56,8 @@
     self.scene = new VIZI.Scene({
       viewport: self.options.viewport,
       // TODO: Remove this when running WebGL tests on Travis is solved
-      suppressRenderer: self.options.suppressRenderer
+      suppressRenderer: self.options.suppressRenderer,
+      picking: self.options.picking
     });
 
     self.camera = self.options.camera || new VIZI.Camera({
@@ -133,6 +135,11 @@
     if (self.layersUI) {
       self.layersUI.onChange();
     }
+  };
+
+  VIZI.World.prototype.addPickable = function(mesh, id) {
+    var self = this;
+    self.scene.addPickable(mesh, id);
   };
 
   VIZI.World.prototype.addSwitchboard = function(switchboard) {

@@ -1,11 +1,16 @@
 var world = new VIZI.World({
   viewport: document.querySelector("#vizicities-viewport"),
-  layersUI: true
+  layersUI: true,
+  picking: true
   // center: new VIZI.LatLon(40.01000594412381, -105.2727379358738) // Collada
 });
 
 var controls = new VIZI.ControlsMap(world.camera, {
   viewport: world.options.viewport
+});
+
+var pickControls = new VIZI.ControlsMousePick(world.camera, {
+  scene: world.scene
 });
 
 var descriptionUI = new VIZI.DescriptionUI({
