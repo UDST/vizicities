@@ -120,6 +120,11 @@
       padding: 5px 15px;
     }
 
+    .vizicities-ui .vizicities-key-ui-item li.description {
+      font-size: smaller;
+      font-style: italic;
+    }
+
     .vizicities-ui .vizicities-key-ui-item li span.scale-icon {
       border-radius: 5px;
       box-shadow: 0 0 3px rgba(0, 0, 0, 0.4);

@@ -16,7 +16,7 @@
     var scope = self;
 
     self.layers = layers;
-    self.closed = false;
+    self.closed = true;
 
     // Check that UI container exists
     if (!document.querySelector(".vizicities-ui .vizicities-layers-ui")) {

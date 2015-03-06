@@ -17,6 +17,7 @@
 
     self.layer = layer;
     self.scale = scale || [];
+    self.description = layer.description || "";
     self.hidden = false;
     self.closed = false;
 
@@ -50,6 +51,11 @@
         var containerStyle = {
           display: (scope.hidden) ? "none" : "block"
         }
+
+        var description;
+        if (self.props.description) {
+          description = <li className="description">{self.props.description}</li>;
+        }
         
         return (
           <section className={className} style={containerStyle}>
@@ -57,6 +63,7 @@
               <h2>{scope.layer.name} key</h2>
             </header>
             <ul>
+              {description}
               {scale}
             </ul>
           </section>
@@ -91,6 +98,6 @@
 
     var Key = self.key;
 
-    React.render(<Key scale={self.scale} onToggleClosed={self.onToggleClosed} />, document.querySelector(".vizicities-key-ui"));
+    React.render(<Key scale={self.scale} description={self.description} onToggleClosed={self.onToggleClosed} />, document.querySelector(".vizicities-key-ui"));
   };
 })();
