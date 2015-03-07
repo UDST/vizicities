@@ -20,10 +20,38 @@
     self.camera = camera;
     self.pixelBuffer = new Uint8Array(4);
 
+    self.options.scene.options.viewport.addEventListener("mousemove", self.onMouseMove.bind(self), false);
     self.options.scene.options.viewport.addEventListener("click", self.onMouseClick.bind(self), false);
   };
 
   VIZI.ControlsMousePick.prototype = Object.create( VIZI.Controls.prototype );
+
+  // TODO: Is this called less on mousemove than it would be on each tick?
+  // If not, either move to each tick (and be called when not needed), or
+  // set a minimum amount of time to pass before re-picking on move (eg. 100ms)
+  VIZI.ControlsMousePick.prototype.onMouseMove = function(event) {
+    var self = this;
+
+    event.preventDefault();
+
+    var screenPos = new VIZI.Point(event.clientX, event.clientY);
+    var viewportOffset = new VIZI.Point(
+      self.options.scene.options.viewport.offsetLeft,
+      self.options.scene.options.viewport.offsetTop
+    );
+
+    var relativePos = screenPos.subtract(viewportOffset);
+
+    var ref = self.pick(relativePos);
+
+    if (!ref) {
+      return;
+    }
+
+    // Emit event with picked id (for other modules to reference from)
+    // TODO: Only emit if different to previous hover pick ref
+    VIZI.Messenger.emit("pick-hover:" + ref.id);
+  };
 
   VIZI.ControlsMousePick.prototype.onMouseClick = function(event) {
     var self = this;
@@ -38,7 +66,14 @@
 
     var relativePos = screenPos.subtract(viewportOffset);
 
-    self.pick(relativePos);
+    var ref = self.pick(relativePos);
+
+    if (!ref) {
+      return;
+    }
+
+    // Emit event with picked id (for other modules to reference from)
+    VIZI.Messenger.emit("pick-click:" + ref.id);
   };
 
   // TODO: Fix issue where ID is being picked up even when clicking outside of objects within scene
@@ -71,7 +106,6 @@
       return;
     }
     
-    // Emit event with picked id (for other modules to reference from)
-    VIZI.Messenger.emit("picked:" + ref.id);
+    return ref;
   };
 })();

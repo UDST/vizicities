@@ -162,8 +162,14 @@
       // TODO: Should this reference the geom.id or mesh.id?
       self.world.addPickable(mesh, geom.id);
 
-      VIZI.Messenger.on("picked:" + geom.id, function() {
-        console.log("Picked:", geom.id);
+      VIZI.Messenger.on("pick-hover:" + geom.id, function() {
+        // TODO: Do something to the choropleth when clicked
+        console.log("Hovered:", geom.id);
+      });
+
+      VIZI.Messenger.on("pick-click:" + geom.id, function() {
+        // TODO: Do something to the choropleth when clicked
+        console.log("Clicked:", geom.id);
       });
     });
 
