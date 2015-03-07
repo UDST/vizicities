@@ -9110,8 +9110,6 @@ if (typeof window === undefined) {
       self.world.addPickable(mesh, geom.id);
 
       VIZI.Messenger.on("pick-hover:" + geom.id, function() {
-        console.log("Hovered:", geom.id);
-
         self.lastPickedId = geom.id;
 
         if (self.pickedMesh) {
@@ -9138,6 +9136,12 @@ if (typeof window === undefined) {
         // console.log(pickedMesh);
 
         self.add(self.pickedMesh);
+      });
+
+      VIZI.Messenger.on("pick-off:" + geom.id, function() {
+        if (self.pickedMesh) {
+          self.remove(self.pickedMesh);
+        }
       });
 
       VIZI.Messenger.on("pick-click:" + geom.id, function() {
@@ -10168,6 +10172,8 @@ if (typeof window === undefined) {
  * @author Robin Hawkes - vizicities.com
  */
 
+ // TODO: Emit event when finished hovering a ref - "pick-off:id"?
+
 (function() {
   "use strict";
 
@@ -10210,11 +10216,19 @@ if (typeof window === undefined) {
     var ref = self.pick(relativePos);
 
     if (!ref) {
+      if (self.lastPickedIdHover) {
+        // Emit event with picked id (for other modules to reference from)
+        VIZI.Messenger.emit("pick-off:" + self.lastPickedIdHover);
+        self.lastPickedIdHover = undefined;
+      }
       return;
     }
 
     if (self.lastPickedIdHover && self.lastPickedIdHover === ref.id) {
       return;
+    } else if (self.lastPickedIdHover && self.lastPickedIdHover !== ref.id) {
+      // Emit event with picked id (for other modules to reference from)
+      VIZI.Messenger.emit("pick-off:" + self.lastPickedIdHover);      
     }
 
     // Emit event with picked id (for other modules to reference from)

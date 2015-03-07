@@ -165,8 +165,6 @@
       self.world.addPickable(mesh, geom.id);
 
       VIZI.Messenger.on("pick-hover:" + geom.id, function() {
-        console.log("Hovered:", geom.id);
-
         self.lastPickedId = geom.id;
 
         if (self.pickedMesh) {
@@ -193,6 +191,12 @@
         // console.log(pickedMesh);
 
         self.add(self.pickedMesh);
+      });
+
+      VIZI.Messenger.on("pick-off:" + geom.id, function() {
+        if (self.pickedMesh) {
+          self.remove(self.pickedMesh);
+        }
       });
 
       VIZI.Messenger.on("pick-click:" + geom.id, function() {

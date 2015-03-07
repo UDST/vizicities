@@ -49,11 +49,19 @@
     var ref = self.pick(relativePos);
 
     if (!ref) {
+      if (self.lastPickedIdHover) {
+        // Emit event with picked id (for other modules to reference from)
+        VIZI.Messenger.emit("pick-off:" + self.lastPickedIdHover);
+        self.lastPickedIdHover = undefined;
+      }
       return;
     }
 
     if (self.lastPickedIdHover && self.lastPickedIdHover === ref.id) {
       return;
+    } else if (self.lastPickedIdHover && self.lastPickedIdHover !== ref.id) {
+      // Emit event with picked id (for other modules to reference from)
+      VIZI.Messenger.emit("pick-off:" + self.lastPickedIdHover);      
     }
 
     // Emit event with picked id (for other modules to reference from)
