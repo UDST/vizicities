@@ -39,6 +39,8 @@
 
     self.world;
     self.keyUI;
+
+    self.pickedMesh;
   };
 
   VIZI.BlueprintOutputChoropleth.prototype = Object.create( VIZI.BlueprintOutput.prototype );
@@ -163,8 +165,34 @@
       self.world.addPickable(mesh, geom.id);
 
       VIZI.Messenger.on("pick-hover:" + geom.id, function() {
-        // TODO: Do something to the choropleth when clicked
         console.log("Hovered:", geom.id);
+
+        self.lastPickedId = geom.id;
+
+        if (self.pickedMesh) {
+          self.remove(self.pickedMesh);
+        }
+
+        self.pickedMesh = new THREE.Mesh(geom, new THREE.MeshBasicMaterial({
+          color: 0xff0000,
+          // TODO: Remove this by implementing logic to make points clockwise
+          side: THREE.BackSide,
+          depthWrite: false,
+          transparent: true
+        }));
+
+        self.pickedMesh.position.copy(mesh.position);
+
+        self.pickedMesh.rotation.copy(mesh.rotation);
+        self.pickedMesh.scale.copy(mesh.scale);
+
+        self.pickedMesh.renderDepth = -1.1 * self.options.layer;
+
+        self.pickedMesh.matrixAutoUpdate && self.pickedMesh.updateMatrix();
+
+        // console.log(pickedMesh);
+
+        self.add(self.pickedMesh);
       });
 
       VIZI.Messenger.on("pick-click:" + geom.id, function() {

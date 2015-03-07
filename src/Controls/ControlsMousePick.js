@@ -5,6 +5,8 @@
  * @author Robin Hawkes - vizicities.com
  */
 
+ // TODO: Emit event when finished hovering a ref - "pick-off:id"?
+
 (function() {
   "use strict";
 
@@ -19,6 +21,8 @@
 
     self.camera = camera;
     self.pixelBuffer = new Uint8Array(4);
+
+    self.lastPickedIdHover;
 
     self.options.scene.options.viewport.addEventListener("mousemove", self.onMouseMove.bind(self), false);
     self.options.scene.options.viewport.addEventListener("click", self.onMouseClick.bind(self), false);
@@ -48,9 +52,14 @@
       return;
     }
 
+    if (self.lastPickedIdHover && self.lastPickedIdHover === ref.id) {
+      return;
+    }
+
     // Emit event with picked id (for other modules to reference from)
-    // TODO: Only emit if different to previous hover pick ref
     VIZI.Messenger.emit("pick-hover:" + ref.id);
+
+    self.lastPickedIdHover = ref.id;
   };
 
   VIZI.ControlsMousePick.prototype.onMouseClick = function(event) {
