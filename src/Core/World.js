@@ -139,6 +139,11 @@
 
   VIZI.World.prototype.addPickable = function(mesh, id) {
     var self = this;
+
+    if (!self.options.picking) {
+      return;
+    }
+
     self.scene.addPickable(mesh, id);
   };
 

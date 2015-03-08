@@ -6693,6 +6693,11 @@ if (typeof window === undefined) {
 
   VIZI.World.prototype.addPickable = function(mesh, id) {
     var self = this;
+
+    if (!self.options.picking) {
+      return;
+    }
+
     self.scene.addPickable(mesh, id);
   };
 
@@ -7370,6 +7375,10 @@ if (typeof window === undefined) {
 
   VIZI.Scene.prototype.addPickable = function(mesh, id) {
     var self = this;
+
+    if (!self.options.picking) {
+      return;
+    }
     
     // Generate unique colour
     self.pickingColour.setHex(self.pickingColourID);
@@ -7402,6 +7411,10 @@ if (typeof window === undefined) {
   VIZI.Scene.prototype.removePickable = function(id) {
     var self = this;
 
+    if (!self.options.picking) {
+      return;
+    }
+
     // TODO: Remove pickable geom from merged geom
     // TODO: Remove reference to id and colour
     // TODO: Update mesh in picking scene
@@ -7409,6 +7422,11 @@ if (typeof window === undefined) {
 
   VIZI.Scene.prototype.getPickable = function(id) {
     var self = this;
+
+    if (!self.options.picking) {
+      return;
+    }
+
     return self.pickingRef[id];
   };
 
@@ -7433,6 +7451,10 @@ if (typeof window === undefined) {
 
   VIZI.Scene.prototype.renderPicking = function(camera) {
     var self = this;
+
+    if (!self.options.picking) {
+      return;
+    }
 
     if (!self.pickingScene) {
       throw new Error("Picking scene is required for render");
@@ -10137,8 +10159,6 @@ if (typeof window === undefined) {
  * Mouse picking controls class
  * @author Robin Hawkes - vizicities.com
  */
-
- // TODO: Emit event when finished hovering a ref - "pick-off:id"?
 
 (function() {
   "use strict";

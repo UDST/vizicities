@@ -130,6 +130,10 @@
 
   VIZI.Scene.prototype.addPickable = function(mesh, id) {
     var self = this;
+
+    if (!self.options.picking) {
+      return;
+    }
     
     // Generate unique colour
     self.pickingColour.setHex(self.pickingColourID);
@@ -162,6 +166,10 @@
   VIZI.Scene.prototype.removePickable = function(id) {
     var self = this;
 
+    if (!self.options.picking) {
+      return;
+    }
+
     // TODO: Remove pickable geom from merged geom
     // TODO: Remove reference to id and colour
     // TODO: Update mesh in picking scene
@@ -169,6 +177,11 @@
 
   VIZI.Scene.prototype.getPickable = function(id) {
     var self = this;
+
+    if (!self.options.picking) {
+      return;
+    }
+
     return self.pickingRef[id];
   };
 
@@ -193,6 +206,10 @@
 
   VIZI.Scene.prototype.renderPicking = function(camera) {
     var self = this;
+
+    if (!self.options.picking) {
+      return;
+    }
 
     if (!self.pickingScene) {
       throw new Error("Picking scene is required for render");
