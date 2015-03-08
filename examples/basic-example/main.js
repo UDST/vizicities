@@ -172,6 +172,7 @@ var choroplethConfig = {
     options: {
       colourRange: ["#ffffe5","#f7fcb9","#d9f0a3","#addd8e","#78c679","#41ab5d","#238443","#006837","#004529"],
       layer: 100,
+      infoUI: true,
       description: "Number of people per hectare"
     }
   },

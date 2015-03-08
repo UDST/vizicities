@@ -26,6 +26,7 @@
       colourRange: ["#ffffe5","#f7fcb9","#d9f0a3","#addd8e","#78c679","#41ab5d","#238443","#006837","#004529"],
       layer: 10,
       keyUI: true,
+      infoUI: false,
       name: "Choropleth"
     });
 
@@ -42,8 +43,10 @@
 
     self.world;
     self.keyUI;
+    self.infoUI;
 
     self.pickedMesh;
+    self.lastPickedIdClick;
   };
 
   VIZI.BlueprintOutputChoropleth.prototype = Object.create( VIZI.BlueprintOutput.prototype );
@@ -55,6 +58,11 @@
     // Set up key UI
     if (self.options.keyUI) {
       self.keyUI = new VIZI.KeyUIColourScale(self);
+    }
+
+    // Set up info UI
+    if (self.options.infoUI) {
+      self.infoUI = new VIZI.InfoUI2D(self.world);
     }
 
     self.emit("initialised");
@@ -173,13 +181,13 @@
           return;
         }
 
-        self.lastPickedId = geom.id;
-
         if (self.pickedMesh) {
           self.remove(self.pickedMesh);
         }
 
-        self.pickedMesh = new THREE.Mesh(geom, new THREE.MeshBasicMaterial({
+        var geomCopy = geom.clone();
+
+        self.pickedMesh = new THREE.Mesh(geomCopy, new THREE.MeshBasicMaterial({
           color: 0xff0000,
           // TODO: Remove this by implementing logic to make points clockwise
           side: THREE.BackSide,
@@ -187,7 +195,21 @@
           transparent: true
         }));
 
-        self.pickedMesh.position.copy(mesh.position);
+        var offset = geomCopy.center();
+
+        // Use previously calculated offset to return merged mesh to correct position
+        // This allows frustum culling to work correctly
+        self.pickedMesh.position.x = -1 * offset.x;
+
+        // Removed for scale center to be correct
+        // Offset with applyMatrix above
+        self.pickedMesh.position.y = -1 * offset.z;
+
+        // TODO: Why is Y the Z offset here?
+        // Is it because the choropleth objects are flipped at 90 degrees?
+        self.pickedMesh.position.z = -1 * offset.y;
+
+        // self.pickedMesh.position.copy(mesh.position);
 
         self.pickedMesh.rotation.copy(mesh.rotation);
         self.pickedMesh.scale.copy(mesh.scale);
@@ -195,8 +217,6 @@
         self.pickedMesh.renderDepth = -1.1 * self.options.layer;
 
         self.pickedMesh.matrixAutoUpdate && self.pickedMesh.updateMatrix();
-
-        // console.log(pickedMesh);
 
         self.add(self.pickedMesh);
       });
@@ -212,9 +232,19 @@
         if (self.hidden) {
           return;
         }
-        
-        // TODO: Do something to the choropleth when clicked
-        console.log("Clicked:", geom.id);
+
+        // console.log("Clicked:", geom.id);
+
+        // Create info panel
+        if (self.infoUI) {
+          if (self.lastPickedIdClick) {
+            self.infoUI.removePanel(self.lastPickedIdClick);  
+          }
+
+          self.infoUI.addPanel(self.pickedMesh, feature.value);
+        }
+
+        self.lastPickedIdClick = self.pickedMesh.id;
       });
     });
 
@@ -248,6 +278,10 @@
     if (self.keyUI) {
       self.keyUI.onHide();
     }
+
+    if (self.infoUI) {
+      self.infoUI.onHide();
+    }
   };
 
   VIZI.BlueprintOutputChoropleth.prototype.onShow = function() {
@@ -256,7 +290,22 @@
     if (self.keyUI) {
       self.keyUI.onShow();
     }
+
+    if (self.infoUI) {
+      self.infoUI.onShow();
+    }
   };
+
+  VIZI.BlueprintOutputChoropleth.prototype.onTick = function(delta) {
+    var self = this;
+
+    // Update panel positions
+    // TODO: Work out how to remove the visible lag between panel position
+    // and actual scene / camera position.
+    if (self.infoUI) {
+      self.infoUI.onChange();
+    }
+  }
 
   VIZI.BlueprintOutputChoropleth.prototype.onAdd = function(world) {
     var self = this;

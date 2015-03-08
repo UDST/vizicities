@@ -25,14 +25,14 @@
       document.querySelector(".vizicities-ui").appendChild(infoUIContainer);
     }
 
-    self.panels = [];
+    self.panels = {};
     self.hidden = false;
 
     self.infoUI = React.createClass({
       render: function() {
         var self = this;
         
-        var panels = self.props.panels.map(function(panel) {
+        var panels = _.map(self.props.panels, function(panel) {
           var bounds = new THREE.Box3().setFromObject(panel.object);
           
           var offsetPos = panel.object.position.clone();
@@ -73,11 +73,23 @@
       text: text
     };
 
-    self.panels.push(panel);
+    self.panels[object.id] = panel;
 
     self.onChange();
 
     return panel;
+  };
+
+  VIZI.InfoUI2D.prototype.removePanel = function(id) {
+    var self = this;
+
+    if (!self.panels[id]) {
+      return;
+    }
+
+    delete self.panels[id];
+
+    self.onChange();
   };
 
   VIZI.InfoUI2D.prototype.onHide = function() {
