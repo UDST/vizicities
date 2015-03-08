@@ -5,8 +5,6 @@
  * @author Robin Hawkes - vizicities.com
  */
 
- // TODO: Emit event when finished hovering a ref - "pick-off:id"?
-
 (function() {
   "use strict";
 
