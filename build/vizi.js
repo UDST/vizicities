@@ -9166,17 +9166,22 @@ if (typeof window === undefined) {
         }
 
         // console.log("Clicked:", geom.id);
+        var pickedId;
 
         // Create info panel
         if (self.infoUI) {
           if (self.lastPickedIdClick) {
-            self.infoUI.removePanel(self.lastPickedIdClick);  
+            self.infoUI.removePanel(self.lastPickedIdClick);
+            pickedId = undefined;
           }
 
-          self.infoUI.addPanel(self.pickedMesh, feature.value);
+          if (!self.lastPickedIdClick || self.lastPickedIdClick !== self.pickedMesh.id) {
+            self.infoUI.addPanel(self.pickedMesh, feature.value);
+            pickedId = self.pickedMesh.id;
+          }
         }
 
-        self.lastPickedIdClick = self.pickedMesh.id;
+        self.lastPickedIdClick = pickedId;
       });
     });
 
