@@ -74,7 +74,6 @@
     
     if (layer) {
       layer.hide();
-      layer.hidden = true;
     }
     
     self.onChange();
@@ -89,7 +88,6 @@
     
     if (layer) {
       layer.show();
-      layer.hidden = false;
     }
     
     self.onChange();

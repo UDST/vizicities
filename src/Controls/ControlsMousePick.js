@@ -37,7 +37,8 @@
   VIZI.ControlsMousePick.prototype.onMouseMove = function(event) {
     var self = this;
 
-    event.preventDefault();
+    // Removed until proven necessary as it was interfering with layers UI 
+    //event.preventDefault();
 
     var screenPos = new VIZI.Point(event.clientX, event.clientY);
     var viewportOffset = new VIZI.Point(
@@ -74,7 +75,8 @@
   VIZI.ControlsMousePick.prototype.onMouseClick = function(event) {
     var self = this;
 
-    event.preventDefault();
+    // Removed until proven necessary as it was interfering with layers UI 
+    //event.preventDefault();
 
     var screenPos = new VIZI.Point(event.clientX, event.clientY);
     var viewportOffset = new VIZI.Point(

@@ -30,7 +30,7 @@
     self.actions = [];
 
     self.name = "";
-    self.description = options.description;
+    self.description = self.options.description;
 
     // TODO: How do you ensure the layer abides by fustrum culling when inner objects are referencing the world coordinate space
     // self.layer = new VIZI.Layer();

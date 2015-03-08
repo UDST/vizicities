@@ -7869,7 +7869,6 @@ if (typeof window === undefined) {
     
     if (layer) {
       layer.hide();
-      layer.hidden = true;
     }
     
     self.onChange();
@@ -7884,7 +7883,6 @@ if (typeof window === undefined) {
     
     if (layer) {
       layer.show();
-      layer.hidden = false;
     }
     
     self.onChange();
@@ -8550,7 +8548,7 @@ if (typeof window === undefined) {
     self.actions = [];
 
     self.name = "";
-    self.description = options.description;
+    self.description = self.options.description;
 
     // TODO: How do you ensure the layer abides by fustrum culling when inner objects are referencing the world coordinate space
     // self.layer = new VIZI.Layer();
@@ -10258,7 +10256,8 @@ if (typeof window === undefined) {
   VIZI.ControlsMousePick.prototype.onMouseMove = function(event) {
     var self = this;
 
-    event.preventDefault();
+    // Removed until proven necessary as it was interfering with layers UI 
+    //event.preventDefault();
 
     var screenPos = new VIZI.Point(event.clientX, event.clientY);
     var viewportOffset = new VIZI.Point(
@@ -10295,7 +10294,8 @@ if (typeof window === undefined) {
   VIZI.ControlsMousePick.prototype.onMouseClick = function(event) {
     var self = this;
 
-    event.preventDefault();
+    // Removed until proven necessary as it was interfering with layers UI 
+    //event.preventDefault();
 
     var screenPos = new VIZI.Point(event.clientX, event.clientY);
     var viewportOffset = new VIZI.Point(
