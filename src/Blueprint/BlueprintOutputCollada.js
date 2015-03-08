@@ -19,6 +19,7 @@
     VIZI.BlueprintOutput.call(self, options);
 
     _.defaults(self.options, {
+      infoUI: false,
       name: "Collada"
     });
 
@@ -34,6 +35,7 @@
     self.name = self.options.name;
 
     self.world;
+    self.infoUI;
   };
 
   VIZI.BlueprintOutputCollada.prototype = Object.create( VIZI.BlueprintOutput.prototype );
@@ -41,6 +43,11 @@
   // Initialise instance and start automated processes
   VIZI.BlueprintOutputCollada.prototype.init = function() {
     var self = this;
+
+    // Set up info UI
+    if (self.options.infoUI) {
+      self.infoUI = new VIZI.InfoUI2D(self.world);
+    }
 
     self.emit("initialised");
   };
@@ -86,8 +93,42 @@
         // }
 
         self.add(dae);
+
+        // Create info panel
+        // TODO: Work out a way to pass in custom text for the info panel or
+        // make it obvcious that you can only use the data avaiable.
+        if (self.infoUI) {
+          self.infoUI.addPanel(dae, dae.id);
+        }
       });
     });
+  };
+
+  VIZI.BlueprintOutputCollada.prototype.onTick = function(delta) {
+    var self = this;
+
+    // Update panel positions
+    // TODO: Work out how to remove the visible lag between panel position
+    // and actual scene / camera position.
+    if (self.infoUI) {
+      self.infoUI.onChange();
+    }
+  }
+
+  VIZI.BlueprintOutputCollada.prototype.onHide = function() {
+    var self = this;
+
+    if (self.infoUI) {
+      self.infoUI.onHide();
+    }
+  };
+
+  VIZI.BlueprintOutputCollada.prototype.onShow = function() {
+    var self = this;
+
+    if (self.infoUI) {
+      self.infoUI.onShow();
+    }
   };
 
   VIZI.BlueprintOutputCollada.prototype.onAdd = function(world) {

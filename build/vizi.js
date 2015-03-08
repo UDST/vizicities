@@ -6782,6 +6782,23 @@ if (typeof window === undefined) {
 
     self.camera.lookAt(point);
   };
+
+  // From: http://stackoverflow.com/a/27412386/997339
+  VIZI.World.prototype.worldPositionTo2D = function(position) {
+    var self = this;
+
+    var vector3 = position.clone();
+
+    // Map to normalized device coordinate (NDC) space
+    vector3.project(self.camera.camera);
+
+    // Map to 2D screen space
+    var position2D = new VIZI.Point();
+    position2D.x = Math.round((vector3.x + 1) * self.options.viewport.clientWidth / 2),
+    position2D.y = Math.round((-vector3.y + 1) * self.options.viewport.clientHeight / 2);
+    
+    return position2D;
+  };
 })();
 /* globals window, _, VIZI, proj4 */
 
@@ -7190,12 +7207,17 @@ if (typeof window === undefined) {
   VIZI.Layer.prototype.hide = function() {
     var self = this;
     self.object.visible = false;
-  };
+    self.onHide();
+  };  
 
   VIZI.Layer.prototype.show = function() {
     var self = this;
     self.object.visible = true;
+    self.onShow();
   };
+
+  VIZI.Layer.prototype.onHide = function() {};
+  VIZI.Layer.prototype.onShow = function() {};
 
   VIZI.Layer.prototype.applyVertexColors = function( geom, colour ) {
     geom.faces.forEach( function( f ) {
@@ -7358,6 +7380,108 @@ if (typeof window === undefined) {
 /* globals window, _, React, VIZI */
 
 /**
+ * 2D info UI class
+ * @author Robin Hawkes - vizicities.com
+ */
+
+// TODO: Sort out scoping issues
+// TODO: Work out a neater structure for defining the render method
+
+(function() {
+  "use strict";
+
+  VIZI.InfoUI2D = function(world) {
+    var self = this;
+    var scope = self;
+
+    self.world = world;
+
+    // Check that 2D info UI container exists
+    if (!document.querySelector(".vizicities-ui .vizicities-info-ui-2d")) {
+      var infoUIContainer = document.createElement("section");
+      infoUIContainer.classList.add("vizicities-info-ui-2d");
+
+      document.querySelector(".vizicities-ui").appendChild(infoUIContainer);
+    }
+
+    self.panels = [];
+    self.hidden = false;
+
+    self.infoUI = React.createClass({displayName: "infoUI",
+      render: function() {
+        var self = this;
+        
+        var panels = self.props.panels.map(function(panel) {
+          var bounds = new THREE.Box3().setFromObject(panel.object);
+          
+          var offsetPos = panel.object.position.clone();
+          offsetPos.y = bounds.max.y;
+
+          var screenPos = scope.world.worldPositionTo2D(offsetPos);
+
+          // TODO: Scale margin-top offset based on camera zoom so panel stays above the object
+          // TODO: Or, base the screen position on the top of the object bounding box
+          // TODO: Set z-index based on object distance from camera
+          var style = {
+            transform: "translateX(calc(" + screenPos.x + "px - 50%)) translateY(calc(" + screenPos.y + "px - 50%))",
+            display: (scope.hidden) ? "none" : "block"
+          }
+
+          return (
+            React.createElement("div", {key: panel.id, style: style, className: "vizicities-info-ui-2d-layer-item"}, panel.text)
+          );
+        });
+        
+        return (
+          React.createElement("section", {className: "vizicities-info-ui-2d-layer"}, 
+            panels
+          )
+        );
+      }
+    });
+
+    self.onChange();
+  };
+
+  VIZI.InfoUI2D.prototype.addPanel = function(object, text) {
+    var self = this;
+
+    var panel = {
+      id: object.id,
+      object: object,
+      text: text
+    };
+
+    self.panels.push(panel);
+
+    self.onChange();
+
+    return panel;
+  };
+
+  VIZI.InfoUI2D.prototype.onHide = function() {
+    var self = this;
+    self.hidden = true;
+    self.onChange();
+  };
+
+  VIZI.InfoUI2D.prototype.onShow = function() {
+    var self = this;
+    self.hidden = false;
+    self.onChange();
+  };
+
+  VIZI.InfoUI2D.prototype.onChange = function() {
+    var self = this;
+
+    var InfoUI = self.infoUI;
+
+    React.render(React.createElement(InfoUI, {panels: self.panels}), document.querySelector(".vizicities-info-ui-2d"));
+  };
+})();
+/* globals window, _, React, VIZI */
+
+/**
  * Key colour-scale UI class
  * @author Robin Hawkes - vizicities.com
  */
@@ -7374,6 +7498,7 @@ if (typeof window === undefined) {
 
     self.layer = layer;
     self.scale = scale || [];
+    self.hidden = false;
 
     // Check that key UI container exists
     if (!document.querySelector(".vizicities-ui .vizicities-key-ui")) {
@@ -7387,7 +7512,6 @@ if (typeof window === undefined) {
       render: function() {
         var self = this;
           
-        // TODO: De-dupe checkbox setup
         var scale = self.props.scale.map(function(scale) {
           var style = {
             background: scale.colour
@@ -7401,9 +7525,12 @@ if (typeof window === undefined) {
         });
 
         var className = "vizicities-ui-item vizicities-key-ui-item";
+        var containerStyle = {
+          display: (scope.hidden) ? "none" : "block"
+        }
         
         return (
-          React.createElement("section", {className: className}, 
+          React.createElement("section", {className: className, style: containerStyle}, 
             React.createElement("header", null, 
               React.createElement("h2", null, scope.layer.name, " key")
             ), 
@@ -7415,6 +7542,18 @@ if (typeof window === undefined) {
       }
     });
 
+    self.onChange();
+  };
+
+  VIZI.KeyUIColourScale.prototype.onHide = function() {
+    var self = this;
+    self.hidden = true;
+    self.onChange();
+  };
+
+  VIZI.KeyUIColourScale.prototype.onShow = function() {
+    var self = this;
+    self.hidden = false;
     self.onChange();
   };
 
@@ -8563,6 +8702,7 @@ if (typeof window === undefined) {
     _.defaults(self.options, {
       colourRange: ["#ffffe5","#f7fcb9","#d9f0a3","#addd8e","#78c679","#41ab5d","#238443","#006837","#004529"],
       layer: 10,
+      keyUI: true,
       name: "Choropleth"
     });
 
@@ -8577,10 +8717,8 @@ if (typeof window === undefined) {
 
     self.name = self.options.name;
 
-    // Set up key UI
-    self.keyUI = new VIZI.KeyUIColourScale(self);
-
     self.world;
+    self.keyUI;
   };
 
   VIZI.BlueprintOutputChoropleth.prototype = Object.create( VIZI.BlueprintOutput.prototype );
@@ -8588,6 +8726,11 @@ if (typeof window === undefined) {
   // Initialise instance and start automated processes
   VIZI.BlueprintOutputChoropleth.prototype.init = function() {
     var self = this;
+
+    // Set up key UI
+    if (self.options.keyUI) {
+      self.keyUI = new VIZI.KeyUIColourScale(self);
+    }
 
     self.emit("initialised");
   };
@@ -8644,8 +8787,10 @@ if (typeof window === undefined) {
         }
       });
 
-      self.keyUI.scale = keyScale;
-      self.keyUI.onChange();
+      if (self.keyUI) {
+        self.keyUI.scale = keyScale;
+        self.keyUI.onChange();
+      }
     }
 
     var combinedGeom = new THREE.Geometry();
@@ -8718,6 +8863,22 @@ if (typeof window === undefined) {
     self.add(combinedMesh);
   };
 
+  VIZI.BlueprintOutputChoropleth.prototype.onHide = function() {
+    var self = this;
+
+    if (self.keyUI) {
+      self.keyUI.onHide();
+    }
+  };
+
+  VIZI.BlueprintOutputChoropleth.prototype.onShow = function() {
+    var self = this;
+
+    if (self.keyUI) {
+      self.keyUI.onShow();
+    }
+  };
+
   VIZI.BlueprintOutputChoropleth.prototype.onAdd = function(world) {
     var self = this;
     self.world = world;
@@ -8745,6 +8906,7 @@ if (typeof window === undefined) {
     VIZI.BlueprintOutput.call(self, options);
 
     _.defaults(self.options, {
+      infoUI: false,
       name: "Collada"
     });
 
@@ -8760,6 +8922,7 @@ if (typeof window === undefined) {
     self.name = self.options.name;
 
     self.world;
+    self.infoUI;
   };
 
   VIZI.BlueprintOutputCollada.prototype = Object.create( VIZI.BlueprintOutput.prototype );
@@ -8767,6 +8930,11 @@ if (typeof window === undefined) {
   // Initialise instance and start automated processes
   VIZI.BlueprintOutputCollada.prototype.init = function() {
     var self = this;
+
+    // Set up info UI
+    if (self.options.infoUI) {
+      self.infoUI = new VIZI.InfoUI2D(self.world);
+    }
 
     self.emit("initialised");
   };
@@ -8812,8 +8980,42 @@ if (typeof window === undefined) {
         // }
 
         self.add(dae);
+
+        // Create info panel
+        // TODO: Work out a way to pass in custom text for the info panel or
+        // make it obvcious that you can only use the data avaiable.
+        if (self.infoUI) {
+          self.infoUI.addPanel(dae, dae.id);
+        }
       });
     });
+  };
+
+  VIZI.BlueprintOutputCollada.prototype.onTick = function(delta) {
+    var self = this;
+
+    // Update panel positions
+    // TODO: Work out how to remove the visible lag between panel position
+    // and actual scene / camera position.
+    if (self.infoUI) {
+      self.infoUI.onChange();
+    }
+  }
+
+  VIZI.BlueprintOutputCollada.prototype.onHide = function() {
+    var self = this;
+
+    if (self.infoUI) {
+      self.infoUI.onHide();
+    }
+  };
+
+  VIZI.BlueprintOutputCollada.prototype.onShow = function() {
+    var self = this;
+
+    if (self.infoUI) {
+      self.infoUI.onShow();
+    }
   };
 
   VIZI.BlueprintOutputCollada.prototype.onAdd = function(world) {

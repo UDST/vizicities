@@ -228,4 +228,21 @@
 
     self.camera.lookAt(point);
   };
+
+  // From: http://stackoverflow.com/a/27412386/997339
+  VIZI.World.prototype.worldPositionTo2D = function(position) {
+    var self = this;
+
+    var vector3 = position.clone();
+
+    // Map to normalized device coordinate (NDC) space
+    vector3.project(self.camera.camera);
+
+    // Map to 2D screen space
+    var position2D = new VIZI.Point();
+    position2D.x = Math.round((vector3.x + 1) * self.options.viewport.clientWidth / 2),
+    position2D.y = Math.round((-vector3.y + 1) * self.options.viewport.clientHeight / 2);
+    
+    return position2D;
+  };
 })();

@@ -17,6 +17,7 @@
 
     self.layer = layer;
     self.scale = scale || [];
+    self.hidden = false;
 
     // Check that key UI container exists
     if (!document.querySelector(".vizicities-ui .vizicities-key-ui")) {
@@ -30,7 +31,6 @@
       render: function() {
         var self = this;
           
-        // TODO: De-dupe checkbox setup
         var scale = self.props.scale.map(function(scale) {
           var style = {
             background: scale.colour
@@ -44,9 +44,12 @@
         });
 
         var className = "vizicities-ui-item vizicities-key-ui-item";
+        var containerStyle = {
+          display: (scope.hidden) ? "none" : "block"
+        }
         
         return (
-          <section className={className}>
+          <section className={className} style={containerStyle}>
             <header>
               <h2>{scope.layer.name} key</h2>
             </header>
@@ -58,6 +61,18 @@
       }
     });
 
+    self.onChange();
+  };
+
+  VIZI.KeyUIColourScale.prototype.onHide = function() {
+    var self = this;
+    self.hidden = true;
+    self.onChange();
+  };
+
+  VIZI.KeyUIColourScale.prototype.onShow = function() {
+    var self = this;
+    self.hidden = false;
     self.onChange();
   };
 
