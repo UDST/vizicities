@@ -5,7 +5,10 @@
 /**
  * Blueprint choropleth output
  * @author Robin Hawkes - vizicities.com
- */  
+ */
+
+  // TODO: Animate hover and off effect for picking (opacity, scale, etc)
+  // TODO: Show 2D info UI on hover or click
 
   // output: {
   //   type: "BlueprintOutputChoropleth",
