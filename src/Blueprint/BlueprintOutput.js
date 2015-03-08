@@ -18,6 +18,10 @@
 
     self.options = options || {};
 
+    _.defaults(self.options, {
+      description: ""
+    });
+
     // Triggers and actions reference (mostly for GUI hooks)
     // [{name: "triggerName", arguments: ["argName1", "argName2"]}, ...]
     self.triggers = [];
@@ -26,6 +30,7 @@
     self.actions = [];
 
     self.name = "";
+    self.description = options.description;
 
     // TODO: How do you ensure the layer abides by fustrum culling when inner objects are referencing the world coordinate space
     // self.layer = new VIZI.Layer();

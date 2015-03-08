@@ -19,6 +19,8 @@ module.exports = function(grunt) {
           "src/UI/KeyUIColourScale.js": "src/UI/KeyUIColourScale.jsx"
         }, {
           "src/UI/InfoUI2D.js": "src/UI/InfoUI2D.jsx"
+        }, {
+          "src/UI/DescriptionUI.js": "src/UI/DescriptionUI.jsx"
         }]
       }
     },
