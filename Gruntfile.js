@@ -13,9 +13,11 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON("package.json"),
     react: {
       vizicities: {
-        files: {
+        files: [{
           "src/UI/LayersUI.js": "src/UI/LayersUI.jsx"
-        }
+        }, {
+          "src/UI/KeyUIColourScale.js": "src/UI/KeyUIColourScale.jsx"
+        }]
       }
     },
     uglify: {
