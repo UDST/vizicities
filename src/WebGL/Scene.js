@@ -18,7 +18,8 @@
     _.defaults(self.options, {
       antialias: false,
       fogColour: 0xffffff,
-      suppressRenderer: false
+      suppressRenderer: false,
+      picking: false
     });
 
     if (!self.options.viewport) {
@@ -27,6 +28,36 @@
 
     self.scene = self.createScene();
     self.renderer = self.createRenderer();
+
+    self.pickingScene;
+    self.pickingTexture;
+    self.pickingMaterial;
+    self.pickingGeom;
+    self.pickingMesh;
+    self.pickingColourID;
+    self.pickingColour;
+    self.pickingRef;
+    
+    if (self.options.picking) {
+      self.pickingScene = new THREE.Scene();
+      
+      self.pickingTexture = new THREE.WebGLRenderTarget(self.options.viewport.clientWidth, self.options.viewport.clientHeight);
+      self.pickingTexture.generateMipmaps = false;
+
+      self.pickingMaterial = new THREE.MeshBasicMaterial({
+        vertexColors: THREE.VertexColors,
+        // TODO: Remove reliance on making things double-sided to make up for meshes created with incorrect wising
+        side: THREE.DoubleSide
+      });
+
+      self.pickingGeom = new THREE.Geometry();
+      self.pickingMesh;
+      
+      // Start at 1 because default pixel value is 0 (black)
+      self.pickingColourID = 1;
+      self.pickingColour = new THREE.Color();
+      self.pickingRef = {};
+    }
   };
 
   VIZI.Scene.prototype.createScene = function() {
@@ -97,6 +128,63 @@
     self.scene.add(object);
   };
 
+  VIZI.Scene.prototype.addPickable = function(mesh, id) {
+    var self = this;
+
+    if (!self.options.picking) {
+      return;
+    }
+    
+    // Generate unique colour
+    self.pickingColour.setHex(self.pickingColourID);
+
+    // Apply colour to geom
+    // TODO: Does this cause issues with anything else using the geom reference?
+    self.applyVertexColors(mesh.geometry, self.pickingColour);
+
+    // Remove mesh from picking scene
+    self.pickingScene.remove(self.pickingMesh);
+
+    // Add geom to merged geom
+    self.pickingGeom.merge(mesh.geometry, mesh.matrix);
+
+    // Store reference to id and colour
+    self.pickingRef[self.pickingColourID] = {
+      id: id,
+      mesh: mesh
+    };
+
+    self.pickingMesh = new THREE.Mesh(self.pickingGeom, self.pickingMaterial);
+
+    // Update mesh in picking scene
+    self.pickingScene.add(self.pickingMesh);
+
+    // Increment picking colour ID
+    self.pickingColourID++;
+  };
+
+  VIZI.Scene.prototype.removePickable = function(id) {
+    var self = this;
+
+    if (!self.options.picking) {
+      return;
+    }
+
+    // TODO: Remove pickable geom from merged geom
+    // TODO: Remove reference to id and colour
+    // TODO: Update mesh in picking scene
+  };
+
+  VIZI.Scene.prototype.getPickable = function(id) {
+    var self = this;
+
+    if (!self.options.picking) {
+      return;
+    }
+
+    return self.pickingRef[id];
+  };
+
   VIZI.Scene.prototype.remove = function(object) {
     var self = this;
     self.scene.remove(object);
@@ -116,8 +204,37 @@
     self.renderer.render(self.scene, camera.camera);
   };
 
+  VIZI.Scene.prototype.renderPicking = function(camera) {
+    var self = this;
+
+    if (!self.options.picking) {
+      return;
+    }
+
+    if (!self.pickingScene) {
+      throw new Error("Picking scene is required for render");
+    }
+
+    if (!camera) {
+      throw new Error("Camera is required for render");
+    }
+
+    self.renderer.render(self.pickingScene, camera.camera, self.pickingTexture);
+  };
+
+  // TODO: Update picking scene on resize
   VIZI.Scene.prototype.resize = function(width, height) {
     var self = this;
     self.renderer.setSize(width, height);
+  };
+
+  // TODO: This is duplicated from VIZI.Layer, find a way to merge
+  VIZI.Scene.prototype.applyVertexColors = function( geom, colour ) {
+    geom.faces.forEach( function( f ) {
+      var n = ( f instanceof THREE.Face3 ) ? 3 : 4;
+      for( var j = 0; j < n; j ++ ) {
+        f.vertexColors[ j ] = colour;
+      }
+    } );
   };
 })();
