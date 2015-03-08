@@ -6,7 +6,7 @@ describe("VIZI.BlueprintOutputBuildingTiles", function() {
 
   before(function() {
     world = new VIZI.World({
-      viewport: document.createElement("div"),
+      viewport: document.body,
       camera: new VIZI.Camera({
         aspect: 1024 / 768
       }),

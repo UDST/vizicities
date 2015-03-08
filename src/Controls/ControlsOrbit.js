@@ -14,7 +14,7 @@
 
     VIZI.Controls.call(self, camera, options);
 
-    self.controls = new THREE.OrbitControls(camera.camera, self.options.viewport);
+    self.controls = new THREE.OrbitControls(camera.camera, self.options.viewport.querySelector("canvas"));
 
     self.controls.addEventListener("start", function(event) {
       self.onStart();

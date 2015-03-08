@@ -16,7 +16,9 @@
 
     VIZI.BlueprintOutput.call(self, options);
 
-    _.defaults(self.options, {});
+    _.defaults(self.options, {
+      name: "Debug points"
+    });
 
     // Triggers and actions reference
     self.triggers = [
@@ -26,6 +28,8 @@
     self.actions = [
       {name: "outputPoints", arguments: ["data"]}
     ];
+
+    self.name = self.options.name;
 
     self.world;
   };

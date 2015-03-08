@@ -5,11 +5,19 @@
 // - https://github.com/cvisco/grunt-smash
 // TODO: Add code style tests
 // - https://github.com/jscs-dev/node-jscs
+// TODO: Make React compilation dynamic
 
 module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     pkg: grunt.file.readJSON("package.json"),
+    react: {
+      vizicities: {
+        files: {
+          "src/UI/LayersUI.js": "src/UI/LayersUI.jsx"
+        }
+      }
+    },
     uglify: {
       vizicities: {
         options: {
@@ -38,7 +46,7 @@ module.exports = function(grunt) {
     },
     concat: {
       vizicities: {
-        src: ["src/Vizi.js", "src/Core/*.js", "src/Geo/CRS.js", "src/WebGL/*.js", "src/Controls/Controls.js", "src/**/*.js"],
+        src: ["src/Vizi.js", "src/Core/*.js", "src/Geo/CRS.js", "src/WebGL/*.js", "src/Controls/Controls.js", "src/UI/*.js", "src/**/*.js"],
         dest: "build/vizi.js"
       },
       bower: {
@@ -47,11 +55,11 @@ module.exports = function(grunt) {
           banner: "/*! ViziCities - v<%= pkg.version %> - " +
           "<%= grunt.template.today('yyyy-mm-dd') %> */\n"
         },
-        src: ["bower_components/**/*min.js", "bower_components/proj4/dist/proj4-src.js", "bower_components/wildemitter/wildemitter-bare.js", "build/vizi.js"],
+        src: ["bower_components/**/*min.js", "bower_components/proj4/dist/proj4-src.js", "bower_components/wildemitter/wildemitter-bare.js", "build/vizi.js", "!bower_components/react/react-with-addons.min.js"],
         dest: "build/vizi.js"
       },
       bower_min: {
-        src: ["bower_components/**/*min.js", "bower_components/proj4/dist/proj4.js", "bower_components/wildemitter/wildemitter-bare.js", "build/vizi.min.js"],
+        src: ["bower_components/**/*min.js", "bower_components/proj4/dist/proj4.js", "bower_components/wildemitter/wildemitter-bare.js", "build/vizi.min.js", "!bower_components/react/react-with-addons.min.js"],
         dest: "build/vizi.min.js"
       },
       vizicities_worker: {
@@ -119,6 +127,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-mocha-slimer");
   grunt.loadNpmTasks("grunt-contrib-concat");
   grunt.loadNpmTasks("grunt-contrib-uglify");
+  grunt.loadNpmTasks("grunt-react");
 
   // Default task(s).
   grunt.registerTask("default", ["test"]);
@@ -129,6 +138,6 @@ module.exports = function(grunt) {
   grunt.registerTask("test", ["jshint", "mocha_slimer"]);
 
   // Build
-  grunt.registerTask("build", ["concat:vizicities", "uglify:vizicities", "concat:bower", "concat:bower_min"]);
-  grunt.registerTask("build_worker", ["concat:vizicities_worker", "uglify:vizicities_worker", "concat:bower_worker", "concat:bower_worker_min"]);
+  grunt.registerTask("build", ["react:vizicities", "concat:vizicities", "uglify:vizicities", "concat:bower", "concat:bower_min"]);
+  grunt.registerTask("build_worker", ["react", "concat:vizicities_worker", "uglify:vizicities_worker", "concat:bower_worker", "concat:bower_worker_min"]);
 };

@@ -40,6 +40,17 @@
     self.object.remove(object);
   };
 
+  // UI handlers
+  VIZI.Layer.prototype.hide = function() {
+    var self = this;
+    self.object.visible = false;
+  };
+
+  VIZI.Layer.prototype.show = function() {
+    var self = this;
+    self.object.visible = true;
+  };
+
   VIZI.Layer.prototype.applyVertexColors = function( geom, colour ) {
     geom.faces.forEach( function( f ) {
       var n = ( f instanceof THREE.Face3 ) ? 3 : 4;

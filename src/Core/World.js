@@ -19,7 +19,8 @@
       crs: VIZI.CRS.EPSG3857,
       center: new VIZI.LatLon(51.50358, -0.01924),
       zoom: 16,
-      suppressRenderer: false // Set true for tests
+      suppressRenderer: false, // Set true for tests
+      layersUI: true
     });
 
     if (!self.options.viewport) {
@@ -35,6 +36,19 @@
     // TODO: Store switchboards and layers in an id-referenced object
     self.switchboards = [];
     self.layers = [];
+
+    // Add UI container
+    // TODO: Move into a separate UI class
+    var uiContainer = document.createElement("div");
+
+    // Styling is adding via vizicities.css
+    uiContainer.classList.add("vizicities-ui");
+    self.options.viewport.appendChild(uiContainer);
+
+    // Set up layer UI
+    if (self.options.layersUI) {
+      self.layersUI = new VIZI.LayersUI(self.layers);
+    }
 
     // TODO: Ability to override this with a scene passed into the options
     // TODO: Pass-through options that tweak scene (antialias, etc)
@@ -114,6 +128,11 @@
 
     self.layers.push(layer);
     self.scene.add(layer.object);
+
+    // Update layers UI
+    if (self.layersUI) {
+      self.layersUI.onChange();
+    }
   };
 
   VIZI.World.prototype.addSwitchboard = function(switchboard) {

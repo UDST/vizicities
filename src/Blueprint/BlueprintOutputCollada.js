@@ -18,7 +18,9 @@
 
     VIZI.BlueprintOutput.call(self, options);
 
-    _.defaults(self.options, {});
+    _.defaults(self.options, {
+      name: "Collada"
+    });
 
     // Triggers and actions reference
     self.triggers = [
@@ -28,6 +30,8 @@
     self.actions = [
       {name: "outputCollada", arguments: ["collada"]}
     ];
+
+    self.name = self.options.name;
 
     self.world;
   };
