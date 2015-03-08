@@ -5,6 +5,8 @@
  * @author Robin Hawkes - vizicities.com
  */
 
+ // TODO: Prevent click (and hover events?) from triggering while moving camera
+
 (function() {
   "use strict";
 
