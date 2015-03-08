@@ -16,6 +16,7 @@
     VIZI.EventEmitter.call(self);
 
     self.object = new THREE.Object3D();
+    self.hidden = false;
   };
 
   VIZI.Layer.prototype = Object.create( VIZI.EventEmitter.prototype );
@@ -43,12 +44,14 @@
   // UI handlers
   VIZI.Layer.prototype.hide = function() {
     var self = this;
+    self.hidden = true;
     self.object.visible = false;
     self.onHide();
   };  
 
   VIZI.Layer.prototype.show = function() {
     var self = this;
+    self.hidden = false;
     self.object.visible = true;
     self.onShow();
   };

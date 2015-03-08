@@ -168,6 +168,11 @@
       self.world.addPickable(mesh, geom.id);
 
       VIZI.Messenger.on("pick-hover:" + geom.id, function() {
+        // Do nothing if hidden
+        if (self.hidden) {
+          return;
+        }
+
         self.lastPickedId = geom.id;
 
         if (self.pickedMesh) {
@@ -203,6 +208,11 @@
       });
 
       VIZI.Messenger.on("pick-click:" + geom.id, function() {
+        // Do nothing if hidden
+        if (self.hidden) {
+          return;
+        }
+        
         // TODO: Do something to the choropleth when clicked
         console.log("Clicked:", geom.id);
       });
