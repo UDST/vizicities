@@ -7277,9 +7277,6 @@ if (typeof window === undefined) {
     self.pickingColourID;
     self.pickingColour;
     self.pickingRef;
-    // self.pickingHighlightScene;
-    // self.pickingHighlightMaterial;
-    // self.pickingHighlightMesh;
     
     if (self.options.picking) {
       self.pickingScene = new THREE.Scene();
@@ -7295,14 +7292,6 @@ if (typeof window === undefined) {
 
       self.pickingGeom = new THREE.Geometry();
       self.pickingMesh;
-
-      // self.pickingHighlightScene = new THREE.Scene();
-      // self.pickingHighlightMaterial = new THREE.MeshBasicMaterial({
-      //   color: 0xff0000,
-      //   depthWrite: false,
-      //   // TODO: Remove reliance on making things double-sided to make up for meshes created with incorrect wising
-      //   side: THREE.DoubleSide
-      // });
       
       // Start at 1 because default pixel value is 0 (black)
       self.pickingColourID = 1;
@@ -7423,26 +7412,6 @@ if (typeof window === undefined) {
     return self.pickingRef[id];
   };
 
-  // VIZI.Scene.prototype.highlightPickable = function(id) {
-  //   var self = this;
-  //   var pick = self.pickingRef[id];
-
-  //   if (!pick) {
-  //     return;
-  //   }
-
-  //   if (self.pickingHighlightMesh) {
-  //     self.pickingHighlightScene.remove(self.pickingHighlightMesh);
-  //   }
-
-  //   self.pickingHighlightMesh = new THREE.Mesh(pick.mesh.geometry, self.pickingHighlightMaterial);
-  //   self.pickingHighlightMesh.position.copy(pick.mesh.position);
-  //   self.pickingHighlightMesh.rotation.copy(pick.mesh.rotation);
-  //   self.pickingHighlightMesh.scale.copy(pick.mesh.scale);
-    
-  //   self.pickingHighlightScene.add(self.pickingHighlightMesh);
-  // };
-
   VIZI.Scene.prototype.remove = function(object) {
     var self = this;
     self.scene.remove(object);
@@ -7459,12 +7428,7 @@ if (typeof window === undefined) {
       throw new Error("Camera is required for render");
     }
 
-    // self.renderer.autoClear = false;
-
     self.renderer.render(self.scene, camera.camera);
-    // self.renderer.render(self.pickingScene, camera.camera);
-    // self.renderer.clearDepth();
-    // self.renderPickingHighlight(camera);
   };
 
   VIZI.Scene.prototype.renderPicking = function(camera) {
@@ -7480,20 +7444,6 @@ if (typeof window === undefined) {
 
     self.renderer.render(self.pickingScene, camera.camera, self.pickingTexture);
   };
-
-  // VIZI.Scene.prototype.renderPickingHighlight = function(camera) {
-  //   var self = this;
-
-  //   if (!self.pickingHighlightScene) {
-  //     throw new Error("Picking highlight scene is required for render");
-  //   }
-
-  //   if (!camera) {
-  //     throw new Error("Camera is required for render");
-  //   }
-
-  //   self.renderer.render(self.pickingHighlightScene, camera.camera);
-  // };
 
   // TODO: Update picking scene on resize
   VIZI.Scene.prototype.resize = function(width, height) {
