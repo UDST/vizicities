@@ -33,6 +33,7 @@
   // TODO: Is this called less on mousemove than it would be on each tick?
   // If not, either move to each tick (and be called when not needed), or
   // set a minimum amount of time to pass before re-picking on move (eg. 100ms)
+  // Could use _.trottle to cap to a certain threshold
   VIZI.ControlsMousePick.prototype.onMouseMove = function(event) {
     var self = this;
 
