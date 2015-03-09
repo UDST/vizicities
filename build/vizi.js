@@ -6711,8 +6711,13 @@ if (typeof window === undefined) {
   VIZI.World.prototype.onTick = function(delta) {
     var self = this;
 
-    _.each(self.switchboards, function(switchboard) {
-      switchboard.onTick(delta);
+    // _.each(self.switchboards, function(switchboard) {
+    //   switchboard.onTick(delta);
+    // });
+  
+    // The new NoFlo approach doesn't use a switchboard
+    _.each(self.layers, function(layer) {
+      layer.onTick(delta);
     });
   };
 
