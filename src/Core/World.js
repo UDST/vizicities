@@ -102,8 +102,8 @@
     zoom = zoom || self.originZoom;
 
     // TODO: Are there ramifications to rounding the pixels?
-    var originPoint = self.crs.latLonToPoint(self.origin, zoom, {round: true});
-    var projected = self.crs.latLonToPoint(latLon, zoom, {round: true});
+    var originPoint = self.crs.latLonToPoint(self.origin, zoom, {round: false});
+    var projected = self.crs.latLonToPoint(latLon, zoom, {round: false});
 
     return projected.subtract(originPoint);
   };
@@ -113,7 +113,7 @@
     zoom = zoom || self.originZoom;
 
     // TODO: Are there ramifications to rounding the pixels?
-    var originPoint = self.crs.latLonToPoint(self.origin, zoom, {round: true});
+    var originPoint = self.crs.latLonToPoint(self.origin, zoom, {round: false});
 
     return self.crs.pointToLatLon(point.add(originPoint), zoom);
   };

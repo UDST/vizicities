@@ -88,11 +88,11 @@
     if (self.options.colourRange) {
       // Sort feature data in order
       var dataValues = data.sort(function(a, b) {
-        return d3.ascending(a.value, b.value);
+        return d3.ascending(Number(a.value), Number(b.value));
       });
 
-      var lo = dataValues[0].value;
-      var hi = dataValues[data.length - 1].value;
+      var lo = Number(dataValues[0].value);
+      var hi = Number(dataValues[data.length - 1].value);
 
       // TODO: Decouple range values
       var scale = d3.scale.linear()
