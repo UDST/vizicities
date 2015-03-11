@@ -177,6 +177,16 @@ THREE.OrbitControls = function ( object, domElement ) {
 		pan.add( panOffset );
 
 	};
+
+	this.panX = function ( distance ) {
+    panOffset.set( distance, 0, 0 );
+    pan.add( panOffset );
+  };
+
+  this.panZ = function ( distance ) {
+    panOffset.set( 0, 0, distance );
+    pan.add( panOffset );
+  };
 	
 	// pass in x,y of change desired in pixel space,
 	// right and down are positive

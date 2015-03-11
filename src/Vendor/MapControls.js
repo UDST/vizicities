@@ -184,6 +184,16 @@ THREE.MapControls = function ( object, domElement ) {
 
   };
 
+  this.panX = function ( distance ) {
+    panOffset.set( distance, 0, 0 );
+    pan.add( panOffset );
+  };
+
+  this.panZ = function ( distance ) {
+    panOffset.set( 0, 0, distance );
+    pan.add( panOffset );
+  };
+
   // // pass in distance in world space to move left
   // this.panLeft = function ( distance ) {
 

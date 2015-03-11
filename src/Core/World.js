@@ -84,7 +84,8 @@
 
     VIZI.Messenger.on("controls:move", function(point) {
       // TODO: Should be more intelligent about whether this has changed
-      self.moveToPoint(point);
+      var unprojected = self.unproject(point);
+      self.updateView(unprojected);
     });
 
     VIZI.Messenger.on("controls:zoom", function(distance) {
@@ -105,7 +106,7 @@
     var originPoint = self.crs.latLonToPoint(self.origin, zoom, {round: false});
     var projected = self.crs.latLonToPoint(latLon, zoom, {round: false});
 
-    return projected.subtract(originPoint);
+    return projected.clone().subtract(originPoint);
   };
 
   VIZI.World.prototype.unproject = function(point, zoom) {
@@ -115,7 +116,7 @@
     // TODO: Are there ramifications to rounding the pixels?
     var originPoint = self.crs.latLonToPoint(self.origin, zoom, {round: false});
 
-    return self.crs.pointToLatLon(point.add(originPoint), zoom);
+    return self.crs.pointToLatLon(point.clone().add(originPoint), zoom);
   };
 
   VIZI.World.prototype.pixelsPerMeter = function(latLon, zoom) {
@@ -157,11 +158,11 @@
   VIZI.World.prototype.onTick = function(delta) {
     var self = this;
 
+    // REMOVED: As new NoFlo approach doesn't use switchboards
     // _.each(self.switchboards, function(switchboard) {
     //   switchboard.onTick(delta);
     // });
   
-    // The new NoFlo approach doesn't use a switchboard
     _.each(self.layers, function(layer) {
       layer.onTick(delta);
     });
@@ -175,7 +176,6 @@
 
   // Centralised method to handle variable changes and firing of events
   // TODO: Trigger events as move and zoom progress
-  // TODO: Update camera zoom and position
   VIZI.World.prototype.updateView = function(center, zoom) {
     var self = this;
 
@@ -185,6 +185,7 @@
 
     self.center = center;
 
+    // This will trigger things like a grid update within BlueprintOutput
     VIZI.Messenger.emit("world:updateView", self.center, self.zoom);
   };
 
@@ -197,42 +198,55 @@
     self.scene.resize(width, height);
   };
 
-  VIZI.World.prototype.moveToLatLon = function(latLon) {
-    var self = this;
-    self.updateView(latLon);
-  };
+  // REMOVED: These don't seem to be of any use in world
+  // It makes more sense to change camera movement via the controls
+  // These helpers would make more sense if a reference to controls was
+  // stored in the world class.
 
-  VIZI.World.prototype.moveToPoint = function(point) {
-    var self = this;
-    // TODO: Are there ramifications to not rounding the pixels?
-    var unprojected = self.unproject(point);
-    self.updateView(unprojected);
-  };
+  // VIZI.World.prototype.moveToLatLon = function(latLon) {
+  //   var self = this;
+  //   self.updateView(latLon);
+  // };
 
-  VIZI.World.prototype.moveBy = function(point) {
-    var self = this;
-    // TODO: Are there ramifications to not rounding the pixels?
-    var centerProjected = self.crs.latLonToPoint(self.center, self.zoom);
-    var newPoint = centerProjected.add(point);
-    self.updateView(self.crs.pointToLatLon(newPoint, self.zoom));
-  };
+  // VIZI.World.prototype.moveToPoint = function(point) {
+  //   var self = this;
+  //   // TODO: Are there ramifications to not rounding the pixels?
+  //   var unprojected = self.unproject(point);
+  //   self.updateView(unprojected);
+  // };
 
+  // VIZI.World.prototype.moveBy = function(point) {
+  //   var self = this;
+  //   // TODO: Are there ramifications to not rounding the pixels?
+  //   var centerProjected = self.crs.latLonToPoint(self.center, self.zoom);
+  //   var newPoint = centerProjected.clone().add(point);
+  //   self.updateView(self.crs.pointToLatLon(newPoint, self.zoom));
+  // };
+
+  // TODO: Should this be handled within the controls?
+  // What purpose does it serve here if it's not changing the control zoom?
   VIZI.World.prototype.zoomTo = function(zoom) {
     var self = this;
     self.updateView(self.center, zoom);
   };
 
+  // TODO: Should this be handled within the controls?
+  // What purpose does it serve here if it's not changing the control zoom?
   VIZI.World.prototype.zoomIn = function(delta) {
     var self = this;
     self.updateView(self.center, self.zoom + delta);
   };
 
+  // TODO: Should this be handled within the controls?
+  // What purpose does it serve here if it's not changing the control zoom?
   VIZI.World.prototype.zoomOut = function(delta) {
     var self = this;
     self.updateView(self.center, self.zoom - delta);
   };
 
   // TODO: Trigger events as camera change progresses
+  // TODO: Should this be handled within the controls?
+  // What purpose does it serve here?
   VIZI.World.prototype.lookAtLatLon = function(latLon) {
     var self = this;
     var projected = self.project(latLon);
@@ -240,6 +254,8 @@
   };
 
   // TODO: Trigger events as camera change progresses
+  // TODO: Should this be handled within the controls?
+  // What purpose does it serve here?
   VIZI.World.prototype.lookAtPoint = function(point) {
     var self = this;
 

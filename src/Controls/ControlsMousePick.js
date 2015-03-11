@@ -46,7 +46,7 @@
       self.options.scene.options.viewport.offsetTop
     );
 
-    var relativePos = screenPos.subtract(viewportOffset);
+    var relativePos = screenPos.clone().subtract(viewportOffset);
 
     var ref = self.pick(relativePos);
 
@@ -84,7 +84,7 @@
       self.options.scene.options.viewport.offsetTop
     );
 
-    var relativePos = screenPos.subtract(viewportOffset);
+    var relativePos = screenPos.clone().subtract(viewportOffset);
 
     var ref = self.pick(relativePos);
 
