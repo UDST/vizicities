@@ -55,15 +55,21 @@
 
   VIZI.ControlsMap.prototype.moveTo = function(point) {
     var self = this;
-    self.controls.target.x = point.x;
-    self.controls.target.z = point.y;
+    
+    // TODO: Work out some cleaner way to map between Vector2 and Vector3
+    var diff = point.clone().sub(new VIZI.Point(self.controls.target.x, self.controls.target.z));
+    self.controls.panX(diff.x);
+    self.controls.panZ(diff.y);
+    
     self.controls.update();
   };
 
   VIZI.ControlsMap.prototype.moveBy = function(delta) {
     var self = this;
-    self.controls.target.x += delta.x;
-    self.controls.target.z += delta.y;
+    
+    self.controls.panX(delta.x);
+    self.controls.panZ(delta.y);
+
     self.controls.update();
   };
 

@@ -225,7 +225,7 @@
       var originPoint = crs.latLonToPoint(origin, zoom, {round: true});
       var projected = crs.latLonToPoint(latLon, zoom, {round: true});
 
-      return projected.subtract(originPoint);
+      return projected.clone().subtract(originPoint);
     };
 
     // Proxy world pixelPerMeter

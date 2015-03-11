@@ -68,6 +68,7 @@
     self.tiles = [];
 
     // Grid movement difference since last mouse up
+    // TODO: Change to something that isn't referencing the mouse as it's no longer used to calculate grid difference.
     self.gridDiffSinceMouseUp = new VIZI.Point();
   };
 
@@ -105,11 +106,12 @@
 
     if (VIZI.DEBUG) console.log("tileCount", self.tileCount);
 
+    // REMOVED: Shouldn't be needed any longer as updates are now triggered based on world:updateView events
     // TODO: Hook into VIZI.Controls.Mouse or at least use correct DOM element
     // Could do with panControlStart and panControlEnd events
-    document.body.addEventListener("mouseup", function(event) {
-      self.onMouseUp(event);
-    }, false);
+    // document.body.addEventListener("mouseup", function(event) {
+    //   self.onMouseUp(event);
+    // }, false);
 
     // TODO: Convert to VIZI.Messenger format
     // TODO: Listen for a zoom event from the camera to handle hiding of objects at distance
@@ -232,12 +234,21 @@
         self.emit("enabled");
       }
     }
+
+    // Force an update, even if nothing has changed
+    self.updateGrid();
   };
 
-  VIZI.BlueprintHelperTileGrid.prototype.onMouseUp = function(event) {
-    var self = this;
+  // REMOVED: Due to move toward using world:updateView instead
+  // VIZI.BlueprintHelperTileGrid.prototype.onMouseUp = function(event) {
+  //   var self = this;
+  //   self.updateGrid();
+  // };
 
+  VIZI.BlueprintHelperTileGrid.prototype.updateGrid = function() {
+    var self = this;
     // If grid has moved (there's an offset) then move grid mesh and update tiles
+    // TODO: Change gridDiffSinceMouseUp to something unrelated to mouse
     if (Math.abs(self.gridDiffSinceMouseUp.x) > 0 || Math.abs(self.gridDiffSinceMouseUp.y) > 0) {
       // self.onGridMove(self.gridDiffSinceMouseUp);
       self.emit("moved", self.tiles, self.gridDiffSinceMouseUp);
