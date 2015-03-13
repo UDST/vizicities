@@ -10336,11 +10336,22 @@ if (typeof window === undefined) {
 
   VIZI.ControlsMousePick.prototype.onMouseDown = function(event) {
     var self = this;
+
+    // Skip if right button
+    if (event.button === 2) {
+      return;
+    }
+
     self.validClick = true;
   };
 
   VIZI.ControlsMousePick.prototype.onMouseUp = function(event) {
     var self = this;
+
+    // Skip if right button
+    if (event.button === 2) {
+      return;
+    }
 
     // Skip if click has been invalidated by movement
     if (!self.validClick) {
