@@ -23,9 +23,11 @@
     self.pixelBuffer = new Uint8Array(4);
 
     self.lastPickedIdHover;
+    self.validClick = true;
 
     self.options.scene.options.viewport.addEventListener("mousemove", self.onMouseMove.bind(self), false);
-    self.options.scene.options.viewport.addEventListener("click", self.onMouseClick.bind(self), false);
+    self.options.scene.options.viewport.addEventListener("mousedown", self.onMouseDown.bind(self), false);
+    self.options.scene.options.viewport.addEventListener("mouseup", self.onMouseUp.bind(self), false);
   };
 
   VIZI.ControlsMousePick.prototype = Object.create( VIZI.Controls.prototype );
@@ -39,6 +41,9 @@
 
     // Removed until proven necessary as it was interfering with layers UI 
     //event.preventDefault();
+
+    // Invalidate any clicks as the mouse has moved
+    self.validClick = false;
 
     var screenPos = new VIZI.Point(event.clientX, event.clientY);
     var viewportOffset = new VIZI.Point(
@@ -72,8 +77,18 @@
     self.lastPickedIdHover = ref.id;
   };
 
-  VIZI.ControlsMousePick.prototype.onMouseClick = function(event) {
+  VIZI.ControlsMousePick.prototype.onMouseDown = function(event) {
     var self = this;
+    self.validClick = true;
+  };
+
+  VIZI.ControlsMousePick.prototype.onMouseUp = function(event) {
+    var self = this;
+
+    // Skip if click has been invalidated by movement
+    if (!self.validClick) {
+      return;
+    }
 
     // Removed until proven necessary as it was interfering with layers UI 
     //event.preventDefault();
