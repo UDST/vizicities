@@ -282,7 +282,10 @@
       // var zoom = Math.floor(19 - Math.log(altitude / 1000) / Math.LN2);
 
       // https://social.msdn.microsoft.com/Forums/en-US/5454d549-5eeb-43a5-b188-63121d3f0cc1/how-to-set-zoomlevel-for-particular-altitude?forum=bingmaps
-      var zoom = 19 - Math.log2(altitude * 0.05);
+      // TODO: Use Math.log2 with a shim
+      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/log2#Polyfill
+      // var zoom = 19 - Math.log2(altitude * 0.05);
+      var zoom = 19 - (Math.log(altitude * 0.05) / Math.LN2);
 
       // http://stackoverflow.com/a/13159839
       // var scale = altitude / 500;
