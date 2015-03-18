@@ -17,9 +17,10 @@
       throw new Error("Required config argument missing");
     }
 
-    self.input;
-    self.output;
-
+    self.inputs = {};
+    self.outputs = {};
+    self.objs = {};
+    
     self.processConfig(config);
   };
 
@@ -27,12 +28,12 @@
   VIZI.BlueprintSwitchboard.prototype.processConfig = function(config) {
     var self = this;
 
-    if (!config.input) {
-      throw new Error("Required input configuration missing");
+    if (!config.inputs) {
+      throw new Error("Required input configuration name list config.inputs missing");
     }
 
-    if (!config.output) {
-      throw new Error("Required output configuration missing");
+    if (!config.outputs) {
+      throw new Error("Required output configuration name list config.outputs missing");
     }
 
     if (!config.triggers) {
@@ -40,26 +41,39 @@
     }
 
     // Create input object (initialise after triggers are set)
-    self.input = self.createViziClassInstance(config.input.type, [config.input.options || {}]);
+    
+    _.each(config.inputs,function(inputName){
+      if(!config[inputName]){
+	throw new Error("Required "+inputName+" configuration specified in config.inputs not found");
+      }
+      var input = self.createViziClassInstance(config[inputName].type, [config[inputName].options || {}]);
+      self.inputs[inputName] = self.objs[inputName] = input;
+    });
 
     // Create output object (initialise after triggers are set)
-    self.output = self.createViziClassInstance(config.output.type, [config.output.options || {}]);
+    _.each(config.outputs,function(outputName){
+      if(!config[outputName]){
+	throw new Error("Required "+outputName+" configuration specified in config.outputs not found");
+      }
+      var output = self.createViziClassInstance(config[outputName].type, [config[outputName].options || {}]);
+      self.outputs[outputName] = self.objs[outputName] = output;
+    });
 
     // Process triggers and actions
     _.each(config.triggers, function(triggerOptions) {
-      if (triggerOptions.triggerObject !== "input" && triggerOptions.triggerObject !== "output") {
-        throw new Error("Trigger object should be either input or output");
+      if (self.inputs[triggerOptions.triggerObject] === undefined && self.outputs[triggerOptions.triggerObject] === undefined) {
+        throw new Error("Trigger object "+triggerOptions.actionObject+" isn't defined in both inputs and outputs");
       }
 
-      var triggerObject = self[triggerOptions.triggerObject];
+      var triggerObject = self.objs[triggerOptions.triggerObject];
       var triggerName = triggerOptions.triggerName;
       var triggerArguments = triggerOptions.triggerArguments;
 
-      if (triggerOptions.actionObject !== "input" && triggerOptions.actionObject !== "output") {
-        throw new Error("Trigger object should be either input or output");
+      if (self.inputs[triggerOptions.actionObject] === undefined && self.outputs[triggerOptions.actionObject] === undefined) {
+        throw new Error("Trigger object "+triggerOptions.actionObject+" isn't defined in both inputs and outputs");
       }
 
-      var actionObject = self[triggerOptions.actionObject];
+      var actionObject = self.objs[triggerOptions.actionObject];
       var actionName = triggerOptions.actionName;
       var actionArguments = triggerOptions.actionArguments;
       var actionOutput = triggerOptions.actionOutput;
@@ -171,6 +185,7 @@
       } else {
         output = output[key];
       }
+      return null;
     });
 
     return output;
@@ -183,17 +198,23 @@
 
     world.addSwitchboard(self);
 
-    self.input.init();
+    _.each(self.inputs,function(input){
+      input.init();
+    });
 
     // Add output to world
-    self.output.addToWorld(world);
+    _.each(self.outputs,function(output){
+      output.addToWorld(world);
+    });
   };
 
   VIZI.BlueprintSwitchboard.prototype.onTick = function(delta) {
     var self = this;
 
-    if (!self.output) return;
+    if (!self.outputs) return;
 
-    self.output.onTick(delta);
+    _.each(self.outputs,function(output){
+      output.onTick(delta);
+    });
   };
 }());

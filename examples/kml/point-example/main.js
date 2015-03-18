@@ -7,6 +7,8 @@ var controls = new VIZI.ControlsMap(world.camera, {
 });
 
 var kmlConfig = {
+  inputs: ['input'],
+  outputs: ['output'],
   input: {
     type: "BlueprintInputKML",
     options: {
@@ -49,6 +51,8 @@ var switchboardKML = new VIZI.BlueprintSwitchboard(kmlConfig);
 switchboardKML.addToWorld(world);
 
 var mapConfig = {
+  inputs: ['input'],
+  outputs: ['output'],
   input: {
     type: "BlueprintInputMapTiles",
     options: {

@@ -8,6 +8,8 @@ var controls = new VIZI.ControlsMap(world.camera, {
 });
 
 var colladaConfig = {
+  inputs: ['input'],
+  outputs: ['output'],
   input: {
     type: "BlueprintInputKML",
     options: {
@@ -54,6 +56,8 @@ var switchboardCollada = new VIZI.BlueprintSwitchboard(colladaConfig);
 switchboardCollada.addToWorld(world);
 
 var mapConfig = {
+  inputs: ['input'],
+  outputs: ['output'],
   input: {
     type: "BlueprintInputMapTiles",
     options: {

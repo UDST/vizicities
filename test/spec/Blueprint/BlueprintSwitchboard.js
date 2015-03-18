@@ -13,6 +13,8 @@ describe("VIZI.BlueprintSwitchboard", function() {
     });
 
     config = {
+      inputs:['input'],
+      outputs:['output'],
       input: {
         type: "BlueprintInputMapTiles",
         options: {
@@ -111,6 +113,8 @@ describe("VIZI.BlueprintSwitchboard", function() {
 
   it("throws error when trigger or action object reference is incorrect", function() {
     var tmpConfig = {
+      inputs:['input'],
+      outputs:['output'],
       input: {
         type: "BlueprintInputMapTiles",
         options: {
@@ -145,6 +149,8 @@ describe("VIZI.BlueprintSwitchboard", function() {
 
   it("throws error when required action arguments are missing", function() {
     var tmpConfig = {
+      inputs:['input'],
+      outputs:['output'],
       input: {
         type: "BlueprintInputMapTiles",
         options: {
@@ -176,11 +182,13 @@ describe("VIZI.BlueprintSwitchboard", function() {
 
     var tmpSwitchboard = new VIZI.BlueprintSwitchboard(tmpConfig);
 
-    expect(function() { tmpSwitchboard.output.emit("initialised"); }).to.throw(Error);
+    expect(function() { tmpswitchboard.outputs.output.emit("initialised"); }).to.throw(Error);
   });
 
   it("throws error when action output is a complex map and process and transformation properties are missing", function() {
     var tmpConfig = {
+      inputs:['input'],
+      outputs:['output'],
       input: {
         type: "BlueprintInputMapTiles",
         options: {
@@ -221,28 +229,28 @@ describe("VIZI.BlueprintSwitchboard", function() {
 
     var tmpSwitchboard = new VIZI.BlueprintSwitchboard(tmpConfig);
 
-    expect(function() { tmpSwitchboard.input.emit("tileReceived"); }).to.throw(Error);
+    expect(function() { tmpswitchboard.inputs.input.emit("tileReceived"); }).to.throw(Error);
   });
 
   it("can process config and create input and output instances", function() {
-    expect(switchboard.input).to.be.an.instanceOf(VIZI.BlueprintInput);
-    expect(switchboard.output).to.be.an.instanceOf(VIZI.BlueprintOutput);
+      expect(switchboard.inputs.input).to.be.an.instanceOf(VIZI.BlueprintInput);
+      expect(switchboard.outputs.output).to.be.an.instanceOf(VIZI.BlueprintOutput);
   });
 
   it("can add output to world", function() {
-    var spy = new sinon.spy(switchboard.output, "addToWorld");
+    var spy = new sinon.spy(switchboard.outputs.output, "addToWorld");
 
     switchboard.addToWorld(world);
 
     expect(spy).to.be.called;
 
-    switchboard.output.addToWorld.restore();
+    switchboard.outputs.output.addToWorld.restore();
     spy = undefined;
   });
 
   it("can process config and map inputs with outputs", function() {
-    var spy1 = new sinon.spy(switchboard.input, "requestTiles");
-    var spy2 = new sinon.spy(switchboard.output, "outputImageTile");
+    var spy1 = new sinon.spy(switchboard.inputs.input, "requestTiles");
+    var spy2 = new sinon.spy(switchboard.outputs.output, "outputImageTile");
 
     switchboard.addToWorld(world);
 
@@ -251,22 +259,22 @@ describe("VIZI.BlueprintSwitchboard", function() {
     setTimeout(function() {
       expect(spy2).to.be.called;
 
-      switchboard.input.requestTiles.restore();
-      switchboard.output.outputImageTile.restore();
+      switchboard.inputs.input.requestTiles.restore();
+      switchboard.outputs.output.outputImageTile.restore();
       spy1 = undefined;
       spy2 = undefined;
     }, 500);
   });
 
   it("can update output on tick", function () {
-    var spy = new sinon.spy(switchboard.output, "onTick");
+    var spy = new sinon.spy(switchboard.outputs.output, "onTick");
     var delta = 0.01;
 
     switchboard.onTick(delta);
 
     expect(spy).to.have.been.called;
 
-    switchboard.output.onTick.restore();
+    switchboard.outputs.output.onTick.restore();
     spy = undefined;
   });
 });

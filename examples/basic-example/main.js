@@ -19,6 +19,8 @@ var descriptionUI = new VIZI.DescriptionUI({
 });
 
 var mapConfig = {
+  inputs: ['input'],
+  outputs: ['output'],
   input: {
     type: "BlueprintInputMapTiles",
     options: {
@@ -97,6 +99,8 @@ var switchboardMap = new VIZI.BlueprintSwitchboard(mapConfig);
 switchboardMap.addToWorld(world);
 
 var buildingsConfig = {
+  inputs: ['input'],
+  outputs: ['output'],
   input: {
     type: "BlueprintInputGeoJSON",
     options: {
@@ -161,6 +165,8 @@ var switchboardBuildings = new VIZI.BlueprintSwitchboard(buildingsConfig);
 switchboardBuildings.addToWorld(world);
 
 var choroplethConfig = {
+  inputs: ['input'],
+  outputs: ['output'],
   input: {
     type: "BlueprintInputGeoJSON",
     options: {

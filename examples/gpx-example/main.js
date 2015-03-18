@@ -7,6 +7,8 @@ var controls = new VIZI.ControlsMap(world.camera, {
 });
 
 var gpxConfig = {
+  inputs: ['input'],
+  outputs: ['output'],
   input: {
     type: "BlueprintInputGPX",
     options: {
@@ -50,6 +52,8 @@ var switchboardGPX = new VIZI.BlueprintSwitchboard(gpxConfig);
 switchboardGPX.addToWorld(world);
 
 var mapConfig = {
+  inputs: ['input'],
+  outputs: ['output'],
   input: {
     type: "BlueprintInputMapTiles",
     options: {
