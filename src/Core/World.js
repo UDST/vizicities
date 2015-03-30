@@ -21,7 +21,8 @@
       zoom: 16,
       suppressRenderer: false, // Set true for tests
       layersUI: true,
-      picking: false
+      picking: false,
+      antialias: false
     });
 
     if (!self.options.viewport) {
@@ -54,6 +55,7 @@
     // TODO: Ability to override this with a scene passed into the options
     // TODO: Pass-through options that tweak scene (antialias, etc)
     self.scene = new VIZI.Scene({
+      antialias: self.options.antialias,
       viewport: self.options.viewport,
       // TODO: Remove this when running WebGL tests on Travis is solved
       suppressRenderer: self.options.suppressRenderer,
