@@ -51,7 +51,7 @@
     // Request data
     d3.xml(self.options.path, function(error, data) {
       if (error) {
-        if (VIZI.DEBUG) console.log("Failed to request KML data");
+        if (self.options.debug) console.log("Failed to request KML data");
         console.warn(error);
         return;
       }

@@ -56,7 +56,7 @@
     // Request data
     d3.json(self.options.path, function(error, data) {
       if (error) {
-        if (VIZI.DEBUG) console.log("Failed to request GeoJSON data");
+        if (self.options.debug) console.log("Failed to request GeoJSON data");
         console.warn(error);
         return;
       }
@@ -80,7 +80,7 @@
       throw new Error("Required tile path option missing");
     }
     
-    if (VIZI.DEBUG) console.log("Requesting tiles", tiles);
+    if (self.options.debug) console.log("Requesting tiles", tiles);
 
     _.each(tiles, function(tile, key) {
       tileURLRegex.lastIndex = 0;
@@ -92,7 +92,7 @@
       // Request tile data
       d3.json(url, function(error, data) {
         if (error) {
-          if (VIZI.DEBUG) console.log("Failed to request GeoJSON data");
+          if (self.options.debug) console.log("Failed to request GeoJSON data");
           console.warn(error);
           return;
         }
