@@ -10,17 +10,15 @@
 
   // Automated tasks and complex initialisation are performed in init()
   VIZI.BlueprintOutput = function(options) {
-    if (VIZI.DEBUG) console.log("Initialising VIZI.BlueprintOutput");
-
     var self = this;
+    self.options = _.defaults(options || {}, {
+      description: "",
+      debug: VIZI.DEBUG
+    });
+
+    if (self.options.debug) console.log("Initialising VIZI.BlueprintOutput");
 
     VIZI.Layer.call(self);
-
-    self.options = options || {};
-
-    _.defaults(self.options, {
-      description: ""
-    });
 
     // Triggers and actions reference (mostly for GUI hooks)
     // [{name: "triggerName", arguments: ["argName1", "argName2"]}, ...]

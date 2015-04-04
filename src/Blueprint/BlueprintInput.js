@@ -10,13 +10,14 @@
 
   // Automated tasks and complex initialisation are performed in init()
   VIZI.BlueprintInput = function(options) {
-    if (VIZI.DEBUG) console.log("Initialising VIZI.BlueprintInput");
-
     var self = this;
+    self.options = _.defaults(options || {}, {
+      debug: VIZI.DEBUG
+    });
+
+    if (self.options.debug) console.log("Initialising VIZI.BlueprintInput");
 
     VIZI.EventEmitter.call(self);
-
-    self.options = options || {};
 
     // Triggers and actions reference (mostly for GUI hooks)
     // [{name: "triggerName", arguments: ["argName1", "argName2"]}, ...]

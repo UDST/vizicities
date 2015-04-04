@@ -53,7 +53,7 @@
   VIZI.BlueprintInputMapTiles.prototype.requestTiles = function(tiles) {
     var self = this;
 
-    if (VIZI.DEBUG) console.log("Requesting tiles", tiles);
+    if (self.options.debug) console.log("Requesting tiles", tiles);
 
     _.each(tiles, function(tile, key) {
       tileURLRegex.lastIndex = 0;

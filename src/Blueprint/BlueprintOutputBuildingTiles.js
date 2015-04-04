@@ -92,7 +92,7 @@
     var grid = new VIZI.BlueprintHelperTileGrid(self.world, gridOptions);
 
     grid.on("moved", function(tiles, diff) {
-      if (VIZI.DEBUG) console.log("Grid moved", tiles, diff);
+      if (self.options.debug) console.log("Grid moved", tiles, diff);
 
       // TODO: Check whether this is enough to remove references to the old mesh
       var oldMeshes = gridOutput.meshes;
@@ -120,7 +120,7 @@
     });
 
     grid.on("disabled", function() {
-      if (VIZI.DEBUG) console.log("Grid disabled");
+      if (self.options.debug) console.log("Grid disabled");
 
       _.each(gridOutput.meshes, function(mesh) {
         mesh.visible = false;
@@ -130,7 +130,7 @@
     // TODO: Either remove previous tiles or prevent event if grid hasn't moved
     // There's a huge hang-up when zooming in due to re-loading and processing tiles
     grid.on("enabled", function() {
-      if (VIZI.DEBUG) console.log("Grid enabled");
+      if (self.options.debug) console.log("Grid enabled");
 
       self.emit("gridUpdated", grid.tiles);
 
@@ -142,7 +142,7 @@
 
     var tiles = grid.init();
 
-    if (VIZI.DEBUG) console.log("Grid initialised", tiles);
+    if (self.options.debug) console.log("Grid initialised", tiles);
 
     gridOutput.grid = grid;
     gridOutput.meshes = {};

@@ -66,7 +66,7 @@
 
       // Set up trigger listener
       triggerObject.on(triggerName, function() {
-        if (VIZI.DEBUG) console.log("Trigger", triggerName, arguments);
+        if (self.options.debug) console.log("Trigger", triggerName, arguments);
 
         var callbackArgs = arguments;
         var actionArgs = [];
@@ -85,12 +85,12 @@
             actionArgs.push(callbackArgs[triggerArguments.indexOf(triggerArg)]);
           // Advanced mapping of trigger argument to action argument
           } else if (_.isObject(triggerArg)) {
-            if (VIZI.DEBUG) console.log("Trigger argument is an object", triggerArg);
+            if (self.options.debug) console.log("Trigger argument is an object", triggerArg);
 
             var items = self.getValueByKeys(callbackArgs[triggerArguments.indexOf(triggerArg.itemsObject)], triggerArg.itemsProperties.split("."));
 
             if (triggerArg.process === "map" && triggerArg.transformation) {
-              if (VIZI.DEBUG) console.log("Mapping trigger argument items using transformation", triggerArg.transformation);
+              if (self.options.debug) console.log("Mapping trigger argument items using transformation", triggerArg.transformation);
 
               items = (!_.isArray(items)) ? [items] : items;
 
@@ -120,7 +120,7 @@
         });
 
         // Call action with mapped arguments
-        if (VIZI.DEBUG) console.log("Action", actionName, actionArgs);
+        if (self.options.debug) console.log("Action", actionName, actionArgs);
         actionObject[actionName].apply(actionObject, actionArgs);
       });
     });
@@ -179,7 +179,7 @@
   VIZI.BlueprintSwitchboard.prototype.addToWorld = function(world) {
     var self = this;
 
-    if (VIZI.DEBUG) console.log("Adding Blueprint to world", self);
+    if (self.options.debug) console.log("Adding Blueprint to world", self);
 
     world.addSwitchboard(self);
 

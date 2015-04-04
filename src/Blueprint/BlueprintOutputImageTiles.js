@@ -88,7 +88,7 @@
     var grid = new VIZI.BlueprintHelperTileGrid(self.world, gridOptions);
 
     grid.on("moved", function(tiles, diff) {
-      if (VIZI.DEBUG) console.log("Grid moved", tiles, diff);
+      if (self.options.debug) console.log("Grid moved", tiles, diff);
 
       // Wipe canvas
       // TODO: This is pretty brutish and a better method for nice visuals (no snapping and wrong tiles) when moving should be found
@@ -118,13 +118,13 @@
     });
 
     grid.on("disabled", function() {
-      if (VIZI.DEBUG) console.log("Grid disabled");
+      if (self.options.debug) console.log("Grid disabled");
 
       gridOutput.mesh.visible = false;
     });
     
     grid.on("enabled", function() {
-      if (VIZI.DEBUG) console.log("Grid enabled");
+      if (self.options.debug) console.log("Grid enabled");
 
       self.emit("gridUpdated", grid.tiles);
 
@@ -133,7 +133,7 @@
 
     var tiles = grid.init();
 
-    if (VIZI.DEBUG) console.log("Grid initialised", tiles);
+    if (self.options.debug) console.log("Grid initialised", tiles);
 
     // Create canvas and object
     self.createGridObject(grid, gridOutput);
@@ -164,7 +164,7 @@
     tileCanvas.width = canvasSizePower2;
     tileCanvas.height = canvasSizePower2;
 
-    if (VIZI.DEBUG) console.log(tileCanvas.width, tileCanvas.height);
+    if (self.options.debug) console.log(tileCanvas.width, tileCanvas.height);
 
     var tileCanvasContext = tileCanvas.getContext("2d");
 
