@@ -5,7 +5,7 @@
 /**
  * Blueprint collada output
  * @author Robin Hawkes - vizicities.com
- */ 
+ */
 
   // output: {
   //   type: "BlueprintOutputCollada",
@@ -60,16 +60,17 @@
     // TODO: Remove this hack around THREE.Loader.Handlers
     // THREE.Loader.Handlers = {get: function(){ return null; }};
 
-    var loader = new THREE.ColladaLoader();
-    loader.options.convertUpAxis = true;
-
     // Local pixels per meter - set once per tile
     var pixelsPerMeter;
 
     _.each(data, function(item) {
+      var loader = new THREE.ColladaLoader();
+      loader.options.convertUpAxis = true;
+      
       var path = (self.options.modelPathPrefix) ? self.options.modelPathPrefix + item.modelPath : item.modelPath;
-    
+
       loader.load(path, function (collada) {
+        console.log(collada);
         var dae = collada.scene;
         var latLon = new VIZI.LatLon(item.coordinates[1], item.coordinates[0]);
 
@@ -86,7 +87,7 @@
 
         // Scale value below 1 indicates collada units are in metres
         // https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/ColladaLoader.js#L219
-        // if (dae.scale.x < 1) { 
+        // if (dae.scale.x < 1) {
         // Scale up model from meters to pixels
         dae.scale.x = dae.scale.y = dae.scale.z = dae.scale.x * pixelsPerMeter.y;
         dae.updateMatrix();
