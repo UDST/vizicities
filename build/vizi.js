@@ -9353,11 +9353,10 @@ if (typeof window === undefined) {
     _.each(data, function(item) {
       var loader = new THREE.ColladaLoader();
       loader.options.convertUpAxis = true;
-      
+
       var path = (self.options.modelPathPrefix) ? self.options.modelPathPrefix + item.modelPath : item.modelPath;
 
       loader.load(path, function (collada) {
-        console.log(collada);
         var dae = collada.scene;
         var latLon = new VIZI.LatLon(item.coordinates[1], item.coordinates[0]);
 
