@@ -1,3 +1,7 @@
+'use strict';
+
+var loadGruntTasks = require('load-grunt-tasks');
+
 module.exports = function(grunt) {
 	var port = grunt.option('port') || 8000;
 
@@ -87,7 +91,13 @@ module.exports = function(grunt) {
 				},
 				ignores: ['src/shared/vendor/**']
 			},
-			files: [ 'Gruntfile.js', 'src/**' ]
+			files: [ 'src/**' ],
+			grunt: {
+				options: {
+					node: true
+				},
+				files: [{src: 'Gruntfile.js'}]
+			}
 		},
 		mocha_phantomjs: {
 			files: ['test/*.html']
@@ -136,17 +146,9 @@ module.exports = function(grunt) {
 		}
 	});
 
-	// Load the plugins
-	grunt.loadNpmTasks('grunt-contrib-uglify');
-	grunt.loadNpmTasks('grunt-contrib-concat');
-	grunt.loadNpmTasks('grunt-contrib-watch');
-	grunt.loadNpmTasks('grunt-contrib-jshint');
-	grunt.loadNpmTasks('grunt-contrib-connect');
-	grunt.loadNpmTasks('grunt-notify');
-	grunt.loadNpmTasks('grunt-mocha-phantomjs');
+	loadGruntTasks(grunt);
 
 	// Default task(s).
-	// grunt.registerTask('default', ['jshint', 'concat', 'uglify', 'notify:finish']);
 	grunt.registerTask('default', ['jshint', 'concat', 'notify:finish']);
 
 	// Serve examples locally
