@@ -1,4 +1,4 @@
-/*! ViziCities - v0.2.0 - 2015-03-30 */
+/*! ViziCities - v0.2.0 - 2015-10-09 */
 //     Underscore.js 1.7.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors

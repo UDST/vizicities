@@ -5,7 +5,7 @@
 /**
  * Blueprint building tiles output
  * @author Robin Hawkes - vizicities.com
- */  
+ */
 
   // output: {
   //   type: "BlueprintOutputBuildingTiles",
@@ -254,6 +254,11 @@
       var outer = feature.outline.shift();
       var inners = feature.outline;
 
+      // Quick check to see if we have a valid polygon to work with
+      if (typeof outer !== "object") {
+        return;
+      }
+
       // Create outer shape
       _.each(outer, function(coord, index) {
         var latLon = new VIZI.LatLon(coord[1], coord[0]);
@@ -280,7 +285,7 @@
       // Create inner shapes (holes)
       _.each(inners, function(inner, index) {
         var innerPath = new THREE.Path();
-        
+
         _.each(inner, function(coord, index) {
           var latLon = new VIZI.LatLon(coord[1], coord[0]);
           var geoCoord = project(latLon);
@@ -304,13 +309,13 @@
       // TODO: Add floor/level-based heights
       // << rounds the height down
       // var height = (feature.height * metersPerLevel * scalingFactor << 0);
-      
+
       // Multiply height in meters by pixels per meter ratio at latitude
       height *= ppm.y;
       minHeight *= ppm.y;
 
       var extrudeSettings = { amount: height - minHeight, bevelEnabled: false };
-      
+
       var geom = new THREE.ExtrudeGeometry( shape, extrudeSettings );
       geom.computeFaceNormals();
 
