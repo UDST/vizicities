@@ -7,6 +7,7 @@ __JavaScript 3D city and data visualisation platform__
 
 **Important links**
 
+* Play with an [interactive demo of ViziCities](http://rawgit.com/vizicities/vizicities/0.2.0/examples/basic-example/index.html)
 * Find out more about what you can do with ViziCities [on the website](http://vizicities.com)
 * Read [the documentation](http://dev.vizicities.com) and learn how to make something with ViziCities
 
@@ -104,7 +105,7 @@ Once you've done that then set up the basic HTML and include the ViziCities file
       height: 100%;
       width: 100%;
     }
-    
+
     #vizicities-viewport {
       height: 100%;
       width: 100%;
@@ -145,7 +146,7 @@ var mapConfig = {
   input: {
     type: "BlueprintInputMapTiles",
     options: {
-      tilePath: "https://a.tiles.mapbox.com/v3/examples.map-i86l3621/{z}/{x}/{y}@2x.png"
+      tilePath: "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}@2x.png"
     }
   },
   output: {
@@ -225,7 +226,7 @@ If you really need to remove the attribution, please [get in touch](hello@vizici
 
 ## Forked ViziCities 0.1.0-pre? Update your remote URL
 
-The ViziCities repo has been moved away from Robin's personal account and now resides within the ViziCities organisation on GitHub. As a result of this, you'll need to update the remote URL if you've forked ViziCities in the past. 
+The ViziCities repo has been moved away from Robin's personal account and now resides within the ViziCities organisation on GitHub. As a result of this, you'll need to update the remote URL if you've forked ViziCities in the past.
 
 It's pretty easy to do, [GitHub even wrote about how to do it](https://help.github.com/articles/changing-a-remote-s-url/). Running the following command within your ViziCities directory should be enough for most people:
 

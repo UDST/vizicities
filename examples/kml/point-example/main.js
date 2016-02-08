@@ -52,7 +52,7 @@ var mapConfig = {
   input: {
     type: "BlueprintInputMapTiles",
     options: {
-      tilePath: "https://a.tiles.mapbox.com/v3/examples.map-i86l3621/{z}/{x}/{y}@2x.png"
+      tilePath: "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}@2x.png"
     }
   },
   output: {

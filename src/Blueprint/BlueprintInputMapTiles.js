@@ -5,12 +5,12 @@
 /**
  * Blueprint map tiles input
  * @author Robin Hawkes - vizicities.com
- */  
+ */
 
   // input: {
   //   type: "BlueprintInputMapTiles",
   //   options: {
-  //     tilePath: "https://a.tiles.mapbox.com/v3/examples.map-i86l3621/{z}/{x}/{y}@2x.png"
+  //     tilePath: "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}@2x.png"
   //   }
   // }
 
@@ -22,7 +22,7 @@
     VIZI.BlueprintInput.call(self, options);
 
     _.defaults(self.options, {
-      tilePath: "https://a.tiles.mapbox.com/v3/examples.map-i86l3621/{z}/{x}/{y}@2x.png"
+      tilePath: "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}@2x.png"
     });
 
     // Triggers and actions reference
