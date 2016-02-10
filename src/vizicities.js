@@ -1,7 +1,5 @@
 const VIZI = {
-  greet() {
-    return 'hello';
-  }
+  version: 0.3
 };
 
 export default VIZI;
