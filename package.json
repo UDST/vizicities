@@ -68,8 +68,18 @@
     "entryFileName": "vizicities",
     "mainVarName": "VIZI",
     "mochaGlobals": [
-      "stub", "spy", "expect", "sandbox", "mock",
-      "useFakeTimers", "useFakeXMLHttpRequest", "useFakeServer"
+      "stub",
+      "spy",
+      "expect",
+      "sandbox",
+      "mock",
+      "useFakeTimers",
+      "useFakeXMLHttpRequest",
+      "useFakeServer"
     ]
+  },
+  "dependencies": {
+    "eventemitter3": "^1.1.1",
+    "three": "^0.73.2"
   }
 }
