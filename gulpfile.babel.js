@@ -10,6 +10,10 @@ import { Instrumenter } from 'isparta';
 
 import manifest  from './package.json';
 
+// TODO: Re-implement build process to utilise proper caching
+// TODO: Consider bundling three.js within the final build, or at least having
+// a different build step for an all-in-one file
+
 // Load all of our Gulp plugins
 const $ = loadPlugins();
 
@@ -68,6 +72,10 @@ function build() {
         filename: exportFileName + '.js',
         libraryTarget: 'umd',
         library: config.mainVarName
+      },
+      externals: {
+        // Proxy the global THREE variable to require('three')
+        'three': 'THREE'
       },
       module: {
         loaders: [

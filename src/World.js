@@ -38,6 +38,11 @@ class World extends EventEmitter {
     // Once _update is called it will run forever, for now
     window.requestAnimationFrame(this._update.bind(this));
 
+    // Update controls
+    this._controls.forEach(controls => {
+      controls.update();
+    });
+
     this.emit('preUpdate');
     this._engine._update(delta);
     this.emit('postUpdate');

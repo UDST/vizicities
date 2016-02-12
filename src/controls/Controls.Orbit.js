@@ -9,6 +9,21 @@ class Orbit extends EventEmitter {
     super();
   }
 
+  // Proxy control events
+  _initEvents() {
+    this._controls.addEventListener('start', (event) => {
+      console.log(event);
+    });
+
+    this._controls.addEventListener('change', (event) => {
+      console.log(event);
+    });
+
+    this._controls.addEventListener('end', (event) => {
+      console.log(event);
+    });
+  }
+
   // Moving the camera along the [x,y,z] axis based on a target position
   _panTo(point, animate) {}
   _panBy(pointDelta, animate) {}
@@ -44,6 +59,11 @@ class Orbit extends EventEmitter {
   _onChange() {}
   _onEnd() {}
 
+  // Proxy to OrbitControls.update()
+  update() {
+    this._controls.update();
+  }
+
   // Add controls to world instance and store world reference
   addTo(world) {
     world.addControls(this);
@@ -56,14 +76,11 @@ class Orbit extends EventEmitter {
 
     // TODO: Override panLeft and panUp methods to prevent panning on Y axis
     // See: http://stackoverflow.com/a/26188674/997339
-    this._orbitControls = new _OrbitControls(world._engine._camera, world._container);
+    this._controls = new _OrbitControls(world._engine._camera, world._container);
+
+    this._initEvents();
 
     this.emit('added');
-  }
-
-  // Proxy to OrbitControls.update()
-  update() {
-    this._orbitControls.update();
   }
 }
 

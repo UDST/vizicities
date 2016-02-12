@@ -80,7 +80,6 @@
   },
   "dependencies": {
     "eventemitter3": "^1.1.1",
-    "three": "^0.73.2",
     "three-orbit-controls": "^72.0.0"
   }
 }
