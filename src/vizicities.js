@@ -1,4 +1,5 @@
 import World from './World';
+import Controls from './controls/Controls';
 import EnvironmentLayer from './layer/environment/EnvironmentLayer';
 
 const VIZI = {
@@ -6,6 +7,7 @@ const VIZI = {
 
   // Public API
   World: World,
+  Controls: Controls,
   EnvironmentLayer: EnvironmentLayer
 };
 

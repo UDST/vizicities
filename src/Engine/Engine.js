@@ -10,15 +10,15 @@ class Engine extends EventEmitter {
 
     super();
 
-    this.scene = Scene;
-    this.renderer = Renderer(container);
-    this.camera = Camera(container);
+    this._scene = Scene;
+    this._renderer = Renderer(container);
+    this._camera = Camera(container);
     this.clock = new THREE.Clock();
   }
 
   _update(delta) {
     this.emit('preRender');
-    this.renderer.render(this.scene, this.camera);
+    this._renderer.render(this._scene, this._camera);
     this.emit('postRender');
   }
 }

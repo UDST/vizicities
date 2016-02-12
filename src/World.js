@@ -9,6 +9,7 @@ class World extends EventEmitter {
     super();
 
     this._layers = [];
+    this._controls = [];
 
     this._initContainer(domId);
     this._initEngine();
@@ -48,13 +49,25 @@ class World extends EventEmitter {
     this._layers.push(layer);
 
     // Could move this into Layer but it'll do here for now
-    this._engine.scene.add(layer._layer);
+    this._engine._scene.add(layer._layer);
 
     this.emit('layerAdded', layer);
     return this;
   }
 
+  // Remove layer and perform clean up operations
   removeLayer(layer) {}
+
+  addControls(controls) {
+    controls._addToWorld(this);
+
+    this._controls.push(controls);
+
+    this.emit('controlsAdded', controls);
+    return this;
+  }
+
+  removeControls(controls) {}
 }
 
 // Initialise without requiring new keyword

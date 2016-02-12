@@ -5,3 +5,6 @@ var world = VIZI.World('world');
 // Makes sense to allow others to customise their environment so perhaps this
 // could be left public but a default is set up within World to simplify things
 var environment = VIZI.EnvironmentLayer().addTo(world);
+
+// Add controls
+VIZI.Controls.Orbit().addTo(world);
