@@ -126,6 +126,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    this._initContainer(domId);
 	    this._initEngine();
+	    this._initEvents();
 	
 	    // Kick off the update and render loop
 	    this._update();
@@ -150,6 +151,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // this._engine.on('postRender', () => {});
 	    }
 	  }, {
+	    key: '_initEvents',
+	    value: function _initEvents() {
+	      this.on('controlsMoveEnd', this._onControlsMoveEnd);
+	    }
+	  }, {
+	    key: '_onControlsMoveEnd',
+	    value: function _onControlsMoveEnd(point) {
+	      this._resetView(this.unproject(point));
+	    }
+	
+	    // Reset world view
+	  }, {
+	    key: '_resetView',
+	    value: function _resetView(latlon) {
+	      this.emit('preResetView');
+	
+	      this._moveStart();
+	      this._move(latlon);
+	      this._moveEnd();
+	
+	      this.emit('postResetView');
+	    }
+	  }, {
+	    key: '_moveStart',
+	    value: function _moveStart() {
+	      this.emit('moveStart');
+	    }
+	  }, {
+	    key: '_move',
+	    value: function _move(latlon) {
+	      this._lastPosition = latlon;
+	      this.emit('move', latlon);
+	    }
+	  }, {
+	    key: '_moveEnd',
+	    value: function _moveEnd() {
+	      this.emit('moveEnd');
+	    }
+	  }, {
 	    key: '_update',
 	    value: function _update() {
 	      var delta = this._engine.clock.getDelta();
@@ -166,6 +206,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._engine._update(delta);
 	      this.emit('postUpdate');
 	    }
+	
+	    // Set world view
+	  }, {
+	    key: 'setView',
+	    value: function setView(latlon) {
+	      this._resetView(latlon);
+	      return this;
+	    }
+	
+	    // Return world geographic position
+	  }, {
+	    key: 'getPosition',
+	    value: function getPosition() {
+	      return this._lastPosition;
+	    }
+	
+	    // Transform geographic coordinate to world point
+	  }, {
+	    key: 'project',
+	    value: function project(latlon) {}
+	
+	    // Transform world point to geographic coordinate
+	  }, {
+	    key: 'unproject',
+	    value: function unproject(point) {}
 	  }, {
 	    key: 'addLayer',
 	    value: function addLayer(layer) {
@@ -739,15 +804,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _this = this;
 	
 	      this._controls.addEventListener('start', function (event) {
-	        _this._world.emit('moveStart');
+	        _this._world.emit('controlsMoveStart', event.target.center);
 	      });
 	
 	      this._controls.addEventListener('change', function (event) {
-	        _this._world.emit('move');
+	        _this._world.emit('controlsMove', event.target.center);
 	      });
 	
 	      this._controls.addEventListener('end', function (event) {
-	        _this._world.emit('moveEnd');
+	        _this._world.emit('controlsMoveEnd', event.target.center);
 	      });
 	    }
 	

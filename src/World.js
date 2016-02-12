@@ -13,6 +13,7 @@ class World extends EventEmitter {
 
     this._initContainer(domId);
     this._initEngine();
+    this._initEvents();
 
     // Kick off the update and render loop
     this._update();
@@ -32,6 +33,37 @@ class World extends EventEmitter {
     // this._engine.on('postRender', () => {});
   }
 
+  _initEvents() {
+    this.on('controlsMoveEnd', this._onControlsMoveEnd);
+  }
+
+  _onControlsMoveEnd(point) {
+    this._resetView(this.unproject(point));
+  }
+
+  // Reset world view
+  _resetView(latlon) {
+    this.emit('preResetView');
+
+    this._moveStart();
+    this._move(latlon);
+    this._moveEnd();
+
+    this.emit('postResetView');
+  }
+
+  _moveStart() {
+    this.emit('moveStart');
+  }
+
+  _move(latlon) {
+    this._lastPosition = latlon;
+    this.emit('move', latlon);
+  }
+  _moveEnd() {
+    this.emit('moveEnd');
+  }
+
   _update() {
     var delta = this._engine.clock.getDelta();
 
@@ -47,6 +79,23 @@ class World extends EventEmitter {
     this._engine._update(delta);
     this.emit('postUpdate');
   }
+
+  // Set world view
+  setView(latlon) {
+    this._resetView(latlon);
+    return this;
+  }
+
+  // Return world geographic position
+  getPosition() {
+    return this._lastPosition;
+  }
+
+  // Transform geographic coordinate to world point
+  project(latlon) {}
+
+  // Transform world point to geographic coordinate
+  unproject(point) {}
 
   addLayer(layer) {
     layer._addToWorld(this);

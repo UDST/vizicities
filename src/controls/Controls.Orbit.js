@@ -14,15 +14,15 @@ class Orbit extends EventEmitter {
   // There's currently no distinction between pan, orbit and zoom events
   _initEvents() {
     this._controls.addEventListener('start', (event) => {
-      this._world.emit('moveStart');
+      this._world.emit('controlsMoveStart', event.target.center);
     });
 
     this._controls.addEventListener('change', (event) => {
-      this._world.emit('move');
+      this._world.emit('controlsMove', event.target.center);
     });
 
     this._controls.addEventListener('end', (event) => {
-      this._world.emit('moveEnd');
+      this._world.emit('controlsMoveEnd', event.target.center);
     });
   }
 

@@ -1,4 +1,4 @@
-var world = VIZI.World('world');
+var world = VIZI.World('world').setView([51.505, -0.09]);
 
 // Not sure if I want to keep this as a public API
 //
