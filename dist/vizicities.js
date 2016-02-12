@@ -2011,6 +2011,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _get(Object.getPrototypeOf(EnvironmentLayer.prototype), 'constructor', this).call(this);
 	
 	    this._initLights();
+	    this._initGrid();
 	  }
 	
 	  // Initialise without requiring new keyword
@@ -2046,6 +2047,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      this._layer.add(helper);
 	      this._layer.add(helper2);
+	    }
+	
+	    // Add grid helper for context during initial development
+	  }, {
+	    key: '_initGrid',
+	    value: function _initGrid() {
+	      var size = 4000;
+	      var step = 100;
+	
+	      var gridHelper = new _three2['default'].GridHelper(size, step);
+	      this._layer.add(gridHelper);
 	    }
 	  }]);
 	

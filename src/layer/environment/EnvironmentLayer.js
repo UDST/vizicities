@@ -6,6 +6,7 @@ class EnvironmentLayer extends Layer {
     super();
 
     this._initLights();
+    this._initGrid();
   }
 
   // Not fleshed out or thought through yet
@@ -36,6 +37,15 @@ class EnvironmentLayer extends Layer {
 
     this._layer.add(helper);
     this._layer.add(helper2);
+  }
+
+  // Add grid helper for context during initial development
+  _initGrid() {
+    var size = 4000;
+    var step = 100;
+
+    var gridHelper = new THREE.GridHelper(size, step);
+    this._layer.add(gridHelper);
   }
 }
 
