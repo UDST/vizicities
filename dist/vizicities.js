@@ -730,20 +730,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // Initialise without requiring new keyword
 	
 	  // Proxy control events
+	  //
+	  // There's currently no distinction between pan, orbit and zoom events
 	
 	  _createClass(Orbit, [{
 	    key: '_initEvents',
 	    value: function _initEvents() {
+	      var _this = this;
+	
 	      this._controls.addEventListener('start', function (event) {
-	        console.log(event);
+	        _this._world.emit('moveStart');
 	      });
 	
 	      this._controls.addEventListener('change', function (event) {
-	        console.log(event);
+	        _this._world.emit('move');
 	      });
 	
 	      this._controls.addEventListener('end', function (event) {
-	        console.log(event);
+	        _this._world.emit('moveEnd');
 	      });
 	    }
 	
@@ -826,8 +830,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      this._controls.maxPolarAngle = Math.PI / 2;
 	
-	      this._controls.enableDamping = true;
-	      this._controls.dampingFactor = 0.25;
+	      // this._controls.enableDamping = true;
+	      // this._controls.dampingFactor = 0.25;
 	
 	      this._initEvents();
 	
