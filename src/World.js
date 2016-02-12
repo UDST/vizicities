@@ -1,5 +1,5 @@
 import EventEmitter from 'eventemitter3';
-import Engine from './Engine/Engine';
+import Engine from './engine/Engine';
 
 // Pretty much any event someone using ViziCities would need will be emitted or
 // proxied by World (eg. render events, etc)
@@ -7,6 +7,8 @@ import Engine from './Engine/Engine';
 class World extends EventEmitter {
   constructor(domId) {
     super();
+
+    this._layers = [];
 
     this._initContainer(domId);
     this._initEngine();
@@ -40,7 +42,18 @@ class World extends EventEmitter {
     this.emit('postUpdate');
   }
 
-  addLayer(layer) {}
+  addLayer(layer) {
+    layer._addToWorld(this);
+
+    this._layers.push(layer);
+
+    // Could move this into Layer but it'll do here for now
+    this._engine.scene.add(layer._layer);
+
+    this.emit('layerAdded', layer);
+    return this;
+  }
+
   removeLayer(layer) {}
 }
 

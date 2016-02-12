@@ -64,11 +64,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _World2 = _interopRequireDefault(_World);
 	
+	var _layerEnvironmentEnvironmentLayer = __webpack_require__(8);
+	
+	var _layerEnvironmentEnvironmentLayer2 = _interopRequireDefault(_layerEnvironmentEnvironmentLayer);
+	
 	var VIZI = {
 	  version: '0.3',
 	
 	  // Public API
-	  World: _World2['default']
+	  World: _World2['default'],
+	  EnvironmentLayer: _layerEnvironmentEnvironmentLayer2['default']
 	};
 	
 	exports['default'] = VIZI;
@@ -96,9 +101,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _eventemitter32 = _interopRequireDefault(_eventemitter3);
 	
-	var _EngineEngine = __webpack_require__(3);
+	var _engineEngine = __webpack_require__(3);
 	
-	var _EngineEngine2 = _interopRequireDefault(_EngineEngine);
+	var _engineEngine2 = _interopRequireDefault(_engineEngine);
 	
 	// Pretty much any event someone using ViziCities would need will be emitted or
 	// proxied by World (eg. render events, etc)
@@ -110,6 +115,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _classCallCheck(this, World);
 	
 	    _get(Object.getPrototypeOf(World.prototype), 'constructor', this).call(this);
+	
+	    this._layers = [];
 	
 	    this._initContainer(domId);
 	    this._initEngine();
@@ -128,7 +135,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_initEngine',
 	    value: function _initEngine() {
-	      this._engine = (0, _EngineEngine2['default'])(this._container);
+	      this._engine = (0, _engineEngine2['default'])(this._container);
 	
 	      // Engine events
 	      //
@@ -150,7 +157,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }, {
 	    key: 'addLayer',
-	    value: function addLayer(layer) {}
+	    value: function addLayer(layer) {
+	      layer._addToWorld(this);
+	
+	      this._layers.push(layer);
+	
+	      // Could move this into Layer but it'll do here for now
+	      this._engine.scene.add(layer._layer);
+	
+	      this.emit('layerAdded', layer);
+	      return this;
+	    }
 	  }, {
 	    key: 'removeLayer',
 	    value: function removeLayer(layer) {}
@@ -36807,6 +36824,154 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	;
+	module.exports = exports['default'];
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var _Layer2 = __webpack_require__(9);
+	
+	var _Layer3 = _interopRequireDefault(_Layer2);
+	
+	var _three = __webpack_require__(4);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var EnvironmentLayer = (function (_Layer) {
+	  _inherits(EnvironmentLayer, _Layer);
+	
+	  function EnvironmentLayer() {
+	    _classCallCheck(this, EnvironmentLayer);
+	
+	    _get(Object.getPrototypeOf(EnvironmentLayer.prototype), 'constructor', this).call(this);
+	
+	    this._initLights();
+	  }
+	
+	  // Initialise without requiring new keyword
+	
+	  // Not fleshed out or thought through yet
+	  //
+	  // Lights could potentially be put it their own 'layer' to keep this class
+	  // much simpler and less messy
+	
+	  _createClass(EnvironmentLayer, [{
+	    key: '_initLights',
+	    value: function _initLights() {
+	      // Position doesn't really matter (the angle is important), however it's
+	      // used here so the helpers look more natural.
+	
+	      var directionalLight = new _three2['default'].DirectionalLight(0x999999);
+	      directionalLight.intesity = 0.1;
+	      directionalLight.position.x = 100;
+	      directionalLight.position.y = 100;
+	      directionalLight.position.z = 100;
+	
+	      var directionalLight2 = new _three2['default'].DirectionalLight(0x999999);
+	      directionalLight2.intesity = 0.1;
+	      directionalLight2.position.x = -100;
+	      directionalLight2.position.y = 100;
+	      directionalLight2.position.z = -100;
+	
+	      var helper = new _three2['default'].DirectionalLightHelper(directionalLight, 10);
+	      var helper2 = new _three2['default'].DirectionalLightHelper(directionalLight2, 10);
+	
+	      this._layer.add(directionalLight);
+	      this._layer.add(directionalLight2);
+	
+	      this._layer.add(helper);
+	      this._layer.add(helper2);
+	    }
+	  }]);
+	
+	  return EnvironmentLayer;
+	})(_Layer3['default']);
+	
+	exports['default'] = function () {
+	  return new EnvironmentLayer();
+	};
+	
+	;
+	module.exports = exports['default'];
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var _eventemitter3 = __webpack_require__(2);
+	
+	var _eventemitter32 = _interopRequireDefault(_eventemitter3);
+	
+	var _three = __webpack_require__(4);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var _engineScene = __webpack_require__(5);
+	
+	var _engineScene2 = _interopRequireDefault(_engineScene);
+	
+	var Layer = (function (_EventEmitter) {
+	  _inherits(Layer, _EventEmitter);
+	
+	  function Layer() {
+	    _classCallCheck(this, Layer);
+	
+	    _get(Object.getPrototypeOf(Layer.prototype), 'constructor', this).call(this);
+	
+	    this._layer = new _three2['default'].Object3D();
+	  }
+	
+	  // Add layer to world instance and store world reference
+	
+	  _createClass(Layer, [{
+	    key: 'addTo',
+	    value: function addTo(world) {
+	      world.addLayer(this);
+	      return this;
+	    }
+	
+	    // Internal method called by World.addLayer to actually add the layer
+	  }, {
+	    key: '_addToWorld',
+	    value: function _addToWorld(world) {
+	      this._world = world;
+	      this.emit('added');
+	    }
+	  }]);
+	
+	  return Layer;
+	})(_eventemitter32['default']);
+	
+	exports['default'] = Layer;
 	module.exports = exports['default'];
 
 /***/ }

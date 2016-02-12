@@ -80,7 +80,12 @@ function build() {
     .pipe($.filter(['*', '!**/*.js.map']))
     .pipe($.rename(exportFileName + '.min.js'))
     .pipe($.sourcemaps.init({ loadMaps: true }))
-    .pipe($.uglify())
+
+    // Don't mangle class names so we can use them in the console
+    // jscs:disable
+    .pipe($.uglify({ mangle: { keep_fnames: true }}))
+    // jscs:enable
+
     .pipe($.sourcemaps.write('./'))
     .pipe(gulp.dest(destinationFolder));
 }
