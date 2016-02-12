@@ -54,11 +54,6 @@ class Orbit extends EventEmitter {
   // has got to
   _flyTo(point, noZoom) {}
 
-  // Internal methods called when before, during and after control updates
-  _onStart() {}
-  _onChange() {}
-  _onEnd() {}
-
   // Proxy to OrbitControls.update()
   update() {
     this._controls.update();
@@ -77,6 +72,11 @@ class Orbit extends EventEmitter {
     // TODO: Override panLeft and panUp methods to prevent panning on Y axis
     // See: http://stackoverflow.com/a/26188674/997339
     this._controls = new _OrbitControls(world._engine._camera, world._container);
+
+    this._controls.maxPolarAngle = Math.PI / 2;
+
+    this._controls.enableDamping = true;
+    this._controls.dampingFactor = 0.25;
 
     this._initEvents();
 

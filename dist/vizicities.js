@@ -799,17 +799,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_flyTo',
 	    value: function _flyTo(point, noZoom) {}
 	
-	    // Internal methods called when before, during and after control updates
-	  }, {
-	    key: '_onStart',
-	    value: function _onStart() {}
-	  }, {
-	    key: '_onChange',
-	    value: function _onChange() {}
-	  }, {
-	    key: '_onEnd',
-	    value: function _onEnd() {}
-	
 	    // Proxy to OrbitControls.update()
 	  }, {
 	    key: 'update',
@@ -834,6 +823,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // TODO: Override panLeft and panUp methods to prevent panning on Y axis
 	      // See: http://stackoverflow.com/a/26188674/997339
 	      this._controls = new _OrbitControls(world._engine._camera, world._container);
+	
+	      this._controls.maxPolarAngle = Math.PI / 2;
+	
+	      this._controls.enableDamping = true;
+	      this._controls.dampingFactor = 0.25;
 	
 	      this._initEvents();
 	
@@ -949,17 +943,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 				var v = new THREE.Vector3();
 	
-				return function panLeft ( distance ) {
+			  return function panLeft(distance) {
+			    var te = this.object.matrix.elements;
+			    var adjDist = distance / Math.cos(phi);
 	
-					var te = this.object.matrix.elements;
+			    v.set(te[ 0 ], 0, te[ 2 ]).normalize();
+			    v.multiplyScalar(-adjDist);
 	
-					// get X column of matrix
-					v.set( te[ 0 ], te[ 1 ], te[ 2 ] );
-					v.multiplyScalar( - distance );
-	
-					panOffset.add( v );
-	
-				};
+			    panOffset.add(v);
+			  };
 	
 			}();
 	
@@ -968,17 +960,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 				var v = new THREE.Vector3();
 	
-				return function panUp ( distance ) {
+			  return function panUp(distance) {
+			    var te = this.object.matrix.elements;
+			    var adjDist = distance / Math.cos(phi);
 	
-					var te = this.object.matrix.elements;
+			    v.set(te[ 8 ], 0, te[ 10 ]).normalize();
+			    v.multiplyScalar(-adjDist);
 	
-					// get Y column of matrix
-					v.set( te[ 4 ], te[ 5 ], te[ 6 ] );
-					v.multiplyScalar( distance );
-	
-					panOffset.add( v );
-	
-				};
+			    panOffset.add(v);
+			  };
 	
 			}();
 	
