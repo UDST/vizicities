@@ -75,7 +75,9 @@ function build() {
       },
       externals: {
         // Proxy the global THREE variable to require('three')
-        'three': 'THREE'
+        'three': 'THREE',
+        // Proxy the global proj4 variable to require('proj4')
+        'proj4': 'proj4'
       },
       module: {
         loaders: [
@@ -95,7 +97,8 @@ function build() {
     // jscs:enable
 
     .pipe($.sourcemaps.write('./'))
-    .pipe(gulp.dest(destinationFolder));
+    .pipe(gulp.dest(destinationFolder))
+    .pipe($.livereload());
 }
 
 function _mocha() {
@@ -132,6 +135,7 @@ const watchFiles = ['src/**/*', 'test/**/*', 'package.json', '**/.eslintrc', '.j
 
 // Run the headless unit tests as you make changes.
 function watch() {
+  $.livereload.listen();
   gulp.watch(watchFiles, ['build']);
   // gulp.watch(watchFiles, ['test']);
 }
@@ -158,7 +162,9 @@ function testBrowser() {
       },
       externals: {
         // Proxy the global THREE variable to require('three')
-        'three': 'THREE'
+        'three': 'THREE',
+        // Proxy the global proj4 variable to require('proj4')
+        'proj4': 'proj4'
       },
       module: {
         loaders: [

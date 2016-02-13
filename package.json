@@ -47,7 +47,7 @@
     "gulp-filter": "^3.0.0",
     "gulp-istanbul": "^0.10.0",
     "gulp-jscs": "^3.0.0",
-    "gulp-livereload": "^3.4.0",
+    "gulp-livereload": "^3.8.1",
     "gulp-load-plugins": "^0.10.0",
     "gulp-mocha": "^2.0.0",
     "gulp-plumber": "^1.0.1",
@@ -81,7 +81,6 @@
   "dependencies": {
     "eventemitter3": "^1.1.1",
     "lodash.assign": "^4.0.2",
-    "proj4": "^2.3.12",
     "three-orbit-controls": "github:robhawkes/three-orbit-controls"
   }
 }

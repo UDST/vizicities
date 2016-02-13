@@ -1,12 +1,22 @@
 import EventEmitter from 'eventemitter3';
+import extend from 'lodash.assign';
+import CRS from './geo/CRS/index';
 import Engine from './engine/Engine';
 
 // Pretty much any event someone using ViziCities would need will be emitted or
 // proxied by World (eg. render events, etc)
 
 class World extends EventEmitter {
-  constructor(domId) {
+  constructor(domId, options) {
     super();
+
+    var defaults = {
+      crs: CRS.EPSG3857
+    };
+
+    this._options = extend(defaults, options);
+
+    console.log(this._options);
 
     this._layers = [];
     this._controls = [];
@@ -125,6 +135,6 @@ class World extends EventEmitter {
 }
 
 // Initialise without requiring new keyword
-export default function(domId) {
-  return new World(domId);
+export default function(domId, options) {
+  return new World(domId, options);
 };
