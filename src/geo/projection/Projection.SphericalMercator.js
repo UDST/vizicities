@@ -6,6 +6,9 @@
  * https://github.com/Leaflet/Leaflet/blob/master/src/geo/projection/Projection.SphericalMercator.js
  */
 
+import LatLon from '../LatLon';
+import Point from '../Point';
+
 const SphericalMercator = {
   // Radius / WGS84 semi-major axis
   R: 6378137,
@@ -18,22 +21,22 @@ const SphericalMercator = {
   project: function(latlon) {
     var d = Math.PI / 180;
     var max = this.MAX_LATITUDE;
-    var lat = Math.max(Math.min(max, latlon[0]), -max);
+    var lat = Math.max(Math.min(max, latlon.lat), -max);
     var sin = Math.sin(lat * d);
 
-    return [
-      this.R * latlon[1] * d,
+    return Point(
+      this.R * latlon.lon * d,
       this.R * Math.log((1 + sin) / (1 - sin)) / 2
-    ];
+    );
   },
 
   unproject: function(point) {
     var d = 180 / Math.PI;
 
-    return [
-      (2 * Math.atan(Math.exp(point[1] / this.R)) - (Math.PI / 2)) * d,
-      point[0] * d / this.R
-    ];
+    return LatLon(
+      (2 * Math.atan(Math.exp(point.y / this.R)) - (Math.PI / 2)) * d,
+      point.x * d / this.R
+    );
   },
 
   // Scale factor for converting between real metres and projected metres
@@ -50,13 +53,13 @@ const SphericalMercator = {
     var k;
 
     if (!accurate) {
-      k = 1 / Math.cos(latlon[0] * rad);
+      k = 1 / Math.cos(latlon.lat * rad);
 
       // [scaleX, scaleY]
       return [k, k];
     } else {
-      var lat = latlon[0] * rad;
-      var lon = latlon[1] * rad;
+      var lat = latlon.lat * rad;
+      var lon = latlon.lon * rad;
 
       var a = this.R;
 

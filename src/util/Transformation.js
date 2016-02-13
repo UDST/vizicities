@@ -6,6 +6,8 @@
  * https://github.com/Leaflet/Leaflet/blob/master/src/geometry/Transformation.js
  */
 
+import Point from '../geo/Point';
+
 class Transformation {
   constructor(a, b, c, d) {
     this._a = a;
@@ -16,24 +18,24 @@ class Transformation {
 
   transform(point, scale) {
     // Copy input point as to not destroy the original data
-    return this._transform([point[0], point[1]], scale);
+    return this._transform(point.clone(), scale);
   }
 
   // Destructive transform (faster)
   _transform(point, scale) {
     scale = scale || 1;
 
-    point[0] = scale * (this._a * point[0] + this._b);
-    point[1] = scale * (this._c * point[1] + this._d);
+    point.x = scale * (this._a * point.x + this._b);
+    point.y = scale * (this._c * point.y + this._d);
     return point;
   }
 
   untransform(point, scale) {
     scale = scale || 1;
-    return [
-      (point[0] / scale - this._b) / this._a,
-      (point[1] / scale - this._d) / this._c
-    ];
+    return Point(
+      (point.x / scale - this._b) / this._a,
+      (point.y / scale - this._d) / this._c
+    );
   }
 }
 

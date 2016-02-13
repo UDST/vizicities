@@ -7,6 +7,9 @@
  * https://github.com/Leaflet/Leaflet/blob/master/src/geo/projection/Projection.Mercator.js
  */
 
+import LatLon from '../LatLon';
+import Point from '../Point';
+
 const Mercator = {
   // Radius / WGS84 semi-major axis
   R: 6378137,
@@ -19,7 +22,7 @@ const Mercator = {
   project: function(latlon) {
     var d = Math.PI / 180;
     var r = this.R;
-    var y = latlon[0] * d;
+    var y = latlon.lat * d;
     var tmp = this.R_MINOR / r;
     var e = Math.sqrt(1 - tmp * tmp);
     var con = e * Math.sin(y);
@@ -27,7 +30,7 @@ const Mercator = {
     var ts = Math.tan(Math.PI / 4 - y / 2) / Math.pow((1 - con) / (1 + con), e / 2);
     y = -r * Math.log(Math.max(ts, 1E-10));
 
-    return [latlon[1] * d * r, y];
+    return Point(latlon.lon * d * r, y);
   },
 
   unproject: function(point) {
@@ -35,7 +38,7 @@ const Mercator = {
     var r = this.R;
     var tmp = this.R_MINOR / r;
     var e = Math.sqrt(1 - tmp * tmp);
-    var ts = Math.exp(-point[1] / r);
+    var ts = Math.exp(-point.y / r);
     var phi = Math.PI / 2 - 2 * Math.atan(ts);
 
     for (var i = 0, dphi = 0.1, con; i < 15 && Math.abs(dphi) > 1e-7; i++) {
@@ -45,7 +48,7 @@ const Mercator = {
       phi += dphi;
     }
 
-    return [phi * d, point[0] * d / r];
+    return LatLon(phi * d, point.x * d / r);
   },
 
   // Scale factor for converting between real metres and projected metres
@@ -56,7 +59,7 @@ const Mercator = {
   // See pg.8: http://www.hydrometronics.com/downloads/Web%20Mercator%20-%20Non-Conformal,%20Non-Mercator%20(notes).pdf
   pointScale: function(latlon) {
     var rad = Math.PI / 180;
-    var lat = latlon[0] * rad;
+    var lat = latlon.lat * rad;
     var sinLat = Math.sin(lat);
     var sinLat2 = sinLat * sinLat;
     var cosLat = Math.cos(lat);

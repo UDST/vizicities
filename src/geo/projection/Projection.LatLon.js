@@ -6,13 +6,16 @@
  * https://github.com/Leaflet/Leaflet/blob/master/src/geo/projection/Projection.LonLat.js
  */
 
-const LatLon = {
+import LatLon from '../LatLon';
+import Point from '../Point';
+
+const ProjectionLatLon = {
   project: function(latlon) {
-    return [latlon[1], latlon[0]];
+    return Point(latlon.lon, latlon.lat);
   },
 
   unproject: function(point) {
-    return [point[1], point[0]];
+    return LatLon(point.y, point.x);
   },
 
   // Scale factor for converting between real metres and degrees
@@ -32,7 +35,7 @@ const LatLon = {
     var p3 = 0.118;
 
     var rad = Math.PI / 180;
-    var lat = latlon[0] * rad;
+    var lat = latlon.lat * rad;
 
     var latlen = m1 + m2 * Math.cos(2 * lat) + m3 * Math.cos(4 * lat) + m4 * Math.cos(6 * lat);
     var lonlen = p1 * Math.cos(lat) + p2 * Math.cos(3 * lat) + p3 * Math.cos(5 * lat);
@@ -43,4 +46,4 @@ const LatLon = {
   bounds: [[-180, -90], [180, 90]]
 };
 
-export default LatLon;
+export default ProjectionLatLon;

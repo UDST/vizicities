@@ -7,7 +7,7 @@
 		exports["VIZI"] = factory(require("proj4"), require("THREE"));
 	else
 		root["VIZI"] = factory(root["proj4"], root["THREE"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_20__, __WEBPACK_EXTERNAL_MODULE_22__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_22__, __WEBPACK_EXTERNAL_MODULE_24__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -64,13 +64,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _World2 = _interopRequireDefault(_World);
 	
-	var _controlsIndex = __webpack_require__(26);
+	var _controlsIndex = __webpack_require__(28);
 	
 	var _controlsIndex2 = _interopRequireDefault(_controlsIndex);
 	
-	var _layerEnvironmentEnvironmentLayer = __webpack_require__(29);
+	var _layerEnvironmentEnvironmentLayer = __webpack_require__(31);
 	
 	var _layerEnvironmentEnvironmentLayer2 = _interopRequireDefault(_layerEnvironmentEnvironmentLayer);
+	
+	var _geoPoint = __webpack_require__(13);
+	
+	var _geoPoint2 = _interopRequireDefault(_geoPoint);
+	
+	var _geoLatLon = __webpack_require__(10);
+	
+	var _geoLatLon2 = _interopRequireDefault(_geoLatLon);
 	
 	var VIZI = {
 	  version: '0.3',
@@ -78,7 +86,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // Public API
 	  World: _World2['default'],
 	  Controls: _controlsIndex2['default'],
-	  EnvironmentLayer: _layerEnvironmentEnvironmentLayer2['default']
+	  EnvironmentLayer: _layerEnvironmentEnvironmentLayer2['default'],
+	  Point: _geoPoint2['default'],
+	  LatLon: _geoLatLon2['default']
 	};
 	
 	exports['default'] = VIZI;
@@ -114,7 +124,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _geoCRSIndex2 = _interopRequireDefault(_geoCRSIndex);
 	
-	var _engineEngine = __webpack_require__(21);
+	var _geoPoint = __webpack_require__(13);
+	
+	var _geoPoint2 = _interopRequireDefault(_geoPoint);
+	
+	var _geoLatLon = __webpack_require__(10);
+	
+	var _geoLatLon2 = _interopRequireDefault(_geoLatLon);
+	
+	var _engineEngine = __webpack_require__(23);
 	
 	var _engineEngine2 = _interopRequireDefault(_engineEngine);
 	
@@ -133,9 +151,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      crs: _geoCRSIndex2['default'].EPSG3857
 	    };
 	
-	    this._options = (0, _lodashAssign2['default'])(defaults, options);
-	
-	    console.log(this._options);
+	    this.options = (0, _lodashAssign2['default'])(defaults, options);
 	
 	    this._layers = [];
 	    this._controls = [];
@@ -174,7 +190,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_onControlsMoveEnd',
 	    value: function _onControlsMoveEnd(point) {
-	      this._resetView(this.unproject(point));
+	      this._resetView(this.pointToLatLon([point.x, point.z]));
 	    }
 	
 	    // Reset world view
@@ -227,6 +243,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'setView',
 	    value: function setView(latlon) {
+	      // Store initial geographic coordinate for the [0,0,0] world position
+	      //
+	      // The origin point doesn't move in three.js / 3D space so only set it once
+	      // here instead of every time _resetView is called
+	      //
+	      // If it was updated every time then coorindates would shift over time and
+	      // would be out of place / context with previously-placed points (0,0 would
+	      // refer to a different point each time)
+	      this._originLatlon = latlon;
+	      this._originPoint = this.project(latlon);
+	
 	      this._resetView(latlon);
 	      return this;
 	    }
@@ -239,14 +266,50 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    // Transform geographic coordinate to world point
+	    //
+	    // This doesn't take into account the origin offset
+	    //
+	    // For example, this takes a geographic coordinate and returns a point
+	    // relative to the origin point of the projection (not the world)
 	  }, {
 	    key: 'project',
-	    value: function project(latlon) {}
+	    value: function project(latlon) {
+	      return this.options.crs.latLonToPoint((0, _geoLatLon2['default'])(latlon));
+	    }
 	
 	    // Transform world point to geographic coordinate
+	    //
+	    // This doesn't take into account the origin offset
+	    //
+	    // For example, this takes a point relative to the origin point of the
+	    // projection (not the world) and returns a geographic coordinate
 	  }, {
 	    key: 'unproject',
-	    value: function unproject(point) {}
+	    value: function unproject(point) {
+	      return this.options.crs.pointToLatLon((0, _geoPoint2['default'])(point));
+	    }
+	
+	    // Takes into account the origin offset
+	    //
+	    // For example, this takes a geographic coordinate and returns a point
+	    // relative to the three.js / 3D origin (0,0)
+	  }, {
+	    key: 'latLonToPoint',
+	    value: function latLonToPoint(latlon) {
+	      var projectedPoint = this.project((0, _geoLatLon2['default'])(latlon));
+	      return projectedPoint._subtract(this._originPoint);
+	    }
+	
+	    // Takes into account the origin offset
+	    //
+	    // For example, this takes a point relative to the three.js / 3D origin (0,0)
+	    // and returns the exact geographic coordinate at that point
+	  }, {
+	    key: 'pointToLatLon',
+	    value: function pointToLatLon(point) {
+	      var projectedPoint = (0, _geoPoint2['default'])(point).add(this._originPoint);
+	      return this.unproject(projectedPoint);
+	    }
 	  }, {
 	    key: 'addLayer',
 	    value: function addLayer(layer) {
@@ -1637,19 +1700,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _CRSEPSG38572 = _interopRequireDefault(_CRSEPSG3857);
 	
-	var _CRSEPSG3395 = __webpack_require__(13);
+	var _CRSEPSG3395 = __webpack_require__(15);
 	
 	var _CRSEPSG33952 = _interopRequireDefault(_CRSEPSG3395);
 	
-	var _CRSEPSG4326 = __webpack_require__(15);
+	var _CRSEPSG4326 = __webpack_require__(17);
 	
 	var _CRSEPSG43262 = _interopRequireDefault(_CRSEPSG4326);
 	
-	var _CRSSimple = __webpack_require__(17);
+	var _CRSSimple = __webpack_require__(19);
 	
 	var _CRSSimple2 = _interopRequireDefault(_CRSSimple);
 	
-	var _CRSProj4 = __webpack_require__(18);
+	var _CRSProj4 = __webpack_require__(20);
 	
 	var _CRSProj42 = _interopRequireDefault(_CRSProj4);
 	
@@ -1690,11 +1753,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _CRSEarth2 = _interopRequireDefault(_CRSEarth);
 	
-	var _projectionProjectionSphericalMercator = __webpack_require__(11);
+	var _projectionProjectionSphericalMercator = __webpack_require__(12);
 	
 	var _projectionProjectionSphericalMercator2 = _interopRequireDefault(_projectionProjectionSphericalMercator);
 	
-	var _utilTransformation = __webpack_require__(12);
+	var _utilTransformation = __webpack_require__(14);
 	
 	var _utilTransformation2 = _interopRequireDefault(_utilTransformation);
 	
@@ -1749,6 +1812,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _CRS2 = _interopRequireDefault(_CRS);
 	
+	var _LatLon = __webpack_require__(10);
+	
+	var _LatLon2 = _interopRequireDefault(_LatLon);
+	
 	var Earth = {
 	  wrapLon: [-180, 180],
 	
@@ -1767,18 +1834,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var a;
 	
 	    if (!accurate) {
-	      lat1 = latlon1[0] * rad;
-	      lat2 = latlon2[0] * rad;
+	      lat1 = latlon1.lat * rad;
+	      lat2 = latlon2.lat * rad;
 	
-	      a = Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos((latlon2[1] - latlon1[1]) * rad);
+	      a = Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos((latlon2.lon - latlon1.lon) * rad);
 	
 	      return this.R * Math.acos(Math.min(a, 1));
 	    } else {
-	      lat1 = latlon1[0] * rad;
-	      lat2 = latlon2[0] * rad;
+	      lat1 = latlon1.lat * rad;
+	      lat2 = latlon2.lat * rad;
 	
-	      var lon1 = latlon1[1] * rad;
-	      var lon2 = latlon2[1] * rad;
+	      var lon1 = latlon1.lon * rad;
+	      var lon2 = latlon2.lon * rad;
 	
 	      var deltaLat = lat2 - lat1;
 	      var deltaLon = lon2 - lon1;
@@ -1879,7 +1946,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * https://github.com/Leaflet/Leaflet/blob/master/src/geo/crs/CRS.js
 	 */
 	
-	var _utilWrapNum = __webpack_require__(10);
+	var _LatLon = __webpack_require__(10);
+	
+	var _LatLon2 = _interopRequireDefault(_LatLon);
+	
+	var _utilWrapNum = __webpack_require__(11);
 	
 	var _utilWrapNum2 = _interopRequireDefault(_utilWrapNum);
 	
@@ -1985,11 +2056,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  // Wraps geo coords in certain ranges if applicable
 	  wrapLatLon: function wrapLatLon(latlon) {
-	    var lat = this.wrapLat ? (0, _utilWrapNum2['default'])(latlon[0], this.wrapLat, true) : latlon[0];
-	    var lng = this.wrapLon ? (0, _utilWrapNum2['default'])(latlon[1], this.wrapLon, true) : latlon[1];
-	    var alt = latlon[2];
+	    var lat = this.wrapLat ? (0, _utilWrapNum2['default'])(latlon.lat, this.wrapLat, true) : latlon.lat;
+	    var lng = this.wrapLon ? (0, _utilWrapNum2['default'])(latlon.lon, this.wrapLon, true) : latlon.lon;
+	    var alt = latlon.alt;
 	
-	    return [lat, lng, alt];
+	    return (0, _LatLon2['default'])(lat, lng, alt);
 	  }
 	};
 	
@@ -1998,6 +2069,84 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 10 */
+/***/ function(module, exports) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	/*
+	 * LatLon is a helper class for ensuring consistent geographic coordinates.
+	 *
+	 * Based on:
+	 * https://github.com/Leaflet/Leaflet/blob/master/src/geo/LatLng.js
+	 */
+	
+	var LatLon = (function () {
+	  function LatLon(lat, lon, alt) {
+	    _classCallCheck(this, LatLon);
+	
+	    if (isNaN(lat) || isNaN(lon)) {
+	      throw new Error('Invalid LatLon object: (' + lat + ', ' + lon + ')');
+	    }
+	
+	    this.lat = +lat;
+	    this.lon = +lon;
+	
+	    if (alt !== undefined) {
+	      this.alt = +alt;
+	    }
+	  }
+	
+	  // Initialise without requiring new keyword
+	  //
+	  // Accepts (LatLon), ([lat, lon, alt]), ([lat, lon]) and (lat, lon, alt)
+	  // Also converts between lng and lon
+	
+	  _createClass(LatLon, [{
+	    key: 'clone',
+	    value: function clone() {
+	      return new LatLon(this.lat, this.lon, this.alt);
+	    }
+	  }]);
+	
+	  return LatLon;
+	})();
+	
+	exports['default'] = function (a, b, c) {
+	  if (a instanceof LatLon) {
+	    return a;
+	  }
+	  if (Array.isArray(a) && typeof a[0] !== 'object') {
+	    if (a.length === 3) {
+	      return new LatLon(a[0], a[1], a[2]);
+	    }
+	    if (a.length === 2) {
+	      return new LatLon(a[0], a[1]);
+	    }
+	    return null;
+	  }
+	  if (a === undefined || a === null) {
+	    return a;
+	  }
+	  if (typeof a === 'object' && 'lat' in a) {
+	    return new LatLon(a.lat, 'lng' in a ? a.lng : a.lon, a.alt);
+	  }
+	  if (b === undefined) {
+	    return null;
+	  }
+	  return new LatLon(a, b, c);
+	};
+	
+	;
+	module.exports = exports['default'];
+
+/***/ },
+/* 11 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -2021,12 +2170,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 11 */
-/***/ function(module, exports) {
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
 
-	Object.defineProperty(exports, "__esModule", {
+	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
 	/*
 	 * Spherical Mercator is the most popular map projection, used by EPSG:3857 CRS
 	 * used by default.
@@ -2034,6 +2186,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Based on:
 	 * https://github.com/Leaflet/Leaflet/blob/master/src/geo/projection/Projection.SphericalMercator.js
 	 */
+	
+	var _LatLon = __webpack_require__(10);
+	
+	var _LatLon2 = _interopRequireDefault(_LatLon);
+	
+	var _Point = __webpack_require__(13);
+	
+	var _Point2 = _interopRequireDefault(_Point);
 	
 	var SphericalMercator = {
 	  // Radius / WGS84 semi-major axis
@@ -2047,16 +2207,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	  project: function project(latlon) {
 	    var d = Math.PI / 180;
 	    var max = this.MAX_LATITUDE;
-	    var lat = Math.max(Math.min(max, latlon[0]), -max);
+	    var lat = Math.max(Math.min(max, latlon.lat), -max);
 	    var sin = Math.sin(lat * d);
 	
-	    return [this.R * latlon[1] * d, this.R * Math.log((1 + sin) / (1 - sin)) / 2];
+	    return (0, _Point2['default'])(this.R * latlon.lon * d, this.R * Math.log((1 + sin) / (1 - sin)) / 2);
 	  },
 	
 	  unproject: function unproject(point) {
 	    var d = 180 / Math.PI;
 	
-	    return [(2 * Math.atan(Math.exp(point[1] / this.R)) - Math.PI / 2) * d, point[0] * d / this.R];
+	    return (0, _LatLon2['default'])((2 * Math.atan(Math.exp(point.y / this.R)) - Math.PI / 2) * d, point.x * d / this.R);
 	  },
 	
 	  // Scale factor for converting between real metres and projected metres
@@ -2073,13 +2233,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var k;
 	
 	    if (!accurate) {
-	      k = 1 / Math.cos(latlon[0] * rad);
+	      k = 1 / Math.cos(latlon.lat * rad);
 	
 	      // [scaleX, scaleY]
 	      return [k, k];
 	    } else {
-	      var lat = latlon[0] * rad;
-	      var lon = latlon[1] * rad;
+	      var lat = latlon.lat * rad;
+	      var lon = latlon.lon * rad;
 	
 	      var a = this.R;
 	
@@ -2112,11 +2272,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  })()
 	};
 	
-	exports["default"] = SphericalMercator;
-	module.exports = exports["default"];
+	exports['default'] = SphericalMercator;
+	module.exports = exports['default'];
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -2128,12 +2288,106 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	/*
+	 * Point is a helper class for ensuring consistent world positions.
+	 *
+	 * Based on:
+	 * https://github.com/Leaflet/Leaflet/blob/master/src/geo/Point.js
+	 */
+	
+	var Point = (function () {
+	  function Point(x, y, round) {
+	    _classCallCheck(this, Point);
+	
+	    this.x = round ? Math.round(x) : x;
+	    this.y = round ? Math.round(y) : y;
+	  }
+	
+	  // Accepts (point), ([x, y]) and (x, y, round)
+	
+	  _createClass(Point, [{
+	    key: "clone",
+	    value: function clone() {
+	      return new Point(this.x, this.y);
+	    }
+	
+	    // Non-destructive
+	  }, {
+	    key: "add",
+	    value: function add(point) {
+	      return this.clone()._add(_point(point));
+	    }
+	
+	    // Destructive
+	  }, {
+	    key: "_add",
+	    value: function _add(point) {
+	      this.x += point.x;
+	      this.y += point.y;
+	      return this;
+	    }
+	
+	    // Non-destructive
+	  }, {
+	    key: "subtract",
+	    value: function subtract(point) {
+	      return this.clone()._subtract(_point(point));
+	    }
+	
+	    // Destructive
+	  }, {
+	    key: "_subtract",
+	    value: function _subtract(point) {
+	      this.x -= point.x;
+	      this.y -= point.y;
+	      return this;
+	    }
+	  }]);
+	
+	  return Point;
+	})();
+	
+	var _point = function _point(x, y, round) {
+	  if (x instanceof Point) {
+	    return x;
+	  }
+	  if (Array.isArray(x)) {
+	    return new Point(x[0], x[1]);
+	  }
+	  if (x === undefined || x === null) {
+	    return x;
+	  }
+	  return new Point(x, y, round);
+	};
+	
+	// Initialise without requiring new keyword
+	exports["default"] = _point;
+	module.exports = exports["default"];
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	/*
 	 * Transformation is an utility class to perform simple point transformations
 	 * through a 2d-matrix.
 	 *
 	 * Based on:
 	 * https://github.com/Leaflet/Leaflet/blob/master/src/geometry/Transformation.js
 	 */
+	
+	var _geoPoint = __webpack_require__(13);
+	
+	var _geoPoint2 = _interopRequireDefault(_geoPoint);
 	
 	var Transformation = (function () {
 	  function Transformation(a, b, c, d) {
@@ -2146,38 +2400,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	  _createClass(Transformation, [{
-	    key: "transform",
+	    key: 'transform',
 	    value: function transform(point, scale) {
 	      // Copy input point as to not destroy the original data
-	      return this._transform([point[0], point[1]], scale);
+	      return this._transform(point.clone(), scale);
 	    }
 	
 	    // Destructive transform (faster)
 	  }, {
-	    key: "_transform",
+	    key: '_transform',
 	    value: function _transform(point, scale) {
 	      scale = scale || 1;
 	
-	      point[0] = scale * (this._a * point[0] + this._b);
-	      point[1] = scale * (this._c * point[1] + this._d);
+	      point.x = scale * (this._a * point.x + this._b);
+	      point.y = scale * (this._c * point.y + this._d);
 	      return point;
 	    }
 	  }, {
-	    key: "untransform",
+	    key: 'untransform',
 	    value: function untransform(point, scale) {
 	      scale = scale || 1;
-	      return [(point[0] / scale - this._b) / this._a, (point[1] / scale - this._d) / this._c];
+	      return (0, _geoPoint2['default'])((point.x / scale - this._b) / this._a, (point.y / scale - this._d) / this._c);
 	    }
 	  }]);
 	
 	  return Transformation;
 	})();
 	
-	exports["default"] = Transformation;
-	module.exports = exports["default"];
+	exports['default'] = Transformation;
+	module.exports = exports['default'];
 
 /***/ },
-/* 13 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -2201,11 +2455,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _CRSEarth2 = _interopRequireDefault(_CRSEarth);
 	
-	var _projectionProjectionMercator = __webpack_require__(14);
+	var _projectionProjectionMercator = __webpack_require__(16);
 	
 	var _projectionProjectionMercator2 = _interopRequireDefault(_projectionProjectionMercator);
 	
-	var _utilTransformation = __webpack_require__(12);
+	var _utilTransformation = __webpack_require__(14);
 	
 	var _utilTransformation2 = _interopRequireDefault(_utilTransformation);
 	
@@ -2232,12 +2486,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 14 */
-/***/ function(module, exports) {
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
 
-	Object.defineProperty(exports, "__esModule", {
+	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
 	/*
 	 * Mercator projection that takes into account that the Earth is not a perfect
 	 * sphere. Less popular than spherical mercator; used by projections like
@@ -2246,6 +2503,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Based on:
 	 * https://github.com/Leaflet/Leaflet/blob/master/src/geo/projection/Projection.Mercator.js
 	 */
+	
+	var _LatLon = __webpack_require__(10);
+	
+	var _LatLon2 = _interopRequireDefault(_LatLon);
+	
+	var _Point = __webpack_require__(13);
+	
+	var _Point2 = _interopRequireDefault(_Point);
 	
 	var Mercator = {
 	  // Radius / WGS84 semi-major axis
@@ -2259,7 +2524,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  project: function project(latlon) {
 	    var d = Math.PI / 180;
 	    var r = this.R;
-	    var y = latlon[0] * d;
+	    var y = latlon.lat * d;
 	    var tmp = this.R_MINOR / r;
 	    var e = Math.sqrt(1 - tmp * tmp);
 	    var con = e * Math.sin(y);
@@ -2267,7 +2532,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var ts = Math.tan(Math.PI / 4 - y / 2) / Math.pow((1 - con) / (1 + con), e / 2);
 	    y = -r * Math.log(Math.max(ts, 1E-10));
 	
-	    return [latlon[1] * d * r, y];
+	    return (0, _Point2['default'])(latlon.lon * d * r, y);
 	  },
 	
 	  unproject: function unproject(point) {
@@ -2275,7 +2540,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var r = this.R;
 	    var tmp = this.R_MINOR / r;
 	    var e = Math.sqrt(1 - tmp * tmp);
-	    var ts = Math.exp(-point[1] / r);
+	    var ts = Math.exp(-point.y / r);
 	    var phi = Math.PI / 2 - 2 * Math.atan(ts);
 	
 	    for (var i = 0, dphi = 0.1, con; i < 15 && Math.abs(dphi) > 1e-7; i++) {
@@ -2285,7 +2550,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      phi += dphi;
 	    }
 	
-	    return [phi * d, point[0] * d / r];
+	    return (0, _LatLon2['default'])(phi * d, point.x * d / r);
 	  },
 	
 	  // Scale factor for converting between real metres and projected metres
@@ -2296,7 +2561,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // See pg.8: http://www.hydrometronics.com/downloads/Web%20Mercator%20-%20Non-Conformal,%20Non-Mercator%20(notes).pdf
 	  pointScale: function pointScale(latlon) {
 	    var rad = Math.PI / 180;
-	    var lat = latlon[0] * rad;
+	    var lat = latlon.lat * rad;
 	    var sinLat = Math.sin(lat);
 	    var sinLat2 = sinLat * sinLat;
 	    var cosLat = Math.cos(lat);
@@ -2310,11 +2575,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  bounds: [[-20037508.34279, -15496570.73972], [20037508.34279, 18764656.23138]]
 	};
 	
-	exports["default"] = Mercator;
-	module.exports = exports["default"];
+	exports['default'] = Mercator;
+	module.exports = exports['default'];
 
 /***/ },
-/* 15 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -2338,11 +2603,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _CRSEarth2 = _interopRequireDefault(_CRSEarth);
 	
-	var _projectionProjectionLatLon = __webpack_require__(16);
+	var _projectionProjectionLatLon = __webpack_require__(18);
 	
 	var _projectionProjectionLatLon2 = _interopRequireDefault(_projectionProjectionLatLon);
 	
-	var _utilTransformation = __webpack_require__(12);
+	var _utilTransformation = __webpack_require__(14);
 	
 	var _utilTransformation2 = _interopRequireDefault(_utilTransformation);
 	
@@ -2366,12 +2631,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 16 */
-/***/ function(module, exports) {
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
 
-	Object.defineProperty(exports, "__esModule", {
+	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
 	/*
 	 * Simple equirectangular (Plate Carree) projection, used by CRS like EPSG:4326
 	 * and Simple.
@@ -2380,13 +2648,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * https://github.com/Leaflet/Leaflet/blob/master/src/geo/projection/Projection.LonLat.js
 	 */
 	
-	var LatLon = {
+	var _LatLon = __webpack_require__(10);
+	
+	var _LatLon2 = _interopRequireDefault(_LatLon);
+	
+	var _Point = __webpack_require__(13);
+	
+	var _Point2 = _interopRequireDefault(_Point);
+	
+	var ProjectionLatLon = {
 	  project: function project(latlon) {
-	    return [latlon[1], latlon[0]];
+	    return (0, _Point2['default'])(latlon[1], latlon[0]);
 	  },
 	
 	  unproject: function unproject(point) {
-	    return [point[1], point[0]];
+	    return (0, _LatLon2['default'])(point[1], point[0]);
 	  },
 	
 	  // Scale factor for converting between real metres and degrees
@@ -2406,7 +2682,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var p3 = 0.118;
 	
 	    var rad = Math.PI / 180;
-	    var lat = latlon[0] * rad;
+	    var lat = latlon.lat * rad;
 	
 	    var latlen = m1 + m2 * Math.cos(2 * lat) + m3 * Math.cos(4 * lat) + m4 * Math.cos(6 * lat);
 	    var lonlen = p1 * Math.cos(lat) + p2 * Math.cos(3 * lat) + p3 * Math.cos(5 * lat);
@@ -2417,11 +2693,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  bounds: [[-180, -90], [180, 90]]
 	};
 	
-	exports["default"] = LatLon;
-	module.exports = exports["default"];
+	exports['default'] = ProjectionLatLon;
+	module.exports = exports['default'];
 
 /***/ },
-/* 17 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -2446,11 +2722,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _CRS2 = _interopRequireDefault(_CRS);
 	
-	var _projectionProjectionLatLon = __webpack_require__(16);
+	var _projectionProjectionLatLon = __webpack_require__(18);
 	
 	var _projectionProjectionLatLon2 = _interopRequireDefault(_projectionProjectionLatLon);
 	
-	var _utilTransformation = __webpack_require__(12);
+	var _utilTransformation = __webpack_require__(14);
 	
 	var _utilTransformation2 = _interopRequireDefault(_utilTransformation);
 	
@@ -2476,8 +2752,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 	
 	  distance: function distance(latlon1, latlon2) {
-	    var dx = latlon2[1] - latlon1[1];
-	    var dy = latlon2[0] - latlon1[0];
+	    var dx = latlon2.lon - latlon1.lon;
+	    var dy = latlon2.lat - latlon1.lat;
 	
 	    return Math.sqrt(dx * dx + dy * dy);
 	  },
@@ -2491,7 +2767,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 18 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -2512,11 +2788,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _CRSEarth2 = _interopRequireDefault(_CRSEarth);
 	
-	var _projectionProjectionProj4 = __webpack_require__(19);
+	var _projectionProjectionProj4 = __webpack_require__(21);
 	
 	var _projectionProjectionProj42 = _interopRequireDefault(_projectionProjectionProj4);
 	
-	var _utilTransformation = __webpack_require__(12);
+	var _utilTransformation = __webpack_require__(14);
 	
 	var _utilTransformation2 = _interopRequireDefault(_utilTransformation);
 	
@@ -2564,7 +2840,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 19 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -2577,20 +2853,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Proj4 support for any projection.
 	 */
 	
-	var _proj4 = __webpack_require__(20);
+	var _proj4 = __webpack_require__(22);
 	
 	var _proj42 = _interopRequireDefault(_proj4);
+	
+	var _LatLon = __webpack_require__(10);
+	
+	var _LatLon2 = _interopRequireDefault(_LatLon);
+	
+	var _Point = __webpack_require__(13);
+	
+	var _Point2 = _interopRequireDefault(_Point);
 	
 	var Proj4 = function Proj4(def, bounds) {
 	  var proj = (0, _proj42['default'])(def);
 	
 	  var project = function project(latlon) {
-	    return proj.forward([latlon[1], latlon[0]]);
+	    return (0, _Point2['default'])(proj.forward([latlon.lon, latlon.lat]));
 	  };
 	
 	  var unproject = function unproject(point) {
 	    var inverse = proj.inverse(point);
-	    return [inverse[1], inverse[0]];
+	    return (0, _LatLon2['default'])(inverse[1], inverse[0]);
 	  };
 	
 	  return {
@@ -2632,13 +2916,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 20 */
+/* 22 */
 /***/ function(module, exports) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_20__;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_22__;
 
 /***/ },
-/* 21 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -2659,19 +2943,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _eventemitter32 = _interopRequireDefault(_eventemitter3);
 	
-	var _three = __webpack_require__(22);
+	var _three = __webpack_require__(24);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _Scene = __webpack_require__(23);
+	var _Scene = __webpack_require__(25);
 	
 	var _Scene2 = _interopRequireDefault(_Scene);
 	
-	var _Renderer = __webpack_require__(24);
+	var _Renderer = __webpack_require__(26);
 	
 	var _Renderer2 = _interopRequireDefault(_Renderer);
 	
-	var _Camera = __webpack_require__(25);
+	var _Camera = __webpack_require__(27);
 	
 	var _Camera2 = _interopRequireDefault(_Camera);
 	
@@ -2713,13 +2997,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 22 */
+/* 24 */
 /***/ function(module, exports) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_22__;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_24__;
 
 /***/ },
-/* 23 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -2728,7 +3012,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _three = __webpack_require__(22);
+	var _three = __webpack_require__(24);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -2744,7 +3028,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 24 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -2753,11 +3037,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _three = __webpack_require__(22);
+	var _three = __webpack_require__(24);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _Scene = __webpack_require__(23);
+	var _Scene = __webpack_require__(25);
 	
 	var _Scene2 = _interopRequireDefault(_Scene);
 	
@@ -2791,7 +3075,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 25 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -2800,7 +3084,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _three = __webpack_require__(22);
+	var _three = __webpack_require__(24);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -2826,7 +3110,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 26 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -2835,7 +3119,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _ControlsOrbit = __webpack_require__(27);
+	var _ControlsOrbit = __webpack_require__(29);
 	
 	var _ControlsOrbit2 = _interopRequireDefault(_ControlsOrbit);
 	
@@ -2847,7 +3131,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 27 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -2868,11 +3152,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _eventemitter32 = _interopRequireDefault(_eventemitter3);
 	
-	var _three = __webpack_require__(22);
+	var _three = __webpack_require__(24);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _threeOrbitControls = __webpack_require__(28);
+	var _threeOrbitControls = __webpack_require__(30);
 	
 	var _threeOrbitControls2 = _interopRequireDefault(_threeOrbitControls);
 	
@@ -2988,7 +3272,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // See: http://stackoverflow.com/a/26188674/997339
 	      this._controls = new _OrbitControls(world._engine._camera, world._container);
 	
-	      this._controls.maxPolarAngle = Math.PI / 2;
+	      // Disable keys for now as no events are fired for them anyway
+	      this._controls.keys = false;
+	
+	      // 89 degrees
+	      this._controls.maxPolarAngle = 1.5533;
 	
 	      // this._controls.enableDamping = true;
 	      // this._controls.dampingFactor = 0.25;
@@ -3010,7 +3298,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 28 */
+/* 30 */
 /***/ function(module, exports) {
 
 	module.exports = function(THREE) {
@@ -4131,7 +4419,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 29 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -4148,11 +4436,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Layer2 = __webpack_require__(30);
+	var _Layer2 = __webpack_require__(32);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
-	var _three = __webpack_require__(22);
+	var _three = __webpack_require__(24);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -4226,7 +4514,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 30 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -4247,11 +4535,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _eventemitter32 = _interopRequireDefault(_eventemitter3);
 	
-	var _three = __webpack_require__(22);
+	var _three = __webpack_require__(24);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _engineScene = __webpack_require__(23);
+	var _engineScene = __webpack_require__(25);
 	
 	var _engineScene2 = _interopRequireDefault(_engineScene);
 	

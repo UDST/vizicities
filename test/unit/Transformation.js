@@ -1,4 +1,5 @@
 import Transformation from '../../src/util/Transformation';
+import Point from '../../src/geo/Point';
 
 describe('Transformation', () => {
   var transformation;
@@ -12,19 +13,19 @@ describe('Transformation', () => {
     spy(transformation, 'transform');
     spy(transformation, 'untransform');
 
-    point = [5, 5];
+    point = Point(5, 5);
     scale = 2;
   });
 
   describe('#transform', () => {
     it('can transform', () => {
       var point2 = transformation.transform(point, scale);
-      expect(transformation.transform).to.have.returned([11, 11]);
+      expect(transformation.transform).to.have.returned(Point(11, 11));
     });
 
     it('uses a scale of 1 by default', () => {
       transformation.transform(point);
-      expect(transformation.transform).to.have.returned([5.5, 5.5]);
+      expect(transformation.transform).to.have.returned(Point(5.5, 5.5));
     });
   });
 

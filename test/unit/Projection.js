@@ -1,58 +1,60 @@
 import Projection from '../../src/geo/projection/index';
+import LatLon from '../../src/geo/LatLon';
+import Point from '../../src/geo/Point';
 
 describe('Projection.SphericalMercator', () => {
   var projection = Projection.SphericalMercator;
 
   describe('#project', () => {
     it('projects the center', () => {
-      var point = projection.project([0, 0]);
+      var point = projection.project(LatLon(0, 0));
 
-      expect(point[0]).to.be.closeTo(0, 0.01);
-      expect(point[1]).to.be.closeTo(0, 0.01);
+      expect(point.x).to.be.closeTo(0, 0.01);
+      expect(point.y).to.be.closeTo(0, 0.01);
     });
 
     it('projects the North-West corner', () => {
-      var point = projection.project([85.0511287798, -180]);
+      var point = projection.project(LatLon(85.0511287798, -180));
 
-      expect(point[0]).to.be.closeTo(-20037508.34279, 0.01);
-      expect(point[1]).to.be.closeTo(20037508.34278, 0.01);
+      expect(point.x).to.be.closeTo(-20037508.34279, 0.01);
+      expect(point.y).to.be.closeTo(20037508.34278, 0.01);
     });
 
     it('projects the South-East corner', () => {
-      var point = projection.project([-85.0511287798, 180]);
+      var point = projection.project(LatLon(-85.0511287798, 180));
 
-      expect(point[0]).to.be.closeTo(20037508.34278, 0.01);
-      expect(point[1]).to.be.closeTo(-20037508.34278, 0.01);
+      expect(point.x).to.be.closeTo(20037508.34278, 0.01);
+      expect(point.y).to.be.closeTo(-20037508.34278, 0.01);
     });
 
     it('caps the maximum latitude', () => {
-      var point = projection.project([-90, 180]);
+      var point = projection.project(LatLon(-90, 180));
 
-      expect(point[0]).to.be.closeTo(20037508.34278, 0.01);
-      expect(point[1]).to.be.closeTo(-20037508.34278, 0.01);
+      expect(point.x).to.be.closeTo(20037508.34278, 0.01);
+      expect(point.y).to.be.closeTo(-20037508.34278, 0.01);
     });
   });
 
   describe('#unproject', () => {
     it('unprojects the center', () => {
-      var latlon = projection.unproject([0, 0]);
+      var latlon = projection.unproject(Point(0, 0));
 
-      expect(latlon[0]).to.be.closeTo(0, 0.01);
-      expect(latlon[1]).to.be.closeTo(0, 0.01);
+      expect(latlon.lat).to.be.closeTo(0, 0.01);
+      expect(latlon.lon).to.be.closeTo(0, 0.01);
     });
 
     it('unprojects the North-West corner', () => {
-      var latlon = projection.unproject([-20037508.34278, 20037508.34278]);
+      var latlon = projection.unproject(Point(-20037508.34278, 20037508.34278));
 
-      expect(latlon[0]).to.be.closeTo(85.0511287798, 0.01);
-      expect(latlon[1]).to.be.closeTo(-180, 0.01);
+      expect(latlon.lat).to.be.closeTo(85.0511287798, 0.01);
+      expect(latlon.lon).to.be.closeTo(-180, 0.01);
     });
 
     it('unprojects the South-East corner', () => {
-      var latlon = projection.unproject([20037508.34278, -20037508.34278]);
+      var latlon = projection.unproject(Point(20037508.34278, -20037508.34278));
 
-      expect(latlon[0]).to.be.closeTo(-85.0511287798, 0.01);
-      expect(latlon[1]).to.be.closeTo(180, 0.01);
+      expect(latlon.lat).to.be.closeTo(-85.0511287798, 0.01);
+      expect(latlon.lon).to.be.closeTo(180, 0.01);
     });
   });
 
@@ -60,24 +62,24 @@ describe('Projection.SphericalMercator', () => {
     var pointScale;
 
     it('returns approximate point scale factor', () => {
-      pointScale = projection.pointScale([0, 0]);
+      pointScale = projection.pointScale(LatLon(0, 0));
 
       expect(pointScale[0]).to.be.closeTo(1, 0.1);
       expect(pointScale[1]).to.be.closeTo(1, 0.1);
 
-      pointScale = projection.pointScale([60, 0]);
+      pointScale = projection.pointScale(LatLon(60, 0));
 
       expect(pointScale[0]).to.be.closeTo(1.9999999999999996, 0.1);
       expect(pointScale[1]).to.be.closeTo(1.9999999999999996, 0.1);
     });
 
     it('returns accurate point scale factor', () => {
-      pointScale = projection.pointScale([0, 0], true);
+      pointScale = projection.pointScale(LatLon(0, 0), true);
 
       expect(pointScale[0]).to.be.closeTo(1, 0.1);
       expect(pointScale[1]).to.be.closeTo(1.0067394967683778, 0.1);
 
-      pointScale = projection.pointScale([60, 0], true);
+      pointScale = projection.pointScale(LatLon(60, 0), true);
 
       expect(pointScale[0]).to.be.closeTo(1.994972897047054, 0.1);
       expect(pointScale[1]).to.be.closeTo(1.9983341753952164, 0.1);
@@ -100,47 +102,47 @@ describe('Projection.Mercator', () => {
 
   describe('#project', () => {
     it('projects the center', () => {
-      var point = projection.project([0, 0]);
+      var point = projection.project(LatLon(0, 0));
 
-      expect(point[0]).to.be.closeTo(0, 0.01);
-      expect(point[1]).to.be.closeTo(0, 0.01);
+      expect(point.x).to.be.closeTo(0, 0.01);
+      expect(point.y).to.be.closeTo(0, 0.01);
     });
 
     it('projects the North-West corner', () => {
-      var point = projection.project([85.0840591556, -180]);
+      var point = projection.project(LatLon(85.0840591556, -180));
 
-      expect(point[0]).to.be.closeTo(-20037508.34279, 0.01);
-      expect(point[1]).to.be.closeTo(20037508.4798169, 0.01);
+      expect(point.x).to.be.closeTo(-20037508.34279, 0.01);
+      expect(point.y).to.be.closeTo(20037508.4798169, 0.01);
     });
 
     it('projects the South-East corner', () => {
-      var point = projection.project([-85.0840591556, 180]);
+      var point = projection.project(LatLon(-85.0840591556, 180));
 
-      expect(point[0]).to.be.closeTo(20037508.34279, 0.01);
-      expect(point[1]).to.be.closeTo(-20037508.4798169, 0.01);
+      expect(point.x).to.be.closeTo(20037508.34279, 0.01);
+      expect(point.y).to.be.closeTo(-20037508.4798169, 0.01);
     });
   });
 
   describe('#unproject', () => {
     it('unprojects the center', () => {
-      var latlon = projection.unproject([0, 0]);
+      var latlon = projection.unproject(Point(0, 0));
 
-      expect(latlon[0]).to.be.closeTo(0, 0.01);
-      expect(latlon[1]).to.be.closeTo(0, 0.01);
+      expect(latlon.lat).to.be.closeTo(0, 0.01);
+      expect(latlon.lon).to.be.closeTo(0, 0.01);
     });
 
     it('unprojects the North-West corner', () => {
-      var latlon = projection.unproject([-20037508.34279, 20037508.4798169]);
+      var latlon = projection.unproject(Point(-20037508.34279, 20037508.4798169));
 
-      expect(latlon[0]).to.be.closeTo(85.0840591556, 0.01);
-      expect(latlon[1]).to.be.closeTo(-180, 0.01);
+      expect(latlon.lat).to.be.closeTo(85.0840591556, 0.01);
+      expect(latlon.lon).to.be.closeTo(-180, 0.01);
     });
 
     it('unprojects the South-East corner', () => {
-      var latlon = projection.unproject([20037508.34279, -20037508.4798169]);
+      var latlon = projection.unproject(Point(20037508.34279, -20037508.4798169));
 
-      expect(latlon[0]).to.be.closeTo(-85.0840591556, 0.01);
-      expect(latlon[1]).to.be.closeTo(180, 0.01);
+      expect(latlon.lat).to.be.closeTo(-85.0840591556, 0.01);
+      expect(latlon.lon).to.be.closeTo(180, 0.01);
     });
   });
 
@@ -148,12 +150,12 @@ describe('Projection.Mercator', () => {
     var pointScale;
 
     it('returns point scale factor', () => {
-      pointScale = projection.pointScale([0, 0]);
+      pointScale = projection.pointScale(LatLon(0, 0));
 
       expect(pointScale[0]).to.be.closeTo(1, 0.1);
       expect(pointScale[1]).to.be.closeTo(1, 0.1);
 
-      pointScale = projection.pointScale([60, 0]);
+      pointScale = projection.pointScale(LatLon(60, 0));
 
       expect(pointScale[0]).to.be.closeTo(1.9999999999999996, 0.1);
       expect(pointScale[1]).to.be.closeTo(1.9999999999999996, 0.1);
@@ -176,47 +178,47 @@ describe('Projection.LatLon', () => {
 
   describe('#project', () => {
     it('projects the center', () => {
-      var point = projection.project([0, 0]);
+      var point = projection.project(LatLon(0, 0));
 
-      expect(point[0]).to.be.closeTo(0, 0.01);
-      expect(point[1]).to.be.closeTo(0, 0.01);
+      expect(point.x).to.be.closeTo(0, 0.01);
+      expect(point.y).to.be.closeTo(0, 0.01);
     });
 
     it('projects the North-West corner', () => {
-      var point = projection.project([90, -180]);
+      var point = projection.project(LatLon(90, -180));
 
-      expect(point[0]).to.be.closeTo(-180, 0.01);
-      expect(point[1]).to.be.closeTo(90, 0.01);
+      expect(point.x).to.be.closeTo(-180, 0.01);
+      expect(point.y).to.be.closeTo(90, 0.01);
     });
 
     it('projects the South-East corner', () => {
-      var point = projection.project([-90, 180]);
+      var point = projection.project(LatLon(-90, 180));
 
-      expect(point[0]).to.be.closeTo(180, 0.01);
-      expect(point[1]).to.be.closeTo(-90, 0.01);
+      expect(point.x).to.be.closeTo(180, 0.01);
+      expect(point.y).to.be.closeTo(-90, 0.01);
     });
   });
 
   describe('#unproject', () => {
     it('unprojects the center', () => {
-      var latlon = projection.unproject([0, 0]);
+      var latlon = projection.unproject(Point(0, 0));
 
-      expect(latlon[0]).to.be.closeTo(0, 0.01);
-      expect(latlon[1]).to.be.closeTo(0, 0.01);
+      expect(latlon.lat).to.be.closeTo(0, 0.01);
+      expect(latlon.lon).to.be.closeTo(0, 0.01);
     });
 
     it('unprojects the North-West corner', () => {
-      var latlon = projection.unproject([-180, 90]);
+      var latlon = projection.unproject(Point(-180, 90));
 
-      expect(latlon[0]).to.be.closeTo(90, 0.01);
-      expect(latlon[1]).to.be.closeTo(-180, 0.01);
+      expect(latlon.lat).to.be.closeTo(90, 0.01);
+      expect(latlon.lon).to.be.closeTo(-180, 0.01);
     });
 
     it('unprojects the South-East corner', () => {
-      var latlon = projection.unproject([180, -90]);
+      var latlon = projection.unproject(Point(180, -90));
 
-      expect(latlon[0]).to.be.closeTo(-90, 0.01);
-      expect(latlon[1]).to.be.closeTo(180, 0.01);
+      expect(latlon.lat).to.be.closeTo(-90, 0.01);
+      expect(latlon.lon).to.be.closeTo(180, 0.01);
     });
   });
 
@@ -224,12 +226,12 @@ describe('Projection.LatLon', () => {
     var pointScale;
 
     it('returns point scale factor', () => {
-      pointScale = projection.pointScale([0, 0]);
+      pointScale = projection.pointScale(LatLon(0, 0));
 
       expect(pointScale[0]).to.be.closeTo(0.000009043695025814084, 0.1);
       expect(pointScale[1]).to.be.closeTo(0.000009043695025814084, 0.1);
 
-      pointScale = projection.pointScale([60, 0]);
+      pointScale = projection.pointScale(LatLon(60, 0));
 
       expect(pointScale[0]).to.be.closeTo(0.000009043695025814084, 0.1);
       expect(pointScale[1]).to.be.closeTo(0.000009043695025814084, 0.1);
@@ -253,47 +255,47 @@ describe('Projection.Proj4', () => {
 
   describe('#project', () => {
     it('projects the center', () => {
-      var point = projection.project([55.46347028885475, -4.186594751907175]);
+      var point = projection.project(LatLon(55.46347028885475, -4.186594751907175));
 
-      expect(point[0]).to.be.closeTo(261849.77, 0.1);
-      expect(point[1]).to.be.closeTo(621021.635, 0.1);
+      expect(point.x).to.be.closeTo(261849.77, 0.1);
+      expect(point.y).to.be.closeTo(621021.635, 0.1);
     });
 
     it('projects the North-West corner', () => {
-      var point = projection.project([60.6596573635804, -10.8865578798635]);
+      var point = projection.project(LatLon(60.6596573635804, -10.8865578798635));
 
-      expect(point[0]).to.be.closeTo(-84667.14, 0.1);
-      expect(point[1]).to.be.closeTo(1230247.30, 0.1);
+      expect(point.x).to.be.closeTo(-84667.14, 0.1);
+      expect(point.y).to.be.closeTo(1230247.30, 0.1);
     });
 
     it('projects the South-East corner', () => {
-      var point = projection.project([49.9699671340061, 0.904406143400599]);
+      var point = projection.project(LatLon(49.9699671340061, 0.904406143400599));
 
-      expect(point[0]).to.be.closeTo(608366.68, 0.1);
-      expect(point[1]).to.be.closeTo(11795.97, 0.1);
+      expect(point.x).to.be.closeTo(608366.68, 0.1);
+      expect(point.y).to.be.closeTo(11795.97, 0.1);
     });
   });
 
   describe('#unproject', () => {
     it('unprojects the center', () => {
-      var latlon = projection.unproject([261849.77, 621021.635]);
+      var latlon = projection.unproject(Point(261849.77, 621021.635));
 
-      expect(latlon[0]).to.be.closeTo(55.46347028885475, 0.01);
-      expect(latlon[1]).to.be.closeTo(-4.186594751907175, 0.01);
+      expect(latlon.lat).to.be.closeTo(55.46347028885475, 0.01);
+      expect(latlon.lon).to.be.closeTo(-4.186594751907175, 0.01);
     });
 
     it('unprojects the North-West corner', () => {
-      var latlon = projection.unproject([-84667.14, 1230247.30]);
+      var latlon = projection.unproject(Point(-84667.14, 1230247.30));
 
-      expect(latlon[0]).to.be.closeTo(60.6596573635804, 0.01);
-      expect(latlon[1]).to.be.closeTo(-10.8865578798635, 0.01);
+      expect(latlon.lat).to.be.closeTo(60.6596573635804, 0.01);
+      expect(latlon.lon).to.be.closeTo(-10.8865578798635, 0.01);
     });
 
     it('unprojects the South-East corner', () => {
-      var latlon = projection.unproject([608366.68, 11795.97]);
+      var latlon = projection.unproject(Point(608366.68, 11795.97));
 
-      expect(latlon[0]).to.be.closeTo(49.9699671340061, 0.01);
-      expect(latlon[1]).to.be.closeTo(0.904406143400599, 0.01);
+      expect(latlon.lat).to.be.closeTo(49.9699671340061, 0.01);
+      expect(latlon.lon).to.be.closeTo(0.904406143400599, 0.01);
     });
   });
 
@@ -301,12 +303,12 @@ describe('Projection.Proj4', () => {
     var pointScale;
 
     it('returns point scale factor', () => {
-      pointScale = projection.pointScale([0, 0]);
+      pointScale = projection.pointScale(LatLon(0, 0));
 
       expect(pointScale[0]).to.be.closeTo(1, 0.1);
       expect(pointScale[1]).to.be.closeTo(1, 0.1);
 
-      pointScale = projection.pointScale([60, 0]);
+      pointScale = projection.pointScale(LatLon(60, 0));
 
       expect(pointScale[0]).to.be.closeTo(1, 0.1);
       expect(pointScale[1]).to.be.closeTo(1, 0.1);

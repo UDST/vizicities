@@ -7,6 +7,7 @@
 
 import extend from 'lodash.assign';
 import CRS from './CRS';
+import LatLon from '../LatLon';
 
 const Earth = {
   wrapLon: [-180, 180],
@@ -26,18 +27,18 @@ const Earth = {
     var a;
 
     if (!accurate) {
-      lat1 = latlon1[0] * rad;
-      lat2 = latlon2[0] * rad;
+      lat1 = latlon1.lat * rad;
+      lat2 = latlon2.lat * rad;
 
-      a = Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos((latlon2[1] - latlon1[1]) * rad);
+      a = Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos((latlon2.lon - latlon1.lon) * rad);
 
       return this.R * Math.acos(Math.min(a, 1));
     } else {
-      lat1 = latlon1[0] * rad;
-      lat2 = latlon2[0] * rad;
+      lat1 = latlon1.lat * rad;
+      lat2 = latlon2.lat * rad;
 
-      var lon1 = latlon1[1] * rad;
-      var lon2 = latlon2[1] * rad;
+      var lon1 = latlon1.lon * rad;
+      var lon2 = latlon2.lon * rad;
 
       var deltaLat = lat2 - lat1;
       var deltaLon = lon2 - lon1;

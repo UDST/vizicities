@@ -5,6 +5,8 @@
  * https://github.com/Leaflet/Leaflet/blob/master/src/geo/crs/CRS.js
  */
 
+import LatLon from '../LatLon';
+import Point from '../Point';
 import wrapNum from '../../util/wrapNum';
 
 const CRS = {
@@ -90,10 +92,10 @@ const CRS = {
     }
 
     // Bottom left
-    var min = this.transformation.transform(b[0], s);
+    var min = this.transformation.transform(Point(b[0]), s);
 
     // Top right
-    var max = this.transformation.transform(b[1], s);
+    var max = this.transformation.transform(Point(b[1]), s);
 
     return [min, max];
   },
@@ -107,11 +109,11 @@ const CRS = {
 
   // Wraps geo coords in certain ranges if applicable
   wrapLatLon: function(latlon) {
-    var lat = this.wrapLat ? wrapNum(latlon[0], this.wrapLat, true) : latlon[0];
-    var lng = this.wrapLon ? wrapNum(latlon[1], this.wrapLon, true) : latlon[1];
-    var alt = latlon[2];
+    var lat = this.wrapLat ? wrapNum(latlon.lat, this.wrapLat, true) : latlon.lat;
+    var lon = this.wrapLon ? wrapNum(latlon.lon, this.wrapLon, true) : latlon.lon;
+    var alt = latlon.alt;
 
-    return [lat, lng, alt];
+    return LatLon(lat, lon, alt);
   }
 };
 

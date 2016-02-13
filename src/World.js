@@ -1,6 +1,8 @@
 import EventEmitter from 'eventemitter3';
 import extend from 'lodash.assign';
 import CRS from './geo/CRS/index';
+import Point from './geo/Point';
+import LatLon from './geo/LatLon';
 import Engine from './engine/Engine';
 
 // Pretty much any event someone using ViziCities would need will be emitted or
@@ -14,9 +16,7 @@ class World extends EventEmitter {
       crs: CRS.EPSG3857
     };
 
-    this._options = extend(defaults, options);
-
-    console.log(this._options);
+    this.options = extend(defaults, options);
 
     this._layers = [];
     this._controls = [];
@@ -48,7 +48,7 @@ class World extends EventEmitter {
   }
 
   _onControlsMoveEnd(point) {
-    this._resetView(this.unproject(point));
+    this._resetView(this.pointToLatLon([point.x, point.z]));
   }
 
   // Reset world view
@@ -92,6 +92,17 @@ class World extends EventEmitter {
 
   // Set world view
   setView(latlon) {
+    // Store initial geographic coordinate for the [0,0,0] world position
+    //
+    // The origin point doesn't move in three.js / 3D space so only set it once
+    // here instead of every time _resetView is called
+    //
+    // If it was updated every time then coorindates would shift over time and
+    // would be out of place / context with previously-placed points (0,0 would
+    // refer to a different point each time)
+    this._originLatlon = latlon;
+    this._originPoint = this.project(latlon);
+
     this._resetView(latlon);
     return this;
   }
@@ -102,10 +113,42 @@ class World extends EventEmitter {
   }
 
   // Transform geographic coordinate to world point
-  project(latlon) {}
+  //
+  // This doesn't take into account the origin offset
+  //
+  // For example, this takes a geographic coordinate and returns a point
+  // relative to the origin point of the projection (not the world)
+  project(latlon) {
+    return this.options.crs.latLonToPoint(LatLon(latlon));
+  }
 
   // Transform world point to geographic coordinate
-  unproject(point) {}
+  //
+  // This doesn't take into account the origin offset
+  //
+  // For example, this takes a point relative to the origin point of the
+  // projection (not the world) and returns a geographic coordinate
+  unproject(point) {
+    return this.options.crs.pointToLatLon(Point(point));
+  }
+
+  // Takes into account the origin offset
+  //
+  // For example, this takes a geographic coordinate and returns a point
+  // relative to the three.js / 3D origin (0,0)
+  latLonToPoint(latlon) {
+    var projectedPoint = this.project(LatLon(latlon));
+    return projectedPoint._subtract(this._originPoint);
+  }
+
+  // Takes into account the origin offset
+  //
+  // For example, this takes a point relative to the three.js / 3D origin (0,0)
+  // and returns the exact geographic coordinate at that point
+  pointToLatLon(point) {
+    var projectedPoint = Point(point).add(this._originPoint);
+    return this.unproject(projectedPoint);
+  }
 
   addLayer(layer) {
     layer._addToWorld(this);

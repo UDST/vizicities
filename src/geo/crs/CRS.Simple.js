@@ -8,11 +8,11 @@
 
 import extend from 'lodash.assign';
 import CRS from './CRS';
-import LatLon from '../projection/Projection.LatLon';
+import LatLonProjection from '../projection/Projection.LatLon';
 import Transformation from '../../util/Transformation';
 
 var _Simple = {
-  projection: LatLon,
+  projection: LatLonProjection,
 
   // Straight 1:1 mapping (-1, -1 would be top-left)
   transformation: new Transformation(1, 0, 1, 0),
@@ -33,8 +33,8 @@ var _Simple = {
   },
 
   distance: function(latlon1, latlon2) {
-    var dx = latlon2[1] - latlon1[1];
-    var dy = latlon2[0] - latlon1[0];
+    var dx = latlon2.lon - latlon1.lon;
+    var dy = latlon2.lat - latlon1.lat;
 
     return Math.sqrt(dx * dx + dy * dy);
   },

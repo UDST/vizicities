@@ -7,12 +7,12 @@
 
 import extend from 'lodash.assign';
 import Earth from './CRS.Earth';
-import LatLon from '../projection/Projection.LatLon';
+import LatLonProjection from '../projection/Projection.LatLon';
 import Transformation from '../../util/Transformation';
 
 var _EPSG4326 = {
   code: 'EPSG:4326',
-  projection: LatLon,
+  projection: LatLonProjection,
 
   // Work out how to de-dupe this (scoping issue)
   transformScale: 1 / 180,

@@ -3,17 +3,19 @@
  */
 
 import proj4 from 'proj4';
+import LatLon from '../LatLon';
+import Point from '../Point';
 
 const Proj4 = function(def, bounds) {
   var proj = proj4(def);
 
   var project = function(latlon) {
-    return proj.forward([latlon[1], latlon[0]]);
+    return Point(proj.forward([latlon.lon, latlon.lat]));
   };
 
   var unproject = function(point) {
-    var inverse = proj.inverse(point);
-    return [inverse[1], inverse[0]];
+    var inverse = proj.inverse([point.x, point.y]);
+    return LatLon(inverse[1], inverse[0]);
   };
 
   return {
