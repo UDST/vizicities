@@ -72,7 +72,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _layerEnvironmentEnvironmentLayer2 = _interopRequireDefault(_layerEnvironmentEnvironmentLayer);
 	
-	var _geoPoint = __webpack_require__(13);
+	var _geoPoint = __webpack_require__(11);
 	
 	var _geoPoint2 = _interopRequireDefault(_geoPoint);
 	
@@ -124,7 +124,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _geoCRSIndex2 = _interopRequireDefault(_geoCRSIndex);
 	
-	var _geoPoint = __webpack_require__(13);
+	var _geoPoint = __webpack_require__(11);
 	
 	var _geoPoint2 = _interopRequireDefault(_geoPoint);
 	
@@ -190,7 +190,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_onControlsMoveEnd',
 	    value: function _onControlsMoveEnd(point) {
-	      this._resetView(this.pointToLatLon([point.x, point.z]));
+	      var _point = (0, _geoPoint2['default'])(point.x, point.z);
+	      this._resetView(this.pointToLatLon(_point));
 	    }
 	
 	    // Reset world view
@@ -1753,7 +1754,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _CRSEarth2 = _interopRequireDefault(_CRSEarth);
 	
-	var _projectionProjectionSphericalMercator = __webpack_require__(12);
+	var _projectionProjectionSphericalMercator = __webpack_require__(13);
 	
 	var _projectionProjectionSphericalMercator2 = _interopRequireDefault(_projectionProjectionSphericalMercator);
 	
@@ -1950,7 +1951,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _LatLon2 = _interopRequireDefault(_LatLon);
 	
-	var _utilWrapNum = __webpack_require__(11);
+	var _Point = __webpack_require__(11);
+	
+	var _Point2 = _interopRequireDefault(_Point);
+	
+	var _utilWrapNum = __webpack_require__(12);
 	
 	var _utilWrapNum2 = _interopRequireDefault(_utilWrapNum);
 	
@@ -2039,10 +2044,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    // Bottom left
-	    var min = this.transformation.transform(b[0], s);
+	    var min = this.transformation.transform((0, _Point2['default'])(b[0]), s);
 	
 	    // Top right
-	    var max = this.transformation.transform(b[1], s);
+	    var max = this.transformation.transform((0, _Point2['default'])(b[1]), s);
 	
 	    return [min, max];
 	  },
@@ -2057,10 +2062,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // Wraps geo coords in certain ranges if applicable
 	  wrapLatLon: function wrapLatLon(latlon) {
 	    var lat = this.wrapLat ? (0, _utilWrapNum2['default'])(latlon.lat, this.wrapLat, true) : latlon.lat;
-	    var lng = this.wrapLon ? (0, _utilWrapNum2['default'])(latlon.lon, this.wrapLon, true) : latlon.lon;
+	    var lon = this.wrapLon ? (0, _utilWrapNum2['default'])(latlon.lon, this.wrapLon, true) : latlon.lon;
 	    var alt = latlon.alt;
 	
-	    return (0, _LatLon2['default'])(lat, lng, alt);
+	    return (0, _LatLon2['default'])(lat, lon, alt);
 	  }
 	};
 	
@@ -2152,6 +2157,94 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	/*
+	 * Point is a helper class for ensuring consistent world positions.
+	 *
+	 * Based on:
+	 * https://github.com/Leaflet/Leaflet/blob/master/src/geo/Point.js
+	 */
+	
+	var Point = (function () {
+	  function Point(x, y, round) {
+	    _classCallCheck(this, Point);
+	
+	    this.x = round ? Math.round(x) : x;
+	    this.y = round ? Math.round(y) : y;
+	  }
+	
+	  // Accepts (point), ([x, y]) and (x, y, round)
+	
+	  _createClass(Point, [{
+	    key: "clone",
+	    value: function clone() {
+	      return new Point(this.x, this.y);
+	    }
+	
+	    // Non-destructive
+	  }, {
+	    key: "add",
+	    value: function add(point) {
+	      return this.clone()._add(_point(point));
+	    }
+	
+	    // Destructive
+	  }, {
+	    key: "_add",
+	    value: function _add(point) {
+	      this.x += point.x;
+	      this.y += point.y;
+	      return this;
+	    }
+	
+	    // Non-destructive
+	  }, {
+	    key: "subtract",
+	    value: function subtract(point) {
+	      return this.clone()._subtract(_point(point));
+	    }
+	
+	    // Destructive
+	  }, {
+	    key: "_subtract",
+	    value: function _subtract(point) {
+	      this.x -= point.x;
+	      this.y -= point.y;
+	      return this;
+	    }
+	  }]);
+	
+	  return Point;
+	})();
+	
+	var _point = function _point(x, y, round) {
+	  if (x instanceof Point) {
+	    return x;
+	  }
+	  if (Array.isArray(x)) {
+	    return new Point(x[0], x[1]);
+	  }
+	  if (x === undefined || x === null) {
+	    return x;
+	  }
+	  return new Point(x, y, round);
+	};
+	
+	// Initialise without requiring new keyword
+	exports["default"] = _point;
+	module.exports = exports["default"];
+
+/***/ },
+/* 12 */
+/***/ function(module, exports) {
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
 	/*
 	 * Wrap the given number to lie within a certain range (eg. longitude)
 	 *
@@ -2170,7 +2263,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -2191,7 +2284,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _LatLon2 = _interopRequireDefault(_LatLon);
 	
-	var _Point = __webpack_require__(13);
+	var _Point = __webpack_require__(11);
 	
 	var _Point2 = _interopRequireDefault(_Point);
 	
@@ -2276,94 +2369,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 13 */
-/***/ function(module, exports) {
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	/*
-	 * Point is a helper class for ensuring consistent world positions.
-	 *
-	 * Based on:
-	 * https://github.com/Leaflet/Leaflet/blob/master/src/geo/Point.js
-	 */
-	
-	var Point = (function () {
-	  function Point(x, y, round) {
-	    _classCallCheck(this, Point);
-	
-	    this.x = round ? Math.round(x) : x;
-	    this.y = round ? Math.round(y) : y;
-	  }
-	
-	  // Accepts (point), ([x, y]) and (x, y, round)
-	
-	  _createClass(Point, [{
-	    key: "clone",
-	    value: function clone() {
-	      return new Point(this.x, this.y);
-	    }
-	
-	    // Non-destructive
-	  }, {
-	    key: "add",
-	    value: function add(point) {
-	      return this.clone()._add(_point(point));
-	    }
-	
-	    // Destructive
-	  }, {
-	    key: "_add",
-	    value: function _add(point) {
-	      this.x += point.x;
-	      this.y += point.y;
-	      return this;
-	    }
-	
-	    // Non-destructive
-	  }, {
-	    key: "subtract",
-	    value: function subtract(point) {
-	      return this.clone()._subtract(_point(point));
-	    }
-	
-	    // Destructive
-	  }, {
-	    key: "_subtract",
-	    value: function _subtract(point) {
-	      this.x -= point.x;
-	      this.y -= point.y;
-	      return this;
-	    }
-	  }]);
-	
-	  return Point;
-	})();
-	
-	var _point = function _point(x, y, round) {
-	  if (x instanceof Point) {
-	    return x;
-	  }
-	  if (Array.isArray(x)) {
-	    return new Point(x[0], x[1]);
-	  }
-	  if (x === undefined || x === null) {
-	    return x;
-	  }
-	  return new Point(x, y, round);
-	};
-	
-	// Initialise without requiring new keyword
-	exports["default"] = _point;
-	module.exports = exports["default"];
-
-/***/ },
 /* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -2385,7 +2390,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * https://github.com/Leaflet/Leaflet/blob/master/src/geometry/Transformation.js
 	 */
 	
-	var _geoPoint = __webpack_require__(13);
+	var _geoPoint = __webpack_require__(11);
 	
 	var _geoPoint2 = _interopRequireDefault(_geoPoint);
 	
@@ -2508,7 +2513,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _LatLon2 = _interopRequireDefault(_LatLon);
 	
-	var _Point = __webpack_require__(13);
+	var _Point = __webpack_require__(11);
 	
 	var _Point2 = _interopRequireDefault(_Point);
 	
@@ -2652,17 +2657,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _LatLon2 = _interopRequireDefault(_LatLon);
 	
-	var _Point = __webpack_require__(13);
+	var _Point = __webpack_require__(11);
 	
 	var _Point2 = _interopRequireDefault(_Point);
 	
 	var ProjectionLatLon = {
 	  project: function project(latlon) {
-	    return (0, _Point2['default'])(latlon[1], latlon[0]);
+	    return (0, _Point2['default'])(latlon.lon, latlon.lat);
 	  },
 	
 	  unproject: function unproject(point) {
-	    return (0, _LatLon2['default'])(point[1], point[0]);
+	    return (0, _LatLon2['default'])(point.y, point.x);
 	  },
 	
 	  // Scale factor for converting between real metres and degrees
@@ -2861,7 +2866,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _LatLon2 = _interopRequireDefault(_LatLon);
 	
-	var _Point = __webpack_require__(13);
+	var _Point = __webpack_require__(11);
 	
 	var _Point2 = _interopRequireDefault(_Point);
 	
@@ -2873,7 +2878,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	
 	  var unproject = function unproject(point) {
-	    var inverse = proj.inverse(point);
+	    var inverse = proj.inverse([point.x, point.y]);
 	    return (0, _LatLon2['default'])(inverse[1], inverse[0]);
 	  };
 	
