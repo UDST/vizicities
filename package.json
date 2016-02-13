@@ -80,6 +80,8 @@
   },
   "dependencies": {
     "eventemitter3": "^1.1.1",
+    "lodash.assign": "^4.0.2",
+    "proj4": "^2.3.12",
     "three-orbit-controls": "github:robhawkes/three-orbit-controls"
   }
 }

@@ -1,5 +1,5 @@
 import World from './World';
-import Controls from './controls/Controls';
+import Controls from './controls/index';
 import EnvironmentLayer from './layer/environment/EnvironmentLayer';
 
 const VIZI = {

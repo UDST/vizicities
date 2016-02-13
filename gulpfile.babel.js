@@ -156,6 +156,10 @@ function testBrowser() {
       output: {
         filename: '__spec-build.js'
       },
+      externals: {
+        // Proxy the global THREE variable to require('three')
+        'three': 'THREE'
+      },
       module: {
         loaders: [
           // This is what allows us to author in future JavaScript

@@ -64,9 +64,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _World2 = _interopRequireDefault(_World);
 	
-	var _controlsControls = __webpack_require__(8);
+	var _controlsIndex = __webpack_require__(8);
 	
-	var _controlsControls2 = _interopRequireDefault(_controlsControls);
+	var _controlsIndex2 = _interopRequireDefault(_controlsIndex);
 	
 	var _layerEnvironmentEnvironmentLayer = __webpack_require__(11);
 	
@@ -77,7 +77,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  // Public API
 	  World: _World2['default'],
-	  Controls: _controlsControls2['default'],
+	  Controls: _controlsIndex2['default'],
 	  EnvironmentLayer: _layerEnvironmentEnvironmentLayer2['default']
 	};
 	
