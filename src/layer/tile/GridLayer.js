@@ -109,9 +109,10 @@ class GridLayer extends Layer {
     var camera = this._world.getCamera();
 
     // Tweak this value to refine specific point that each quad is subdivided
-    // 1.0 is used by OpenWebGlobe
-    // 2.0 seems to keep tiles below 256 pixels for ViziCities
-    var quality = 2.0;
+    //
+    // It's used to multiple the dimensions of the surface sides before
+    // comparing against the surface distance from camera
+    var quality = 3.0;
 
     // 1. Return false if quadkey length is greater than maxDepth
     if (surface.quadkey.length > maxDepth) {

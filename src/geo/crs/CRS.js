@@ -21,7 +21,7 @@ const CRS = {
   //
   // For example, if you want the world dimensions to be between -1000 and 1000
   // then the scale factor will be 1000
-  scaleFactor: 1000,
+  scaleFactor: 1000000,
 
   // Converts geo coords to pixel / WebGL ones
   latLonToPoint: function(latlon, zoom) {

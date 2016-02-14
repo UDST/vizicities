@@ -1984,7 +1984,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  //
 	  // For example, if you want the world dimensions to be between -1000 and 1000
 	  // then the scale factor will be 1000
-	  scaleFactor: 1000,
+	  scaleFactor: 1000000,
 	
 	  // Converts geo coords to pixel / WebGL ones
 	  latLonToPoint: function latLonToPoint(latlon, zoom) {
@@ -4755,9 +4755,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var camera = this._world.getCamera();
 	
 	      // Tweak this value to refine specific point that each quad is subdivided
-	      // 1.0 is used by OpenWebGlobe
-	      // 2.0 seems to keep tiles below 256 pixels for ViziCities
-	      var quality = 2.0;
+	      //
+	      // It's used to multiple the dimensions of the surface sides before
+	      // comparing against the surface distance from camera
+	      var quality = 3.0;
 	
 	      // 1. Return false if quadkey length is greater than maxDepth
 	      if (surface.quadkey.length > maxDepth) {
@@ -4835,21 +4836,61 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.center = this._boundsToCenter(this.bounds);
 	    this.side = new _three2['default'].Vector3(this.bounds[0], 0, this.bounds[3]).sub(new _three2['default'].Vector3(this.bounds[0], 0, this.bounds[1])).length();
 	
-	    this._createMesh();
+	    this.mesh = this._createMesh();
 	  }
 	
 	  // Initialise without requiring new keyword
 	
 	  _createClass(Surface, [{
+	    key: '_createDebugMesh',
+	    value: function _createDebugMesh() {
+	      var canvas = document.createElement('canvas');
+	      canvas.width = 1024;
+	      canvas.height = 1024;
+	
+	      var context = canvas.getContext('2d');
+	      context.font = 'Bold 60px Courier';
+	      context.fillStyle = 'rgba(255,0,0,1)';
+	      context.fillText(this.quadkey, 100, 530);
+	
+	      var texture = new _three2['default'].Texture(canvas);
+	
+	      // Silky smooth images when tilted
+	      texture.magFilter = _three2['default'].LinearFilter;
+	      texture.minFilter = _three2['default'].LinearMipMapLinearFilter;
+	
+	      // TODO: Set this to renderer.getMaxAnisotropy() / 4
+	      texture.anisotropy = 4;
+	
+	      texture.needsUpdate = true;
+	
+	      var material = new _three2['default'].MeshBasicMaterial({
+	        map: texture,
+	        transparent: true
+	      });
+	
+	      var geom = new _three2['default'].PlaneGeometry(this.side, this.side, 1);
+	      var mesh = new _three2['default'].Mesh(geom, material);
+	
+	      mesh.rotation.x = -90 * Math.PI / 180;
+	      mesh.position.y = 0.1;
+	
+	      this.mesh.add(mesh);
+	    }
+	  }, {
 	    key: '_createMesh',
 	    value: function _createMesh() {
 	      var _this = this;
 	
-	      this.mesh = new _three2['default'].Object3D();
-	
+	      var mesh = new _three2['default'].Object3D();
 	      var geom = new _three2['default'].PlaneGeometry(this.side, this.side, 1);
 	
-	      loader.load('http://a.basemaps.cartocdn.com/light_nolabels/' + this.tile[2] + '/' + this.tile[0] + '/' + this.tile[1] + '@2x.png', function (texture) {
+	      var letter = String.fromCharCode(97 + Math.floor(Math.random() * 26));
+	      var url = 'http://' + letter + '.basemaps.cartocdn.com/light_nolabels/';
+	      // var url = 'http://tile.stamen.com/toner-lite/';
+	
+	      loader.load(url + this.tile[2] + '/' + this.tile[0] + '/' + this.tile[1] + '@2x.png', function (texture) {
+	        console.log('Loaded');
 	        // Silky smooth images when tilted
 	        texture.magFilter = _three2['default'].LinearFilter;
 	        texture.minFilter = _three2['default'].LinearMipMapLinearFilter;
@@ -4857,19 +4898,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // TODO: Set this to renderer.getMaxAnisotropy() / 4
 	        texture.anisotropy = 4;
 	
+	        texture.needsUpdate = true;
+	
 	        var material = new _three2['default'].MeshBasicMaterial({ map: texture });
 	
 	        var localMesh = new _three2['default'].Mesh(geom, material);
 	        localMesh.rotation.x = -90 * Math.PI / 180;
 	
-	        _this.mesh.add(localMesh);
+	        // Sometimes tiles don't appear, even though the images have loaded ok
+	        // This helps a little but it's a total hack and the real solution needs
+	        // to be found.
+	        setTimeout(function () {
+	          mesh.add(localMesh);
+	        }, 2000);
 	
-	        _this.mesh.position.x = _this.center[0];
-	        _this.mesh.position.z = _this.center[1];
+	        mesh.position.x = _this.center[0];
+	        mesh.position.z = _this.center[1];
 	
 	        var box = new _three2['default'].BoxHelper(localMesh);
-	        _this.mesh.add(box);
+	        mesh.add(box);
+	
+	        _this._createDebugMesh();
 	      });
+	
+	      return mesh;
 	    }
 	  }, {
 	    key: '_quadkeyToTile',
