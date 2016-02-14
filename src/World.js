@@ -87,7 +87,7 @@ class World extends EventEmitter {
     });
 
     this.emit('preUpdate');
-    this._engine._update(delta);
+    this._engine.update(delta);
     this.emit('postUpdate');
   }
 
@@ -149,6 +149,12 @@ class World extends EventEmitter {
   pointToLatLon(point) {
     var projectedPoint = Point(point).add(this._originPoint);
     return this.unproject(projectedPoint);
+  }
+
+  // Unsure if it's a good idea to expose this here for components like
+  // GridLayer to use (eg. to keep track of a frustum)
+  getCamera() {
+    return this._engine._camera;
   }
 
   addLayer(layer) {

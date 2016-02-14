@@ -18,6 +18,7 @@ class Layer extends EventEmitter {
   // Internal method called by World.addLayer to actually add the layer
   _addToWorld(world) {
     this._world = world;
+    this._onAdd(world);
     this.emit('added');
   }
 }

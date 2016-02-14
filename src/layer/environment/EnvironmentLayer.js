@@ -9,6 +9,8 @@ class EnvironmentLayer extends Layer {
     this._initGrid();
   }
 
+  _onAdd() {}
+
   // Not fleshed out or thought through yet
   //
   // Lights could potentially be put it their own 'layer' to keep this class

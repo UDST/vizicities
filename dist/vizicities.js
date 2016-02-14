@@ -72,6 +72,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _layerEnvironmentEnvironmentLayer2 = _interopRequireDefault(_layerEnvironmentEnvironmentLayer);
 	
+	var _layerTileGridLayer = __webpack_require__(33);
+	
+	var _layerTileGridLayer2 = _interopRequireDefault(_layerTileGridLayer);
+	
 	var _geoPoint = __webpack_require__(11);
 	
 	var _geoPoint2 = _interopRequireDefault(_geoPoint);
@@ -87,6 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  World: _World2['default'],
 	  Controls: _controlsIndex2['default'],
 	  EnvironmentLayer: _layerEnvironmentEnvironmentLayer2['default'],
+	  GridLayer: _layerTileGridLayer2['default'],
 	  Point: _geoPoint2['default'],
 	  LatLon: _geoLatLon2['default']
 	};
@@ -236,7 +241,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	
 	      this.emit('preUpdate');
-	      this._engine._update(delta);
+	      this._engine.update(delta);
 	      this.emit('postUpdate');
 	    }
 	
@@ -310,6 +315,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function pointToLatLon(point) {
 	      var projectedPoint = (0, _geoPoint2['default'])(point).add(this._originPoint);
 	      return this.unproject(projectedPoint);
+	    }
+	
+	    // Unsure if it's a good idea to expose this here for components like
+	    // GridLayer to use (eg. to keep track of a frustum)
+	  }, {
+	    key: 'getCamera',
+	    value: function getCamera() {
+	      return this._engine._camera;
 	    }
 	  }, {
 	    key: 'addLayer',
@@ -2978,13 +2991,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._renderer = (0, _Renderer2['default'])(container);
 	    this._camera = (0, _Camera2['default'])(container);
 	    this.clock = new _three2['default'].Clock();
+	
+	    this._frustum = new _three2['default'].Frustum();
 	  }
 	
 	  // Initialise without requiring new keyword
 	
 	  _createClass(Engine, [{
-	    key: '_update',
-	    value: function _update(delta) {
+	    key: 'update',
+	    value: function update(delta) {
 	      this.emit('preRender');
 	      this._renderer.render(this._scene, this._camera);
 	      this.emit('postRender');
@@ -4463,12 +4478,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  // Initialise without requiring new keyword
 	
-	  // Not fleshed out or thought through yet
-	  //
-	  // Lights could potentially be put it their own 'layer' to keep this class
-	  // much simpler and less messy
-	
 	  _createClass(EnvironmentLayer, [{
+	    key: '_onAdd',
+	    value: function _onAdd() {}
+	
+	    // Not fleshed out or thought through yet
+	    //
+	    // Lights could potentially be put it their own 'layer' to keep this class
+	    // much simpler and less messy
+	  }, {
 	    key: '_initLights',
 	    value: function _initLights() {
 	      // Position doesn't really matter (the angle is important), however it's
@@ -4573,6 +4591,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_addToWorld',
 	    value: function _addToWorld(world) {
 	      this._world = world;
+	      this._onAdd(world);
 	      this.emit('added');
 	    }
 	  }]);
@@ -4581,6 +4600,350 @@ return /******/ (function(modules) { // webpackBootstrap
 	})(_eventemitter32['default']);
 	
 	exports['default'] = Layer;
+	module.exports = exports['default'];
+
+/***/ },
+/* 33 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var _Layer2 = __webpack_require__(32);
+	
+	var _Layer3 = _interopRequireDefault(_Layer2);
+	
+	var _Surface = __webpack_require__(34);
+	
+	var _Surface2 = _interopRequireDefault(_Surface);
+	
+	var _three = __webpack_require__(24);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var GridLayer = (function (_Layer) {
+	  _inherits(GridLayer, _Layer);
+	
+	  function GridLayer() {
+	    _classCallCheck(this, GridLayer);
+	
+	    _get(Object.getPrototypeOf(GridLayer.prototype), 'constructor', this).call(this);
+	
+	    this._minLOD = 3;
+	    this._maxLOD = 18;
+	    this._frustum = new _three2['default'].Frustum();
+	  }
+	
+	  // Initialise without requiring new keyword
+	
+	  _createClass(GridLayer, [{
+	    key: '_onAdd',
+	    value: function _onAdd(world) {
+	      this._initEvents();
+	    }
+	  }, {
+	    key: '_initEvents',
+	    value: function _initEvents() {
+	      this._world.on('move', function (latlon) {
+	        console.log(latlon);
+	      });
+	    }
+	  }, {
+	    key: '_updateFrustum',
+	    value: function _updateFrustum() {
+	      var camera = this._world.getCamera();
+	      var projScreenMatrix = new _three2['default'].Matrix4();
+	      projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+	
+	      this._frustum.setFromMatrix(camera.projectionMatrix);
+	      this._frustum.setFromMatrix(new _three2['default'].Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
+	    }
+	  }, {
+	    key: '_surfaceInFrustum',
+	    value: function _surfaceInFrustum(surface) {
+	      return this._frustum.intersectsBox(new _three2['default'].Box3(new _three2['default'].Vector3(surface.bounds[0], 0, surface.bounds[3]), new _three2['default'].Vector3(surface.bounds[2], 0, surface.bounds[1])));
+	    }
+	  }, {
+	    key: '_calculateLOD',
+	    value: function _calculateLOD() {
+	      var _this = this;
+	
+	      var camera = this._world.getCamera();
+	
+	      // 1. Update and retrieve camera frustum
+	      this._updateFrustum(this._frustum, camera);
+	
+	      // 2. Add the four root items of the quadtree to a check list
+	      var checkList = this._checklist;
+	      checkList = [];
+	      checkList.push((0, _Surface2['default'])('0', this._world));
+	      checkList.push((0, _Surface2['default'])('1', this._world));
+	      checkList.push((0, _Surface2['default'])('2', this._world));
+	      checkList.push((0, _Surface2['default'])('3', this._world));
+	
+	      // 3. Call Divide, passing in the check list
+	      this._divide(checkList);
+	
+	      // 4. Render the quadtree items remaining in the check list
+	      checkList.forEach(function (surface, index) {
+	        if (!_this._surfaceInFrustum(surface)) {
+	          return;
+	        }
+	
+	        console.log(surface);
+	
+	        // surface.render();
+	        _this._layer.add(surface.mesh);
+	      });
+	    }
+	  }, {
+	    key: '_divide',
+	    value: function _divide(checkList) {
+	      var count = 0;
+	      var currentItem;
+	      var quadkey;
+	
+	      // 1. Loop until count equals check list length
+	      while (count != checkList.length) {
+	        currentItem = checkList[count];
+	        quadkey = currentItem.quadkey;
+	
+	        // 2. Increase count and continue loop if quadkey equals max LOD / zoom
+	        if (currentItem.length === this._maxLOD) {
+	          count++;
+	          continue;
+	        }
+	
+	        // 3. Else, calculate screen-space error metric for quadkey
+	        if (this._screenSpaceError(currentItem)) {
+	          // 4. If error is sufficient...
+	
+	          // 4a. Remove parent item from the check list
+	          checkList.splice(count, 1);
+	
+	          // 4b. Add 4 child items to the check list
+	          checkList.push((0, _Surface2['default'])(quadkey + '0', this._world));
+	          checkList.push((0, _Surface2['default'])(quadkey + '1', this._world));
+	          checkList.push((0, _Surface2['default'])(quadkey + '2', this._world));
+	          checkList.push((0, _Surface2['default'])(quadkey + '3', this._world));
+	
+	          // 4d. Continue the loop without increasing count
+	          continue;
+	        } else {
+	          // 5. Else, increase count and continue loop
+	          count++;
+	        }
+	      }
+	    }
+	  }, {
+	    key: '_screenSpaceError',
+	    value: function _screenSpaceError(surface) {
+	      var minDepth = this._minLOD;
+	      var maxDepth = this._maxLOD;
+	
+	      var camera = this._world.getCamera();
+	
+	      // Tweak this value to refine specific point that each quad is subdivided
+	      // 1.0 is used by OpenWebGlobe
+	      // 2.0 seems to keep tiles below 256 pixels for ViziCities
+	      var quality = 2.0;
+	
+	      // 1. Return false if quadkey length is greater than maxDepth
+	      if (surface.quadkey.length > maxDepth) {
+	        return false;
+	      }
+	
+	      // 2. Return true if quadkey length is less than minDepth
+	      if (surface.quadkey.length < minDepth) {
+	        return true;
+	      }
+	
+	      // 3. Return false if quadkey bounds are not in view frustum
+	      if (!this._surfaceInFrustum(surface)) {
+	        return false;
+	      }
+	
+	      // 4. Calculate screen-space error metric
+	      // TODO: Use closest distance to one of the 4 surface corners
+	      var dist = new _three2['default'].Vector3(surface.center[0], 0, surface.center[1]).sub(camera.position).length();
+	
+	      console.log(surface, dist);
+	
+	      var error = quality * surface.side / dist;
+	
+	      // 5. Return true if error is greater than 1.0, else return false
+	      return error > 1.0;
+	    }
+	  }]);
+	
+	  return GridLayer;
+	})(_Layer3['default']);
+	
+	exports['default'] = function () {
+	  return new GridLayer();
+	};
+	
+	;
+	module.exports = exports['default'];
+
+/***/ },
+/* 34 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	var _geoLatLon = __webpack_require__(10);
+	
+	var _geoLatLon2 = _interopRequireDefault(_geoLatLon);
+	
+	var _three = __webpack_require__(24);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var r2d = 180 / Math.PI;
+	
+	var loader = new _three2['default'].TextureLoader();
+	loader.setCrossOrigin('');
+	
+	var Surface = (function () {
+	  function Surface(quadkey, world) {
+	    _classCallCheck(this, Surface);
+	
+	    this.world = world;
+	    this.quadkey = quadkey;
+	    this.tile = this._quadkeyToTile(quadkey);
+	    this.bounds = this._tileBounds(this.tile);
+	    this.center = this._boundsToCenter(this.bounds);
+	    this.side = new _three2['default'].Vector3(this.bounds[0], 0, this.bounds[3]).sub(new _three2['default'].Vector3(this.bounds[0], 0, this.bounds[1])).length();
+	
+	    this._createMesh();
+	  }
+	
+	  // Initialise without requiring new keyword
+	
+	  _createClass(Surface, [{
+	    key: '_createMesh',
+	    value: function _createMesh() {
+	      var _this = this;
+	
+	      this.mesh = new _three2['default'].Object3D();
+	
+	      var geom = new _three2['default'].PlaneGeometry(this.side, this.side, 1);
+	
+	      loader.load('http://a.basemaps.cartocdn.com/light_nolabels/' + this.tile[2] + '/' + this.tile[0] + '/' + this.tile[1] + '@2x.png', function (texture) {
+	        // Silky smooth images when tilted
+	        texture.magFilter = _three2['default'].LinearFilter;
+	        texture.minFilter = _three2['default'].LinearMipMapLinearFilter;
+	
+	        // TODO: Set this to renderer.getMaxAnisotropy() / 4
+	        texture.anisotropy = 4;
+	
+	        var material = new _three2['default'].MeshBasicMaterial({ map: texture });
+	
+	        var localMesh = new _three2['default'].Mesh(geom, material);
+	        localMesh.rotation.x = -90 * Math.PI / 180;
+	
+	        _this.mesh.add(localMesh);
+	
+	        _this.mesh.position.x = _this.center[0];
+	        _this.mesh.position.z = _this.center[1];
+	
+	        var box = new _three2['default'].BoxHelper(localMesh);
+	        _this.mesh.add(box);
+	      });
+	    }
+	  }, {
+	    key: '_quadkeyToTile',
+	    value: function _quadkeyToTile(quadkey) {
+	      var x = 0;
+	      var y = 0;
+	      var z = quadkey.length;
+	
+	      for (var i = z; i > 0; i--) {
+	        var mask = 1 << i - 1;
+	        var q = +quadkey[z - i];
+	        if (q === 1) {
+	          x |= mask;
+	        }
+	        if (q === 2) {
+	          y |= mask;
+	        }
+	        if (q === 3) {
+	          x |= mask;
+	          y |= mask;
+	        }
+	      }
+	
+	      return [x, y, z];
+	    }
+	  }, {
+	    key: '_boundsToCenter',
+	    value: function _boundsToCenter(bounds) {
+	      var x = bounds[0] + (bounds[2] - bounds[0]) / 2;
+	      var y = bounds[1] + (bounds[3] - bounds[1]) / 2;
+	
+	      return [x, y];
+	    }
+	  }, {
+	    key: '_tileBounds',
+	    value: function _tileBounds(tile) {
+	      var boundsWGS84 = this._tileBoundsWGS84(tile);
+	
+	      var sw = this.world.latLonToPoint((0, _geoLatLon2['default'])(boundsWGS84[1], boundsWGS84[0]));
+	      var ne = this.world.latLonToPoint((0, _geoLatLon2['default'])(boundsWGS84[3], boundsWGS84[2]));
+	
+	      return [sw.x, sw.y, ne.x, ne.y];
+	      // return [swMerc[0], -swMerc[1], neMerc[0], -neMerc[1]];
+	    }
+	  }, {
+	    key: '_tileBoundsWGS84',
+	    value: function _tileBoundsWGS84(tile) {
+	      var e = this._tile2lon(tile[0] + 1, tile[2]);
+	      var w = this._tile2lon(tile[0], tile[2]);
+	      var s = this._tile2lat(tile[1] + 1, tile[2]);
+	      var n = this._tile2lat(tile[1], tile[2]);
+	      return [w, s, e, n];
+	    }
+	  }, {
+	    key: '_tile2lon',
+	    value: function _tile2lon(x, z) {
+	      return x / Math.pow(2, z) * 360 - 180;
+	    }
+	  }, {
+	    key: '_tile2lat',
+	    value: function _tile2lat(y, z) {
+	      var n = Math.PI - 2 * Math.PI * y / Math.pow(2, z);
+	      return r2d * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
+	    }
+	  }]);
+	
+	  return Surface;
+	})();
+	
+	exports['default'] = function (quadkey, world) {
+	  return new Surface(quadkey, world);
+	};
+	
+	;
 	module.exports = exports['default'];
 
 /***/ }

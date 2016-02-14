@@ -14,9 +14,11 @@ class Engine extends EventEmitter {
     this._renderer = Renderer(container);
     this._camera = Camera(container);
     this.clock = new THREE.Clock();
+
+    this._frustum = new THREE.Frustum();
   }
 
-  _update(delta) {
+  update(delta) {
     this.emit('preRender');
     this._renderer.render(this._scene, this._camera);
     this.emit('postRender');
