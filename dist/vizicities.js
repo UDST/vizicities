@@ -3113,6 +3113,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports['default'] = function (container) {
 	  var camera = new _three2['default'].PerspectiveCamera(40, 1, 1, 40000);
+	  camera.position.y = 400;
 	  camera.position.z = 400;
 	
 	  var updateSize = function updateSize() {
@@ -4632,6 +4633,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
+	// TODO: Prevent tiles from being loaded if they are further than a certain
+	// distance from the camera and are unlikely to be seen anyway
+	
 	var GridLayer = (function (_Layer) {
 	  _inherits(GridLayer, _Layer);
 	
@@ -4650,13 +4654,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(GridLayer, [{
 	    key: '_onAdd',
 	    value: function _onAdd(world) {
+	      var _this = this;
+	
 	      this._initEvents();
+	
+	      // Trigger initial quadtree calculation on the next frame
+	      //
+	      // TODO: This is a hack to ensure the camera is all set up - a better
+	      // solution should be found
+	      setTimeout(function () {
+	        _this._calculateLOD();
+	      }, 0);
 	    }
 	  }, {
 	    key: '_initEvents',
 	    value: function _initEvents() {
+	      var _this2 = this;
+	
 	      this._world.on('move', function (latlon) {
-	        console.log(latlon);
+	        _this2._calculateLOD();
 	      });
 	    }
 	  }, {
@@ -4677,7 +4693,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_calculateLOD',
 	    value: function _calculateLOD() {
-	      var _this = this;
+	      var _this3 = this;
 	
 	      var camera = this._world.getCamera();
 	
@@ -4697,14 +4713,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // 4. Render the quadtree items remaining in the check list
 	      checkList.forEach(function (surface, index) {
-	        if (!_this._surfaceInFrustum(surface)) {
+	        if (!_this3._surfaceInFrustum(surface)) {
 	          return;
 	        }
 	
-	        console.log(surface);
+	        // console.log(surface);
 	
 	        // surface.render();
-	        _this._layer.add(surface.mesh);
+	        _this3._layer.add(surface.mesh);
 	      });
 	    }
 	  }, {
@@ -4779,7 +4795,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // TODO: Use closest distance to one of the 4 surface corners
 	      var dist = new _three2['default'].Vector3(surface.center[0], 0, surface.center[1]).sub(camera.position).length();
 	
-	      console.log(surface, dist);
+	      // console.log(surface, dist);
 	
 	      var error = quality * surface.side / dist;
 	
@@ -4845,13 +4861,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_createDebugMesh',
 	    value: function _createDebugMesh() {
 	      var canvas = document.createElement('canvas');
-	      canvas.width = 1024;
-	      canvas.height = 1024;
+	      canvas.width = 256;
+	      canvas.height = 256;
 	
 	      var context = canvas.getContext('2d');
-	      context.font = 'Bold 60px Courier';
+	      context.font = 'Bold 20px Helvetica Neue, Verdana, Arial';
 	      context.fillStyle = 'rgba(255,0,0,1)';
-	      context.fillText(this.quadkey, 100, 530);
+	      context.fillText(this.quadkey, 20, canvas.width / 2 + 10);
 	
 	      var texture = new _three2['default'].Texture(canvas);
 	
@@ -4875,51 +4891,64 @@ return /******/ (function(modules) { // webpackBootstrap
 	      mesh.rotation.x = -90 * Math.PI / 180;
 	      mesh.position.y = 0.1;
 	
-	      this.mesh.add(mesh);
+	      return mesh;
 	    }
 	  }, {
 	    key: '_createMesh',
 	    value: function _createMesh() {
-	      var _this = this;
-	
 	      var mesh = new _three2['default'].Object3D();
 	      var geom = new _three2['default'].PlaneGeometry(this.side, this.side, 1);
 	
-	      var letter = String.fromCharCode(97 + Math.floor(Math.random() * 26));
-	      var url = 'http://' + letter + '.basemaps.cartocdn.com/light_nolabels/';
-	      // var url = 'http://tile.stamen.com/toner-lite/';
+	      var material = new _three2['default'].MeshBasicMaterial();
 	
-	      loader.load(url + this.tile[2] + '/' + this.tile[0] + '/' + this.tile[1] + '@2x.png', function (texture) {
-	        console.log('Loaded');
-	        // Silky smooth images when tilted
-	        texture.magFilter = _three2['default'].LinearFilter;
-	        texture.minFilter = _three2['default'].LinearMipMapLinearFilter;
+	      var localMesh = new _three2['default'].Mesh(geom, material);
+	      localMesh.rotation.x = -90 * Math.PI / 180;
 	
-	        // TODO: Set this to renderer.getMaxAnisotropy() / 4
-	        texture.anisotropy = 4;
+	      mesh.add(localMesh);
 	
-	        texture.needsUpdate = true;
+	      mesh.position.x = this.center[0];
+	      mesh.position.z = this.center[1];
 	
-	        var material = new _three2['default'].MeshBasicMaterial({ map: texture });
+	      var box = new _three2['default'].BoxHelper(localMesh);
+	      mesh.add(box);
 	
-	        var localMesh = new _three2['default'].Mesh(geom, material);
-	        localMesh.rotation.x = -90 * Math.PI / 180;
+	      mesh.add(this._createDebugMesh());
 	
-	        // Sometimes tiles don't appear, even though the images have loaded ok
-	        // This helps a little but it's a total hack and the real solution needs
-	        // to be found.
-	        setTimeout(function () {
-	          mesh.add(localMesh);
-	        }, 2000);
-	
-	        mesh.position.x = _this.center[0];
-	        mesh.position.z = _this.center[1];
-	
-	        var box = new _three2['default'].BoxHelper(localMesh);
-	        mesh.add(box);
-	
-	        _this._createDebugMesh();
-	      });
+	      // var letter = String.fromCharCode(97 + Math.floor(Math.random() * 26));
+	      // var url = 'http://' + letter + '.basemaps.cartocdn.com/light_nolabels/';
+	      // // var url = 'http://tile.stamen.com/toner-lite/';
+	      //
+	      // loader.load(url + this.tile[2] + '/' + this.tile[0] + '/' + this.tile[1] + '@2x.png', texture => {
+	      //   console.log('Loaded');
+	      //   // Silky smooth images when tilted
+	      //   texture.magFilter = THREE.LinearFilter;
+	      //   texture.minFilter = THREE.LinearMipMapLinearFilter;
+	      //
+	      //   // TODO: Set this to renderer.getMaxAnisotropy() / 4
+	      //   texture.anisotropy = 4;
+	      //
+	      //   texture.needsUpdate = true;
+	      //
+	      //   var material = new THREE.MeshBasicMaterial({map: texture});
+	      //
+	      //   var localMesh = new THREE.Mesh(geom, material);
+	      //   localMesh.rotation.x = -90 * Math.PI / 180;
+	      //
+	      //   // Sometimes tiles don't appear, even though the images have loaded ok
+	      //   // This helps a little but it's a total hack and the real solution needs
+	      //   // to be found.
+	      //   setTimeout(function() {
+	      //     mesh.add(localMesh);
+	      //   }, 2000);
+	      //
+	      //   mesh.position.x = this.center[0];
+	      //   mesh.position.z = this.center[1];
+	      //
+	      //   var box = new THREE.BoxHelper(localMesh);
+	      //   mesh.add(box);
+	      //
+	      //   this._createDebugMesh();
+	      // });
 	
 	      return mesh;
 	    }

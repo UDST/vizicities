@@ -2,6 +2,9 @@ import Layer from '../Layer';
 import Surface from './Surface';
 import THREE from 'three';
 
+// TODO: Prevent tiles from being loaded if they are further than a certain
+// distance from the camera and are unlikely to be seen anyway
+
 class GridLayer extends Layer {
   constructor() {
     super();
@@ -13,11 +16,19 @@ class GridLayer extends Layer {
 
   _onAdd(world) {
     this._initEvents();
+
+    // Trigger initial quadtree calculation on the next frame
+    //
+    // TODO: This is a hack to ensure the camera is all set up - a better
+    // solution should be found
+    setTimeout(() => {
+      this._calculateLOD();
+    }, 0);
   }
 
   _initEvents() {
     this._world.on('move', latlon => {
-      console.log(latlon);
+      this._calculateLOD();
     });
   }
 
@@ -57,7 +68,7 @@ class GridLayer extends Layer {
         return;
       }
 
-      console.log(surface);
+      // console.log(surface);
 
       // surface.render();
       this._layer.add(surface.mesh);
@@ -133,7 +144,7 @@ class GridLayer extends Layer {
     // TODO: Use closest distance to one of the 4 surface corners
     var dist = (new THREE.Vector3(surface.center[0], 0, surface.center[1])).sub(camera.position).length();
 
-    console.log(surface, dist);
+    // console.log(surface, dist);
 
     var error = quality * surface.side / dist;
 

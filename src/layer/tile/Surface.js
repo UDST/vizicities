@@ -20,13 +20,13 @@ class Surface {
 
   _createDebugMesh() {
     var canvas = document.createElement('canvas');
-    canvas.width = 1024;
-    canvas.height = 1024;
+    canvas.width = 256;
+    canvas.height = 256;
 
     var context = canvas.getContext('2d');
-    context.font = 'Bold 60px Courier';
+    context.font = 'Bold 20px Helvetica Neue, Verdana, Arial';
     context.fillStyle = 'rgba(255,0,0,1)';
-    context.fillText(this.quadkey, 100, 530);
+    context.fillText(this.quadkey, 20, canvas.width / 2 + 10);
 
     var texture = new THREE.Texture(canvas);
 
@@ -50,48 +50,63 @@ class Surface {
     mesh.rotation.x = -90 * Math.PI / 180;
     mesh.position.y = 0.1;
 
-    this.mesh.add(mesh);
+    return mesh;
   }
 
   _createMesh() {
     var mesh = new THREE.Object3D();
     var geom = new THREE.PlaneGeometry(this.side, this.side, 1);
 
-    var letter = String.fromCharCode(97 + Math.floor(Math.random() * 26));
-    var url = 'http://' + letter + '.basemaps.cartocdn.com/light_nolabels/';
-    // var url = 'http://tile.stamen.com/toner-lite/';
+    var material = new THREE.MeshBasicMaterial();
 
-    loader.load(url + this.tile[2] + '/' + this.tile[0] + '/' + this.tile[1] + '@2x.png', texture => {
-      console.log('Loaded');
-      // Silky smooth images when tilted
-      texture.magFilter = THREE.LinearFilter;
-      texture.minFilter = THREE.LinearMipMapLinearFilter;
+    var localMesh = new THREE.Mesh(geom, material);
+    localMesh.rotation.x = -90 * Math.PI / 180;
 
-      // TODO: Set this to renderer.getMaxAnisotropy() / 4
-      texture.anisotropy = 4;
+    mesh.add(localMesh);
 
-      texture.needsUpdate = true;
+    mesh.position.x = this.center[0];
+    mesh.position.z = this.center[1];
 
-      var material = new THREE.MeshBasicMaterial({map: texture});
+    var box = new THREE.BoxHelper(localMesh);
+    mesh.add(box);
 
-      var localMesh = new THREE.Mesh(geom, material);
-      localMesh.rotation.x = -90 * Math.PI / 180;
+    mesh.add(this._createDebugMesh());
 
-      // Sometimes tiles don't appear, even though the images have loaded ok
-      // This helps a little but it's a total hack and the real solution needs
-      // to be found.
-      setTimeout(function() {
-        mesh.add(localMesh);
-      }, 2000);
-
-      mesh.position.x = this.center[0];
-      mesh.position.z = this.center[1];
-
-      var box = new THREE.BoxHelper(localMesh);
-      mesh.add(box);
-
-      this._createDebugMesh();
-    });
+    // var letter = String.fromCharCode(97 + Math.floor(Math.random() * 26));
+    // var url = 'http://' + letter + '.basemaps.cartocdn.com/light_nolabels/';
+    // // var url = 'http://tile.stamen.com/toner-lite/';
+    //
+    // loader.load(url + this.tile[2] + '/' + this.tile[0] + '/' + this.tile[1] + '@2x.png', texture => {
+    //   console.log('Loaded');
+    //   // Silky smooth images when tilted
+    //   texture.magFilter = THREE.LinearFilter;
+    //   texture.minFilter = THREE.LinearMipMapLinearFilter;
+    //
+    //   // TODO: Set this to renderer.getMaxAnisotropy() / 4
+    //   texture.anisotropy = 4;
+    //
+    //   texture.needsUpdate = true;
+    //
+    //   var material = new THREE.MeshBasicMaterial({map: texture});
+    //
+    //   var localMesh = new THREE.Mesh(geom, material);
+    //   localMesh.rotation.x = -90 * Math.PI / 180;
+    //
+    //   // Sometimes tiles don't appear, even though the images have loaded ok
+    //   // This helps a little but it's a total hack and the real solution needs
+    //   // to be found.
+    //   setTimeout(function() {
+    //     mesh.add(localMesh);
+    //   }, 2000);
+    //
+    //   mesh.position.x = this.center[0];
+    //   mesh.position.z = this.center[1];
+    //
+    //   var box = new THREE.BoxHelper(localMesh);
+    //   mesh.add(box);
+    //
+    //   this._createDebugMesh();
+    // });
 
     return mesh;
   }
