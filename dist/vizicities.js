@@ -4625,9 +4625,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
-	var _Surface = __webpack_require__(34);
+	var _TileCache = __webpack_require__(34);
 	
-	var _Surface2 = _interopRequireDefault(_Surface);
+	var _TileCache2 = _interopRequireDefault(_TileCache);
+	
+	var _lodashThrottle = __webpack_require__(44);
+	
+	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
 	
 	var _three = __webpack_require__(24);
 	
@@ -4644,8 +4648,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    _get(Object.getPrototypeOf(GridLayer.prototype), 'constructor', this).call(this);
 	
+	    this._tileCache = new _TileCache2['default'](1000);
+	
+	    // TODO: Work out why changing the minLOD causes loads of issues
 	    this._minLOD = 3;
 	    this._maxLOD = 18;
+	
 	    this._frustum = new _three2['default'].Frustum();
 	  }
 	
@@ -4671,9 +4679,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _initEvents() {
 	      var _this2 = this;
 	
-	      this._world.on('move', function (latlon) {
+	      // Run LOD calculations based on render calls
+	      //
+	      // TODO: Perhaps don't perform a calculation if nothing has changed in a
+	      // frame and there are no tiles waiting to be loaded.
+	      this._world.on('preUpdate', (0, _lodashThrottle2['default'])(function () {
 	        _this2._calculateLOD();
-	      });
+	      }, 100));
 	    }
 	  }, {
 	    key: '_updateFrustum',
@@ -4686,14 +4698,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._frustum.setFromMatrix(new _three2['default'].Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
 	    }
 	  }, {
-	    key: '_surfaceInFrustum',
-	    value: function _surfaceInFrustum(surface) {
-	      return this._frustum.intersectsBox(new _three2['default'].Box3(new _three2['default'].Vector3(surface.bounds[0], 0, surface.bounds[3]), new _three2['default'].Vector3(surface.bounds[2], 0, surface.bounds[1])));
+	    key: '_tileInFrustum',
+	    value: function _tileInFrustum(tile) {
+	      var bounds = tile.getBounds();
+	      return this._frustum.intersectsBox(new _three2['default'].Box3(new _three2['default'].Vector3(bounds[0], 0, bounds[3]), new _three2['default'].Vector3(bounds[2], 0, bounds[1])));
 	    }
 	  }, {
 	    key: '_calculateLOD',
 	    value: function _calculateLOD() {
 	      var _this3 = this;
+	
+	      if (this._stop) {
+	        return;
+	      }
+	
+	      // var start = performance.now();
 	
 	      var camera = this._world.getCamera();
 	
@@ -4703,45 +4722,83 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // 2. Add the four root items of the quadtree to a check list
 	      var checkList = this._checklist;
 	      checkList = [];
-	      checkList.push((0, _Surface2['default'])('0', this._world));
-	      checkList.push((0, _Surface2['default'])('1', this._world));
-	      checkList.push((0, _Surface2['default'])('2', this._world));
-	      checkList.push((0, _Surface2['default'])('3', this._world));
+	      checkList.push(this._tileCache.requestTile('0', this));
+	      checkList.push(this._tileCache.requestTile('1', this));
+	      checkList.push(this._tileCache.requestTile('2', this));
+	      checkList.push(this._tileCache.requestTile('3', this));
 	
 	      // 3. Call Divide, passing in the check list
 	      this._divide(checkList);
 	
-	      // 4. Render the quadtree items remaining in the check list
-	      checkList.forEach(function (surface, index) {
-	        if (!_this3._surfaceInFrustum(surface)) {
+	      // 4. Remove all tiles from layer
+	      this._removeTiles();
+	
+	      var tileCount = 0;
+	
+	      // 5. Render the tiles remaining in the check list
+	      checkList.forEach(function (tile, index) {
+	        // Skip tile if it's not in the current view frustum
+	        if (!_this3._tileInFrustum(tile)) {
 	          return;
 	        }
 	
-	        // console.log(surface);
+	        // TODO: Can probably speed this up
+	        var center = tile.getCenter();
+	        var dist = new _three2['default'].Vector3(center[0], 0, center[1]).sub(camera.position).length();
 	
-	        // surface.render();
-	        _this3._layer.add(surface.mesh);
+	        // Manual distance limit to cut down on tiles so far away
+	        if (dist > 8000) {
+	          return;
+	        }
+	
+	        // Does the tile have a mesh?
+	        //
+	        // If yes, continue
+	        // If no, generate tile mesh, request texture and skip
+	        if (!tile.getMesh()) {
+	          tile.requestTileAsync();
+	          return;
+	        }
+	
+	        // Are the mesh and texture ready?
+	        //
+	        // If yes, continue
+	        // If no, skip
+	        if (!tile.isReady()) {
+	          return;
+	        }
+	
+	        // Add tile to layer (and to scene)
+	        _this3._layer.add(tile.getMesh());
+	
+	        // Output added tile (for debugging)
+	        // console.log(tile);
+	
+	        tileCount++;
 	      });
+	
+	      // console.log(tileCount);
+	      // console.log(performance.now() - start);
 	    }
 	  }, {
 	    key: '_divide',
 	    value: function _divide(checkList) {
 	      var count = 0;
 	      var currentItem;
-	      var quadkey;
+	      var quadcode;
 	
 	      // 1. Loop until count equals check list length
 	      while (count != checkList.length) {
 	        currentItem = checkList[count];
-	        quadkey = currentItem.quadkey;
+	        quadcode = currentItem.getQuadcode();
 	
-	        // 2. Increase count and continue loop if quadkey equals max LOD / zoom
+	        // 2. Increase count and continue loop if quadcode equals max LOD / zoom
 	        if (currentItem.length === this._maxLOD) {
 	          count++;
 	          continue;
 	        }
 	
-	        // 3. Else, calculate screen-space error metric for quadkey
+	        // 3. Else, calculate screen-space error metric for quadcode
 	        if (this._screenSpaceError(currentItem)) {
 	          // 4. If error is sufficient...
 	
@@ -4749,10 +4806,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	          checkList.splice(count, 1);
 	
 	          // 4b. Add 4 child items to the check list
-	          checkList.push((0, _Surface2['default'])(quadkey + '0', this._world));
-	          checkList.push((0, _Surface2['default'])(quadkey + '1', this._world));
-	          checkList.push((0, _Surface2['default'])(quadkey + '2', this._world));
-	          checkList.push((0, _Surface2['default'])(quadkey + '3', this._world));
+	          checkList.push(this._tileCache.requestTile(quadcode + '0', this));
+	          checkList.push(this._tileCache.requestTile(quadcode + '1', this));
+	          checkList.push(this._tileCache.requestTile(quadcode + '2', this));
+	          checkList.push(this._tileCache.requestTile(quadcode + '3', this));
 	
 	          // 4d. Continue the loop without increasing count
 	          continue;
@@ -4764,43 +4821,54 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }, {
 	    key: '_screenSpaceError',
-	    value: function _screenSpaceError(surface) {
+	    value: function _screenSpaceError(tile) {
 	      var minDepth = this._minLOD;
 	      var maxDepth = this._maxLOD;
+	
+	      var quadcode = tile.getQuadcode();
 	
 	      var camera = this._world.getCamera();
 	
 	      // Tweak this value to refine specific point that each quad is subdivided
 	      //
-	      // It's used to multiple the dimensions of the surface sides before
-	      // comparing against the surface distance from camera
+	      // It's used to multiple the dimensions of the tile sides before
+	      // comparing against the tile distance from camera
 	      var quality = 3.0;
 	
-	      // 1. Return false if quadkey length is greater than maxDepth
-	      if (surface.quadkey.length > maxDepth) {
+	      // 1. Return false if quadcode length is greater than maxDepth
+	      if (quadcode.length > maxDepth) {
 	        return false;
 	      }
 	
-	      // 2. Return true if quadkey length is less than minDepth
-	      if (surface.quadkey.length < minDepth) {
+	      // 2. Return true if quadcode length is less than minDepth
+	      if (quadcode.length < minDepth) {
 	        return true;
 	      }
 	
-	      // 3. Return false if quadkey bounds are not in view frustum
-	      if (!this._surfaceInFrustum(surface)) {
+	      // 3. Return false if quadcode bounds are not in view frustum
+	      if (!this._tileInFrustum(tile)) {
 	        return false;
 	      }
 	
+	      var center = tile.getCenter();
+	
 	      // 4. Calculate screen-space error metric
-	      // TODO: Use closest distance to one of the 4 surface corners
-	      var dist = new _three2['default'].Vector3(surface.center[0], 0, surface.center[1]).sub(camera.position).length();
+	      // TODO: Use closest distance to one of the 4 tile corners
+	      var dist = new _three2['default'].Vector3(center[0], 0, center[1]).sub(camera.position).length();
 	
-	      // console.log(surface, dist);
-	
-	      var error = quality * surface.side / dist;
+	      var error = quality * tile.getSide() / dist;
 	
 	      // 5. Return true if error is greater than 1.0, else return false
 	      return error > 1.0;
+	    }
+	  }, {
+	    key: '_removeTiles',
+	    value: function _removeTiles() {
+	      // console.log('Pre:', this._layer.children.length);
+	      for (var i = this._layer.children.length - 1; i >= 0; i--) {
+	        this._layer.remove(this._layer.children[i]);
+	      }
+	      // console.log('Post:', this._layer.children.length);
 	    }
 	  }]);
 	
@@ -4828,6 +4896,1796 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
+	var _lruCache = __webpack_require__(35);
+	
+	var _lruCache2 = _interopRequireDefault(_lruCache);
+	
+	var _Tile = __webpack_require__(43);
+	
+	var _Tile2 = _interopRequireDefault(_Tile);
+	
+	// This process is based on a similar approach taken by OpenWebGlobe
+	// See: https://github.com/OpenWebGlobe/WebViewer/blob/master/source/core/globecache.js
+	
+	var TileCache = (function () {
+	  function TileCache(cacheLimit) {
+	    _classCallCheck(this, TileCache);
+	
+	    this._cache = (0, _lruCache2['default'])(cacheLimit);
+	  }
+	
+	  // Returns true if all specified tile providers are ready to be used
+	  // Otherwise, returns false
+	
+	  _createClass(TileCache, [{
+	    key: 'isReady',
+	    value: function isReady() {
+	      return false;
+	    }
+	
+	    // Get a cached tile or request a new one if not in cache
+	  }, {
+	    key: 'requestTile',
+	    value: function requestTile(quadcode, layer) {
+	      var tile = this._cache.get(quadcode);
+	
+	      if (!tile) {
+	        // Set up a brand new tile
+	        tile = new _Tile2['default'](quadcode, layer);
+	
+	        // Request data for various tile providers
+	        // tile.requestData(imageProviders);
+	
+	        // Add tile to cache, though it won't be ready yet as the data is being
+	        // requested from various places asynchronously
+	        this._cache.set(quadcode, tile);
+	      }
+	
+	      return tile;
+	    }
+	
+	    // Get a cached tile without requesting a new one
+	  }, {
+	    key: 'getTile',
+	    value: function getTile(quadcode) {
+	      return this._cache.get(quadcode);
+	    }
+	
+	    // Destroy the cache and remove it from memory
+	    //
+	    // TODO: Call destroy method on items in cache
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {
+	      this._cache.reset();
+	    }
+	  }]);
+	
+	  return TileCache;
+	})();
+	
+	exports['default'] = TileCache;
+	module.exports = exports['default'];
+
+/***/ },
+/* 35 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = LRUCache
+	
+	// This will be a proper iterable 'Map' in engines that support it,
+	// or a fakey-fake PseudoMap in older versions.
+	var Map = __webpack_require__(36)
+	var util = __webpack_require__(39)
+	
+	// A linked list to keep track of recently-used-ness
+	var Yallist = __webpack_require__(42)
+	
+	// use symbols if possible, otherwise just _props
+	var symbols = {}
+	var hasSymbol = typeof Symbol === 'function'
+	var makeSymbol
+	if (hasSymbol) {
+	  makeSymbol = function (key) {
+	    return Symbol.for(key)
+	  }
+	} else {
+	  makeSymbol = function (key) {
+	    return '_' + key
+	  }
+	}
+	
+	function priv (obj, key, val) {
+	  var sym
+	  if (symbols[key]) {
+	    sym = symbols[key]
+	  } else {
+	    sym = makeSymbol(key)
+	    symbols[key] = sym
+	  }
+	  if (arguments.length === 2) {
+	    return obj[sym]
+	  } else {
+	    obj[sym] = val
+	    return val
+	  }
+	}
+	
+	function naiveLength () { return 1 }
+	
+	// lruList is a yallist where the head is the youngest
+	// item, and the tail is the oldest.  the list contains the Hit
+	// objects as the entries.
+	// Each Hit object has a reference to its Yallist.Node.  This
+	// never changes.
+	//
+	// cache is a Map (or PseudoMap) that matches the keys to
+	// the Yallist.Node object.
+	function LRUCache (options) {
+	  if (!(this instanceof LRUCache)) {
+	    return new LRUCache(options)
+	  }
+	
+	  if (typeof options === 'number') {
+	    options = { max: options }
+	  }
+	
+	  if (!options) {
+	    options = {}
+	  }
+	
+	  var max = priv(this, 'max', options.max)
+	  // Kind of weird to have a default max of Infinity, but oh well.
+	  if (!max ||
+	      !(typeof max === 'number') ||
+	      max <= 0) {
+	    priv(this, 'max', Infinity)
+	  }
+	
+	  var lc = options.length || naiveLength
+	  if (typeof lc !== 'function') {
+	    lc = naiveLength
+	  }
+	  priv(this, 'lengthCalculator', lc)
+	
+	  priv(this, 'allowStale', options.stale || false)
+	  priv(this, 'maxAge', options.maxAge || 0)
+	  priv(this, 'dispose', options.dispose)
+	  this.reset()
+	}
+	
+	// resize the cache when the max changes.
+	Object.defineProperty(LRUCache.prototype, 'max', {
+	  set: function (mL) {
+	    if (!mL || !(typeof mL === 'number') || mL <= 0) {
+	      mL = Infinity
+	    }
+	    priv(this, 'max', mL)
+	    trim(this)
+	  },
+	  get: function () {
+	    return priv(this, 'max')
+	  },
+	  enumerable: true
+	})
+	
+	Object.defineProperty(LRUCache.prototype, 'allowStale', {
+	  set: function (allowStale) {
+	    priv(this, 'allowStale', !!allowStale)
+	  },
+	  get: function () {
+	    return priv(this, 'allowStale')
+	  },
+	  enumerable: true
+	})
+	
+	Object.defineProperty(LRUCache.prototype, 'maxAge', {
+	  set: function (mA) {
+	    if (!mA || !(typeof mA === 'number') || mA < 0) {
+	      mA = 0
+	    }
+	    priv(this, 'maxAge', mA)
+	    trim(this)
+	  },
+	  get: function () {
+	    return priv(this, 'maxAge')
+	  },
+	  enumerable: true
+	})
+	
+	// resize the cache when the lengthCalculator changes.
+	Object.defineProperty(LRUCache.prototype, 'lengthCalculator', {
+	  set: function (lC) {
+	    if (typeof lC !== 'function') {
+	      lC = naiveLength
+	    }
+	    if (lC !== priv(this, 'lengthCalculator')) {
+	      priv(this, 'lengthCalculator', lC)
+	      priv(this, 'length', 0)
+	      priv(this, 'lruList').forEach(function (hit) {
+	        hit.length = priv(this, 'lengthCalculator').call(this, hit.value, hit.key)
+	        priv(this, 'length', priv(this, 'length') + hit.length)
+	      }, this)
+	    }
+	    trim(this)
+	  },
+	  get: function () { return priv(this, 'lengthCalculator') },
+	  enumerable: true
+	})
+	
+	Object.defineProperty(LRUCache.prototype, 'length', {
+	  get: function () { return priv(this, 'length') },
+	  enumerable: true
+	})
+	
+	Object.defineProperty(LRUCache.prototype, 'itemCount', {
+	  get: function () { return priv(this, 'lruList').length },
+	  enumerable: true
+	})
+	
+	LRUCache.prototype.rforEach = function (fn, thisp) {
+	  thisp = thisp || this
+	  for (var walker = priv(this, 'lruList').tail; walker !== null;) {
+	    var prev = walker.prev
+	    forEachStep(this, fn, walker, thisp)
+	    walker = prev
+	  }
+	}
+	
+	function forEachStep (self, fn, node, thisp) {
+	  var hit = node.value
+	  if (isStale(self, hit)) {
+	    del(self, node)
+	    if (!priv(self, 'allowStale')) {
+	      hit = undefined
+	    }
+	  }
+	  if (hit) {
+	    fn.call(thisp, hit.value, hit.key, self)
+	  }
+	}
+	
+	LRUCache.prototype.forEach = function (fn, thisp) {
+	  thisp = thisp || this
+	  for (var walker = priv(this, 'lruList').head; walker !== null;) {
+	    var next = walker.next
+	    forEachStep(this, fn, walker, thisp)
+	    walker = next
+	  }
+	}
+	
+	LRUCache.prototype.keys = function () {
+	  return priv(this, 'lruList').toArray().map(function (k) {
+	    return k.key
+	  }, this)
+	}
+	
+	LRUCache.prototype.values = function () {
+	  return priv(this, 'lruList').toArray().map(function (k) {
+	    return k.value
+	  }, this)
+	}
+	
+	LRUCache.prototype.reset = function () {
+	  if (priv(this, 'dispose') &&
+	      priv(this, 'lruList') &&
+	      priv(this, 'lruList').length) {
+	    priv(this, 'lruList').forEach(function (hit) {
+	      priv(this, 'dispose').call(this, hit.key, hit.value)
+	    }, this)
+	  }
+	
+	  priv(this, 'cache', new Map()) // hash of items by key
+	  priv(this, 'lruList', new Yallist()) // list of items in order of use recency
+	  priv(this, 'length', 0) // length of items in the list
+	}
+	
+	LRUCache.prototype.dump = function () {
+	  return priv(this, 'lruList').map(function (hit) {
+	    if (!isStale(this, hit)) {
+	      return {
+	        k: hit.key,
+	        v: hit.value,
+	        e: hit.now + (hit.maxAge || 0)
+	      }
+	    }
+	  }, this).toArray().filter(function (h) {
+	    return h
+	  })
+	}
+	
+	LRUCache.prototype.dumpLru = function () {
+	  return priv(this, 'lruList')
+	}
+	
+	LRUCache.prototype.inspect = function (n, opts) {
+	  var str = 'LRUCache {'
+	  var extras = false
+	
+	  var as = priv(this, 'allowStale')
+	  if (as) {
+	    str += '\n  allowStale: true'
+	    extras = true
+	  }
+	
+	  var max = priv(this, 'max')
+	  if (max && max !== Infinity) {
+	    if (extras) {
+	      str += ','
+	    }
+	    str += '\n  max: ' + util.inspect(max, opts)
+	    extras = true
+	  }
+	
+	  var maxAge = priv(this, 'maxAge')
+	  if (maxAge) {
+	    if (extras) {
+	      str += ','
+	    }
+	    str += '\n  maxAge: ' + util.inspect(maxAge, opts)
+	    extras = true
+	  }
+	
+	  var lc = priv(this, 'lengthCalculator')
+	  if (lc && lc !== naiveLength) {
+	    if (extras) {
+	      str += ','
+	    }
+	    str += '\n  length: ' + util.inspect(priv(this, 'length'), opts)
+	    extras = true
+	  }
+	
+	  var didFirst = false
+	  priv(this, 'lruList').forEach(function (item) {
+	    if (didFirst) {
+	      str += ',\n  '
+	    } else {
+	      if (extras) {
+	        str += ',\n'
+	      }
+	      didFirst = true
+	      str += '\n  '
+	    }
+	    var key = util.inspect(item.key).split('\n').join('\n  ')
+	    var val = { value: item.value }
+	    if (item.maxAge !== maxAge) {
+	      val.maxAge = item.maxAge
+	    }
+	    if (lc !== naiveLength) {
+	      val.length = item.length
+	    }
+	    if (isStale(this, item)) {
+	      val.stale = true
+	    }
+	
+	    val = util.inspect(val, opts).split('\n').join('\n  ')
+	    str += key + ' => ' + val
+	  })
+	
+	  if (didFirst || extras) {
+	    str += '\n'
+	  }
+	  str += '}'
+	
+	  return str
+	}
+	
+	LRUCache.prototype.set = function (key, value, maxAge) {
+	  maxAge = maxAge || priv(this, 'maxAge')
+	
+	  var now = maxAge ? Date.now() : 0
+	  var len = priv(this, 'lengthCalculator').call(this, value, key)
+	
+	  if (priv(this, 'cache').has(key)) {
+	    if (len > priv(this, 'max')) {
+	      del(this, priv(this, 'cache').get(key))
+	      return false
+	    }
+	
+	    var node = priv(this, 'cache').get(key)
+	    var item = node.value
+	
+	    // dispose of the old one before overwriting
+	    if (priv(this, 'dispose')) {
+	      priv(this, 'dispose').call(this, key, item.value)
+	    }
+	
+	    item.now = now
+	    item.maxAge = maxAge
+	    item.value = value
+	    priv(this, 'length', priv(this, 'length') + (len - item.length))
+	    item.length = len
+	    this.get(key)
+	    trim(this)
+	    return true
+	  }
+	
+	  var hit = new Entry(key, value, len, now, maxAge)
+	
+	  // oversized objects fall out of cache automatically.
+	  if (hit.length > priv(this, 'max')) {
+	    if (priv(this, 'dispose')) {
+	      priv(this, 'dispose').call(this, key, value)
+	    }
+	    return false
+	  }
+	
+	  priv(this, 'length', priv(this, 'length') + hit.length)
+	  priv(this, 'lruList').unshift(hit)
+	  priv(this, 'cache').set(key, priv(this, 'lruList').head)
+	  trim(this)
+	  return true
+	}
+	
+	LRUCache.prototype.has = function (key) {
+	  if (!priv(this, 'cache').has(key)) return false
+	  var hit = priv(this, 'cache').get(key).value
+	  if (isStale(this, hit)) {
+	    return false
+	  }
+	  return true
+	}
+	
+	LRUCache.prototype.get = function (key) {
+	  return get(this, key, true)
+	}
+	
+	LRUCache.prototype.peek = function (key) {
+	  return get(this, key, false)
+	}
+	
+	LRUCache.prototype.pop = function () {
+	  var node = priv(this, 'lruList').tail
+	  if (!node) return null
+	  del(this, node)
+	  return node.value
+	}
+	
+	LRUCache.prototype.del = function (key) {
+	  del(this, priv(this, 'cache').get(key))
+	}
+	
+	LRUCache.prototype.load = function (arr) {
+	  // reset the cache
+	  this.reset()
+	
+	  var now = Date.now()
+	  // A previous serialized cache has the most recent items first
+	  for (var l = arr.length - 1; l >= 0; l--) {
+	    var hit = arr[l]
+	    var expiresAt = hit.e || 0
+	    if (expiresAt === 0) {
+	      // the item was created without expiration in a non aged cache
+	      this.set(hit.k, hit.v)
+	    } else {
+	      var maxAge = expiresAt - now
+	      // dont add already expired items
+	      if (maxAge > 0) {
+	        this.set(hit.k, hit.v, maxAge)
+	      }
+	    }
+	  }
+	}
+	
+	LRUCache.prototype.prune = function () {
+	  var self = this
+	  priv(this, 'cache').forEach(function (value, key) {
+	    get(self, key, false)
+	  })
+	}
+	
+	function get (self, key, doUse) {
+	  var node = priv(self, 'cache').get(key)
+	  if (node) {
+	    var hit = node.value
+	    if (isStale(self, hit)) {
+	      del(self, node)
+	      if (!priv(self, 'allowStale')) hit = undefined
+	    } else {
+	      if (doUse) {
+	        priv(self, 'lruList').unshiftNode(node)
+	      }
+	    }
+	    if (hit) hit = hit.value
+	  }
+	  return hit
+	}
+	
+	function isStale (self, hit) {
+	  if (!hit || (!hit.maxAge && !priv(self, 'maxAge'))) {
+	    return false
+	  }
+	  var stale = false
+	  var diff = Date.now() - hit.now
+	  if (hit.maxAge) {
+	    stale = diff > hit.maxAge
+	  } else {
+	    stale = priv(self, 'maxAge') && (diff > priv(self, 'maxAge'))
+	  }
+	  return stale
+	}
+	
+	function trim (self) {
+	  if (priv(self, 'length') > priv(self, 'max')) {
+	    for (var walker = priv(self, 'lruList').tail;
+	         priv(self, 'length') > priv(self, 'max') && walker !== null;) {
+	      // We know that we're about to delete this one, and also
+	      // what the next least recently used key will be, so just
+	      // go ahead and set it now.
+	      var prev = walker.prev
+	      del(self, walker)
+	      walker = prev
+	    }
+	  }
+	}
+	
+	function del (self, node) {
+	  if (node) {
+	    var hit = node.value
+	    if (priv(self, 'dispose')) {
+	      priv(self, 'dispose').call(this, hit.key, hit.value)
+	    }
+	    priv(self, 'length', priv(self, 'length') - hit.length)
+	    priv(self, 'cache').delete(hit.key)
+	    priv(self, 'lruList').removeNode(node)
+	  }
+	}
+	
+	// classy, since V8 prefers predictable objects.
+	function Entry (key, value, length, now, maxAge) {
+	  this.key = key
+	  this.value = value
+	  this.length = length
+	  this.now = now
+	  this.maxAge = maxAge || 0
+	}
+
+
+/***/ },
+/* 36 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {if (process.env.npm_package_name === 'pseudomap' &&
+	    process.env.npm_lifecycle_script === 'test')
+	  process.env.TEST_PSEUDOMAP = 'true'
+	
+	if (typeof Map === 'function' && !process.env.TEST_PSEUDOMAP) {
+	  module.exports = Map
+	} else {
+	  module.exports = __webpack_require__(38)
+	}
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(37)))
+
+/***/ },
+/* 37 */
+/***/ function(module, exports) {
+
+	// shim for using process in browser
+	
+	var process = module.exports = {};
+	var queue = [];
+	var draining = false;
+	var currentQueue;
+	var queueIndex = -1;
+	
+	function cleanUpNextTick() {
+	    draining = false;
+	    if (currentQueue.length) {
+	        queue = currentQueue.concat(queue);
+	    } else {
+	        queueIndex = -1;
+	    }
+	    if (queue.length) {
+	        drainQueue();
+	    }
+	}
+	
+	function drainQueue() {
+	    if (draining) {
+	        return;
+	    }
+	    var timeout = setTimeout(cleanUpNextTick);
+	    draining = true;
+	
+	    var len = queue.length;
+	    while(len) {
+	        currentQueue = queue;
+	        queue = [];
+	        while (++queueIndex < len) {
+	            if (currentQueue) {
+	                currentQueue[queueIndex].run();
+	            }
+	        }
+	        queueIndex = -1;
+	        len = queue.length;
+	    }
+	    currentQueue = null;
+	    draining = false;
+	    clearTimeout(timeout);
+	}
+	
+	process.nextTick = function (fun) {
+	    var args = new Array(arguments.length - 1);
+	    if (arguments.length > 1) {
+	        for (var i = 1; i < arguments.length; i++) {
+	            args[i - 1] = arguments[i];
+	        }
+	    }
+	    queue.push(new Item(fun, args));
+	    if (queue.length === 1 && !draining) {
+	        setTimeout(drainQueue, 0);
+	    }
+	};
+	
+	// v8 likes predictible objects
+	function Item(fun, array) {
+	    this.fun = fun;
+	    this.array = array;
+	}
+	Item.prototype.run = function () {
+	    this.fun.apply(null, this.array);
+	};
+	process.title = 'browser';
+	process.browser = true;
+	process.env = {};
+	process.argv = [];
+	process.version = ''; // empty string to avoid regexp issues
+	process.versions = {};
+	
+	function noop() {}
+	
+	process.on = noop;
+	process.addListener = noop;
+	process.once = noop;
+	process.off = noop;
+	process.removeListener = noop;
+	process.removeAllListeners = noop;
+	process.emit = noop;
+	
+	process.binding = function (name) {
+	    throw new Error('process.binding is not supported');
+	};
+	
+	process.cwd = function () { return '/' };
+	process.chdir = function (dir) {
+	    throw new Error('process.chdir is not supported');
+	};
+	process.umask = function() { return 0; };
+
+
+/***/ },
+/* 38 */
+/***/ function(module, exports) {
+
+	var hasOwnProperty = Object.prototype.hasOwnProperty
+	
+	module.exports = PseudoMap
+	
+	function PseudoMap (set) {
+	  if (!(this instanceof PseudoMap)) // whyyyyyyy
+	    throw new TypeError("Constructor PseudoMap requires 'new'")
+	
+	  this.clear()
+	
+	  if (set) {
+	    if ((set instanceof PseudoMap) ||
+	        (typeof Map === 'function' && set instanceof Map))
+	      set.forEach(function (value, key) {
+	        this.set(key, value)
+	      }, this)
+	    else if (Array.isArray(set))
+	      set.forEach(function (kv) {
+	        this.set(kv[0], kv[1])
+	      }, this)
+	    else
+	      throw new TypeError('invalid argument')
+	  }
+	}
+	
+	PseudoMap.prototype.forEach = function (fn, thisp) {
+	  thisp = thisp || this
+	  Object.keys(this._data).forEach(function (k) {
+	    if (k !== 'size')
+	      fn.call(thisp, this._data[k].value, this._data[k].key)
+	  }, this)
+	}
+	
+	PseudoMap.prototype.has = function (k) {
+	  return !!find(this._data, k)
+	}
+	
+	PseudoMap.prototype.get = function (k) {
+	  var res = find(this._data, k)
+	  return res && res.value
+	}
+	
+	PseudoMap.prototype.set = function (k, v) {
+	  set(this._data, k, v)
+	}
+	
+	PseudoMap.prototype.delete = function (k) {
+	  var res = find(this._data, k)
+	  if (res) {
+	    delete this._data[res._index]
+	    this._data.size--
+	  }
+	}
+	
+	PseudoMap.prototype.clear = function () {
+	  var data = Object.create(null)
+	  data.size = 0
+	
+	  Object.defineProperty(this, '_data', {
+	    value: data,
+	    enumerable: false,
+	    configurable: true,
+	    writable: false
+	  })
+	}
+	
+	Object.defineProperty(PseudoMap.prototype, 'size', {
+	  get: function () {
+	    return this._data.size
+	  },
+	  set: function (n) {},
+	  enumerable: true,
+	  configurable: true
+	})
+	
+	PseudoMap.prototype.values =
+	PseudoMap.prototype.keys =
+	PseudoMap.prototype.entries = function () {
+	  throw new Error('iterators are not implemented in this version')
+	}
+	
+	// Either identical, or both NaN
+	function same (a, b) {
+	  return a === b || a !== a && b !== b
+	}
+	
+	function Entry (k, v, i) {
+	  this.key = k
+	  this.value = v
+	  this._index = i
+	}
+	
+	function find (data, k) {
+	  for (var i = 0, s = '_' + k, key = s;
+	       hasOwnProperty.call(data, key);
+	       key = s + i++) {
+	    if (same(data[key].key, k))
+	      return data[key]
+	  }
+	}
+	
+	function set (data, k, v) {
+	  for (var i = 0, s = '_' + k, key = s;
+	       hasOwnProperty.call(data, key);
+	       key = s + i++) {
+	    if (same(data[key].key, k)) {
+	      data[key].value = v
+	      return
+	    }
+	  }
+	  data.size++
+	  data[key] = new Entry(k, v, key)
+	}
+
+
+/***/ },
+/* 39 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
+	//
+	// Permission is hereby granted, free of charge, to any person obtaining a
+	// copy of this software and associated documentation files (the
+	// "Software"), to deal in the Software without restriction, including
+	// without limitation the rights to use, copy, modify, merge, publish,
+	// distribute, sublicense, and/or sell copies of the Software, and to permit
+	// persons to whom the Software is furnished to do so, subject to the
+	// following conditions:
+	//
+	// The above copyright notice and this permission notice shall be included
+	// in all copies or substantial portions of the Software.
+	//
+	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+	// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+	// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+	// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+	// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+	// USE OR OTHER DEALINGS IN THE SOFTWARE.
+	
+	var formatRegExp = /%[sdj%]/g;
+	exports.format = function(f) {
+	  if (!isString(f)) {
+	    var objects = [];
+	    for (var i = 0; i < arguments.length; i++) {
+	      objects.push(inspect(arguments[i]));
+	    }
+	    return objects.join(' ');
+	  }
+	
+	  var i = 1;
+	  var args = arguments;
+	  var len = args.length;
+	  var str = String(f).replace(formatRegExp, function(x) {
+	    if (x === '%%') return '%';
+	    if (i >= len) return x;
+	    switch (x) {
+	      case '%s': return String(args[i++]);
+	      case '%d': return Number(args[i++]);
+	      case '%j':
+	        try {
+	          return JSON.stringify(args[i++]);
+	        } catch (_) {
+	          return '[Circular]';
+	        }
+	      default:
+	        return x;
+	    }
+	  });
+	  for (var x = args[i]; i < len; x = args[++i]) {
+	    if (isNull(x) || !isObject(x)) {
+	      str += ' ' + x;
+	    } else {
+	      str += ' ' + inspect(x);
+	    }
+	  }
+	  return str;
+	};
+	
+	
+	// Mark that a method should not be used.
+	// Returns a modified function which warns once by default.
+	// If --no-deprecation is set, then it is a no-op.
+	exports.deprecate = function(fn, msg) {
+	  // Allow for deprecating things in the process of starting up.
+	  if (isUndefined(global.process)) {
+	    return function() {
+	      return exports.deprecate(fn, msg).apply(this, arguments);
+	    };
+	  }
+	
+	  if (process.noDeprecation === true) {
+	    return fn;
+	  }
+	
+	  var warned = false;
+	  function deprecated() {
+	    if (!warned) {
+	      if (process.throwDeprecation) {
+	        throw new Error(msg);
+	      } else if (process.traceDeprecation) {
+	        console.trace(msg);
+	      } else {
+	        console.error(msg);
+	      }
+	      warned = true;
+	    }
+	    return fn.apply(this, arguments);
+	  }
+	
+	  return deprecated;
+	};
+	
+	
+	var debugs = {};
+	var debugEnviron;
+	exports.debuglog = function(set) {
+	  if (isUndefined(debugEnviron))
+	    debugEnviron = process.env.NODE_DEBUG || '';
+	  set = set.toUpperCase();
+	  if (!debugs[set]) {
+	    if (new RegExp('\\b' + set + '\\b', 'i').test(debugEnviron)) {
+	      var pid = process.pid;
+	      debugs[set] = function() {
+	        var msg = exports.format.apply(exports, arguments);
+	        console.error('%s %d: %s', set, pid, msg);
+	      };
+	    } else {
+	      debugs[set] = function() {};
+	    }
+	  }
+	  return debugs[set];
+	};
+	
+	
+	/**
+	 * Echos the value of a value. Trys to print the value out
+	 * in the best way possible given the different types.
+	 *
+	 * @param {Object} obj The object to print out.
+	 * @param {Object} opts Optional options object that alters the output.
+	 */
+	/* legacy: obj, showHidden, depth, colors*/
+	function inspect(obj, opts) {
+	  // default options
+	  var ctx = {
+	    seen: [],
+	    stylize: stylizeNoColor
+	  };
+	  // legacy...
+	  if (arguments.length >= 3) ctx.depth = arguments[2];
+	  if (arguments.length >= 4) ctx.colors = arguments[3];
+	  if (isBoolean(opts)) {
+	    // legacy...
+	    ctx.showHidden = opts;
+	  } else if (opts) {
+	    // got an "options" object
+	    exports._extend(ctx, opts);
+	  }
+	  // set default options
+	  if (isUndefined(ctx.showHidden)) ctx.showHidden = false;
+	  if (isUndefined(ctx.depth)) ctx.depth = 2;
+	  if (isUndefined(ctx.colors)) ctx.colors = false;
+	  if (isUndefined(ctx.customInspect)) ctx.customInspect = true;
+	  if (ctx.colors) ctx.stylize = stylizeWithColor;
+	  return formatValue(ctx, obj, ctx.depth);
+	}
+	exports.inspect = inspect;
+	
+	
+	// http://en.wikipedia.org/wiki/ANSI_escape_code#graphics
+	inspect.colors = {
+	  'bold' : [1, 22],
+	  'italic' : [3, 23],
+	  'underline' : [4, 24],
+	  'inverse' : [7, 27],
+	  'white' : [37, 39],
+	  'grey' : [90, 39],
+	  'black' : [30, 39],
+	  'blue' : [34, 39],
+	  'cyan' : [36, 39],
+	  'green' : [32, 39],
+	  'magenta' : [35, 39],
+	  'red' : [31, 39],
+	  'yellow' : [33, 39]
+	};
+	
+	// Don't use 'blue' not visible on cmd.exe
+	inspect.styles = {
+	  'special': 'cyan',
+	  'number': 'yellow',
+	  'boolean': 'yellow',
+	  'undefined': 'grey',
+	  'null': 'bold',
+	  'string': 'green',
+	  'date': 'magenta',
+	  // "name": intentionally not styling
+	  'regexp': 'red'
+	};
+	
+	
+	function stylizeWithColor(str, styleType) {
+	  var style = inspect.styles[styleType];
+	
+	  if (style) {
+	    return '\u001b[' + inspect.colors[style][0] + 'm' + str +
+	           '\u001b[' + inspect.colors[style][1] + 'm';
+	  } else {
+	    return str;
+	  }
+	}
+	
+	
+	function stylizeNoColor(str, styleType) {
+	  return str;
+	}
+	
+	
+	function arrayToHash(array) {
+	  var hash = {};
+	
+	  array.forEach(function(val, idx) {
+	    hash[val] = true;
+	  });
+	
+	  return hash;
+	}
+	
+	
+	function formatValue(ctx, value, recurseTimes) {
+	  // Provide a hook for user-specified inspect functions.
+	  // Check that value is an object with an inspect function on it
+	  if (ctx.customInspect &&
+	      value &&
+	      isFunction(value.inspect) &&
+	      // Filter out the util module, it's inspect function is special
+	      value.inspect !== exports.inspect &&
+	      // Also filter out any prototype objects using the circular check.
+	      !(value.constructor && value.constructor.prototype === value)) {
+	    var ret = value.inspect(recurseTimes, ctx);
+	    if (!isString(ret)) {
+	      ret = formatValue(ctx, ret, recurseTimes);
+	    }
+	    return ret;
+	  }
+	
+	  // Primitive types cannot have properties
+	  var primitive = formatPrimitive(ctx, value);
+	  if (primitive) {
+	    return primitive;
+	  }
+	
+	  // Look up the keys of the object.
+	  var keys = Object.keys(value);
+	  var visibleKeys = arrayToHash(keys);
+	
+	  if (ctx.showHidden) {
+	    keys = Object.getOwnPropertyNames(value);
+	  }
+	
+	  // IE doesn't make error fields non-enumerable
+	  // http://msdn.microsoft.com/en-us/library/ie/dww52sbt(v=vs.94).aspx
+	  if (isError(value)
+	      && (keys.indexOf('message') >= 0 || keys.indexOf('description') >= 0)) {
+	    return formatError(value);
+	  }
+	
+	  // Some type of object without properties can be shortcutted.
+	  if (keys.length === 0) {
+	    if (isFunction(value)) {
+	      var name = value.name ? ': ' + value.name : '';
+	      return ctx.stylize('[Function' + name + ']', 'special');
+	    }
+	    if (isRegExp(value)) {
+	      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
+	    }
+	    if (isDate(value)) {
+	      return ctx.stylize(Date.prototype.toString.call(value), 'date');
+	    }
+	    if (isError(value)) {
+	      return formatError(value);
+	    }
+	  }
+	
+	  var base = '', array = false, braces = ['{', '}'];
+	
+	  // Make Array say that they are Array
+	  if (isArray(value)) {
+	    array = true;
+	    braces = ['[', ']'];
+	  }
+	
+	  // Make functions say that they are functions
+	  if (isFunction(value)) {
+	    var n = value.name ? ': ' + value.name : '';
+	    base = ' [Function' + n + ']';
+	  }
+	
+	  // Make RegExps say that they are RegExps
+	  if (isRegExp(value)) {
+	    base = ' ' + RegExp.prototype.toString.call(value);
+	  }
+	
+	  // Make dates with properties first say the date
+	  if (isDate(value)) {
+	    base = ' ' + Date.prototype.toUTCString.call(value);
+	  }
+	
+	  // Make error with message first say the error
+	  if (isError(value)) {
+	    base = ' ' + formatError(value);
+	  }
+	
+	  if (keys.length === 0 && (!array || value.length == 0)) {
+	    return braces[0] + base + braces[1];
+	  }
+	
+	  if (recurseTimes < 0) {
+	    if (isRegExp(value)) {
+	      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
+	    } else {
+	      return ctx.stylize('[Object]', 'special');
+	    }
+	  }
+	
+	  ctx.seen.push(value);
+	
+	  var output;
+	  if (array) {
+	    output = formatArray(ctx, value, recurseTimes, visibleKeys, keys);
+	  } else {
+	    output = keys.map(function(key) {
+	      return formatProperty(ctx, value, recurseTimes, visibleKeys, key, array);
+	    });
+	  }
+	
+	  ctx.seen.pop();
+	
+	  return reduceToSingleString(output, base, braces);
+	}
+	
+	
+	function formatPrimitive(ctx, value) {
+	  if (isUndefined(value))
+	    return ctx.stylize('undefined', 'undefined');
+	  if (isString(value)) {
+	    var simple = '\'' + JSON.stringify(value).replace(/^"|"$/g, '')
+	                                             .replace(/'/g, "\\'")
+	                                             .replace(/\\"/g, '"') + '\'';
+	    return ctx.stylize(simple, 'string');
+	  }
+	  if (isNumber(value))
+	    return ctx.stylize('' + value, 'number');
+	  if (isBoolean(value))
+	    return ctx.stylize('' + value, 'boolean');
+	  // For some reason typeof null is "object", so special case here.
+	  if (isNull(value))
+	    return ctx.stylize('null', 'null');
+	}
+	
+	
+	function formatError(value) {
+	  return '[' + Error.prototype.toString.call(value) + ']';
+	}
+	
+	
+	function formatArray(ctx, value, recurseTimes, visibleKeys, keys) {
+	  var output = [];
+	  for (var i = 0, l = value.length; i < l; ++i) {
+	    if (hasOwnProperty(value, String(i))) {
+	      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
+	          String(i), true));
+	    } else {
+	      output.push('');
+	    }
+	  }
+	  keys.forEach(function(key) {
+	    if (!key.match(/^\d+$/)) {
+	      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
+	          key, true));
+	    }
+	  });
+	  return output;
+	}
+	
+	
+	function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
+	  var name, str, desc;
+	  desc = Object.getOwnPropertyDescriptor(value, key) || { value: value[key] };
+	  if (desc.get) {
+	    if (desc.set) {
+	      str = ctx.stylize('[Getter/Setter]', 'special');
+	    } else {
+	      str = ctx.stylize('[Getter]', 'special');
+	    }
+	  } else {
+	    if (desc.set) {
+	      str = ctx.stylize('[Setter]', 'special');
+	    }
+	  }
+	  if (!hasOwnProperty(visibleKeys, key)) {
+	    name = '[' + key + ']';
+	  }
+	  if (!str) {
+	    if (ctx.seen.indexOf(desc.value) < 0) {
+	      if (isNull(recurseTimes)) {
+	        str = formatValue(ctx, desc.value, null);
+	      } else {
+	        str = formatValue(ctx, desc.value, recurseTimes - 1);
+	      }
+	      if (str.indexOf('\n') > -1) {
+	        if (array) {
+	          str = str.split('\n').map(function(line) {
+	            return '  ' + line;
+	          }).join('\n').substr(2);
+	        } else {
+	          str = '\n' + str.split('\n').map(function(line) {
+	            return '   ' + line;
+	          }).join('\n');
+	        }
+	      }
+	    } else {
+	      str = ctx.stylize('[Circular]', 'special');
+	    }
+	  }
+	  if (isUndefined(name)) {
+	    if (array && key.match(/^\d+$/)) {
+	      return str;
+	    }
+	    name = JSON.stringify('' + key);
+	    if (name.match(/^"([a-zA-Z_][a-zA-Z_0-9]*)"$/)) {
+	      name = name.substr(1, name.length - 2);
+	      name = ctx.stylize(name, 'name');
+	    } else {
+	      name = name.replace(/'/g, "\\'")
+	                 .replace(/\\"/g, '"')
+	                 .replace(/(^"|"$)/g, "'");
+	      name = ctx.stylize(name, 'string');
+	    }
+	  }
+	
+	  return name + ': ' + str;
+	}
+	
+	
+	function reduceToSingleString(output, base, braces) {
+	  var numLinesEst = 0;
+	  var length = output.reduce(function(prev, cur) {
+	    numLinesEst++;
+	    if (cur.indexOf('\n') >= 0) numLinesEst++;
+	    return prev + cur.replace(/\u001b\[\d\d?m/g, '').length + 1;
+	  }, 0);
+	
+	  if (length > 60) {
+	    return braces[0] +
+	           (base === '' ? '' : base + '\n ') +
+	           ' ' +
+	           output.join(',\n  ') +
+	           ' ' +
+	           braces[1];
+	  }
+	
+	  return braces[0] + base + ' ' + output.join(', ') + ' ' + braces[1];
+	}
+	
+	
+	// NOTE: These type checking functions intentionally don't use `instanceof`
+	// because it is fragile and can be easily faked with `Object.create()`.
+	function isArray(ar) {
+	  return Array.isArray(ar);
+	}
+	exports.isArray = isArray;
+	
+	function isBoolean(arg) {
+	  return typeof arg === 'boolean';
+	}
+	exports.isBoolean = isBoolean;
+	
+	function isNull(arg) {
+	  return arg === null;
+	}
+	exports.isNull = isNull;
+	
+	function isNullOrUndefined(arg) {
+	  return arg == null;
+	}
+	exports.isNullOrUndefined = isNullOrUndefined;
+	
+	function isNumber(arg) {
+	  return typeof arg === 'number';
+	}
+	exports.isNumber = isNumber;
+	
+	function isString(arg) {
+	  return typeof arg === 'string';
+	}
+	exports.isString = isString;
+	
+	function isSymbol(arg) {
+	  return typeof arg === 'symbol';
+	}
+	exports.isSymbol = isSymbol;
+	
+	function isUndefined(arg) {
+	  return arg === void 0;
+	}
+	exports.isUndefined = isUndefined;
+	
+	function isRegExp(re) {
+	  return isObject(re) && objectToString(re) === '[object RegExp]';
+	}
+	exports.isRegExp = isRegExp;
+	
+	function isObject(arg) {
+	  return typeof arg === 'object' && arg !== null;
+	}
+	exports.isObject = isObject;
+	
+	function isDate(d) {
+	  return isObject(d) && objectToString(d) === '[object Date]';
+	}
+	exports.isDate = isDate;
+	
+	function isError(e) {
+	  return isObject(e) &&
+	      (objectToString(e) === '[object Error]' || e instanceof Error);
+	}
+	exports.isError = isError;
+	
+	function isFunction(arg) {
+	  return typeof arg === 'function';
+	}
+	exports.isFunction = isFunction;
+	
+	function isPrimitive(arg) {
+	  return arg === null ||
+	         typeof arg === 'boolean' ||
+	         typeof arg === 'number' ||
+	         typeof arg === 'string' ||
+	         typeof arg === 'symbol' ||  // ES6 symbol
+	         typeof arg === 'undefined';
+	}
+	exports.isPrimitive = isPrimitive;
+	
+	exports.isBuffer = __webpack_require__(40);
+	
+	function objectToString(o) {
+	  return Object.prototype.toString.call(o);
+	}
+	
+	
+	function pad(n) {
+	  return n < 10 ? '0' + n.toString(10) : n.toString(10);
+	}
+	
+	
+	var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
+	              'Oct', 'Nov', 'Dec'];
+	
+	// 26 Feb 16:19:34
+	function timestamp() {
+	  var d = new Date();
+	  var time = [pad(d.getHours()),
+	              pad(d.getMinutes()),
+	              pad(d.getSeconds())].join(':');
+	  return [d.getDate(), months[d.getMonth()], time].join(' ');
+	}
+	
+	
+	// log is just a thin wrapper to console.log that prepends a timestamp
+	exports.log = function() {
+	  console.log('%s - %s', timestamp(), exports.format.apply(exports, arguments));
+	};
+	
+	
+	/**
+	 * Inherit the prototype methods from one constructor into another.
+	 *
+	 * The Function.prototype.inherits from lang.js rewritten as a standalone
+	 * function (not on Function.prototype). NOTE: If this file is to be loaded
+	 * during bootstrapping this function needs to be rewritten using some native
+	 * functions as prototype setup using normal JavaScript does not work as
+	 * expected during bootstrapping (see mirror.js in r114903).
+	 *
+	 * @param {function} ctor Constructor function which needs to inherit the
+	 *     prototype.
+	 * @param {function} superCtor Constructor function to inherit prototype from.
+	 */
+	exports.inherits = __webpack_require__(41);
+	
+	exports._extend = function(origin, add) {
+	  // Don't do anything if add isn't an object
+	  if (!add || !isObject(add)) return origin;
+	
+	  var keys = Object.keys(add);
+	  var i = keys.length;
+	  while (i--) {
+	    origin[keys[i]] = add[keys[i]];
+	  }
+	  return origin;
+	};
+	
+	function hasOwnProperty(obj, prop) {
+	  return Object.prototype.hasOwnProperty.call(obj, prop);
+	}
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(37)))
+
+/***/ },
+/* 40 */
+/***/ function(module, exports) {
+
+	module.exports = function isBuffer(arg) {
+	  return arg && typeof arg === 'object'
+	    && typeof arg.copy === 'function'
+	    && typeof arg.fill === 'function'
+	    && typeof arg.readUInt8 === 'function';
+	}
+
+/***/ },
+/* 41 */
+/***/ function(module, exports) {
+
+	if (typeof Object.create === 'function') {
+	  // implementation from standard node.js 'util' module
+	  module.exports = function inherits(ctor, superCtor) {
+	    ctor.super_ = superCtor
+	    ctor.prototype = Object.create(superCtor.prototype, {
+	      constructor: {
+	        value: ctor,
+	        enumerable: false,
+	        writable: true,
+	        configurable: true
+	      }
+	    });
+	  };
+	} else {
+	  // old school shim for old browsers
+	  module.exports = function inherits(ctor, superCtor) {
+	    ctor.super_ = superCtor
+	    var TempCtor = function () {}
+	    TempCtor.prototype = superCtor.prototype
+	    ctor.prototype = new TempCtor()
+	    ctor.prototype.constructor = ctor
+	  }
+	}
+
+
+/***/ },
+/* 42 */
+/***/ function(module, exports) {
+
+	module.exports = Yallist
+	
+	Yallist.Node = Node
+	Yallist.create = Yallist
+	
+	function Yallist (list) {
+	  var self = this
+	  if (!(self instanceof Yallist)) {
+	    self = new Yallist()
+	  }
+	
+	  self.tail = null
+	  self.head = null
+	  self.length = 0
+	
+	  if (list && typeof list.forEach === 'function') {
+	    list.forEach(function (item) {
+	      self.push(item)
+	    })
+	  } else if (arguments.length > 0) {
+	    for (var i = 0, l = arguments.length; i < l; i++) {
+	      self.push(arguments[i])
+	    }
+	  }
+	
+	  return self
+	}
+	
+	Yallist.prototype.removeNode = function (node) {
+	  if (node.list !== this) {
+	    throw new Error('removing node which does not belong to this list')
+	  }
+	
+	  var next = node.next
+	  var prev = node.prev
+	
+	  if (next) {
+	    next.prev = prev
+	  }
+	
+	  if (prev) {
+	    prev.next = next
+	  }
+	
+	  if (node === this.head) {
+	    this.head = next
+	  }
+	  if (node === this.tail) {
+	    this.tail = prev
+	  }
+	
+	  node.list.length --
+	  node.next = null
+	  node.prev = null
+	  node.list = null
+	}
+	
+	Yallist.prototype.unshiftNode = function (node) {
+	  if (node === this.head) {
+	    return
+	  }
+	
+	  if (node.list) {
+	    node.list.removeNode(node)
+	  }
+	
+	  var head = this.head
+	  node.list = this
+	  node.next = head
+	  if (head) {
+	    head.prev = node
+	  }
+	
+	  this.head = node
+	  if (!this.tail) {
+	    this.tail = node
+	  }
+	  this.length ++
+	}
+	
+	Yallist.prototype.pushNode = function (node) {
+	  if (node === this.tail) {
+	    return
+	  }
+	
+	  if (node.list) {
+	    node.list.removeNode(node)
+	  }
+	
+	  var tail = this.tail
+	  node.list = this
+	  node.prev = tail
+	  if (tail) {
+	    tail.next = node
+	  }
+	
+	  this.tail = node
+	  if (!this.head) {
+	    this.head = node
+	  }
+	  this.length ++
+	}
+	
+	Yallist.prototype.push = function () {
+	  for (var i = 0, l = arguments.length; i < l; i++) {
+	    push(this, arguments[i])
+	  }
+	  return this.length
+	}
+	
+	Yallist.prototype.unshift = function () {
+	  for (var i = 0, l = arguments.length; i < l; i++) {
+	    unshift(this, arguments[i])
+	  }
+	  return this.length
+	}
+	
+	Yallist.prototype.pop = function () {
+	  if (!this.tail)
+	    return undefined
+	
+	  var res = this.tail.value
+	  this.tail = this.tail.prev
+	  this.tail.next = null
+	  this.length --
+	  return res
+	}
+	
+	Yallist.prototype.shift = function () {
+	  if (!this.head)
+	    return undefined
+	
+	  var res = this.head.value
+	  this.head = this.head.next
+	  this.head.prev = null
+	  this.length --
+	  return res
+	}
+	
+	Yallist.prototype.forEach = function (fn, thisp) {
+	  thisp = thisp || this
+	  for (var walker = this.head, i = 0; walker !== null; i++) {
+	    fn.call(thisp, walker.value, i, this)
+	    walker = walker.next
+	  }
+	}
+	
+	Yallist.prototype.forEachReverse = function (fn, thisp) {
+	  thisp = thisp || this
+	  for (var walker = this.tail, i = this.length - 1; walker !== null; i--) {
+	    fn.call(thisp, walker.value, i, this)
+	    walker = walker.prev
+	  }
+	}
+	
+	Yallist.prototype.get = function (n) {
+	  for (var i = 0, walker = this.head; walker !== null && i < n; i++) {
+	    // abort out of the list early if we hit a cycle
+	    walker = walker.next
+	  }
+	  if (i === n && walker !== null) {
+	    return walker.value
+	  }
+	}
+	
+	Yallist.prototype.getReverse = function (n) {
+	  for (var i = 0, walker = this.tail; walker !== null && i < n; i++) {
+	    // abort out of the list early if we hit a cycle
+	    walker = walker.prev
+	  }
+	  if (i === n && walker !== null) {
+	    return walker.value
+	  }
+	}
+	
+	Yallist.prototype.map = function (fn, thisp) {
+	  thisp = thisp || this
+	  var res = new Yallist()
+	  for (var walker = this.head; walker !== null; ) {
+	    res.push(fn.call(thisp, walker.value, this))
+	    walker = walker.next
+	  }
+	  return res
+	}
+	
+	Yallist.prototype.mapReverse = function (fn, thisp) {
+	  thisp = thisp || this
+	  var res = new Yallist()
+	  for (var walker = this.tail; walker !== null;) {
+	    res.push(fn.call(thisp, walker.value, this))
+	    walker = walker.prev
+	  }
+	  return res
+	}
+	
+	Yallist.prototype.reduce = function (fn, initial) {
+	  var acc
+	  var walker = this.head
+	  if (arguments.length > 1) {
+	    acc = initial
+	  } else if (this.head) {
+	    walker = this.head.next
+	    acc = this.head.value
+	  } else {
+	    throw new TypeError('Reduce of empty list with no initial value')
+	  }
+	
+	  for (var i = 0; walker !== null; i++) {
+	    acc = fn(acc, walker.value, i)
+	    walker = walker.next
+	  }
+	
+	  return acc
+	}
+	
+	Yallist.prototype.reduceReverse = function (fn, initial) {
+	  var acc
+	  var walker = this.tail
+	  if (arguments.length > 1) {
+	    acc = initial
+	  } else if (this.tail) {
+	    walker = this.tail.prev
+	    acc = this.tail.value
+	  } else {
+	    throw new TypeError('Reduce of empty list with no initial value')
+	  }
+	
+	  for (var i = this.length - 1; walker !== null; i--) {
+	    acc = fn(acc, walker.value, i)
+	    walker = walker.prev
+	  }
+	
+	  return acc
+	}
+	
+	Yallist.prototype.toArray = function () {
+	  var arr = new Array(this.length)
+	  for (var i = 0, walker = this.head; walker !== null; i++) {
+	    arr[i] = walker.value
+	    walker = walker.next
+	  }
+	  return arr
+	}
+	
+	Yallist.prototype.toArrayReverse = function () {
+	  var arr = new Array(this.length)
+	  for (var i = 0, walker = this.tail; walker !== null; i++) {
+	    arr[i] = walker.value
+	    walker = walker.prev
+	  }
+	  return arr
+	}
+	
+	Yallist.prototype.slice = function (from, to) {
+	  to = to || this.length
+	  if (to < 0) {
+	    to += this.length
+	  }
+	  from = from || 0
+	  if (from < 0) {
+	    from += this.length
+	  }
+	  var ret = new Yallist()
+	  if (to < from || to < 0) {
+	    return ret
+	  }
+	  if (from < 0) {
+	    from = 0
+	  }
+	  if (to > this.length) {
+	    to = this.length
+	  }
+	  for (var i = 0, walker = this.head; walker !== null && i < from; i++) {
+	    walker = walker.next
+	  }
+	  for (; walker !== null && i < to; i++, walker = walker.next) {
+	    ret.push(walker.value)
+	  }
+	  return ret
+	}
+	
+	Yallist.prototype.sliceReverse = function (from, to) {
+	  to = to || this.length
+	  if (to < 0) {
+	    to += this.length
+	  }
+	  from = from || 0
+	  if (from < 0) {
+	    from += this.length
+	  }
+	  var ret = new Yallist()
+	  if (to < from || to < 0) {
+	    return ret
+	  }
+	  if (from < 0) {
+	    from = 0
+	  }
+	  if (to > this.length) {
+	    to = this.length
+	  }
+	  for (var i = this.length, walker = this.tail; walker !== null && i > to; i--) {
+	    walker = walker.prev
+	  }
+	  for (; walker !== null && i > from; i--, walker = walker.prev) {
+	    ret.push(walker.value)
+	  }
+	  return ret
+	}
+	
+	Yallist.prototype.reverse = function () {
+	  var head = this.head
+	  var tail = this.tail
+	  for (var walker = head; walker !== null; walker = walker.prev) {
+	    var p = walker.prev
+	    walker.prev = walker.next
+	    walker.next = p
+	  }
+	  this.head = tail
+	  this.tail = head
+	  return this
+	}
+	
+	function push (self, item) {
+	  self.tail = new Node(item, self.tail, null, self)
+	  if (!self.head) {
+	    self.head = self.tail
+	  }
+	  self.length ++
+	}
+	
+	function unshift (self, item) {
+	  self.head = new Node(item, null, self.head, self)
+	  if (!self.tail) {
+	    self.tail = self.head
+	  }
+	  self.length ++
+	}
+	
+	function Node (value, prev, next, list) {
+	  if (!(this instanceof Node)) {
+	    return new Node(value, prev, next, list)
+	  }
+	
+	  this.list = list
+	  this.value = value
+	
+	  if (prev) {
+	    prev.next = this
+	    this.prev = prev
+	  } else {
+	    this.prev = null
+	  }
+	
+	  if (next) {
+	    next.prev = this
+	    this.next = next
+	  } else {
+	    this.next = null
+	  }
+	}
+
+
+/***/ },
+/* 43 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
 	var _geoLatLon = __webpack_require__(10);
 	
 	var _geoLatLon2 = _interopRequireDefault(_geoLatLon);
@@ -4836,68 +6694,115 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
+	// Manages a single tile and its layers
+	
 	var r2d = 180 / Math.PI;
 	
 	var loader = new _three2['default'].TextureLoader();
 	loader.setCrossOrigin('');
 	
-	var Surface = (function () {
-	  function Surface(quadkey, world) {
-	    _classCallCheck(this, Surface);
+	var Tile = (function () {
+	  function Tile(quadcode, layer) {
+	    _classCallCheck(this, Tile);
 	
-	    this.world = world;
-	    this.quadkey = quadkey;
-	    this.tile = this._quadkeyToTile(quadkey);
-	    this.bounds = this._tileBounds(this.tile);
-	    this.center = this._boundsToCenter(this.bounds);
-	    this.side = new _three2['default'].Vector3(this.bounds[0], 0, this.bounds[3]).sub(new _three2['default'].Vector3(this.bounds[0], 0, this.bounds[1])).length();
+	    this._layer = layer;
+	    this._quadcode = quadcode;
 	
-	    this.mesh = this._createMesh();
+	    this._ready = false;
+	
+	    this._tile = this._quadcodeToTile(quadcode);
+	
+	    // Bottom-left and top-right bounds in WGS84 coordinates
+	    this._boundsLatLon = this._tileBoundsWGS84(this._tile);
+	
+	    // Bottom-left and top-right bounds in world coordinates
+	    this._boundsWorld = this._tileBoundsFromWGS84(this._boundsLatLon);
+	
+	    // Tile center in world coordinates
+	    this._center = this._boundsToCenter(this._boundsWorld);
+	
+	    // Length of a tile side in world coorindates
+	    this._side = this._getSide(this._boundsWorld);
 	  }
 	
-	  // Initialise without requiring new keyword
+	  // Returns true if the tile mesh and texture are ready to be used
+	  // Otherwise, returns false
 	
-	  _createClass(Surface, [{
-	    key: '_createDebugMesh',
-	    value: function _createDebugMesh() {
-	      var canvas = document.createElement('canvas');
-	      canvas.width = 256;
-	      canvas.height = 256;
-	
-	      var context = canvas.getContext('2d');
-	      context.font = 'Bold 20px Helvetica Neue, Verdana, Arial';
-	      context.fillStyle = 'rgba(255,0,0,1)';
-	      context.fillText(this.quadkey, 20, canvas.width / 2 + 10);
-	
-	      var texture = new _three2['default'].Texture(canvas);
-	
-	      // Silky smooth images when tilted
-	      texture.magFilter = _three2['default'].LinearFilter;
-	      texture.minFilter = _three2['default'].LinearMipMapLinearFilter;
-	
-	      // TODO: Set this to renderer.getMaxAnisotropy() / 4
-	      texture.anisotropy = 4;
-	
-	      texture.needsUpdate = true;
-	
-	      var material = new _three2['default'].MeshBasicMaterial({
-	        map: texture,
-	        transparent: true
-	      });
-	
-	      var geom = new _three2['default'].PlaneGeometry(this.side, this.side, 1);
-	      var mesh = new _three2['default'].Mesh(geom, material);
-	
-	      mesh.rotation.x = -90 * Math.PI / 180;
-	      mesh.position.y = 0.1;
-	
-	      return mesh;
+	  _createClass(Tile, [{
+	    key: 'isReady',
+	    value: function isReady() {
+	      return this._ready;
 	    }
+	
+	    // Request data for the various tile providers
+	    //
+	    // Providers are provided here and not on instantiation of the class so that
+	    // providers can be easily changed in subsequent requests without heavy
+	    // management
+	    //
+	    // If requestData is called more than once then the provider data will be
+	    // re-downloaded and the mesh output will be changed
+	    //
+	    // Being able to update tile data and output like this on-the-fly makes it
+	    // appealing for situations where tile data may be dynamic / realtime
+	    // (eg. realtime traffic tiles)
+	    //
+	    // May need to be intelligent about what exactly is updated each time
+	    // requestData is called as it doesn't make sense to re-request and
+	    // re-generate a mesh each time when only the image provider needs updating,
+	    // and likewise it doesn't make sense to update the imagery when only terrain
+	    // provider changes
+	  }, {
+	    key: 'requestTileAsync',
+	    value: function requestTileAsync(imageProviders) {
+	      var _this = this;
+	
+	      // Making this asynchronous really speeds up the LOD framerate
+	      setTimeout(function () {
+	        if (!_this._mesh) {
+	          _this._mesh = _this._createMesh();
+	          _this._requestTextureAsync();
+	        }
+	      }, 0);
+	    }
+	  }, {
+	    key: 'getQuadcode',
+	    value: function getQuadcode() {
+	      return this._quadcode;
+	    }
+	  }, {
+	    key: 'getBounds',
+	    value: function getBounds() {
+	      return this._boundsWorld;
+	    }
+	  }, {
+	    key: 'getCenter',
+	    value: function getCenter() {
+	      return this._center;
+	    }
+	  }, {
+	    key: 'getSide',
+	    value: function getSide() {
+	      return this._side;
+	    }
+	  }, {
+	    key: 'getMesh',
+	    value: function getMesh() {
+	      return this._mesh;
+	    }
+	
+	    // Destroys the tile and removes it from the layer and memory
+	    //
+	    // Ensure that this leaves no trace of the tile – no textures, no meshes,
+	    // nothing in memory or the GPU
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {}
 	  }, {
 	    key: '_createMesh',
 	    value: function _createMesh() {
 	      var mesh = new _three2['default'].Object3D();
-	      var geom = new _three2['default'].PlaneGeometry(this.side, this.side, 1);
+	      var geom = new _three2['default'].PlaneGeometry(this._side, this._side, 1);
 	
 	      var material = new _three2['default'].MeshBasicMaterial();
 	
@@ -4906,62 +6811,55 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      mesh.add(localMesh);
 	
-	      mesh.position.x = this.center[0];
-	      mesh.position.z = this.center[1];
+	      mesh.position.x = this._center[0];
+	      mesh.position.z = this._center[1];
 	
 	      var box = new _three2['default'].BoxHelper(localMesh);
 	      mesh.add(box);
 	
-	      mesh.add(this._createDebugMesh());
-	
-	      // var letter = String.fromCharCode(97 + Math.floor(Math.random() * 26));
-	      // var url = 'http://' + letter + '.basemaps.cartocdn.com/light_nolabels/';
-	      // // var url = 'http://tile.stamen.com/toner-lite/';
-	      //
-	      // loader.load(url + this.tile[2] + '/' + this.tile[0] + '/' + this.tile[1] + '@2x.png', texture => {
-	      //   console.log('Loaded');
-	      //   // Silky smooth images when tilted
-	      //   texture.magFilter = THREE.LinearFilter;
-	      //   texture.minFilter = THREE.LinearMipMapLinearFilter;
-	      //
-	      //   // TODO: Set this to renderer.getMaxAnisotropy() / 4
-	      //   texture.anisotropy = 4;
-	      //
-	      //   texture.needsUpdate = true;
-	      //
-	      //   var material = new THREE.MeshBasicMaterial({map: texture});
-	      //
-	      //   var localMesh = new THREE.Mesh(geom, material);
-	      //   localMesh.rotation.x = -90 * Math.PI / 180;
-	      //
-	      //   // Sometimes tiles don't appear, even though the images have loaded ok
-	      //   // This helps a little but it's a total hack and the real solution needs
-	      //   // to be found.
-	      //   setTimeout(function() {
-	      //     mesh.add(localMesh);
-	      //   }, 2000);
-	      //
-	      //   mesh.position.x = this.center[0];
-	      //   mesh.position.z = this.center[1];
-	      //
-	      //   var box = new THREE.BoxHelper(localMesh);
-	      //   mesh.add(box);
-	      //
-	      //   this._createDebugMesh();
-	      // });
+	      // mesh.add(this._createDebugMesh());
 	
 	      return mesh;
 	    }
 	  }, {
-	    key: '_quadkeyToTile',
-	    value: function _quadkeyToTile(quadkey) {
+	    key: '_requestTextureAsync',
+	    value: function _requestTextureAsync() {
+	      var _this2 = this;
+	
+	      var letter = String.fromCharCode(97 + Math.floor(Math.random() * 26));
+	      var url = 'http://' + letter + '.basemaps.cartocdn.com/light_nolabels/';
+	      // var url = 'http://tile.stamen.com/toner-lite/';
+	
+	      loader.load(url + this._tile[2] + '/' + this._tile[0] + '/' + this._tile[1] + '.png', function (texture) {
+	        // console.log('Loaded');
+	        // Silky smooth images when tilted
+	        texture.magFilter = _three2['default'].LinearFilter;
+	        texture.minFilter = _three2['default'].LinearMipMapLinearFilter;
+	
+	        // TODO: Set this to renderer.getMaxAnisotropy() / 4
+	        texture.anisotropy = 4;
+	
+	        texture.needsUpdate = true;
+	
+	        _this2._mesh.children[0].material.map = texture;
+	        _this2._mesh.children[0].material.needsUpdate = true;
+	        _this2._ready = true;
+	      }, null, function (xhr) {
+	        console.log(xhr);
+	      });
+	    }
+	
+	    // Convert from quadcode to TMS tile coordinates
+	  }, {
+	    key: '_quadcodeToTile',
+	    value: function _quadcodeToTile(quadcode) {
 	      var x = 0;
 	      var y = 0;
-	      var z = quadkey.length;
+	      var z = quadcode.length;
 	
 	      for (var i = z; i > 0; i--) {
 	        var mask = 1 << i - 1;
-	        var q = +quadkey[z - i];
+	        var q = +quadcode[z - i];
 	        if (q === 1) {
 	          x |= mask;
 	        }
@@ -4976,25 +6874,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      return [x, y, z];
 	    }
-	  }, {
-	    key: '_boundsToCenter',
-	    value: function _boundsToCenter(bounds) {
-	      var x = bounds[0] + (bounds[2] - bounds[0]) / 2;
-	      var y = bounds[1] + (bounds[3] - bounds[1]) / 2;
 	
-	      return [x, y];
-	    }
+	    // Convert WGS84 tile bounds to world coordinates
 	  }, {
-	    key: '_tileBounds',
-	    value: function _tileBounds(tile) {
-	      var boundsWGS84 = this._tileBoundsWGS84(tile);
-	
-	      var sw = this.world.latLonToPoint((0, _geoLatLon2['default'])(boundsWGS84[1], boundsWGS84[0]));
-	      var ne = this.world.latLonToPoint((0, _geoLatLon2['default'])(boundsWGS84[3], boundsWGS84[2]));
+	    key: '_tileBoundsFromWGS84',
+	    value: function _tileBoundsFromWGS84(boundsWGS84) {
+	      var sw = this._layer._world.latLonToPoint((0, _geoLatLon2['default'])(boundsWGS84[1], boundsWGS84[0]));
+	      var ne = this._layer._world.latLonToPoint((0, _geoLatLon2['default'])(boundsWGS84[3], boundsWGS84[2]));
 	
 	      return [sw.x, sw.y, ne.x, ne.y];
-	      // return [swMerc[0], -swMerc[1], neMerc[0], -neMerc[1]];
 	    }
+	
+	    // Get tile bounds in WGS84 coordinates
 	  }, {
 	    key: '_tileBoundsWGS84',
 	    value: function _tileBoundsWGS84(tile) {
@@ -5015,17 +6906,454 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var n = Math.PI - 2 * Math.PI * y / Math.pow(2, z);
 	      return r2d * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
 	    }
+	  }, {
+	    key: '_boundsToCenter',
+	    value: function _boundsToCenter(bounds) {
+	      var x = bounds[0] + (bounds[2] - bounds[0]) / 2;
+	      var y = bounds[1] + (bounds[3] - bounds[1]) / 2;
+	
+	      return [x, y];
+	    }
+	  }, {
+	    key: '_getSide',
+	    value: function _getSide(bounds) {
+	      return new _three2['default'].Vector3(bounds[0], 0, bounds[3]).sub(new _three2['default'].Vector3(bounds[0], 0, bounds[1])).length();
+	    }
 	  }]);
 	
-	  return Surface;
+	  return Tile;
 	})();
 	
-	exports['default'] = function (quadkey, world) {
-	  return new Surface(quadkey, world);
-	};
-	
-	;
+	exports['default'] = Tile;
 	module.exports = exports['default'];
+
+/***/ },
+/* 44 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * lodash 4.0.0 (Custom Build) <https://lodash.com/>
+	 * Build: `lodash modularize exports="npm" -o ./`
+	 * Copyright 2012-2016 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2016 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <https://lodash.com/license>
+	 */
+	var debounce = __webpack_require__(45);
+	
+	/** Used as the `TypeError` message for "Functions" methods. */
+	var FUNC_ERROR_TEXT = 'Expected a function';
+	
+	/**
+	 * Creates a throttled function that only invokes `func` at most once per
+	 * every `wait` milliseconds. The throttled function comes with a `cancel`
+	 * method to cancel delayed `func` invocations and a `flush` method to
+	 * immediately invoke them. Provide an options object to indicate whether
+	 * `func` should be invoked on the leading and/or trailing edge of the `wait`
+	 * timeout. The `func` is invoked with the last arguments provided to the
+	 * throttled function. Subsequent calls to the throttled function return the
+	 * result of the last `func` invocation.
+	 *
+	 * **Note:** If `leading` and `trailing` options are `true`, `func` is invoked
+	 * on the trailing edge of the timeout only if the the throttled function is
+	 * invoked more than once during the `wait` timeout.
+	 *
+	 * See [David Corbacho's article](http://drupalmotion.com/article/debounce-and-throttle-visual-explanation)
+	 * for details over the differences between `_.throttle` and `_.debounce`.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Function
+	 * @param {Function} func The function to throttle.
+	 * @param {number} [wait=0] The number of milliseconds to throttle invocations to.
+	 * @param {Object} [options] The options object.
+	 * @param {boolean} [options.leading=true] Specify invoking on the leading
+	 *  edge of the timeout.
+	 * @param {boolean} [options.trailing=true] Specify invoking on the trailing
+	 *  edge of the timeout.
+	 * @returns {Function} Returns the new throttled function.
+	 * @example
+	 *
+	 * // avoid excessively updating the position while scrolling
+	 * jQuery(window).on('scroll', _.throttle(updatePosition, 100));
+	 *
+	 * // invoke `renewToken` when the click event is fired, but not more than once every 5 minutes
+	 * var throttled = _.throttle(renewToken, 300000, { 'trailing': false });
+	 * jQuery(element).on('click', throttled);
+	 *
+	 * // cancel a trailing throttled invocation
+	 * jQuery(window).on('popstate', throttled.cancel);
+	 */
+	function throttle(func, wait, options) {
+	  var leading = true,
+	      trailing = true;
+	
+	  if (typeof func != 'function') {
+	    throw new TypeError(FUNC_ERROR_TEXT);
+	  }
+	  if (isObject(options)) {
+	    leading = 'leading' in options ? !!options.leading : leading;
+	    trailing = 'trailing' in options ? !!options.trailing : trailing;
+	  }
+	  return debounce(func, wait, { 'leading': leading, 'maxWait': wait, 'trailing': trailing });
+	}
+	
+	/**
+	 * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
+	 * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+	 * @example
+	 *
+	 * _.isObject({});
+	 * // => true
+	 *
+	 * _.isObject([1, 2, 3]);
+	 * // => true
+	 *
+	 * _.isObject(_.noop);
+	 * // => true
+	 *
+	 * _.isObject(null);
+	 * // => false
+	 */
+	function isObject(value) {
+	  // Avoid a V8 JIT bug in Chrome 19-20.
+	  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
+	  var type = typeof value;
+	  return !!value && (type == 'object' || type == 'function');
+	}
+	
+	module.exports = throttle;
+
+
+/***/ },
+/* 45 */
+/***/ function(module, exports) {
+
+	/**
+	 * lodash 4.0.1 (Custom Build) <https://lodash.com/>
+	 * Build: `lodash modularize exports="npm" -o ./`
+	 * Copyright 2012-2016 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2016 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <https://lodash.com/license>
+	 */
+	
+	/** Used as the `TypeError` message for "Functions" methods. */
+	var FUNC_ERROR_TEXT = 'Expected a function';
+	
+	/** Used as references for various `Number` constants. */
+	var NAN = 0 / 0;
+	
+	/** `Object#toString` result references. */
+	var funcTag = '[object Function]',
+	    genTag = '[object GeneratorFunction]';
+	
+	/** Used to match leading and trailing whitespace. */
+	var reTrim = /^\s+|\s+$/g;
+	
+	/** Used to detect bad signed hexadecimal string values. */
+	var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
+	
+	/** Used to detect binary string values. */
+	var reIsBinary = /^0b[01]+$/i;
+	
+	/** Used to detect octal string values. */
+	var reIsOctal = /^0o[0-7]+$/i;
+	
+	/** Built-in method references without a dependency on `root`. */
+	var freeParseInt = parseInt;
+	
+	/** Used for built-in method references. */
+	var objectProto = Object.prototype;
+	
+	/**
+	 * Used to resolve the [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
+	 * of values.
+	 */
+	var objectToString = objectProto.toString;
+	
+	/* Built-in method references for those with the same name as other `lodash` methods. */
+	var nativeMax = Math.max;
+	
+	/**
+	 * Gets the timestamp of the number of milliseconds that have elapsed since
+	 * the Unix epoch (1 January 1970 00:00:00 UTC).
+	 *
+	 * @static
+	 * @memberOf _
+	 * @type Function
+	 * @category Date
+	 * @returns {number} Returns the timestamp.
+	 * @example
+	 *
+	 * _.defer(function(stamp) {
+	 *   console.log(_.now() - stamp);
+	 * }, _.now());
+	 * // => logs the number of milliseconds it took for the deferred function to be invoked
+	 */
+	var now = Date.now;
+	
+	/**
+	 * Creates a debounced function that delays invoking `func` until after `wait`
+	 * milliseconds have elapsed since the last time the debounced function was
+	 * invoked. The debounced function comes with a `cancel` method to cancel
+	 * delayed `func` invocations and a `flush` method to immediately invoke them.
+	 * Provide an options object to indicate whether `func` should be invoked on
+	 * the leading and/or trailing edge of the `wait` timeout. The `func` is invoked
+	 * with the last arguments provided to the debounced function. Subsequent calls
+	 * to the debounced function return the result of the last `func` invocation.
+	 *
+	 * **Note:** If `leading` and `trailing` options are `true`, `func` is invoked
+	 * on the trailing edge of the timeout only if the the debounced function is
+	 * invoked more than once during the `wait` timeout.
+	 *
+	 * See [David Corbacho's article](http://drupalmotion.com/article/debounce-and-throttle-visual-explanation)
+	 * for details over the differences between `_.debounce` and `_.throttle`.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Function
+	 * @param {Function} func The function to debounce.
+	 * @param {number} [wait=0] The number of milliseconds to delay.
+	 * @param {Object} [options] The options object.
+	 * @param {boolean} [options.leading=false] Specify invoking on the leading
+	 *  edge of the timeout.
+	 * @param {number} [options.maxWait] The maximum time `func` is allowed to be
+	 *  delayed before it's invoked.
+	 * @param {boolean} [options.trailing=true] Specify invoking on the trailing
+	 *  edge of the timeout.
+	 * @returns {Function} Returns the new debounced function.
+	 * @example
+	 *
+	 * // Avoid costly calculations while the window size is in flux.
+	 * jQuery(window).on('resize', _.debounce(calculateLayout, 150));
+	 *
+	 * // Invoke `sendMail` when clicked, debouncing subsequent calls.
+	 * jQuery(element).on('click', _.debounce(sendMail, 300, {
+	 *   'leading': true,
+	 *   'trailing': false
+	 * }));
+	 *
+	 * // Ensure `batchLog` is invoked once after 1 second of debounced calls.
+	 * var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });
+	 * var source = new EventSource('/stream');
+	 * jQuery(source).on('message', debounced);
+	 *
+	 * // Cancel the trailing debounced invocation.
+	 * jQuery(window).on('popstate', debounced.cancel);
+	 */
+	function debounce(func, wait, options) {
+	  var args,
+	      maxTimeoutId,
+	      result,
+	      stamp,
+	      thisArg,
+	      timeoutId,
+	      trailingCall,
+	      lastCalled = 0,
+	      leading = false,
+	      maxWait = false,
+	      trailing = true;
+	
+	  if (typeof func != 'function') {
+	    throw new TypeError(FUNC_ERROR_TEXT);
+	  }
+	  wait = toNumber(wait) || 0;
+	  if (isObject(options)) {
+	    leading = !!options.leading;
+	    maxWait = 'maxWait' in options && nativeMax(toNumber(options.maxWait) || 0, wait);
+	    trailing = 'trailing' in options ? !!options.trailing : trailing;
+	  }
+	
+	  function cancel() {
+	    if (timeoutId) {
+	      clearTimeout(timeoutId);
+	    }
+	    if (maxTimeoutId) {
+	      clearTimeout(maxTimeoutId);
+	    }
+	    lastCalled = 0;
+	    args = maxTimeoutId = thisArg = timeoutId = trailingCall = undefined;
+	  }
+	
+	  function complete(isCalled, id) {
+	    if (id) {
+	      clearTimeout(id);
+	    }
+	    maxTimeoutId = timeoutId = trailingCall = undefined;
+	    if (isCalled) {
+	      lastCalled = now();
+	      result = func.apply(thisArg, args);
+	      if (!timeoutId && !maxTimeoutId) {
+	        args = thisArg = undefined;
+	      }
+	    }
+	  }
+	
+	  function delayed() {
+	    var remaining = wait - (now() - stamp);
+	    if (remaining <= 0 || remaining > wait) {
+	      complete(trailingCall, maxTimeoutId);
+	    } else {
+	      timeoutId = setTimeout(delayed, remaining);
+	    }
+	  }
+	
+	  function flush() {
+	    if ((timeoutId && trailingCall) || (maxTimeoutId && trailing)) {
+	      result = func.apply(thisArg, args);
+	    }
+	    cancel();
+	    return result;
+	  }
+	
+	  function maxDelayed() {
+	    complete(trailing, timeoutId);
+	  }
+	
+	  function debounced() {
+	    args = arguments;
+	    stamp = now();
+	    thisArg = this;
+	    trailingCall = trailing && (timeoutId || !leading);
+	
+	    if (maxWait === false) {
+	      var leadingCall = leading && !timeoutId;
+	    } else {
+	      if (!maxTimeoutId && !leading) {
+	        lastCalled = stamp;
+	      }
+	      var remaining = maxWait - (stamp - lastCalled),
+	          isCalled = remaining <= 0 || remaining > maxWait;
+	
+	      if (isCalled) {
+	        if (maxTimeoutId) {
+	          maxTimeoutId = clearTimeout(maxTimeoutId);
+	        }
+	        lastCalled = stamp;
+	        result = func.apply(thisArg, args);
+	      }
+	      else if (!maxTimeoutId) {
+	        maxTimeoutId = setTimeout(maxDelayed, remaining);
+	      }
+	    }
+	    if (isCalled && timeoutId) {
+	      timeoutId = clearTimeout(timeoutId);
+	    }
+	    else if (!timeoutId && wait !== maxWait) {
+	      timeoutId = setTimeout(delayed, wait);
+	    }
+	    if (leadingCall) {
+	      isCalled = true;
+	      result = func.apply(thisArg, args);
+	    }
+	    if (isCalled && !timeoutId && !maxTimeoutId) {
+	      args = thisArg = undefined;
+	    }
+	    return result;
+	  }
+	  debounced.cancel = cancel;
+	  debounced.flush = flush;
+	  return debounced;
+	}
+	
+	/**
+	 * Checks if `value` is classified as a `Function` object.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
+	 * @example
+	 *
+	 * _.isFunction(_);
+	 * // => true
+	 *
+	 * _.isFunction(/abc/);
+	 * // => false
+	 */
+	function isFunction(value) {
+	  // The use of `Object#toString` avoids issues with the `typeof` operator
+	  // in Safari 8 which returns 'object' for typed array constructors, and
+	  // PhantomJS 1.9 which returns 'function' for `NodeList` instances.
+	  var tag = isObject(value) ? objectToString.call(value) : '';
+	  return tag == funcTag || tag == genTag;
+	}
+	
+	/**
+	 * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
+	 * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+	 * @example
+	 *
+	 * _.isObject({});
+	 * // => true
+	 *
+	 * _.isObject([1, 2, 3]);
+	 * // => true
+	 *
+	 * _.isObject(_.noop);
+	 * // => true
+	 *
+	 * _.isObject(null);
+	 * // => false
+	 */
+	function isObject(value) {
+	  var type = typeof value;
+	  return !!value && (type == 'object' || type == 'function');
+	}
+	
+	/**
+	 * Converts `value` to a number.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Lang
+	 * @param {*} value The value to process.
+	 * @returns {number} Returns the number.
+	 * @example
+	 *
+	 * _.toNumber(3);
+	 * // => 3
+	 *
+	 * _.toNumber(Number.MIN_VALUE);
+	 * // => 5e-324
+	 *
+	 * _.toNumber(Infinity);
+	 * // => Infinity
+	 *
+	 * _.toNumber('3');
+	 * // => 3
+	 */
+	function toNumber(value) {
+	  if (isObject(value)) {
+	    var other = isFunction(value.valueOf) ? value.valueOf() : value;
+	    value = isObject(other) ? (other + '') : other;
+	  }
+	  if (typeof value != 'string') {
+	    return value === 0 ? value : +value;
+	  }
+	  value = value.replace(reTrim, '');
+	  var isBinary = reIsBinary.test(value);
+	  return (isBinary || reIsOctal.test(value))
+	    ? freeParseInt(value.slice(2), isBinary ? 2 : 8)
+	    : (reIsBadHex.test(value) ? NAN : +value);
+	}
+	
+	module.exports = debounce;
+
 
 /***/ }
 /******/ ])

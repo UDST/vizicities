@@ -81,6 +81,8 @@
   "dependencies": {
     "eventemitter3": "^1.1.1",
     "lodash.assign": "^4.0.2",
+    "lodash.throttle": "^4.0.0",
+    "lru-cache": "^4.0.0",
     "three-orbit-controls": "github:robhawkes/three-orbit-controls"
   }
 }
