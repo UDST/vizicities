@@ -6,7 +6,7 @@ class EnvironmentLayer extends Layer {
     super();
 
     this._initLights();
-    this._initGrid();
+    // this._initGrid();
   }
 
   _onAdd() {}

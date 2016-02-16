@@ -4474,7 +4474,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _get(Object.getPrototypeOf(EnvironmentLayer.prototype), 'constructor', this).call(this);
 	
 	    this._initLights();
-	    this._initGrid();
+	    // this._initGrid();
 	  }
 	
 	  // Initialise without requiring new keyword
@@ -4629,7 +4629,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _TileCache2 = _interopRequireDefault(_TileCache);
 	
-	var _lodashThrottle = __webpack_require__(44);
+	var _lodashThrottle = __webpack_require__(45);
 	
 	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
 	
@@ -4639,6 +4639,40 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// TODO: Prevent tiles from being loaded if they are further than a certain
 	// distance from the camera and are unlikely to be seen anyway
+	
+	// TODO: Find a way to avoid the flashing caused by the gap between old tiles
+	// being removed and the new tiles being ready for display
+	//
+	// Could keep the old tiles around until the new ones are ready, though they'd
+	// probably need to be layered in a way so the old tiles don't overlap new ones,
+	// which is similar to how Leaflet approaches this (it has 2 layers)
+	
+	// TODO: Avoid performing LOD calculation when it isn't required. For example,
+	// when nothing has changed since the last frame and there are no tiles to be
+	// loaded or in need of rendering
+	
+	// TODO: Only remove tiles from the layer that aren't to be rendered in the
+	// current frame – it seems excessive to remove all tiles and re-add them on
+	// every single frame, even if it's just array manipulation
+	
+	// TODO: Fix LOD calculation so min and max LOD can be changed without causing
+	// problems (eg. making min above 5 causes all sorts of issues)
+	
+	// TODO: Reuse THREE objects where possible instead of creating new instances
+	// on every LOD calculation
+	
+	// TODO: Consider not using THREE or LatLon / Point objects in LOD calculations
+	// to avoid creating unnecessary memory for garbage collection
+	
+	// TODO: Load and display a base layer separate to the LOD grid that is at a low
+	// resolution – used as a backup / background to fill in empty areas / distance
+	
+	// TODO: Fix the issue where some tiles just don't load, or at least the texture
+	// never shows up – tends to happen if you quickly zoom in / out past it while
+	// it's still loading, leaving a blank space
+	
+	// TODO: Optimise the request of many image tiles – look at how Leaflet and
+	// OpenWebGlobe approach this
 	
 	var GridLayer = (function (_Layer) {
 	  _inherits(GridLayer, _Layer);
@@ -4681,8 +4715,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // Run LOD calculations based on render calls
 	      //
-	      // TODO: Perhaps don't perform a calculation if nothing has changed in a
-	      // frame and there are no tiles waiting to be loaded.
+	      // Throttled to 1 LOD calculation per 100ms
 	      this._world.on('preUpdate', (0, _lodashThrottle2['default'])(function () {
 	        _this2._calculateLOD();
 	      }, 100));
@@ -4864,11 +4897,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_removeTiles',
 	    value: function _removeTiles() {
-	      // console.log('Pre:', this._layer.children.length);
 	      for (var i = this._layer.children.length - 1; i >= 0; i--) {
 	        this._layer.remove(this._layer.children[i]);
 	      }
-	      // console.log('Post:', this._layer.children.length);
 	    }
 	  }]);
 	
@@ -6690,6 +6721,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _geoLatLon2 = _interopRequireDefault(_geoLatLon);
 	
+	var _vendorBoxHelper = __webpack_require__(44);
+	
+	var _vendorBoxHelper2 = _interopRequireDefault(_vendorBoxHelper);
+	
 	var _three = __webpack_require__(24);
 	
 	var _three2 = _interopRequireDefault(_three);
@@ -6802,7 +6837,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_createMesh',
 	    value: function _createMesh() {
 	      var mesh = new _three2['default'].Object3D();
-	      var geom = new _three2['default'].PlaneGeometry(this._side, this._side, 1);
+	      var geom = new _three2['default'].PlaneBufferGeometry(this._side, this._side, 1);
 	
 	      var material = new _three2['default'].MeshBasicMaterial();
 	
@@ -6814,10 +6849,46 @@ return /******/ (function(modules) { // webpackBootstrap
 	      mesh.position.x = this._center[0];
 	      mesh.position.z = this._center[1];
 	
-	      var box = new _three2['default'].BoxHelper(localMesh);
+	      var box = new _vendorBoxHelper2['default'](localMesh);
 	      mesh.add(box);
 	
 	      // mesh.add(this._createDebugMesh());
+	
+	      return mesh;
+	    }
+	  }, {
+	    key: '_createDebugMesh',
+	    value: function _createDebugMesh() {
+	      var canvas = document.createElement('canvas');
+	      canvas.width = 256;
+	      canvas.height = 256;
+	
+	      var context = canvas.getContext('2d');
+	      context.font = 'Bold 20px Helvetica Neue, Verdana, Arial';
+	      context.fillStyle = 'rgba(255,0,0,1)';
+	      context.fillText(this._quadcode, 20, canvas.width / 2 + 10);
+	
+	      var texture = new _three2['default'].Texture(canvas);
+	
+	      // Silky smooth images when tilted
+	      texture.magFilter = _three2['default'].LinearFilter;
+	      texture.minFilter = _three2['default'].LinearMipMapLinearFilter;
+	
+	      // TODO: Set this to renderer.getMaxAnisotropy() / 4
+	      texture.anisotropy = 4;
+	
+	      texture.needsUpdate = true;
+	
+	      var material = new _three2['default'].MeshBasicMaterial({
+	        map: texture,
+	        transparent: true
+	      });
+	
+	      var geom = new _three2['default'].PlaneBufferGeometry(this._side, this._side, 1);
+	      var mesh = new _three2['default'].Mesh(geom, material);
+	
+	      mesh.rotation.x = -90 * Math.PI / 180;
+	      mesh.position.y = 0.1;
 	
 	      return mesh;
 	    }
@@ -6826,9 +6897,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _requestTextureAsync() {
 	      var _this2 = this;
 	
-	      var letter = String.fromCharCode(97 + Math.floor(Math.random() * 26));
+	      // Pick a letter between a-c
+	      var letter = String.fromCharCode(97 + Math.floor(Math.random() * 3));
+	
+	      // These tiles can be nearly 20 times larger in filesize than OSM tiles!
 	      var url = 'http://' + letter + '.basemaps.cartocdn.com/light_nolabels/';
-	      // var url = 'http://tile.stamen.com/toner-lite/';
+	      // var url = 'http://' + letter + '.tile.osm.org/';
 	
 	      loader.load(url + this._tile[2] + '/' + this._tile[0] + '/' + this._tile[1] + '.png', function (texture) {
 	        // console.log('Loaded');
@@ -6931,6 +7005,96 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
+	Object.defineProperty(exports, '__esModule', {
+		value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	// jscs:disable
+	/*eslint eqeqeq:0*/
+	
+	var _three = __webpack_require__(24);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	/**
+	 * @author mrdoob / http://mrdoob.com/
+	 */
+	
+	BoxHelper = function (object) {
+	
+		var indices = new Uint16Array([0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7]);
+		var positions = new Float32Array(8 * 3);
+	
+		var geometry = new _three2['default'].BufferGeometry();
+		geometry.setIndex(new _three2['default'].BufferAttribute(indices, 1));
+		geometry.addAttribute('position', new _three2['default'].BufferAttribute(positions, 3));
+	
+		_three2['default'].LineSegments.call(this, geometry, new _three2['default'].LineBasicMaterial({ linewidth: 2, color: 0xff0000 }));
+	
+		if (object !== undefined) {
+	
+			this.update(object);
+		}
+	};
+	
+	BoxHelper.prototype = Object.create(_three2['default'].LineSegments.prototype);
+	BoxHelper.prototype.constructor = BoxHelper;
+	
+	BoxHelper.prototype.update = (function () {
+	
+		var box = new _three2['default'].Box3();
+	
+		return function (object) {
+	
+			box.setFromObject(object);
+	
+			if (box.isEmpty()) return;
+	
+			var min = box.min;
+			var max = box.max;
+	
+			/*
+	    5____4
+	  1/___0/|
+	  | 6__|_7
+	  2/___3/
+	  	0: max.x, max.y, max.z
+	  1: min.x, max.y, max.z
+	  2: min.x, min.y, max.z
+	  3: max.x, min.y, max.z
+	  4: max.x, max.y, min.z
+	  5: min.x, max.y, min.z
+	  6: min.x, min.y, min.z
+	  7: max.x, min.y, min.z
+	  */
+	
+			var position = this.geometry.attributes.position;
+			var array = position.array;
+	
+			array[0] = max.x;array[1] = max.y;array[2] = max.z;
+			array[3] = min.x;array[4] = max.y;array[5] = max.z;
+			array[6] = min.x;array[7] = min.y;array[8] = max.z;
+			array[9] = max.x;array[10] = min.y;array[11] = max.z;
+			array[12] = max.x;array[13] = max.y;array[14] = min.z;
+			array[15] = min.x;array[16] = max.y;array[17] = min.z;
+			array[18] = min.x;array[19] = min.y;array[20] = min.z;
+			array[21] = max.x;array[22] = min.y;array[23] = min.z;
+	
+			position.needsUpdate = true;
+	
+			this.geometry.computeBoundingSphere();
+		};
+	})();
+	
+	exports['default'] = BoxHelper;
+	module.exports = exports['default'];
+
+/***/ },
+/* 45 */
+/***/ function(module, exports, __webpack_require__) {
+
 	/**
 	 * lodash 4.0.0 (Custom Build) <https://lodash.com/>
 	 * Build: `lodash modularize exports="npm" -o ./`
@@ -6939,7 +7103,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2016 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <https://lodash.com/license>
 	 */
-	var debounce = __webpack_require__(45);
+	var debounce = __webpack_require__(46);
 	
 	/** Used as the `TypeError` message for "Functions" methods. */
 	var FUNC_ERROR_TEXT = 'Expected a function';
@@ -7032,7 +7196,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 45 */
+/* 46 */
 /***/ function(module, exports) {
 
 	/**

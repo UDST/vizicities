@@ -1,4 +1,5 @@
 import LatLon from '../../geo/LatLon';
+import BoxHelper from '../../vendor/BoxHelper';
 import THREE from 'three';
 
 // Manages a single tile and its layers
@@ -92,7 +93,7 @@ class Tile {
 
   _createMesh() {
     var mesh = new THREE.Object3D();
-    var geom = new THREE.PlaneGeometry(this._side, this._side, 1);
+    var geom = new THREE.PlaneBufferGeometry(this._side, this._side, 1);
 
     var material = new THREE.MeshBasicMaterial();
 
@@ -104,7 +105,7 @@ class Tile {
     mesh.position.x = this._center[0];
     mesh.position.z = this._center[1];
 
-    var box = new THREE.BoxHelper(localMesh);
+    var box = new BoxHelper(localMesh);
     mesh.add(box);
 
     // mesh.add(this._createDebugMesh());
@@ -112,10 +113,48 @@ class Tile {
     return mesh;
   }
 
+  _createDebugMesh() {
+    var canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 256;
+
+    var context = canvas.getContext('2d');
+    context.font = 'Bold 20px Helvetica Neue, Verdana, Arial';
+    context.fillStyle = 'rgba(255,0,0,1)';
+    context.fillText(this._quadcode, 20, canvas.width / 2 + 10);
+
+    var texture = new THREE.Texture(canvas);
+
+    // Silky smooth images when tilted
+    texture.magFilter = THREE.LinearFilter;
+    texture.minFilter = THREE.LinearMipMapLinearFilter;
+
+    // TODO: Set this to renderer.getMaxAnisotropy() / 4
+    texture.anisotropy = 4;
+
+    texture.needsUpdate = true;
+
+    var material = new THREE.MeshBasicMaterial({
+      map: texture,
+      transparent: true
+    });
+
+    var geom = new THREE.PlaneBufferGeometry(this._side, this._side, 1);
+    var mesh = new THREE.Mesh(geom, material);
+
+    mesh.rotation.x = -90 * Math.PI / 180;
+    mesh.position.y = 0.1;
+
+    return mesh;
+  }
+
   _requestTextureAsync() {
-    var letter = String.fromCharCode(97 + Math.floor(Math.random() * 26));
+    // Pick a letter between a-c
+    var letter = String.fromCharCode(97 + Math.floor(Math.random() * 3));
+
+    // These tiles can be nearly 20 times larger in filesize than OSM tiles!
     var url = 'http://' + letter + '.basemaps.cartocdn.com/light_nolabels/';
-    // var url = 'http://tile.stamen.com/toner-lite/';
+    // var url = 'http://' + letter + '.tile.osm.org/';
 
     loader.load(url + this._tile[2] + '/' + this._tile[0] + '/' + this._tile[1] + '.png', texture => {
       // console.log('Loaded');

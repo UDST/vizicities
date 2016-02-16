@@ -6,6 +6,40 @@ import THREE from 'three';
 // TODO: Prevent tiles from being loaded if they are further than a certain
 // distance from the camera and are unlikely to be seen anyway
 
+// TODO: Find a way to avoid the flashing caused by the gap between old tiles
+// being removed and the new tiles being ready for display
+//
+// Could keep the old tiles around until the new ones are ready, though they'd
+// probably need to be layered in a way so the old tiles don't overlap new ones,
+// which is similar to how Leaflet approaches this (it has 2 layers)
+
+// TODO: Avoid performing LOD calculation when it isn't required. For example,
+// when nothing has changed since the last frame and there are no tiles to be
+// loaded or in need of rendering
+
+// TODO: Only remove tiles from the layer that aren't to be rendered in the
+// current frame – it seems excessive to remove all tiles and re-add them on
+// every single frame, even if it's just array manipulation
+
+// TODO: Fix LOD calculation so min and max LOD can be changed without causing
+// problems (eg. making min above 5 causes all sorts of issues)
+
+// TODO: Reuse THREE objects where possible instead of creating new instances
+// on every LOD calculation
+
+// TODO: Consider not using THREE or LatLon / Point objects in LOD calculations
+// to avoid creating unnecessary memory for garbage collection
+
+// TODO: Load and display a base layer separate to the LOD grid that is at a low
+// resolution – used as a backup / background to fill in empty areas / distance
+
+// TODO: Fix the issue where some tiles just don't load, or at least the texture
+// never shows up – tends to happen if you quickly zoom in / out past it while
+// it's still loading, leaving a blank space
+
+// TODO: Optimise the request of many image tiles – look at how Leaflet and
+// OpenWebGlobe approach this
+
 class GridLayer extends Layer {
   constructor() {
     super();
@@ -34,8 +68,7 @@ class GridLayer extends Layer {
   _initEvents() {
     // Run LOD calculations based on render calls
     //
-    // TODO: Perhaps don't perform a calculation if nothing has changed in a
-    // frame and there are no tiles waiting to be loaded.
+    // Throttled to 1 LOD calculation per 100ms
     this._world.on('preUpdate', throttle(() => {
       this._calculateLOD();
     }, 100));
@@ -209,11 +242,9 @@ class GridLayer extends Layer {
   }
 
   _removeTiles() {
-    // console.log('Pre:', this._layer.children.length);
     for (var i = this._layer.children.length - 1; i >= 0; i--) {
       this._layer.remove(this._layer.children[i]);
     }
-    // console.log('Post:', this._layer.children.length);
   }
 }
 
