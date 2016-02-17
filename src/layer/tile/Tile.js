@@ -6,9 +6,6 @@ import THREE from 'three';
 
 var r2d = 180 / Math.PI;
 
-var loader = new THREE.TextureLoader();
-loader.setCrossOrigin('');
-
 class Tile {
   constructor(quadcode, layer) {
     this._layer = layer;
@@ -108,7 +105,7 @@ class Tile {
     var box = new BoxHelper(localMesh);
     mesh.add(box);
 
-    // mesh.add(this._createDebugMesh());
+    mesh.add(this._createDebugMesh());
 
     return mesh;
   }
@@ -120,8 +117,9 @@ class Tile {
 
     var context = canvas.getContext('2d');
     context.font = 'Bold 20px Helvetica Neue, Verdana, Arial';
-    context.fillStyle = 'rgba(255,0,0,1)';
-    context.fillText(this._quadcode, 20, canvas.width / 2 + 10);
+    context.fillStyle = '#ff0000';
+    context.fillText(this._quadcode, 20, canvas.width / 2 - 5);
+    context.fillText(this._tile.toString(), 20, canvas.width / 2 + 25);
 
     var texture = new THREE.Texture(canvas);
 
@@ -150,14 +148,21 @@ class Tile {
 
   _requestTextureAsync() {
     // Pick a letter between a-c
-    var letter = String.fromCharCode(97 + Math.floor(Math.random() * 3));
+    var letter = String.fromCharCode(97 + Math.floor(Math.random() * 26));
 
     // These tiles can be nearly 20 times larger in filesize than OSM tiles!
     var url = 'http://' + letter + '.basemaps.cartocdn.com/light_nolabels/';
     // var url = 'http://' + letter + '.tile.osm.org/';
+    // http://a.tiles.wmflabs.org/osm-no-labels/12/2200/1341.png
 
-    loader.load(url + this._tile[2] + '/' + this._tile[0] + '/' + this._tile[1] + '.png', texture => {
-      // console.log('Loaded');
+    var image = document.createElement('img');
+
+    image.addEventListener('load', event => {
+      var texture = new THREE.Texture();
+
+      texture.image = image;
+      texture.needsUpdate = true;
+
       // Silky smooth images when tilted
       texture.magFilter = THREE.LinearFilter;
       texture.minFilter = THREE.LinearMipMapLinearFilter;
@@ -169,10 +174,23 @@ class Tile {
 
       this._mesh.children[0].material.map = texture;
       this._mesh.children[0].material.needsUpdate = true;
+
+      this._texture = texture;
       this._ready = true;
-    }, null, xhr => {
-      console.log(xhr);
-    });
+    }, false);
+
+    // image.addEventListener('progress', event => {
+    //
+    // }, false);
+
+    image.addEventListener('error', event => {
+      console.error(event);
+    }, false);
+
+    image.crossOrigin = '';
+
+    // Load image
+    image.src = url + this._tile[2] + '/' + this._tile[0] + '/' + this._tile[1] + '.png';
   }
 
   // Convert from quadcode to TMS tile coordinates

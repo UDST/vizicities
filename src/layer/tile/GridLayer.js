@@ -3,15 +3,25 @@ import TileCache from './TileCache';
 import throttle from 'lodash.throttle';
 import THREE from 'three';
 
-// TODO: Prevent tiles from being loaded if they are further than a certain
+// DONE: Prevent tiles from being loaded if they are further than a certain
 // distance from the camera and are unlikely to be seen anyway
 
 // TODO: Find a way to avoid the flashing caused by the gap between old tiles
 // being removed and the new tiles being ready for display
 //
+// Simplest first step for MVP would be to give each tile mesh the colour of the
+// basemap ground so it blends in a little more, or have a huge ground plane
+// underneath all the tiles that shows through between tile updates.
+//
 // Could keep the old tiles around until the new ones are ready, though they'd
 // probably need to be layered in a way so the old tiles don't overlap new ones,
 // which is similar to how Leaflet approaches this (it has 2 layers)
+//
+// Could keep the tile from the previous quadtree level visible until all 4
+// tiles at the new / current level have finished loading and are displayed.
+// Perhaps by keeping a map of tiles by quadcode and a boolean for each of the
+// child quadcodes showing whether they are loaded and in view. If all true then
+// remove the parent tile, otherwise keep it on a lower layer.
 
 // TODO: Avoid performing LOD calculation when it isn't required. For example,
 // when nothing has changed since the last frame and there are no tiles to be
@@ -33,12 +43,15 @@ import THREE from 'three';
 // TODO: Load and display a base layer separate to the LOD grid that is at a low
 // resolution – used as a backup / background to fill in empty areas / distance
 
-// TODO: Fix the issue where some tiles just don't load, or at least the texture
+// DONE: Fix the issue where some tiles just don't load, or at least the texture
 // never shows up – tends to happen if you quickly zoom in / out past it while
 // it's still loading, leaving a blank space
 
 // TODO: Optimise the request of many image tiles – look at how Leaflet and
 // OpenWebGlobe approach this
+
+// TODO: Prioritise loading of tiles at highest level in the quadtree (those
+// closest to the camera) so visual inconsistancies during loading are minimised
 
 class GridLayer extends Layer {
   constructor() {
@@ -114,8 +127,6 @@ class GridLayer extends Layer {
     // 4. Remove all tiles from layer
     this._removeTiles();
 
-    var tileCount = 0;
-
     // 5. Render the tiles remaining in the check list
     checkList.forEach((tile, index) => {
       // Skip tile if it's not in the current view frustum
@@ -123,14 +134,14 @@ class GridLayer extends Layer {
         return;
       }
 
-      // TODO: Can probably speed this up
-      var center = tile.getCenter();
-      var dist = (new THREE.Vector3(center[0], 0, center[1])).sub(camera.position).length();
+      // // TODO: Can probably speed this up
+      // var center = tile.getCenter();
+      // var dist = (new THREE.Vector3(center[0], 0, center[1])).sub(camera.position).length();
 
       // Manual distance limit to cut down on tiles so far away
-      if (dist > 8000) {
-        return;
-      }
+      // if (dist > 8000) {
+      //   return;
+      // }
 
       // Does the tile have a mesh?
       //
@@ -151,14 +162,8 @@ class GridLayer extends Layer {
 
       // Add tile to layer (and to scene)
       this._layer.add(tile.getMesh());
-
-      // Output added tile (for debugging)
-      // console.log(tile);
-
-      tileCount++;
     });
 
-    // console.log(tileCount);
     // console.log(performance.now() - start);
   }
 
