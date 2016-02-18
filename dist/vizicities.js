@@ -6970,11 +6970,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'destroy',
 	    value: function destroy() {
+	      // Cancel any pending requests
+	      this._abortRequest();
+	
+	      // Clear image reference
+	      this._image = null;
+	
 	      _get(Object.getPrototypeOf(ImageTile.prototype), 'destroy', this).call(this);
 	    }
 	  }, {
 	    key: '_createMesh',
 	    value: function _createMesh() {
+	      // Something went wrong and the tile
+	      //
+	      // Possibly removed by the cache before loaded
+	      if (!this._center) {
+	        return;
+	      }
+	
 	      var mesh = new _three2['default'].Object3D();
 	      var geom = new _three2['default'].PlaneBufferGeometry(this._side, this._side, 1);
 	
@@ -7065,6 +7078,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        texture.needsUpdate = true;
 	
+	        // Something went wrong and the tile or its material is missing
+	        //
+	        // Possibly removed by the cache before the image loaded
+	        if (!_this2._mesh || !_this2._mesh.children[0] || !_this2._mesh.children[0].material) {
+	          return;
+	        }
+	
 	        _this2._mesh.children[0].material.map = texture;
 	        _this2._mesh.children[0].material.needsUpdate = true;
 	
@@ -7072,18 +7092,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _this2._ready = true;
 	      }, false);
 	
-	      // image.addEventListener('progress', event => {
-	      //
-	      // }, false);
-	
-	      image.addEventListener('error', function (event) {
-	        console.error(event);
-	      }, false);
+	      // image.addEventListener('progress', event => {}, false);
+	      // image.addEventListener('error', event => {}, false);
 	
 	      image.crossOrigin = '';
 	
 	      // Load image
 	      image.src = url;
+	
+	      this._image = image;
+	    }
+	  }, {
+	    key: '_abortRequest',
+	    value: function _abortRequest() {
+	      if (!this._image) {
+	        return;
+	      }
+	
+	      this._image.src = '';
 	    }
 	  }]);
 	

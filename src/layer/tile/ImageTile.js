@@ -19,10 +19,23 @@ class ImageTile extends Tile {
   }
 
   destroy() {
+    // Cancel any pending requests
+    this._abortRequest();
+
+    // Clear image reference
+    this._image = null;
+
     super.destroy();
   }
 
   _createMesh() {
+    // Something went wrong and the tile
+    //
+    // Possibly removed by the cache before loaded
+    if (!this._center) {
+      return;
+    }
+
     var mesh = new THREE.Object3D();
     var geom = new THREE.PlaneBufferGeometry(this._side, this._side, 1);
 
@@ -109,6 +122,13 @@ class ImageTile extends Tile {
 
       texture.needsUpdate = true;
 
+      // Something went wrong and the tile or its material is missing
+      //
+      // Possibly removed by the cache before the image loaded
+      if (!this._mesh || !this._mesh.children[0] || !this._mesh.children[0].material) {
+        return;
+      }
+
       this._mesh.children[0].material.map = texture;
       this._mesh.children[0].material.needsUpdate = true;
 
@@ -116,18 +136,23 @@ class ImageTile extends Tile {
       this._ready = true;
     }, false);
 
-    // image.addEventListener('progress', event => {
-    //
-    // }, false);
-
-    image.addEventListener('error', event => {
-      console.error(event);
-    }, false);
+    // image.addEventListener('progress', event => {}, false);
+    // image.addEventListener('error', event => {}, false);
 
     image.crossOrigin = '';
 
     // Load image
     image.src = url;
+
+    this._image = image;
+  }
+
+  _abortRequest() {
+    if (!this._image) {
+      return;
+    }
+
+    this._image.src = '';
   }
 }
 
