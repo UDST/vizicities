@@ -5,8 +5,13 @@ import Tile from './Tile';
 // See: https://github.com/OpenWebGlobe/WebViewer/blob/master/source/core/globecache.js
 
 class TileCache {
-  constructor(cacheLimit) {
-    this._cache = LRUCache(cacheLimit);
+  constructor(cacheLimit, onDestroyTile) {
+    this._cache = LRUCache({
+      max: cacheLimit,
+      dispose: (key, tile) => {
+        onDestroyTile(tile);
+      }
+    });
   }
 
   // Returns true if all specified tile providers are ready to be used
@@ -44,7 +49,11 @@ class TileCache {
   // TODO: Call destroy method on items in cache
   destroy() {
     this._cache.reset();
+    this._cache = null;
   }
 }
 
-export default TileCache;
+// Initialise without requiring new keyword
+export default function(cacheLimit, onDestroyTile) {
+  return new TileCache(cacheLimit, onDestroyTile);
+};

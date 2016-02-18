@@ -86,7 +86,34 @@ class Tile {
   //
   // Ensure that this leaves no trace of the tile – no textures, no meshes,
   // nothing in memory or the GPU
-  destroy() {}
+  destroy() {
+    // Delete reference to layer
+    this._layer = null;
+
+    // Delete location references
+    this._boundsLatLon = null;
+    this._boundsWorld = null;
+    this._center = null;
+
+    // Done if no mesh
+    if (!this._mesh) {
+      return;
+    }
+
+    // Dispose of mesh and materials
+    this._mesh.children.forEach(child => {
+      child.geometry.dispose();
+      child.geometry = null;
+
+      if (child.material.map) {
+        child.material.map.dispose();
+        child.material.map = null;
+      }
+
+      child.material.dispose();
+      child.material = null;
+    });
+  }
 
   _createMesh() {
     var mesh = new THREE.Object3D();

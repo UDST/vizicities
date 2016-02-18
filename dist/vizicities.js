@@ -4702,11 +4702,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _inherits(GridLayer, _Layer);
 	
 	  function GridLayer() {
+	    var _this = this;
+	
 	    _classCallCheck(this, GridLayer);
 	
 	    _get(Object.getPrototypeOf(GridLayer.prototype), 'constructor', this).call(this);
 	
-	    this._tileCache = new _TileCache2['default'](1000);
+	    this._tileCache = (0, _TileCache2['default'])(1000, function (tile) {
+	      _this._destroyTile(tile);
+	    });
 	
 	    // TODO: Work out why changing the minLOD causes loads of issues
 	    this._minLOD = 3;
@@ -4720,7 +4724,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(GridLayer, [{
 	    key: '_onAdd',
 	    value: function _onAdd(world) {
-	      var _this = this;
+	      var _this2 = this;
 	
 	      this._initEvents();
 	
@@ -4737,24 +4741,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // TODO: This is a hack to ensure the camera is all set up - a better
 	      // solution should be found
 	      setTimeout(function () {
-	        _this._calculateLOD();
+	        _this2._calculateLOD();
 	      }, 0);
 	    }
 	  }, {
 	    key: '_initEvents',
 	    value: function _initEvents() {
-	      var _this2 = this;
-	
 	      // Run LOD calculations based on render calls
 	      //
 	      // Throttled to 1 LOD calculation per 100ms
-	      this._world.on('preUpdate', (0, _lodashThrottle2['default'])(function () {
-	        _this2._calculateLOD();
-	      }, 100));
+	      this._throttledWorldUpdate = (0, _lodashThrottle2['default'])(this._onWorldUpdate, 100).bind(this);
 	
-	      this._world.on('move', function (latlon, point) {
-	        _this2._moveBaseLayer(point);
-	      });
+	      this._world.on('preUpdate', this._throttledWorldUpdate);
+	      this._world.on('move', this._onWorldMove.bind(this));
+	    }
+	  }, {
+	    key: '_onWorldUpdate',
+	    value: function _onWorldUpdate() {
+	      this._calculateLOD();
+	    }
+	  }, {
+	    key: '_onWorldMove',
+	    value: function _onWorldMove(latlon, point) {
+	      this._moveBaseLayer(point);
 	    }
 	  }, {
 	    key: '_moveBaseLayer',
@@ -4783,7 +4792,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _calculateLOD() {
 	      var _this3 = this;
 	
-	      if (this._stop) {
+	      if (this._stop || !this._world) {
 	        return;
 	      }
 	
@@ -4936,6 +4945,50 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._layer.remove(this._layer.children[i]);
 	      }
 	    }
+	  }, {
+	    key: '_destroyTile',
+	    value: function _destroyTile(tile) {
+	      // Remove tile from scene
+	      this._layer.remove(tile);
+	
+	      // Delete any references to the tile within this component
+	
+	      // Call destory on tile instance
+	      tile.destroy();
+	    }
+	
+	    // Destroys the layer and removes it from the scene and memory
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {
+	      this._world.off('preUpdate', this._throttledWorldUpdate);
+	      this._world.off('move', this._onWorldMove);
+	
+	      for (var i = this._layer.children.length - 1; i >= 0; i--) {
+	        this._layer.remove(this._layer.children[i]);
+	      }
+	
+	      this._tileCache.destroy();
+	      this._tileCache = null;
+	
+	      // Dispose of mesh and materials
+	      this._baseLayer.geometry.dispose();
+	      this._baseLayer.geometry = null;
+	
+	      if (this._baseLayer.material.map) {
+	        this._baseLayer.material.map.dispose();
+	        this._baseLayer.material.map = null;
+	      }
+	
+	      this._baseLayer.material.dispose();
+	      this._baseLayer.material = null;
+	
+	      this._baseLayer = null;
+	
+	      this._world = null;
+	      this._layer = null;
+	      this._frustum = null;
+	    }
 	  }]);
 	
 	  return GridLayer;
@@ -4974,11 +5027,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	// See: https://github.com/OpenWebGlobe/WebViewer/blob/master/source/core/globecache.js
 	
 	var TileCache = (function () {
-	  function TileCache(cacheLimit) {
+	  function TileCache(cacheLimit, onDestroyTile) {
 	    _classCallCheck(this, TileCache);
 	
-	    this._cache = (0, _lruCache2['default'])(cacheLimit);
+	    this._cache = (0, _lruCache2['default'])({
+	      max: cacheLimit,
+	      dispose: function dispose(key, tile) {
+	        onDestroyTile(tile);
+	      }
+	    });
 	  }
+	
+	  // Initialise without requiring new keyword
 	
 	  // Returns true if all specified tile providers are ready to be used
 	  // Otherwise, returns false
@@ -5024,13 +5084,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'destroy',
 	    value: function destroy() {
 	      this._cache.reset();
+	      this._cache = null;
 	    }
 	  }]);
 	
 	  return TileCache;
 	})();
 	
-	exports['default'] = TileCache;
+	exports['default'] = function (cacheLimit, onDestroyTile) {
+	  return new TileCache(cacheLimit, onDestroyTile);
+	};
+	
+	;
 	module.exports = exports['default'];
 
 /***/ },
@@ -6864,7 +6929,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // nothing in memory or the GPU
 	  }, {
 	    key: 'destroy',
-	    value: function destroy() {}
+	    value: function destroy() {
+	      // Delete reference to layer
+	      this._layer = null;
+	
+	      // Delete location references
+	      this._boundsLatLon = null;
+	      this._boundsWorld = null;
+	      this._center = null;
+	
+	      // Done if no mesh
+	      if (!this._mesh) {
+	        return;
+	      }
+	
+	      // Dispose of mesh and materials
+	      this._mesh.children.forEach(function (child) {
+	        child.geometry.dispose();
+	        child.geometry = null;
+	
+	        if (child.material.map) {
+	          child.material.map.dispose();
+	          child.material.map = null;
+	        }
+	
+	        child.material.dispose();
+	        child.material = null;
+	      });
+	    }
 	  }, {
 	    key: '_createMesh',
 	    value: function _createMesh() {

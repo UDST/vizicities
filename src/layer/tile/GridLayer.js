@@ -62,7 +62,9 @@ class GridLayer extends Layer {
   constructor() {
     super();
 
-    this._tileCache = new TileCache(1000);
+    this._tileCache = TileCache(1000, tile => {
+      this._destroyTile(tile);
+    });
 
     // TODO: Work out why changing the minLOD causes loads of issues
     this._minLOD = 3;
@@ -95,13 +97,18 @@ class GridLayer extends Layer {
     // Run LOD calculations based on render calls
     //
     // Throttled to 1 LOD calculation per 100ms
-    this._world.on('preUpdate', throttle(() => {
-      this._calculateLOD();
-    }, 100));
+    this._throttledWorldUpdate = throttle(this._onWorldUpdate, 100).bind(this);
 
-    this._world.on('move', (latlon, point) => {
-      this._moveBaseLayer(point);
-    });
+    this._world.on('preUpdate', this._throttledWorldUpdate);
+    this._world.on('move', this._onWorldMove.bind(this));
+  }
+
+  _onWorldUpdate() {
+    this._calculateLOD();
+  }
+
+  _onWorldMove(latlon, point) {
+    this._moveBaseLayer(point);
   }
 
   _moveBaseLayer(point) {
@@ -124,7 +131,7 @@ class GridLayer extends Layer {
   }
 
   _calculateLOD() {
-    if (this._stop) {
+    if (this._stop || !this._world) {
       return;
     }
 
@@ -273,6 +280,47 @@ class GridLayer extends Layer {
     for (var i = this._layer.children.length - 1; i >= 1; i--) {
       this._layer.remove(this._layer.children[i]);
     }
+  }
+
+  _destroyTile(tile) {
+    // Remove tile from scene
+    this._layer.remove(tile);
+
+    // Delete any references to the tile within this component
+
+    // Call destory on tile instance
+    tile.destroy();
+  }
+
+  // Destroys the layer and removes it from the scene and memory
+  destroy() {
+    this._world.off('preUpdate', this._throttledWorldUpdate);
+    this._world.off('move', this._onWorldMove);
+
+    for (var i = this._layer.children.length - 1; i >= 0; i--) {
+      this._layer.remove(this._layer.children[i]);
+    }
+
+    this._tileCache.destroy();
+    this._tileCache = null;
+
+    // Dispose of mesh and materials
+    this._baseLayer.geometry.dispose();
+    this._baseLayer.geometry = null;
+
+    if (this._baseLayer.material.map) {
+      this._baseLayer.material.map.dispose();
+      this._baseLayer.material.map = null;
+    }
+
+    this._baseLayer.material.dispose();
+    this._baseLayer.material = null;
+
+    this._baseLayer = null;
+
+    this._world = null;
+    this._layer = null;
+    this._frustum = null;
   }
 }
 
