@@ -49,15 +49,15 @@ class World extends EventEmitter {
 
   _onControlsMoveEnd(point) {
     var _point = Point(point.x, point.z);
-    this._resetView(this.pointToLatLon(_point));
+    this._resetView(this.pointToLatLon(_point), _point);
   }
 
   // Reset world view
-  _resetView(latlon) {
+  _resetView(latlon, point) {
     this.emit('preResetView');
 
     this._moveStart();
-    this._move(latlon);
+    this._move(latlon, point);
     this._moveEnd();
 
     this.emit('postResetView');
@@ -67,9 +67,9 @@ class World extends EventEmitter {
     this.emit('moveStart');
   }
 
-  _move(latlon) {
+  _move(latlon, point) {
     this._lastPosition = latlon;
-    this.emit('move', latlon);
+    this.emit('move', latlon, point);
   }
   _moveEnd() {
     this.emit('moveEnd');

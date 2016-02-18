@@ -1,17 +1,18 @@
 import Layer from '../Layer';
 import TileCache from './TileCache';
+import GridBaseMaterial from './GridBaseMaterial';
 import throttle from 'lodash.throttle';
 import THREE from 'three';
 
 // DONE: Prevent tiles from being loaded if they are further than a certain
 // distance from the camera and are unlikely to be seen anyway
 
-// TODO: Find a way to avoid the flashing caused by the gap between old tiles
+// DONE: Find a way to avoid the flashing caused by the gap between old tiles
 // being removed and the new tiles being ready for display
 //
-// Simplest first step for MVP would be to give each tile mesh the colour of the
-// basemap ground so it blends in a little more, or have a huge ground plane
-// underneath all the tiles that shows through between tile updates.
+// DONE: Simplest first step for MVP would be to give each tile mesh the colour
+// of the basemap ground so it blends in a little more, or have a huge ground
+// plane underneath all the tiles that shows through between tile updates.
 //
 // Could keep the old tiles around until the new ones are ready, though they'd
 // probably need to be layered in a way so the old tiles don't overlap new ones,
@@ -48,7 +49,11 @@ import THREE from 'three';
 // it's still loading, leaving a blank space
 
 // TODO: Optimise the request of many image tiles – look at how Leaflet and
-// OpenWebGlobe approach this
+// OpenWebGlobe approach this (eg. batching, queues, etc)
+
+// TODO: Cancel pending tile requests if they get removed from view before they
+// reach a ready state (eg. cancel image requests, etc). Need to ensure that the
+// images are re-requested when the tile is next in scene (even if from cache)
 
 // TODO: Prioritise loading of tiles at highest level in the quadtree (those
 // closest to the camera) so visual inconsistancies during loading are minimised
@@ -69,6 +74,14 @@ class GridLayer extends Layer {
   _onAdd(world) {
     this._initEvents();
 
+    // Add base layer
+    var geom = new THREE.PlaneBufferGeometry(40000, 40000, 1);
+    var mesh = new THREE.Mesh(geom, GridBaseMaterial('#f5f5f3'));
+    mesh.rotation.x = -90 * Math.PI / 180;
+
+    this._baseLayer = mesh;
+    this._layer.add(mesh);
+
     // Trigger initial quadtree calculation on the next frame
     //
     // TODO: This is a hack to ensure the camera is all set up - a better
@@ -85,6 +98,15 @@ class GridLayer extends Layer {
     this._world.on('preUpdate', throttle(() => {
       this._calculateLOD();
     }, 100));
+
+    this._world.on('move', (latlon, point) => {
+      this._moveBaseLayer(point);
+    });
+  }
+
+  _moveBaseLayer(point) {
+    this._baseLayer.position.x = point.x;
+    this._baseLayer.position.z = point.y;
   }
 
   _updateFrustum() {
@@ -247,7 +269,8 @@ class GridLayer extends Layer {
   }
 
   _removeTiles() {
-    for (var i = this._layer.children.length - 1; i >= 0; i--) {
+    // i >= 1 (instead of 0) to skip the grid base layer
+    for (var i = this._layer.children.length - 1; i >= 1; i--) {
       this._layer.remove(this._layer.children[i]);
     }
   }

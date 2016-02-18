@@ -92,7 +92,9 @@ class Tile {
     var mesh = new THREE.Object3D();
     var geom = new THREE.PlaneBufferGeometry(this._side, this._side, 1);
 
-    var material = new THREE.MeshBasicMaterial();
+    var material = new THREE.MeshBasicMaterial({
+      depthWrite: false
+    });
 
     var localMesh = new THREE.Mesh(geom, material);
     localMesh.rotation.x = -90 * Math.PI / 180;
@@ -134,7 +136,8 @@ class Tile {
 
     var material = new THREE.MeshBasicMaterial({
       map: texture,
-      transparent: true
+      transparent: true,
+      depthWrite: false
     });
 
     var geom = new THREE.PlaneBufferGeometry(this._side, this._side, 1);

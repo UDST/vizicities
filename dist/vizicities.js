@@ -196,17 +196,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_onControlsMoveEnd',
 	    value: function _onControlsMoveEnd(point) {
 	      var _point = (0, _geoPoint2['default'])(point.x, point.z);
-	      this._resetView(this.pointToLatLon(_point));
+	      this._resetView(this.pointToLatLon(_point), _point);
 	    }
 	
 	    // Reset world view
 	  }, {
 	    key: '_resetView',
-	    value: function _resetView(latlon) {
+	    value: function _resetView(latlon, point) {
 	      this.emit('preResetView');
 	
 	      this._moveStart();
-	      this._move(latlon);
+	      this._move(latlon, point);
 	      this._moveEnd();
 	
 	      this.emit('postResetView');
@@ -218,9 +218,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }, {
 	    key: '_move',
-	    value: function _move(latlon) {
+	    value: function _move(latlon, point) {
 	      this._lastPosition = latlon;
-	      this.emit('move', latlon);
+	      this.emit('move', latlon, point);
 	    }
 	  }, {
 	    key: '_moveEnd',
@@ -4632,7 +4632,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _TileCache2 = _interopRequireDefault(_TileCache);
 	
-	var _lodashThrottle = __webpack_require__(45);
+	var _GridBaseMaterial = __webpack_require__(45);
+	
+	var _GridBaseMaterial2 = _interopRequireDefault(_GridBaseMaterial);
+	
+	var _lodashThrottle = __webpack_require__(46);
 	
 	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
 	
@@ -4643,12 +4647,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	// DONE: Prevent tiles from being loaded if they are further than a certain
 	// distance from the camera and are unlikely to be seen anyway
 	
-	// TODO: Find a way to avoid the flashing caused by the gap between old tiles
+	// DONE: Find a way to avoid the flashing caused by the gap between old tiles
 	// being removed and the new tiles being ready for display
 	//
-	// Simplest first step for MVP would be to give each tile mesh the colour of the
-	// basemap ground so it blends in a little more, or have a huge ground plane
-	// underneath all the tiles that shows through between tile updates.
+	// DONE: Simplest first step for MVP would be to give each tile mesh the colour
+	// of the basemap ground so it blends in a little more, or have a huge ground
+	// plane underneath all the tiles that shows through between tile updates.
 	//
 	// Could keep the old tiles around until the new ones are ready, though they'd
 	// probably need to be layered in a way so the old tiles don't overlap new ones,
@@ -4685,7 +4689,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	// it's still loading, leaving a blank space
 	
 	// TODO: Optimise the request of many image tiles – look at how Leaflet and
-	// OpenWebGlobe approach this
+	// OpenWebGlobe approach this (eg. batching, queues, etc)
+	
+	// TODO: Cancel pending tile requests if they get removed from view before they
+	// reach a ready state (eg. cancel image requests, etc). Need to ensure that the
+	// images are re-requested when the tile is next in scene (even if from cache)
 	
 	// TODO: Prioritise loading of tiles at highest level in the quadtree (those
 	// closest to the camera) so visual inconsistancies during loading are minimised
@@ -4716,6 +4724,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      this._initEvents();
 	
+	      // Add base layer
+	      var geom = new _three2['default'].PlaneBufferGeometry(40000, 40000, 1);
+	      var mesh = new _three2['default'].Mesh(geom, (0, _GridBaseMaterial2['default'])('#f5f5f3'));
+	      mesh.rotation.x = -90 * Math.PI / 180;
+	
+	      this._baseLayer = mesh;
+	      this._layer.add(mesh);
+	
 	      // Trigger initial quadtree calculation on the next frame
 	      //
 	      // TODO: This is a hack to ensure the camera is all set up - a better
@@ -4735,6 +4751,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._world.on('preUpdate', (0, _lodashThrottle2['default'])(function () {
 	        _this2._calculateLOD();
 	      }, 100));
+	
+	      this._world.on('move', function (latlon, point) {
+	        _this2._moveBaseLayer(point);
+	      });
+	    }
+	  }, {
+	    key: '_moveBaseLayer',
+	    value: function _moveBaseLayer(point) {
+	      this._baseLayer.position.x = point.x;
+	      this._baseLayer.position.z = point.y;
 	    }
 	  }, {
 	    key: '_updateFrustum',
@@ -4905,7 +4931,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_removeTiles',
 	    value: function _removeTiles() {
-	      for (var i = this._layer.children.length - 1; i >= 0; i--) {
+	      // i >= 1 (instead of 0) to skip the grid base layer
+	      for (var i = this._layer.children.length - 1; i >= 1; i--) {
 	        this._layer.remove(this._layer.children[i]);
 	      }
 	    }
@@ -6844,7 +6871,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var mesh = new _three2['default'].Object3D();
 	      var geom = new _three2['default'].PlaneBufferGeometry(this._side, this._side, 1);
 	
-	      var material = new _three2['default'].MeshBasicMaterial();
+	      var material = new _three2['default'].MeshBasicMaterial({
+	        depthWrite: false
+	      });
 	
 	      var localMesh = new _three2['default'].Mesh(geom, material);
 	      localMesh.rotation.x = -90 * Math.PI / 180;
@@ -6887,7 +6916,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      var material = new _three2['default'].MeshBasicMaterial({
 	        map: texture,
-	        transparent: true
+	        transparent: true,
+	        depthWrite: false
 	      });
 	
 	      var geom = new _three2['default'].PlaneBufferGeometry(this._side, this._side, 1);
@@ -7121,6 +7151,57 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _three = __webpack_require__(24);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	exports['default'] = function (colour) {
+	  var canvas = document.createElement('canvas');
+	  canvas.width = 1;
+	  canvas.height = 1;
+	
+	  var context = canvas.getContext('2d');
+	  context.fillStyle = colour;
+	  context.fillRect(0, 0, canvas.width, canvas.height);
+	  // context.strokeStyle = '#D0D0CF';
+	  // context.strokeRect(0, 0, canvas.width, canvas.height);
+	
+	  var texture = new _three2['default'].Texture(canvas);
+	
+	  // // Silky smooth images when tilted
+	  // texture.magFilter = THREE.LinearFilter;
+	  // texture.minFilter = THREE.LinearMipMapLinearFilter;
+	  // //
+	  // // // TODO: Set this to renderer.getMaxAnisotropy() / 4
+	  // texture.anisotropy = 4;
+	
+	  // texture.wrapS = THREE.RepeatWrapping;
+	  // texture.wrapT = THREE.RepeatWrapping;
+	  // texture.repeat.set(segments, segments);
+	
+	  texture.needsUpdate = true;
+	
+	  var material = new _three2['default'].MeshBasicMaterial({
+	    map: texture,
+	    depthWrite: false
+	  });
+	
+	  return material;
+	};
+	
+	;
+	module.exports = exports['default'];
+
+/***/ },
+/* 46 */
+/***/ function(module, exports, __webpack_require__) {
+
 	/**
 	 * lodash 4.0.0 (Custom Build) <https://lodash.com/>
 	 * Build: `lodash modularize exports="npm" -o ./`
@@ -7129,7 +7210,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2016 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <https://lodash.com/license>
 	 */
-	var debounce = __webpack_require__(46);
+	var debounce = __webpack_require__(47);
 	
 	/** Used as the `TypeError` message for "Functions" methods. */
 	var FUNC_ERROR_TEXT = 'Expected a function';
@@ -7222,7 +7303,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 46 */
+/* 47 */
 /***/ function(module, exports) {
 
 	/**
