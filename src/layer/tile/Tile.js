@@ -1,15 +1,17 @@
 import LatLon from '../../geo/LatLon';
-import BoxHelper from '../../vendor/BoxHelper';
 import THREE from 'three';
 
 // Manages a single tile and its layers
 
 var r2d = 180 / Math.PI;
 
+var tileURLRegex = /\{([szxy])\}/g;
+
 class Tile {
-  constructor(quadcode, layer) {
+  constructor(quadcode, path, layer) {
     this._layer = layer;
     this._quadcode = quadcode;
+    this._path = path;
 
     this._ready = false;
 
@@ -34,33 +36,8 @@ class Tile {
     return this._ready;
   }
 
-  // Request data for the various tile providers
-  //
-  // Providers are provided here and not on instantiation of the class so that
-  // providers can be easily changed in subsequent requests without heavy
-  // management
-  //
-  // If requestData is called more than once then the provider data will be
-  // re-downloaded and the mesh output will be changed
-  //
-  // Being able to update tile data and output like this on-the-fly makes it
-  // appealing for situations where tile data may be dynamic / realtime
-  // (eg. realtime traffic tiles)
-  //
-  // May need to be intelligent about what exactly is updated each time
-  // requestData is called as it doesn't make sense to re-request and
-  // re-generate a mesh each time when only the image provider needs updating,
-  // and likewise it doesn't make sense to update the imagery when only terrain
-  // provider changes
-  requestTileAsync(imageProviders) {
-    // Making this asynchronous really speeds up the LOD framerate
-    setTimeout(() => {
-      if (!this._mesh) {
-        this._mesh = this._createMesh();
-        this._requestTextureAsync();
-      }
-    }, 0);
-  }
+  // Request data for the tile
+  requestTileAsync() {}
 
   getQuadcode() {
     return this._quadcode;
@@ -100,127 +77,48 @@ class Tile {
       return;
     }
 
-    // Dispose of mesh and materials
-    this._mesh.children.forEach(child => {
-      child.geometry.dispose();
-      child.geometry = null;
+    if (this._mesh.children) {
+      // Dispose of mesh and materials
+      this._mesh.children.forEach(child => {
+        child.geometry.dispose();
+        child.geometry = null;
 
-      if (child.material.map) {
-        child.material.map.dispose();
-        child.material.map = null;
+        if (child.material.map) {
+          child.material.map.dispose();
+          child.material.map = null;
+        }
+
+        child.material.dispose();
+        child.material = null;
+      });
+    } else {
+      this._mesh.geometry.dispose();
+      this._mesh.geometry = null;
+
+      if (this._mesh.material.map) {
+        this._mesh.material.map.dispose();
+        this._mesh.material.map = null;
       }
 
-      child.material.dispose();
-      child.material = null;
-    });
+      this._mesh.material.dispose();
+      this._mesh.material = null;
+    }
   }
 
-  _createMesh() {
-    var mesh = new THREE.Object3D();
-    var geom = new THREE.PlaneBufferGeometry(this._side, this._side, 1);
+  _createMesh() {}
+  _createDebugMesh() {}
 
-    var material = new THREE.MeshBasicMaterial({
-      depthWrite: false
+  _getTileURL(urlParams) {
+    if (!urlParams.s) {
+      // Default to a random choice of a, b or c
+      s = String.fromCharCode(97 + Math.floor(Math.random() * 3));
+    }
+
+    tileURLRegex.lastIndex = 0;
+    return this._path.replace(tileURLRegex, function(value, key) {
+      // Replace with paramter, otherwise keep existing value
+      return urlParams[key];
     });
-
-    var localMesh = new THREE.Mesh(geom, material);
-    localMesh.rotation.x = -90 * Math.PI / 180;
-
-    mesh.add(localMesh);
-
-    mesh.position.x = this._center[0];
-    mesh.position.z = this._center[1];
-
-    var box = new BoxHelper(localMesh);
-    mesh.add(box);
-
-    mesh.add(this._createDebugMesh());
-
-    return mesh;
-  }
-
-  _createDebugMesh() {
-    var canvas = document.createElement('canvas');
-    canvas.width = 256;
-    canvas.height = 256;
-
-    var context = canvas.getContext('2d');
-    context.font = 'Bold 20px Helvetica Neue, Verdana, Arial';
-    context.fillStyle = '#ff0000';
-    context.fillText(this._quadcode, 20, canvas.width / 2 - 5);
-    context.fillText(this._tile.toString(), 20, canvas.width / 2 + 25);
-
-    var texture = new THREE.Texture(canvas);
-
-    // Silky smooth images when tilted
-    texture.magFilter = THREE.LinearFilter;
-    texture.minFilter = THREE.LinearMipMapLinearFilter;
-
-    // TODO: Set this to renderer.getMaxAnisotropy() / 4
-    texture.anisotropy = 4;
-
-    texture.needsUpdate = true;
-
-    var material = new THREE.MeshBasicMaterial({
-      map: texture,
-      transparent: true,
-      depthWrite: false
-    });
-
-    var geom = new THREE.PlaneBufferGeometry(this._side, this._side, 1);
-    var mesh = new THREE.Mesh(geom, material);
-
-    mesh.rotation.x = -90 * Math.PI / 180;
-    mesh.position.y = 0.1;
-
-    return mesh;
-  }
-
-  _requestTextureAsync() {
-    // Pick a letter between a-c
-    var letter = String.fromCharCode(97 + Math.floor(Math.random() * 26));
-
-    // These tiles can be nearly 20 times larger in filesize than OSM tiles!
-    var url = 'http://' + letter + '.basemaps.cartocdn.com/light_nolabels/';
-    // var url = 'http://' + letter + '.tile.osm.org/';
-    // http://a.tiles.wmflabs.org/osm-no-labels/12/2200/1341.png
-
-    var image = document.createElement('img');
-
-    image.addEventListener('load', event => {
-      var texture = new THREE.Texture();
-
-      texture.image = image;
-      texture.needsUpdate = true;
-
-      // Silky smooth images when tilted
-      texture.magFilter = THREE.LinearFilter;
-      texture.minFilter = THREE.LinearMipMapLinearFilter;
-
-      // TODO: Set this to renderer.getMaxAnisotropy() / 4
-      texture.anisotropy = 4;
-
-      texture.needsUpdate = true;
-
-      this._mesh.children[0].material.map = texture;
-      this._mesh.children[0].material.needsUpdate = true;
-
-      this._texture = texture;
-      this._ready = true;
-    }, false);
-
-    // image.addEventListener('progress', event => {
-    //
-    // }, false);
-
-    image.addEventListener('error', event => {
-      console.error(event);
-    }, false);
-
-    image.crossOrigin = '';
-
-    // Load image
-    image.src = url + this._tile[2] + '/' + this._tile[0] + '/' + this._tile[1] + '.png';
   }
 
   // Convert from quadcode to TMS tile coordinates

@@ -1,7 +1,7 @@
 import World from './World';
 import Controls from './controls/index';
 import EnvironmentLayer from './layer/environment/EnvironmentLayer';
-import GridLayer from './layer/tile/GridLayer';
+import ImageTileLayer from './layer/tile/ImageTileLayer';
 import Point from './geo/Point';
 import LatLon from './geo/LatLon';
 
@@ -12,7 +12,7 @@ const VIZI = {
   World: World,
   Controls: Controls,
   EnvironmentLayer: EnvironmentLayer,
-  GridLayer: GridLayer,
+  ImageTileLayer: ImageTileLayer,
   Point: Point,
   LatLon: LatLon
 };

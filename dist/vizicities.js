@@ -72,9 +72,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _layerEnvironmentEnvironmentLayer2 = _interopRequireDefault(_layerEnvironmentEnvironmentLayer);
 	
-	var _layerTileGridLayer = __webpack_require__(33);
+	var _layerTileImageTileLayer = __webpack_require__(33);
 	
-	var _layerTileGridLayer2 = _interopRequireDefault(_layerTileGridLayer);
+	var _layerTileImageTileLayer2 = _interopRequireDefault(_layerTileImageTileLayer);
 	
 	var _geoPoint = __webpack_require__(11);
 	
@@ -91,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  World: _World2['default'],
 	  Controls: _controlsIndex2['default'],
 	  EnvironmentLayer: _layerEnvironmentEnvironmentLayer2['default'],
-	  GridLayer: _layerTileGridLayer2['default'],
+	  ImageTileLayer: _layerTileImageTileLayer2['default'],
 	  Point: _geoPoint2['default'],
 	  LatLon: _geoLatLon2['default']
 	};
@@ -4646,28 +4646,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Layer2 = __webpack_require__(32);
+	var _TileLayer2 = __webpack_require__(34);
 	
-	var _Layer3 = _interopRequireDefault(_Layer2);
+	var _TileLayer3 = _interopRequireDefault(_TileLayer2);
 	
-	var _TileCache = __webpack_require__(34);
+	var _ImageTile = __webpack_require__(44);
 	
-	var _TileCache2 = _interopRequireDefault(_TileCache);
+	var _ImageTile2 = _interopRequireDefault(_ImageTile);
 	
-	var _GridBaseMaterial = __webpack_require__(45);
+	var _ImageTileLayerBaseMaterial = __webpack_require__(47);
 	
-	var _GridBaseMaterial2 = _interopRequireDefault(_GridBaseMaterial);
+	var _ImageTileLayerBaseMaterial2 = _interopRequireDefault(_ImageTileLayerBaseMaterial);
 	
-	var _lodashThrottle = __webpack_require__(46);
+	var _lodashThrottle = __webpack_require__(48);
 	
 	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
 	
 	var _three = __webpack_require__(24);
 	
 	var _three2 = _interopRequireDefault(_three);
-	
-	// DONE: Prevent tiles from being loaded if they are further than a certain
-	// distance from the camera and are unlikely to be seen anyway
 	
 	// DONE: Find a way to avoid the flashing caused by the gap between old tiles
 	// being removed and the new tiles being ready for display
@@ -4686,23 +4683,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	// child quadcodes showing whether they are loaded and in view. If all true then
 	// remove the parent tile, otherwise keep it on a lower layer.
 	
-	// TODO: Avoid performing LOD calculation when it isn't required. For example,
-	// when nothing has changed since the last frame and there are no tiles to be
-	// loaded or in need of rendering
-	
-	// TODO: Only remove tiles from the layer that aren't to be rendered in the
-	// current frame – it seems excessive to remove all tiles and re-add them on
-	// every single frame, even if it's just array manipulation
-	
-	// TODO: Fix LOD calculation so min and max LOD can be changed without causing
-	// problems (eg. making min above 5 causes all sorts of issues)
-	
-	// TODO: Reuse THREE objects where possible instead of creating new instances
-	// on every LOD calculation
-	
-	// TODO: Consider not using THREE or LatLon / Point objects in LOD calculations
-	// to avoid creating unnecessary memory for garbage collection
-	
 	// TODO: Load and display a base layer separate to the LOD grid that is at a low
 	// resolution – used as a backup / background to fill in empty areas / distance
 	
@@ -4717,42 +4697,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	// reach a ready state (eg. cancel image requests, etc). Need to ensure that the
 	// images are re-requested when the tile is next in scene (even if from cache)
 	
-	// TODO: Prioritise loading of tiles at highest level in the quadtree (those
-	// closest to the camera) so visual inconsistancies during loading are minimised
+	var ImageTileLayer = (function (_TileLayer) {
+	  _inherits(ImageTileLayer, _TileLayer);
 	
-	var GridLayer = (function (_Layer) {
-	  _inherits(GridLayer, _Layer);
+	  function ImageTileLayer(path, options) {
+	    _classCallCheck(this, ImageTileLayer);
 	
-	  function GridLayer() {
-	    var _this = this;
+	    // Cache 1000 tiles
+	    _get(Object.getPrototypeOf(ImageTileLayer.prototype), 'constructor', this).call(this, 1000);
 	
-	    _classCallCheck(this, GridLayer);
-	
-	    _get(Object.getPrototypeOf(GridLayer.prototype), 'constructor', this).call(this);
-	
-	    this._tileCache = (0, _TileCache2['default'])(1000, function (tile) {
-	      _this._destroyTile(tile);
-	    });
-	
-	    // TODO: Work out why changing the minLOD causes loads of issues
-	    this._minLOD = 3;
-	    this._maxLOD = 18;
-	
-	    this._frustum = new _three2['default'].Frustum();
+	    this._path = path;
 	  }
 	
 	  // Initialise without requiring new keyword
 	
-	  _createClass(GridLayer, [{
+	  _createClass(ImageTileLayer, [{
 	    key: '_onAdd',
 	    value: function _onAdd(world) {
-	      var _this2 = this;
+	      var _this = this;
+	
+	      _get(Object.getPrototypeOf(ImageTileLayer.prototype), '_onAdd', this).call(this, world);
 	
 	      this._initEvents();
 	
 	      // Add base layer
 	      var geom = new _three2['default'].PlaneBufferGeometry(40000, 40000, 1);
-	      var mesh = new _three2['default'].Mesh(geom, (0, _GridBaseMaterial2['default'])('#f5f5f3'));
+	      var mesh = new _three2['default'].Mesh(geom, (0, _ImageTileLayerBaseMaterial2['default'])('#f5f5f3'));
 	      mesh.rotation.x = -90 * Math.PI / 180;
 	
 	      this._baseLayer = mesh;
@@ -4763,7 +4733,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // TODO: This is a hack to ensure the camera is all set up - a better
 	      // solution should be found
 	      setTimeout(function () {
-	        _this2._calculateLOD();
+	        _this._calculateLOD();
 	      }, 0);
 	    }
 	  }, {
@@ -4794,6 +4764,130 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._baseLayer.position.z = point.y;
 	    }
 	  }, {
+	    key: '_createTile',
+	    value: function _createTile(quadcode, layer) {
+	      return (0, _ImageTile2['default'])(quadcode, this._path, layer);
+	    }
+	
+	    // Destroys the layer and removes it from the scene and memory
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {
+	      this._world.off('preUpdate', this._throttledWorldUpdate);
+	      this._world.off('move', this._onWorldMove);
+	
+	      this._throttledWorldUpdate = null;
+	
+	      // Dispose of mesh and materials
+	      this._baseLayer.geometry.dispose();
+	      this._baseLayer.geometry = null;
+	
+	      if (this._baseLayer.material.map) {
+	        this._baseLayer.material.map.dispose();
+	        this._baseLayer.material.map = null;
+	      }
+	
+	      this._baseLayer.material.dispose();
+	      this._baseLayer.material = null;
+	
+	      this._baseLayer = null;
+	
+	      // Run common destruction logic from parent
+	      _get(Object.getPrototypeOf(ImageTileLayer.prototype), 'destroy', this).call(this);
+	    }
+	  }]);
+	
+	  return ImageTileLayer;
+	})(_TileLayer3['default']);
+	
+	exports['default'] = function (path, options) {
+	  return new ImageTileLayer(path, options);
+	};
+	
+	;
+	module.exports = exports['default'];
+
+/***/ },
+/* 34 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var _Layer2 = __webpack_require__(32);
+	
+	var _Layer3 = _interopRequireDefault(_Layer2);
+	
+	var _TileCache = __webpack_require__(35);
+	
+	var _TileCache2 = _interopRequireDefault(_TileCache);
+	
+	var _three = __webpack_require__(24);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	// DONE: Prevent tiles from being loaded if they are further than a certain
+	// distance from the camera and are unlikely to be seen anyway
+	
+	// TODO: Avoid performing LOD calculation when it isn't required. For example,
+	// when nothing has changed since the last frame and there are no tiles to be
+	// loaded or in need of rendering
+	
+	// TODO: Only remove tiles from the layer that aren't to be rendered in the
+	// current frame – it seems excessive to remove all tiles and re-add them on
+	// every single frame, even if it's just array manipulation
+	
+	// TODO: Fix LOD calculation so min and max LOD can be changed without causing
+	// problems (eg. making min above 5 causes all sorts of issues)
+	
+	// TODO: Reuse THREE objects where possible instead of creating new instances
+	// on every LOD calculation
+	
+	// TODO: Consider not using THREE or LatLon / Point objects in LOD calculations
+	// to avoid creating unnecessary memory for garbage collection
+	
+	// TODO: Prioritise loading of tiles at highest level in the quadtree (those
+	// closest to the camera) so visual inconsistancies during loading are minimised
+	
+	var TileLayer = (function (_Layer) {
+	  _inherits(TileLayer, _Layer);
+	
+	  function TileLayer(maxCache) {
+	    var _this = this;
+	
+	    _classCallCheck(this, TileLayer);
+	
+	    _get(Object.getPrototypeOf(TileLayer.prototype), 'constructor', this).call(this);
+	
+	    this._tileCache = (0, _TileCache2['default'])(maxCache, function (tile) {
+	      _this._destroyTile(tile);
+	    });
+	
+	    // TODO: Work out why changing the minLOD causes loads of issues
+	    this._minLOD = 3;
+	    this._maxLOD = 18;
+	
+	    this._frustum = new _three2['default'].Frustum();
+	    this._tiles = new _three2['default'].Object3D();
+	  }
+	
+	  _createClass(TileLayer, [{
+	    key: '_onAdd',
+	    value: function _onAdd(world) {
+	      this._layer.add(this._tiles);
+	    }
+	  }, {
 	    key: '_updateFrustum',
 	    value: function _updateFrustum() {
 	      var camera = this._world.getCamera();
@@ -4812,7 +4906,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_calculateLOD',
 	    value: function _calculateLOD() {
-	      var _this3 = this;
+	      var _this2 = this;
 	
 	      if (this._stop || !this._world) {
 	        return;
@@ -4828,10 +4922,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // 2. Add the four root items of the quadtree to a check list
 	      var checkList = this._checklist;
 	      checkList = [];
-	      checkList.push(this._tileCache.requestTile('0', this));
-	      checkList.push(this._tileCache.requestTile('1', this));
-	      checkList.push(this._tileCache.requestTile('2', this));
-	      checkList.push(this._tileCache.requestTile('3', this));
+	      checkList.push(this._requestTile('0', this));
+	      checkList.push(this._requestTile('1', this));
+	      checkList.push(this._requestTile('2', this));
+	      checkList.push(this._requestTile('3', this));
 	
 	      // 3. Call Divide, passing in the check list
 	      this._divide(checkList);
@@ -4842,7 +4936,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // 5. Render the tiles remaining in the check list
 	      checkList.forEach(function (tile, index) {
 	        // Skip tile if it's not in the current view frustum
-	        if (!_this3._tileInFrustum(tile)) {
+	        if (!_this2._tileInFrustum(tile)) {
 	          return;
 	        }
 	
@@ -4873,7 +4967,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        // Add tile to layer (and to scene)
-	        _this3._layer.add(tile.getMesh());
+	        _this2._tiles.add(tile.getMesh());
 	      });
 	
 	      // console.log(performance.now() - start);
@@ -4904,10 +4998,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	          checkList.splice(count, 1);
 	
 	          // 4b. Add 4 child items to the check list
-	          checkList.push(this._tileCache.requestTile(quadcode + '0', this));
-	          checkList.push(this._tileCache.requestTile(quadcode + '1', this));
-	          checkList.push(this._tileCache.requestTile(quadcode + '2', this));
-	          checkList.push(this._tileCache.requestTile(quadcode + '3', this));
+	          checkList.push(this._requestTile(quadcode + '0', this));
+	          checkList.push(this._requestTile(quadcode + '1', this));
+	          checkList.push(this._requestTile(quadcode + '2', this));
+	          checkList.push(this._requestTile(quadcode + '3', this));
 	
 	          // 4d. Continue the loop without increasing count
 	          continue;
@@ -4962,10 +5056,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_removeTiles',
 	    value: function _removeTiles() {
-	      // i >= 1 (instead of 0) to skip the grid base layer
-	      for (var i = this._layer.children.length - 1; i >= 1; i--) {
-	        this._layer.remove(this._layer.children[i]);
+	      for (var i = this._tiles.children.length - 1; i >= 0; i--) {
+	        this._tiles.remove(this._tiles.children[i]);
 	      }
+	    }
+	
+	    // Return a new tile instance
+	  }, {
+	    key: '_createTile',
+	    value: function _createTile(quadcode, layer) {}
+	
+	    // Get a cached tile or request a new one if not in cache
+	  }, {
+	    key: '_requestTile',
+	    value: function _requestTile(quadcode, layer) {
+	      var tile = this._tileCache.getTile(quadcode);
+	
+	      if (!tile) {
+	        // Set up a brand new tile
+	        tile = this._createTile(quadcode, layer);
+	
+	        // Add tile to cache, though it won't be ready yet as the data is being
+	        // requested from various places asynchronously
+	        this._tileCache.setTile(quadcode, tile);
+	      }
+	
+	      return tile;
 	    }
 	  }, {
 	    key: '_destroyTile',
@@ -4983,50 +5099,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'destroy',
 	    value: function destroy() {
-	      this._world.off('preUpdate', this._throttledWorldUpdate);
-	      this._world.off('move', this._onWorldMove);
+	      var i;
 	
-	      this._throttledWorldUpdate = null;
+	      // Remove all tiles
+	      for (i = this._tiles.children.length - 1; i >= 0; i--) {
+	        this._tiles.remove(this._tiles.children[i]);
+	      }
 	
-	      for (var i = this._layer.children.length - 1; i >= 0; i--) {
+	      // Remove everything else in the layer
+	      for (i = this._layer.children.length - 1; i >= 0; i--) {
 	        this._layer.remove(this._layer.children[i]);
 	      }
 	
 	      this._tileCache.destroy();
 	      this._tileCache = null;
 	
-	      // Dispose of mesh and materials
-	      this._baseLayer.geometry.dispose();
-	      this._baseLayer.geometry = null;
-	
-	      if (this._baseLayer.material.map) {
-	        this._baseLayer.material.map.dispose();
-	        this._baseLayer.material.map = null;
-	      }
-	
-	      this._baseLayer.material.dispose();
-	      this._baseLayer.material = null;
-	
-	      this._baseLayer = null;
-	
 	      this._world = null;
+	      this._tiles = null;
 	      this._layer = null;
 	      this._frustum = null;
 	    }
 	  }]);
 	
-	  return GridLayer;
+	  return TileLayer;
 	})(_Layer3['default']);
 	
-	exports['default'] = function () {
-	  return new GridLayer();
-	};
-	
-	;
+	exports['default'] = TileLayer;
 	module.exports = exports['default'];
 
 /***/ },
-/* 34 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -5039,13 +5141,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var _lruCache = __webpack_require__(35);
+	var _lruCache = __webpack_require__(36);
 	
 	var _lruCache2 = _interopRequireDefault(_lruCache);
-	
-	var _Tile = __webpack_require__(43);
-	
-	var _Tile2 = _interopRequireDefault(_Tile);
 	
 	// This process is based on a similar approach taken by OpenWebGlobe
 	// See: https://github.com/OpenWebGlobe/WebViewer/blob/master/source/core/globecache.js
@@ -5073,32 +5171,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return false;
 	    }
 	
-	    // Get a cached tile or request a new one if not in cache
-	  }, {
-	    key: 'requestTile',
-	    value: function requestTile(quadcode, layer) {
-	      var tile = this._cache.get(quadcode);
-	
-	      if (!tile) {
-	        // Set up a brand new tile
-	        tile = new _Tile2['default'](quadcode, layer);
-	
-	        // Request data for various tile providers
-	        // tile.requestData(imageProviders);
-	
-	        // Add tile to cache, though it won't be ready yet as the data is being
-	        // requested from various places asynchronously
-	        this._cache.set(quadcode, tile);
-	      }
-	
-	      return tile;
-	    }
-	
 	    // Get a cached tile without requesting a new one
 	  }, {
 	    key: 'getTile',
 	    value: function getTile(quadcode) {
 	      return this._cache.get(quadcode);
+	    }
+	
+	    // Add tile to cache
+	  }, {
+	    key: 'setTile',
+	    value: function setTile(quadcode, tile) {
+	      this._cache.set(quadcode, tile);
 	    }
 	
 	    // Destroy the cache and remove it from memory
@@ -5123,18 +5207,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 35 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = LRUCache
 	
 	// This will be a proper iterable 'Map' in engines that support it,
 	// or a fakey-fake PseudoMap in older versions.
-	var Map = __webpack_require__(36)
-	var util = __webpack_require__(39)
+	var Map = __webpack_require__(37)
+	var util = __webpack_require__(40)
 	
 	// A linked list to keep track of recently-used-ness
-	var Yallist = __webpack_require__(42)
+	var Yallist = __webpack_require__(43)
 	
 	// use symbols if possible, otherwise just _props
 	var symbols = {}
@@ -5597,7 +5681,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 36 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {if (process.env.npm_package_name === 'pseudomap' &&
@@ -5607,13 +5691,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	if (typeof Map === 'function' && !process.env.TEST_PSEUDOMAP) {
 	  module.exports = Map
 	} else {
-	  module.exports = __webpack_require__(38)
+	  module.exports = __webpack_require__(39)
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(37)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(38)))
 
 /***/ },
-/* 37 */
+/* 38 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -5710,7 +5794,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 38 */
+/* 39 */
 /***/ function(module, exports) {
 
 	var hasOwnProperty = Object.prototype.hasOwnProperty
@@ -5829,7 +5913,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 39 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -6357,7 +6441,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.isPrimitive = isPrimitive;
 	
-	exports.isBuffer = __webpack_require__(40);
+	exports.isBuffer = __webpack_require__(41);
 	
 	function objectToString(o) {
 	  return Object.prototype.toString.call(o);
@@ -6401,7 +6485,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *     prototype.
 	 * @param {function} superCtor Constructor function to inherit prototype from.
 	 */
-	exports.inherits = __webpack_require__(41);
+	exports.inherits = __webpack_require__(42);
 	
 	exports._extend = function(origin, add) {
 	  // Don't do anything if add isn't an object
@@ -6419,10 +6503,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return Object.prototype.hasOwnProperty.call(obj, prop);
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(37)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(38)))
 
 /***/ },
-/* 40 */
+/* 41 */
 /***/ function(module, exports) {
 
 	module.exports = function isBuffer(arg) {
@@ -6433,7 +6517,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 41 */
+/* 42 */
 /***/ function(module, exports) {
 
 	if (typeof Object.create === 'function') {
@@ -6462,7 +6546,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 42 */
+/* 43 */
 /***/ function(module, exports) {
 
 	module.exports = Yallist
@@ -6828,7 +6912,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 43 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -6837,15 +6921,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 	
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var _geoLatLon = __webpack_require__(10);
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _geoLatLon2 = _interopRequireDefault(_geoLatLon);
+	var _Tile2 = __webpack_require__(45);
 	
-	var _vendorBoxHelper = __webpack_require__(44);
+	var _Tile3 = _interopRequireDefault(_Tile2);
+	
+	var _vendorBoxHelper = __webpack_require__(46);
 	
 	var _vendorBoxHelper2 = _interopRequireDefault(_vendorBoxHelper);
 	
@@ -6853,133 +6941,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	// Manages a single tile and its layers
+	var ImageTile = (function (_Tile) {
+	  _inherits(ImageTile, _Tile);
 	
-	var r2d = 180 / Math.PI;
+	  function ImageTile(quadcode, path, layer) {
+	    _classCallCheck(this, ImageTile);
 	
-	var Tile = (function () {
-	  function Tile(quadcode, layer) {
-	    _classCallCheck(this, Tile);
-	
-	    this._layer = layer;
-	    this._quadcode = quadcode;
-	
-	    this._ready = false;
-	
-	    this._tile = this._quadcodeToTile(quadcode);
-	
-	    // Bottom-left and top-right bounds in WGS84 coordinates
-	    this._boundsLatLon = this._tileBoundsWGS84(this._tile);
-	
-	    // Bottom-left and top-right bounds in world coordinates
-	    this._boundsWorld = this._tileBoundsFromWGS84(this._boundsLatLon);
-	
-	    // Tile center in world coordinates
-	    this._center = this._boundsToCenter(this._boundsWorld);
-	
-	    // Length of a tile side in world coorindates
-	    this._side = this._getSide(this._boundsWorld);
+	    _get(Object.getPrototypeOf(ImageTile.prototype), 'constructor', this).call(this, quadcode, path, layer);
 	  }
 	
-	  // Returns true if the tile mesh and texture are ready to be used
-	  // Otherwise, returns false
+	  // Initialise without requiring new keyword
 	
-	  _createClass(Tile, [{
-	    key: 'isReady',
-	    value: function isReady() {
-	      return this._ready;
-	    }
+	  // Request data for the various tile provider
 	
-	    // Request data for the various tile providers
-	    //
-	    // Providers are provided here and not on instantiation of the class so that
-	    // providers can be easily changed in subsequent requests without heavy
-	    // management
-	    //
-	    // If requestData is called more than once then the provider data will be
-	    // re-downloaded and the mesh output will be changed
-	    //
-	    // Being able to update tile data and output like this on-the-fly makes it
-	    // appealing for situations where tile data may be dynamic / realtime
-	    // (eg. realtime traffic tiles)
-	    //
-	    // May need to be intelligent about what exactly is updated each time
-	    // requestData is called as it doesn't make sense to re-request and
-	    // re-generate a mesh each time when only the image provider needs updating,
-	    // and likewise it doesn't make sense to update the imagery when only terrain
-	    // provider changes
-	  }, {
+	  _createClass(ImageTile, [{
 	    key: 'requestTileAsync',
-	    value: function requestTileAsync(imageProviders) {
+	    value: function requestTileAsync() {
 	      var _this = this;
 	
 	      // Making this asynchronous really speeds up the LOD framerate
 	      setTimeout(function () {
 	        if (!_this._mesh) {
 	          _this._mesh = _this._createMesh();
-	          _this._requestTextureAsync();
+	          _this._requestTexture();
 	        }
 	      }, 0);
 	    }
 	  }, {
-	    key: 'getQuadcode',
-	    value: function getQuadcode() {
-	      return this._quadcode;
-	    }
-	  }, {
-	    key: 'getBounds',
-	    value: function getBounds() {
-	      return this._boundsWorld;
-	    }
-	  }, {
-	    key: 'getCenter',
-	    value: function getCenter() {
-	      return this._center;
-	    }
-	  }, {
-	    key: 'getSide',
-	    value: function getSide() {
-	      return this._side;
-	    }
-	  }, {
-	    key: 'getMesh',
-	    value: function getMesh() {
-	      return this._mesh;
-	    }
-	
-	    // Destroys the tile and removes it from the layer and memory
-	    //
-	    // Ensure that this leaves no trace of the tile – no textures, no meshes,
-	    // nothing in memory or the GPU
-	  }, {
 	    key: 'destroy',
 	    value: function destroy() {
-	      // Delete reference to layer
-	      this._layer = null;
-	
-	      // Delete location references
-	      this._boundsLatLon = null;
-	      this._boundsWorld = null;
-	      this._center = null;
-	
-	      // Done if no mesh
-	      if (!this._mesh) {
-	        return;
-	      }
-	
-	      // Dispose of mesh and materials
-	      this._mesh.children.forEach(function (child) {
-	        child.geometry.dispose();
-	        child.geometry = null;
-	
-	        if (child.material.map) {
-	          child.material.map.dispose();
-	          child.material.map = null;
-	        }
-	
-	        child.material.dispose();
-	        child.material = null;
-	      });
+	      _get(Object.getPrototypeOf(ImageTile.prototype), 'destroy', this).call(this);
 	    }
 	  }, {
 	    key: '_createMesh',
@@ -7045,17 +7036,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return mesh;
 	    }
 	  }, {
-	    key: '_requestTextureAsync',
-	    value: function _requestTextureAsync() {
+	    key: '_requestTexture',
+	    value: function _requestTexture() {
 	      var _this2 = this;
 	
-	      // Pick a letter between a-c
-	      var letter = String.fromCharCode(97 + Math.floor(Math.random() * 26));
+	      var urlParams = {
+	        x: this._tile[0],
+	        y: this._tile[1],
+	        z: this._tile[2]
+	      };
 	
-	      // These tiles can be nearly 20 times larger in filesize than OSM tiles!
-	      var url = 'http://' + letter + '.basemaps.cartocdn.com/light_nolabels/';
-	      // var url = 'http://' + letter + '.tile.osm.org/';
-	      // http://a.tiles.wmflabs.org/osm-no-labels/12/2200/1341.png
+	      var url = this._getTileURL(urlParams);
 	
 	      var image = document.createElement('img');
 	
@@ -7092,7 +7083,178 @@ return /******/ (function(modules) { // webpackBootstrap
 	      image.crossOrigin = '';
 	
 	      // Load image
-	      image.src = url + this._tile[2] + '/' + this._tile[0] + '/' + this._tile[1] + '.png';
+	      image.src = url;
+	    }
+	  }]);
+	
+	  return ImageTile;
+	})(_Tile3['default']);
+	
+	exports['default'] = function (quadcode, path, layer) {
+	  return new ImageTile(quadcode, path, layer);
+	};
+	
+	;
+	module.exports = exports['default'];
+
+/***/ },
+/* 45 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	var _geoLatLon = __webpack_require__(10);
+	
+	var _geoLatLon2 = _interopRequireDefault(_geoLatLon);
+	
+	var _three = __webpack_require__(24);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	// Manages a single tile and its layers
+	
+	var r2d = 180 / Math.PI;
+	
+	var tileURLRegex = /\{([szxy])\}/g;
+	
+	var Tile = (function () {
+	  function Tile(quadcode, path, layer) {
+	    _classCallCheck(this, Tile);
+	
+	    this._layer = layer;
+	    this._quadcode = quadcode;
+	    this._path = path;
+	
+	    this._ready = false;
+	
+	    this._tile = this._quadcodeToTile(quadcode);
+	
+	    // Bottom-left and top-right bounds in WGS84 coordinates
+	    this._boundsLatLon = this._tileBoundsWGS84(this._tile);
+	
+	    // Bottom-left and top-right bounds in world coordinates
+	    this._boundsWorld = this._tileBoundsFromWGS84(this._boundsLatLon);
+	
+	    // Tile center in world coordinates
+	    this._center = this._boundsToCenter(this._boundsWorld);
+	
+	    // Length of a tile side in world coorindates
+	    this._side = this._getSide(this._boundsWorld);
+	  }
+	
+	  // Returns true if the tile mesh and texture are ready to be used
+	  // Otherwise, returns false
+	
+	  _createClass(Tile, [{
+	    key: 'isReady',
+	    value: function isReady() {
+	      return this._ready;
+	    }
+	
+	    // Request data for the tile
+	  }, {
+	    key: 'requestTileAsync',
+	    value: function requestTileAsync() {}
+	  }, {
+	    key: 'getQuadcode',
+	    value: function getQuadcode() {
+	      return this._quadcode;
+	    }
+	  }, {
+	    key: 'getBounds',
+	    value: function getBounds() {
+	      return this._boundsWorld;
+	    }
+	  }, {
+	    key: 'getCenter',
+	    value: function getCenter() {
+	      return this._center;
+	    }
+	  }, {
+	    key: 'getSide',
+	    value: function getSide() {
+	      return this._side;
+	    }
+	  }, {
+	    key: 'getMesh',
+	    value: function getMesh() {
+	      return this._mesh;
+	    }
+	
+	    // Destroys the tile and removes it from the layer and memory
+	    //
+	    // Ensure that this leaves no trace of the tile – no textures, no meshes,
+	    // nothing in memory or the GPU
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {
+	      // Delete reference to layer
+	      this._layer = null;
+	
+	      // Delete location references
+	      this._boundsLatLon = null;
+	      this._boundsWorld = null;
+	      this._center = null;
+	
+	      // Done if no mesh
+	      if (!this._mesh) {
+	        return;
+	      }
+	
+	      if (this._mesh.children) {
+	        // Dispose of mesh and materials
+	        this._mesh.children.forEach(function (child) {
+	          child.geometry.dispose();
+	          child.geometry = null;
+	
+	          if (child.material.map) {
+	            child.material.map.dispose();
+	            child.material.map = null;
+	          }
+	
+	          child.material.dispose();
+	          child.material = null;
+	        });
+	      } else {
+	        this._mesh.geometry.dispose();
+	        this._mesh.geometry = null;
+	
+	        if (this._mesh.material.map) {
+	          this._mesh.material.map.dispose();
+	          this._mesh.material.map = null;
+	        }
+	
+	        this._mesh.material.dispose();
+	        this._mesh.material = null;
+	      }
+	    }
+	  }, {
+	    key: '_createMesh',
+	    value: function _createMesh() {}
+	  }, {
+	    key: '_createDebugMesh',
+	    value: function _createDebugMesh() {}
+	  }, {
+	    key: '_getTileURL',
+	    value: function _getTileURL(urlParams) {
+	      if (!urlParams.s) {
+	        // Default to a random choice of a, b or c
+	        s = String.fromCharCode(97 + Math.floor(Math.random() * 3));
+	      }
+	
+	      tileURLRegex.lastIndex = 0;
+	      return this._path.replace(tileURLRegex, function (value, key) {
+	        // Replace with paramter, otherwise keep existing value
+	        return urlParams[key];
+	      });
 	    }
 	
 	    // Convert from quadcode to TMS tile coordinates
@@ -7174,7 +7336,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 44 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -7264,7 +7426,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 45 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -7315,7 +7477,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 46 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -7326,7 +7488,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2016 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <https://lodash.com/license>
 	 */
-	var debounce = __webpack_require__(47);
+	var debounce = __webpack_require__(49);
 	
 	/** Used as the `TypeError` message for "Functions" methods. */
 	var FUNC_ERROR_TEXT = 'Expected a function';
@@ -7419,7 +7581,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 47 */
+/* 49 */
 /***/ function(module, exports) {
 
 	/**

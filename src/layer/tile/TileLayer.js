@@ -1,28 +1,9 @@
 import Layer from '../Layer';
 import TileCache from './TileCache';
-import GridBaseMaterial from './GridBaseMaterial';
-import throttle from 'lodash.throttle';
 import THREE from 'three';
 
 // DONE: Prevent tiles from being loaded if they are further than a certain
 // distance from the camera and are unlikely to be seen anyway
-
-// DONE: Find a way to avoid the flashing caused by the gap between old tiles
-// being removed and the new tiles being ready for display
-//
-// DONE: Simplest first step for MVP would be to give each tile mesh the colour
-// of the basemap ground so it blends in a little more, or have a huge ground
-// plane underneath all the tiles that shows through between tile updates.
-//
-// Could keep the old tiles around until the new ones are ready, though they'd
-// probably need to be layered in a way so the old tiles don't overlap new ones,
-// which is similar to how Leaflet approaches this (it has 2 layers)
-//
-// Could keep the tile from the previous quadtree level visible until all 4
-// tiles at the new / current level have finished loading and are displayed.
-// Perhaps by keeping a map of tiles by quadcode and a boolean for each of the
-// child quadcodes showing whether they are loaded and in view. If all true then
-// remove the parent tile, otherwise keep it on a lower layer.
 
 // TODO: Avoid performing LOD calculation when it isn't required. For example,
 // when nothing has changed since the last frame and there are no tiles to be
@@ -41,28 +22,14 @@ import THREE from 'three';
 // TODO: Consider not using THREE or LatLon / Point objects in LOD calculations
 // to avoid creating unnecessary memory for garbage collection
 
-// TODO: Load and display a base layer separate to the LOD grid that is at a low
-// resolution – used as a backup / background to fill in empty areas / distance
-
-// DONE: Fix the issue where some tiles just don't load, or at least the texture
-// never shows up – tends to happen if you quickly zoom in / out past it while
-// it's still loading, leaving a blank space
-
-// TODO: Optimise the request of many image tiles – look at how Leaflet and
-// OpenWebGlobe approach this (eg. batching, queues, etc)
-
-// TODO: Cancel pending tile requests if they get removed from view before they
-// reach a ready state (eg. cancel image requests, etc). Need to ensure that the
-// images are re-requested when the tile is next in scene (even if from cache)
-
 // TODO: Prioritise loading of tiles at highest level in the quadtree (those
 // closest to the camera) so visual inconsistancies during loading are minimised
 
-class GridLayer extends Layer {
-  constructor() {
+class TileLayer extends Layer {
+  constructor(maxCache) {
     super();
 
-    this._tileCache = TileCache(1000, tile => {
+    this._tileCache = TileCache(maxCache, tile => {
       this._destroyTile(tile);
     });
 
@@ -71,49 +38,11 @@ class GridLayer extends Layer {
     this._maxLOD = 18;
 
     this._frustum = new THREE.Frustum();
+    this._tiles = new THREE.Object3D();
   }
 
   _onAdd(world) {
-    this._initEvents();
-
-    // Add base layer
-    var geom = new THREE.PlaneBufferGeometry(40000, 40000, 1);
-    var mesh = new THREE.Mesh(geom, GridBaseMaterial('#f5f5f3'));
-    mesh.rotation.x = -90 * Math.PI / 180;
-
-    this._baseLayer = mesh;
-    this._layer.add(mesh);
-
-    // Trigger initial quadtree calculation on the next frame
-    //
-    // TODO: This is a hack to ensure the camera is all set up - a better
-    // solution should be found
-    setTimeout(() => {
-      this._calculateLOD();
-    }, 0);
-  }
-
-  _initEvents() {
-    // Run LOD calculations based on render calls
-    //
-    // Throttled to 1 LOD calculation per 100ms
-    this._throttledWorldUpdate = throttle(this._onWorldUpdate, 100);
-
-    this._world.on('preUpdate', this._throttledWorldUpdate, this);
-    this._world.on('move', this._onWorldMove, this);
-  }
-
-  _onWorldUpdate() {
-    this._calculateLOD();
-  }
-
-  _onWorldMove(latlon, point) {
-    this._moveBaseLayer(point);
-  }
-
-  _moveBaseLayer(point) {
-    this._baseLayer.position.x = point.x;
-    this._baseLayer.position.z = point.y;
+    this._layer.add(this._tiles);
   }
 
   _updateFrustum() {
@@ -145,10 +74,10 @@ class GridLayer extends Layer {
     // 2. Add the four root items of the quadtree to a check list
     var checkList = this._checklist;
     checkList = [];
-    checkList.push(this._tileCache.requestTile('0', this));
-    checkList.push(this._tileCache.requestTile('1', this));
-    checkList.push(this._tileCache.requestTile('2', this));
-    checkList.push(this._tileCache.requestTile('3', this));
+    checkList.push(this._requestTile('0', this));
+    checkList.push(this._requestTile('1', this));
+    checkList.push(this._requestTile('2', this));
+    checkList.push(this._requestTile('3', this));
 
     // 3. Call Divide, passing in the check list
     this._divide(checkList);
@@ -190,7 +119,7 @@ class GridLayer extends Layer {
       }
 
       // Add tile to layer (and to scene)
-      this._layer.add(tile.getMesh());
+      this._tiles.add(tile.getMesh());
     });
 
     // console.log(performance.now() - start);
@@ -220,10 +149,10 @@ class GridLayer extends Layer {
         checkList.splice(count, 1);
 
         // 4b. Add 4 child items to the check list
-        checkList.push(this._tileCache.requestTile(quadcode + '0', this));
-        checkList.push(this._tileCache.requestTile(quadcode + '1', this));
-        checkList.push(this._tileCache.requestTile(quadcode + '2', this));
-        checkList.push(this._tileCache.requestTile(quadcode + '3', this));
+        checkList.push(this._requestTile(quadcode + '0', this));
+        checkList.push(this._requestTile(quadcode + '1', this));
+        checkList.push(this._requestTile(quadcode + '2', this));
+        checkList.push(this._requestTile(quadcode + '3', this));
 
         // 4d. Continue the loop without increasing count
         continue;
@@ -276,10 +205,28 @@ class GridLayer extends Layer {
   }
 
   _removeTiles() {
-    // i >= 1 (instead of 0) to skip the grid base layer
-    for (var i = this._layer.children.length - 1; i >= 1; i--) {
-      this._layer.remove(this._layer.children[i]);
+    for (var i = this._tiles.children.length - 1; i >= 0; i--) {
+      this._tiles.remove(this._tiles.children[i]);
     }
+  }
+
+  // Return a new tile instance
+  _createTile(quadcode, layer) {}
+
+  // Get a cached tile or request a new one if not in cache
+  _requestTile(quadcode, layer) {
+    var tile = this._tileCache.getTile(quadcode);
+
+    if (!tile) {
+      // Set up a brand new tile
+      tile = this._createTile(quadcode, layer);
+
+      // Add tile to cache, though it won't be ready yet as the data is being
+      // requested from various places asynchronously
+      this._tileCache.setTile(quadcode, tile);
+    }
+
+    return tile;
   }
 
   _destroyTile(tile) {
@@ -294,39 +241,26 @@ class GridLayer extends Layer {
 
   // Destroys the layer and removes it from the scene and memory
   destroy() {
-    this._world.off('preUpdate', this._throttledWorldUpdate);
-    this._world.off('move', this._onWorldMove);
+    var i;
 
-    this._throttledWorldUpdate = null;
+    // Remove all tiles
+    for (i = this._tiles.children.length - 1; i >= 0; i--) {
+      this._tiles.remove(this._tiles.children[i]);
+    }
 
-    for (var i = this._layer.children.length - 1; i >= 0; i--) {
+    // Remove everything else in the layer
+    for (i = this._layer.children.length - 1; i >= 0; i--) {
       this._layer.remove(this._layer.children[i]);
     }
 
     this._tileCache.destroy();
     this._tileCache = null;
 
-    // Dispose of mesh and materials
-    this._baseLayer.geometry.dispose();
-    this._baseLayer.geometry = null;
-
-    if (this._baseLayer.material.map) {
-      this._baseLayer.material.map.dispose();
-      this._baseLayer.material.map = null;
-    }
-
-    this._baseLayer.material.dispose();
-    this._baseLayer.material = null;
-
-    this._baseLayer = null;
-
     this._world = null;
+    this._tiles = null;
     this._layer = null;
     this._frustum = null;
   }
 }
 
-// Initialise without requiring new keyword
-export default function() {
-  return new GridLayer();
-};
+export default TileLayer;

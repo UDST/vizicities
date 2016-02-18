@@ -9,4 +9,8 @@ VIZI.Controls.Orbit().addTo(world);
 // could be left public but a default is set up within World to simplify things
 var environmentLayer = VIZI.EnvironmentLayer().addTo(world);
 
-var gridLayer = VIZI.GridLayer().addTo(world);
+// http://{s}.tile.osm.org/{z}/{x}/{y}.png
+// http://{s}.tiles.wmflabs.org/osm-no-labels/{z}/{x}/{y}.png
+var imageTileLayer = VIZI.ImageTileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
+  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
+}).addTo(world);

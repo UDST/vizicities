@@ -1,5 +1,4 @@
 import LRUCache from 'lru-cache';
-import Tile from './Tile';
 
 // This process is based on a similar approach taken by OpenWebGlobe
 // See: https://github.com/OpenWebGlobe/WebViewer/blob/master/source/core/globecache.js
@@ -20,28 +19,14 @@ class TileCache {
     return false;
   }
 
-  // Get a cached tile or request a new one if not in cache
-  requestTile(quadcode, layer) {
-    var tile = this._cache.get(quadcode);
-
-    if (!tile) {
-      // Set up a brand new tile
-      tile = new Tile(quadcode, layer);
-
-      // Request data for various tile providers
-      // tile.requestData(imageProviders);
-
-      // Add tile to cache, though it won't be ready yet as the data is being
-      // requested from various places asynchronously
-      this._cache.set(quadcode, tile);
-    }
-
-    return tile;
-  }
-
   // Get a cached tile without requesting a new one
   getTile(quadcode) {
     return this._cache.get(quadcode);
+  }
+
+  // Add tile to cache
+  setTile(quadcode, tile) {
+    this._cache.set(quadcode, tile);
   }
 
   // Destroy the cache and remove it from memory
