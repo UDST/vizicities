@@ -97,10 +97,10 @@ class GridLayer extends Layer {
     // Run LOD calculations based on render calls
     //
     // Throttled to 1 LOD calculation per 100ms
-    this._throttledWorldUpdate = throttle(this._onWorldUpdate, 100).bind(this);
+    this._throttledWorldUpdate = throttle(this._onWorldUpdate, 100);
 
-    this._world.on('preUpdate', this._throttledWorldUpdate);
-    this._world.on('move', this._onWorldMove.bind(this));
+    this._world.on('preUpdate', this._throttledWorldUpdate, this);
+    this._world.on('move', this._onWorldMove, this);
   }
 
   _onWorldUpdate() {
@@ -296,6 +296,8 @@ class GridLayer extends Layer {
   destroy() {
     this._world.off('preUpdate', this._throttledWorldUpdate);
     this._world.off('move', this._onWorldMove);
+
+    this._throttledWorldUpdate = null;
 
     for (var i = this._layer.children.length - 1; i >= 0; i--) {
       this._layer.remove(this._layer.children[i]);

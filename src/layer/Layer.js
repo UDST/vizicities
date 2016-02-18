@@ -21,6 +21,12 @@ class Layer extends EventEmitter {
     this._onAdd(world);
     this.emit('added');
   }
+
+  // Destroys the layer and removes it from the scene and memory
+  destroy() {
+    this._world = null;
+    this._layer = null;
+  }
 }
 
 export default Layer;

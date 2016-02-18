@@ -170,7 +170,21 @@ class World extends EventEmitter {
   }
 
   // Remove layer and perform clean up operations
-  removeLayer(layer) {}
+  removeLayer(layer) {
+    var layerIndex = this._layers.indexOf(layer);
+
+    if (layerIndex > -1) {
+      // Remove from this._layers
+      this._layers.splice(layerIndex, 1);
+    };
+
+    this._engine._scene.remove(layer._layer);
+
+    layer.destroy();
+
+    this.emit('layerRemoved');
+    return this;
+  }
 
   addControls(controls) {
     controls._addToWorld(this);

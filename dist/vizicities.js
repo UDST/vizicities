@@ -341,7 +341,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Remove layer and perform clean up operations
 	  }, {
 	    key: 'removeLayer',
-	    value: function removeLayer(layer) {}
+	    value: function removeLayer(layer) {
+	      var layerIndex = this._layers.indexOf(layer);
+	
+	      if (layerIndex > -1) {
+	        // Remove from this._layers
+	        this._layers.splice(layerIndex, 1);
+	      };
+	
+	      this._engine._scene.remove(layer._layer);
+	
+	      layer.destroy();
+	
+	      this.emit('layerRemoved');
+	      return this;
+	    }
 	  }, {
 	    key: 'addControls',
 	    value: function addControls(controls) {
@@ -4598,6 +4612,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._onAdd(world);
 	      this.emit('added');
 	    }
+	
+	    // Destroys the layer and removes it from the scene and memory
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {
+	      this._world = null;
+	      this._layer = null;
+	    }
 	  }]);
 	
 	  return Layer;
@@ -4750,10 +4772,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Run LOD calculations based on render calls
 	      //
 	      // Throttled to 1 LOD calculation per 100ms
-	      this._throttledWorldUpdate = (0, _lodashThrottle2['default'])(this._onWorldUpdate, 100).bind(this);
+	      this._throttledWorldUpdate = (0, _lodashThrottle2['default'])(this._onWorldUpdate, 100);
 	
-	      this._world.on('preUpdate', this._throttledWorldUpdate);
-	      this._world.on('move', this._onWorldMove.bind(this));
+	      this._world.on('preUpdate', this._throttledWorldUpdate, this);
+	      this._world.on('move', this._onWorldMove, this);
 	    }
 	  }, {
 	    key: '_onWorldUpdate',
@@ -4963,6 +4985,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function destroy() {
 	      this._world.off('preUpdate', this._throttledWorldUpdate);
 	      this._world.off('move', this._onWorldMove);
+	
+	      this._throttledWorldUpdate = null;
 	
 	      for (var i = this._layer.children.length - 1; i >= 0; i--) {
 	        this._layer.remove(this._layer.children[i]);
