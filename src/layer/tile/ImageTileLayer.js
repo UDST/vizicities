@@ -35,6 +35,14 @@ import THREE from 'three';
 // reach a ready state (eg. cancel image requests, etc). Need to ensure that the
 // images are re-requested when the tile is next in scene (even if from cache)
 
+// TODO: Consider not performing an LOD calculation on every frame, instead only
+// on move end so panning, orbiting and zooming stays smooth. Otherwise it's
+// possible for performance to tank if you pan, orbit or zoom rapidly while all
+// the LOD calculations are being made and new tiles requested.
+//
+// Pending tiles should continue to be requested and output to the scene on each
+// frame, but no new LOD calculations should be made.
+
 class ImageTileLayer extends TileLayer {
   constructor(path, options) {
     // Cache 1000 tiles

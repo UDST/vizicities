@@ -2,6 +2,23 @@ import Layer from '../Layer';
 import TileCache from './TileCache';
 import THREE from 'three';
 
+// TODO: Consider keeping a single TileLayer / LOD instance running by default
+// that keeps a standard LOD grid for other layers to utilise, rather than
+// having to create their own, unique LOD grid and duplicate calculations when
+// they're going to use the same grid setup anyway
+//
+// It still makes sense to be able to have a custom LOD grid for some layers as
+// they may want to customise things, maybe not even using a quadtree at all!
+//
+// Perhaps it makes sense to split out the quadtree stuff into a singleton and
+// pass in the necessary parameters each time for the calculation step.
+//
+// Either way, it seems silly to force layers to have to create a new LOD grid
+// each time and create extra, duplicated processing every frame.
+
+// TODO: Allow passing in of options to define min/max LOD and a distance to use
+// for culling tiles beyond that distance.
+
 // DONE: Prevent tiles from being loaded if they are further than a certain
 // distance from the camera and are unlikely to be seen anyway
 

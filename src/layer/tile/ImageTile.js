@@ -7,7 +7,7 @@ class ImageTile extends Tile {
     super(quadcode, path, layer);
   }
 
-  // Request data for the various tile provider
+  // Request data for the tile
   requestTileAsync() {
     // Making this asynchronous really speeds up the LOD framerate
     setTimeout(() => {
