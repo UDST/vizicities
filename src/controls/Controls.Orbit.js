@@ -1,8 +1,6 @@
 import EventEmitter from 'eventemitter3';
 import THREE from 'three';
-import OrbitControls from 'three-orbit-controls';
-
-var _OrbitControls = OrbitControls(THREE);
+import OrbitControls from '../vendor/OrbitControls';
 
 class Orbit extends EventEmitter {
   constructor() {
@@ -14,15 +12,15 @@ class Orbit extends EventEmitter {
   // There's currently no distinction between pan, orbit and zoom events
   _initEvents() {
     this._controls.addEventListener('start', (event) => {
-      this._world.emit('controlsMoveStart', event.target.center);
+      this._world.emit('controlsMoveStart', event.target.target);
     });
 
     this._controls.addEventListener('change', (event) => {
-      this._world.emit('controlsMove', event.target.center);
+      this._world.emit('controlsMove', event.target.target);
     });
 
     this._controls.addEventListener('end', (event) => {
-      this._world.emit('controlsMoveEnd', event.target.center);
+      this._world.emit('controlsMoveEnd', event.target.target);
     });
   }
 
@@ -73,7 +71,7 @@ class Orbit extends EventEmitter {
 
     // TODO: Override panLeft and panUp methods to prevent panning on Y axis
     // See: http://stackoverflow.com/a/26188674/997339
-    this._controls = new _OrbitControls(world._engine._camera, world._container);
+    this._controls = new OrbitControls(world._engine._camera, world._container);
 
     // Disable keys for now as no events are fired for them anyway
     this._controls.keys = false;
