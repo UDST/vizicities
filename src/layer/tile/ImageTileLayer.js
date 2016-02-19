@@ -45,16 +45,13 @@ import THREE from 'three';
 
 class ImageTileLayer extends TileLayer {
   constructor(path, options) {
-    // Cache 1000 tiles
-    super(1000);
+    super(options);
 
     this._path = path;
   }
 
   _onAdd(world) {
     super._onAdd(world);
-
-    this._initEvents();
 
     // Add base layer
     var geom = new THREE.PlaneBufferGeometry(40000, 40000, 1);
@@ -70,6 +67,7 @@ class ImageTileLayer extends TileLayer {
     // solution should be found
     setTimeout(() => {
       this._calculateLOD();
+      this._initEvents();
     }, 0);
   }
 

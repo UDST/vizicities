@@ -1,4 +1,5 @@
 import Layer from '../Layer';
+import extend from 'lodash.assign';
 import TileCache from './TileCache';
 import THREE from 'three';
 
@@ -43,16 +44,23 @@ import THREE from 'three';
 // closest to the camera) so visual inconsistancies during loading are minimised
 
 class TileLayer extends Layer {
-  constructor(maxCache) {
-    super();
+  constructor(options) {
+    super(options);
 
-    this._tileCache = TileCache(maxCache, tile => {
+    var defaults = {
+      maxCache: 1000,
+      maxLOD: 18
+    };
+
+    this._options = extend(defaults, options);
+
+    this._tileCache = TileCache(this._options.maxCache, tile => {
       this._destroyTile(tile);
     });
 
     // TODO: Work out why changing the minLOD causes loads of issues
     this._minLOD = 3;
-    this._maxLOD = 18;
+    this._maxLOD = this._options.maxLOD;
 
     this._frustum = new THREE.Frustum();
     this._tiles = new THREE.Object3D();
@@ -109,14 +117,16 @@ class TileLayer extends Layer {
         return;
       }
 
-      // // TODO: Can probably speed this up
-      // var center = tile.getCenter();
-      // var dist = (new THREE.Vector3(center[0], 0, center[1])).sub(camera.position).length();
+      if (this._options.distance && this._options.distance > 0) {
+        // TODO: Can probably speed this up
+        var center = tile.getCenter();
+        var dist = (new THREE.Vector3(center[0], 0, center[1])).sub(camera.position).length();
 
-      // Manual distance limit to cut down on tiles so far away
-      // if (dist > 8000) {
-      //   return;
-      // }
+        // Manual distance limit to cut down on tiles so far away
+        if (dist > this._options.distance) {
+          return;
+        }
+      }
 
       // Does the tile have a mesh?
       //
@@ -194,8 +204,8 @@ class TileLayer extends Layer {
     // comparing against the tile distance from camera
     var quality = 3.0;
 
-    // 1. Return false if quadcode length is greater than maxDepth
-    if (quadcode.length > maxDepth) {
+    // 1. Return false if quadcode length equals maxDepth (stop dividing)
+    if (quadcode.length === maxDepth) {
       return false;
     }
 

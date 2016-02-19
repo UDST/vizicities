@@ -76,6 +76,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _layerTileImageTileLayer2 = _interopRequireDefault(_layerTileImageTileLayer);
 	
+	var _layerTileTopoJSONTileLayer = __webpack_require__(50);
+	
+	var _layerTileTopoJSONTileLayer2 = _interopRequireDefault(_layerTileTopoJSONTileLayer);
+	
 	var _geoPoint = __webpack_require__(11);
 	
 	var _geoPoint2 = _interopRequireDefault(_geoPoint);
@@ -92,6 +96,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Controls: _controlsIndex2['default'],
 	  EnvironmentLayer: _layerEnvironmentEnvironmentLayer2['default'],
 	  ImageTileLayer: _layerTileImageTileLayer2['default'],
+	  TopoJSONTileLayer: _layerTileTopoJSONTileLayer2['default'],
 	  Point: _geoPoint2['default'],
 	  LatLon: _geoLatLon2['default']
 	};
@@ -4592,14 +4597,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	// reach a ready state (eg. cancel image requests, etc). Need to ensure that the
 	// images are re-requested when the tile is next in scene (even if from cache)
 	
+	// TODO: Consider not performing an LOD calculation on every frame, instead only
+	// on move end so panning, orbiting and zooming stays smooth. Otherwise it's
+	// possible for performance to tank if you pan, orbit or zoom rapidly while all
+	// the LOD calculations are being made and new tiles requested.
+	//
+	// Pending tiles should continue to be requested and output to the scene on each
+	// frame, but no new LOD calculations should be made.
+	
 	var ImageTileLayer = (function (_TileLayer) {
 	  _inherits(ImageTileLayer, _TileLayer);
 	
 	  function ImageTileLayer(path, options) {
 	    _classCallCheck(this, ImageTileLayer);
 	
-	    // Cache 1000 tiles
-	    _get(Object.getPrototypeOf(ImageTileLayer.prototype), 'constructor', this).call(this, 1000);
+	    _get(Object.getPrototypeOf(ImageTileLayer.prototype), 'constructor', this).call(this, options);
 	
 	    this._path = path;
 	  }
@@ -4612,8 +4624,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _this = this;
 	
 	      _get(Object.getPrototypeOf(ImageTileLayer.prototype), '_onAdd', this).call(this, world);
-	
-	      this._initEvents();
 	
 	      // Add base layer
 	      var geom = new _three2['default'].PlaneBufferGeometry(40000, 40000, 1);
@@ -4629,6 +4639,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // solution should be found
 	      setTimeout(function () {
 	        _this._calculateLOD();
+	        _this._initEvents();
 	      }, 0);
 	    }
 	  }, {
@@ -4724,6 +4735,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
+	var _lodashAssign = __webpack_require__(3);
+	
+	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
+	
 	var _TileCache = __webpack_require__(35);
 	
 	var _TileCache2 = _interopRequireDefault(_TileCache);
@@ -4775,20 +4790,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	var TileLayer = (function (_Layer) {
 	  _inherits(TileLayer, _Layer);
 	
-	  function TileLayer(maxCache) {
+	  function TileLayer(options) {
 	    var _this = this;
 	
 	    _classCallCheck(this, TileLayer);
 	
-	    _get(Object.getPrototypeOf(TileLayer.prototype), 'constructor', this).call(this);
+	    _get(Object.getPrototypeOf(TileLayer.prototype), 'constructor', this).call(this, options);
 	
-	    this._tileCache = (0, _TileCache2['default'])(maxCache, function (tile) {
+	    var defaults = {
+	      maxCache: 1000,
+	      maxLOD: 18
+	    };
+	
+	    this._options = (0, _lodashAssign2['default'])(defaults, options);
+	
+	    this._tileCache = (0, _TileCache2['default'])(this._options.maxCache, function (tile) {
 	      _this._destroyTile(tile);
 	    });
 	
 	    // TODO: Work out why changing the minLOD causes loads of issues
 	    this._minLOD = 3;
-	    this._maxLOD = 18;
+	    this._maxLOD = this._options.maxLOD;
 	
 	    this._frustum = new _three2['default'].Frustum();
 	    this._tiles = new _three2['default'].Object3D();
@@ -4852,14 +4874,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	          return;
 	        }
 	
-	        // // TODO: Can probably speed this up
-	        // var center = tile.getCenter();
-	        // var dist = (new THREE.Vector3(center[0], 0, center[1])).sub(camera.position).length();
+	        if (_this2._options.distance && _this2._options.distance > 0) {
+	          // TODO: Can probably speed this up
+	          var center = tile.getCenter();
+	          var dist = new _three2['default'].Vector3(center[0], 0, center[1]).sub(camera.position).length();
 	
-	        // Manual distance limit to cut down on tiles so far away
-	        // if (dist > 8000) {
-	        //   return;
-	        // }
+	          // Manual distance limit to cut down on tiles so far away
+	          if (dist > _this2._options.distance) {
+	            return;
+	          }
+	        }
 	
 	        // Does the tile have a mesh?
 	        //
@@ -4939,8 +4963,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // comparing against the tile distance from camera
 	      var quality = 3.0;
 	
-	      // 1. Return false if quadcode length is greater than maxDepth
-	      if (quadcode.length > maxDepth) {
+	      // 1. Return false if quadcode length equals maxDepth (stop dividing)
+	      if (quadcode.length === maxDepth) {
 	        return false;
 	      }
 	
@@ -6875,7 +6899,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      setTimeout(function () {
 	        if (!_this._mesh) {
 	          _this._mesh = _this._createMesh();
-	          _this._requestTexture();
+	          _this._requestTile();
 	        }
 	      }, 0);
 	    }
@@ -6912,13 +6936,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      mesh.add(localMesh);
 	
+	      mesh.renderOrder = 0;
+	
 	      mesh.position.x = this._center[0];
 	      mesh.position.z = this._center[1];
 	
-	      var box = new _vendorBoxHelper2['default'](localMesh);
-	      mesh.add(box);
-	
-	      mesh.add(this._createDebugMesh());
+	      // var box = new BoxHelper(localMesh);
+	      // mesh.add(box);
+	      //
+	      // mesh.add(this._createDebugMesh());
 	
 	      return mesh;
 	    }
@@ -6961,8 +6987,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return mesh;
 	    }
 	  }, {
-	    key: '_requestTexture',
-	    value: function _requestTexture() {
+	    key: '_requestTile',
+	    value: function _requestTile() {
 	      var _this2 = this;
 	
 	      var urlParams = {
@@ -7840,6 +7866,2343 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	module.exports = debounce;
+
+
+/***/ },
+/* 50 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var _TileLayer2 = __webpack_require__(34);
+	
+	var _TileLayer3 = _interopRequireDefault(_TileLayer2);
+	
+	var _lodashAssign = __webpack_require__(3);
+	
+	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
+	
+	var _TopoJSONTile = __webpack_require__(51);
+	
+	var _TopoJSONTile2 = _interopRequireDefault(_TopoJSONTile);
+	
+	var _lodashThrottle = __webpack_require__(48);
+	
+	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
+	
+	var _three = __webpack_require__(24);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var TopoJSONTileLayer = (function (_TileLayer) {
+	  _inherits(TopoJSONTileLayer, _TileLayer);
+	
+	  function TopoJSONTileLayer(path, options) {
+	    _classCallCheck(this, TopoJSONTileLayer);
+	
+	    var defaults = {
+	      maxLOD: 13,
+	      distance: 2000
+	    };
+	
+	    options = (0, _lodashAssign2['default'])(defaults, options);
+	
+	    _get(Object.getPrototypeOf(TopoJSONTileLayer.prototype), 'constructor', this).call(this, options);
+	
+	    this._path = path;
+	  }
+	
+	  // Initialise without requiring new keyword
+	
+	  _createClass(TopoJSONTileLayer, [{
+	    key: '_onAdd',
+	    value: function _onAdd(world) {
+	      var _this = this;
+	
+	      _get(Object.getPrototypeOf(TopoJSONTileLayer.prototype), '_onAdd', this).call(this, world);
+	
+	      // Trigger initial quadtree calculation on the next frame
+	      //
+	      // TODO: This is a hack to ensure the camera is all set up - a better
+	      // solution should be found
+	      setTimeout(function () {
+	        _this._calculateLOD();
+	        _this._initEvents();
+	      }, 0);
+	    }
+	  }, {
+	    key: '_initEvents',
+	    value: function _initEvents() {
+	      // Run LOD calculations based on render calls
+	      //
+	      // Throttled to 1 LOD calculation per 100ms
+	      this._throttledWorldUpdate = (0, _lodashThrottle2['default'])(this._onWorldUpdate, 100);
+	
+	      this._world.on('preUpdate', this._throttledWorldUpdate, this);
+	      this._world.on('move', this._onWorldMove, this);
+	    }
+	  }, {
+	    key: '_onWorldUpdate',
+	    value: function _onWorldUpdate() {
+	      this._calculateLOD();
+	    }
+	  }, {
+	    key: '_onWorldMove',
+	    value: function _onWorldMove(latlon, point) {
+	      // this._moveBaseLayer(point);
+	    }
+	  }, {
+	    key: '_createTile',
+	    value: function _createTile(quadcode, layer) {
+	      return (0, _TopoJSONTile2['default'])(quadcode, this._path, layer);
+	    }
+	
+	    // Destroys the layer and removes it from the scene and memory
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {
+	      this._world.off('preUpdate', this._throttledWorldUpdate);
+	      this._world.off('move', this._onWorldMove);
+	
+	      this._throttledWorldUpdate = null;
+	
+	      // Run common destruction logic from parent
+	      _get(Object.getPrototypeOf(TopoJSONTileLayer.prototype), 'destroy', this).call(this);
+	    }
+	  }]);
+	
+	  return TopoJSONTileLayer;
+	})(_TileLayer3['default']);
+	
+	exports['default'] = function (path, options) {
+	  return new TopoJSONTileLayer(path, options);
+	};
+	
+	;
+	module.exports = exports['default'];
+
+/***/ },
+/* 51 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var _Tile2 = __webpack_require__(45);
+	
+	var _Tile3 = _interopRequireDefault(_Tile2);
+	
+	var _vendorBoxHelper = __webpack_require__(46);
+	
+	var _vendorBoxHelper2 = _interopRequireDefault(_vendorBoxHelper);
+	
+	var _three = __webpack_require__(24);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var _reqwest = __webpack_require__(52);
+	
+	var _reqwest2 = _interopRequireDefault(_reqwest);
+	
+	var _topojson = __webpack_require__(54);
+	
+	var _topojson2 = _interopRequireDefault(_topojson);
+	
+	var _geoPoint = __webpack_require__(11);
+	
+	var _geoPoint2 = _interopRequireDefault(_geoPoint);
+	
+	var _geoLatLon = __webpack_require__(10);
+	
+	var _geoLatLon2 = _interopRequireDefault(_geoLatLon);
+	
+	var _earcut = __webpack_require__(55);
+	
+	var _earcut2 = _interopRequireDefault(_earcut);
+	
+	var TopoJSONTile = (function (_Tile) {
+	  _inherits(TopoJSONTile, _Tile);
+	
+	  function TopoJSONTile(quadcode, path, layer) {
+	    _classCallCheck(this, TopoJSONTile);
+	
+	    _get(Object.getPrototypeOf(TopoJSONTile.prototype), 'constructor', this).call(this, quadcode, path, layer);
+	  }
+	
+	  // Initialise without requiring new keyword
+	
+	  // Request data for the tile
+	
+	  _createClass(TopoJSONTile, [{
+	    key: 'requestTileAsync',
+	    value: function requestTileAsync() {
+	      var _this = this;
+	
+	      // Making this asynchronous really speeds up the LOD framerate
+	      setTimeout(function () {
+	        if (!_this._mesh) {
+	          _this._mesh = _this._createMesh();
+	          _this._requestTile();
+	        }
+	      }, 0);
+	    }
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {
+	      // Cancel any pending requests
+	      this._abortRequest();
+	
+	      // Clear request reference
+	      this._request = null;
+	
+	      _get(Object.getPrototypeOf(TopoJSONTile.prototype), 'destroy', this).call(this);
+	    }
+	  }, {
+	    key: '_createMesh',
+	    value: function _createMesh() {
+	      // Something went wrong and the tile
+	      //
+	      // Possibly removed by the cache before loaded
+	      if (!this._center) {
+	        return;
+	      }
+	
+	      var mesh = new _three2['default'].Object3D();
+	
+	      mesh.renderOrder = 1;
+	
+	      mesh.position.x = this._center[0];
+	      mesh.position.z = this._center[1];
+	
+	      // var geom = new THREE.PlaneBufferGeometry(this._side, this._side, 1);
+	      //
+	      // var material = new THREE.MeshBasicMaterial({
+	      //   depthWrite: false
+	      // });
+	      //
+	      // var localMesh = new THREE.Mesh(geom, material);
+	      // localMesh.rotation.x = -90 * Math.PI / 180;
+	      //
+	      // mesh.add(localMesh);
+	      //
+	      // var box = new BoxHelper(localMesh);
+	      // mesh.add(box);
+	      //
+	      // mesh.add(this._createDebugMesh());
+	
+	      return mesh;
+	    }
+	  }, {
+	    key: '_createDebugMesh',
+	    value: function _createDebugMesh() {
+	      var canvas = document.createElement('canvas');
+	      canvas.width = 256;
+	      canvas.height = 256;
+	
+	      var context = canvas.getContext('2d');
+	      context.font = 'Bold 20px Helvetica Neue, Verdana, Arial';
+	      context.fillStyle = '#ff0000';
+	      context.fillText(this._quadcode, 20, canvas.width / 2 - 5);
+	      context.fillText(this._tile.toString(), 20, canvas.width / 2 + 25);
+	
+	      var texture = new _three2['default'].Texture(canvas);
+	
+	      // Silky smooth images when tilted
+	      texture.magFilter = _three2['default'].LinearFilter;
+	      texture.minFilter = _three2['default'].LinearMipMapLinearFilter;
+	
+	      // TODO: Set this to renderer.getMaxAnisotropy() / 4
+	      texture.anisotropy = 4;
+	
+	      texture.needsUpdate = true;
+	
+	      var material = new _three2['default'].MeshBasicMaterial({
+	        map: texture,
+	        transparent: true,
+	        depthWrite: false
+	      });
+	
+	      var geom = new _three2['default'].PlaneBufferGeometry(this._side, this._side, 1);
+	      var mesh = new _three2['default'].Mesh(geom, material);
+	
+	      mesh.rotation.x = -90 * Math.PI / 180;
+	      mesh.position.y = 0.1;
+	
+	      return mesh;
+	    }
+	  }, {
+	    key: '_requestTile',
+	    value: function _requestTile() {
+	      var _this2 = this;
+	
+	      var urlParams = {
+	        x: this._tile[0],
+	        y: this._tile[1],
+	        z: this._tile[2]
+	      };
+	
+	      var url = this._getTileURL(urlParams);
+	
+	      this._request = (0, _reqwest2['default'])({
+	        url: url,
+	        type: 'json',
+	        crossOrigin: true
+	      }).then(function (res) {
+	        // Clear request reference
+	        _this2._request = null;
+	        _this2._processTileData(res);
+	      })['catch'](function (err) {
+	        console.error(err);
+	
+	        // Clear request reference
+	        _this2._request = null;
+	      });
+	    }
+	  }, {
+	    key: '_processTileData',
+	    value: function _processTileData(data) {
+	      var _this3 = this;
+	
+	      var geojson = _topojson2['default'].feature(data, data.objects.vectile);
+	
+	      var offset = (0, _geoPoint2['default'])(0, 0);
+	      offset.x = -1 * this._center[0];
+	      offset.y = -1 * this._center[1];
+	
+	      var coordinates;
+	      var earcutData;
+	      var faces;
+	      // var geometry;
+	
+	      var allVertices = [];
+	      var allFaces = [];
+	      var facesCount = 0;
+	
+	      geojson.features.forEach(function (feature) {
+	        // feature.geometry, feature.properties
+	
+	        var coordinates = feature.geometry.coordinates;
+	
+	        if (!coordinates[0] || !coordinates[0][0] || !Array.isArray(coordinates[0][0])) {
+	          return;
+	        }
+	
+	        coordinates = coordinates.map(function (ring) {
+	          return ring.map(function (coordinate) {
+	            var latlon = (0, _geoLatLon2['default'])(coordinate[1], coordinate[0]);
+	            var point = _this3._layer._world.latLonToPoint(latlon);
+	            return [point.x, point.y];
+	          });
+	        });
+	
+	        earcutData = _this3._toEarcut(coordinates);
+	
+	        faces = _this3._triangulate(earcutData.vertices, earcutData.holes, earcutData.dimensions);
+	
+	        allVertices.push(earcutData.vertices);
+	        allFaces.push(faces);
+	
+	        facesCount += faces.length;
+	
+	        // console.log(earcutData.vertices);
+	        // console.log(faces);
+	        // return;
+	
+	        // geometry = new THREE.BufferGeometry();
+	        //
+	        // // Three components per vertex per face (3 x 3 = 9)
+	        // var vertices = new Float32Array(faces.length * 9);
+	        //
+	        // var index;
+	        // for (var i = 0; i < faces.length; i++) {
+	        //   // Array of vertex indexes for the face
+	        //   index = faces[i][0];
+	        //
+	        //   vertices[i * 9 + 0] = earcutData.vertices[index * dim];
+	        //   vertices[i * 9 + 1] = 0;
+	        //   vertices[i * 9 + 2] = earcutData.vertices[index * dim + 1];
+	        //
+	        //   // Array of vertex indexes for the face
+	        //   index = faces[i][1];
+	        //
+	        //   vertices[i * 9 + 3] = earcutData.vertices[index * dim];
+	        //   vertices[i * 9 + 4] = 0;
+	        //   vertices[i * 9 + 5] = earcutData.vertices[index * dim + 1];
+	        //
+	        //   // Array of vertex indexes for the face
+	        //   index = faces[i][2];
+	        //
+	        //   vertices[i * 9 + 6] = earcutData.vertices[index * dim];
+	        //   vertices[i * 9 + 7] = 0;
+	        //   vertices[i * 9 + 8] = earcutData.vertices[index * dim + 1];
+	        // }
+	
+	        // var shape = new THREE.Shape();
+	        //
+	        // var outer = coordinates.shift();
+	        // var inners = coordinates;
+	        //
+	        // if (!outer || !outer[0] || !Array.isArray(outer[0])) {
+	        //   return;
+	        // }
+	        //
+	        // // Create outer shape
+	        // outer.forEach((coord, index) => {
+	        //   var latlon = LatLon(coord[1], coord[0]);
+	        //   var point = this._layer._world.latLonToPoint(latlon);
+	        //
+	        //   // Move if first coordinate
+	        //   if (index === 0) {
+	        //     shape.moveTo(point.x + offset.x, point.y + offset.y);
+	        //   } else {
+	        //     shape.lineTo(point.x + offset.x, point.y + offset.y);
+	        //   }
+	        // });
+	        //
+	        // var geom = new THREE.ShapeGeometry(shape);
+	        // var mesh = new THREE.Mesh(geom, new THREE.MeshBasicMaterial({
+	        //   color: 0x0000ff,
+	        //   side: THREE.BackSide,
+	        //   depthWrite: false
+	        // }));
+	        //
+	        // // Offset
+	        // // mesh.position.x = -1 * offset.x;
+	        // // mesh.position.z = -1 * offset.y;
+	        //
+	        // mesh.rotation.x = 90 * Math.PI / 180;
+	        //
+	        // this._mesh.add(mesh);
+	      });
+	
+	      // Skip if no faces
+	      //
+	      // Need to check way before this if there are no faces, before even doing
+	      // earcut triangulation.
+	      if (facesCount === 0) {
+	        this._ready = true;
+	        return;
+	      }
+	
+	      var geometry = new _three2['default'].BufferGeometry();
+	
+	      // Three components per vertex per face (3 x 3 = 9)
+	      var vertices = new Float32Array(facesCount * 9);
+	
+	      var dim = 2;
+	
+	      var index;
+	      var _faces;
+	      var _vertices;
+	      var lastIndex = 0;
+	      for (var i = 0; i < allFaces.length; i++) {
+	        _faces = allFaces[i];
+	        _vertices = allVertices[i];
+	
+	        for (var j = 0; j < _faces.length; j++) {
+	          // Array of vertex indexes for the face
+	          index = _faces[j][0];
+	
+	          vertices[lastIndex * 9 + 0] = _vertices[index * dim] + offset.x;
+	          vertices[lastIndex * 9 + 1] = 0;
+	          vertices[lastIndex * 9 + 2] = _vertices[index * dim + 1] + offset.y;
+	
+	          // Array of vertex indexes for the face
+	          index = _faces[j][1];
+	
+	          vertices[lastIndex * 9 + 3] = _vertices[index * dim] + offset.x;
+	          vertices[lastIndex * 9 + 4] = 0;
+	          vertices[lastIndex * 9 + 5] = _vertices[index * dim + 1] + offset.y;
+	
+	          // Array of vertex indexes for the face
+	          index = _faces[j][2];
+	
+	          vertices[lastIndex * 9 + 6] = _vertices[index * dim] + offset.x;
+	          vertices[lastIndex * 9 + 7] = 0;
+	          vertices[lastIndex * 9 + 8] = _vertices[index * dim + 1] + offset.y;
+	
+	          lastIndex++;
+	        }
+	      }
+	
+	      // itemSize = 3 because there are 3 values (components) per vertex
+	      geometry.addAttribute('position', new _three2['default'].BufferAttribute(vertices, 3));
+	      var material = new _three2['default'].MeshBasicMaterial({
+	        color: 0x0000ff,
+	        side: _three2['default'].BackSide,
+	        depthWrite: false
+	      });
+	      var mesh = new _three2['default'].Mesh(geometry, material);
+	      mesh.renderOrder = 1;
+	
+	      this._mesh.add(mesh);
+	
+	      this._ready = true;
+	    }
+	  }, {
+	    key: '_toEarcut',
+	    value: function _toEarcut(data) {
+	      var dim = data[0][0].length;
+	      var result = { vertices: [], holes: [], dimensions: dim };
+	      var holeIndex = 0;
+	
+	      for (var i = 0; i < data.length; i++) {
+	        for (var j = 0; j < data[i].length; j++) {
+	          for (var d = 0; d < dim; d++) {
+	            result.vertices.push(data[i][j][d]);
+	          }
+	        }
+	        if (i > 0) {
+	          holeIndex += data[i - 1].length;
+	          result.holes.push(holeIndex);
+	        }
+	      }
+	
+	      return result;
+	    }
+	  }, {
+	    key: '_triangulate',
+	    value: function _triangulate(contour, holes, dim) {
+	      // console.time('earcut');
+	
+	      var faces = (0, _earcut2['default'])(contour, holes, dim);
+	      var result = [];
+	
+	      for (i = 0, il = faces.length; i < il; i += 3) {
+	        result.push(faces.slice(i, i + 3));
+	      }
+	
+	      // console.timeEnd('earcut');
+	
+	      return result;
+	    }
+	  }, {
+	    key: '_abortRequest',
+	    value: function _abortRequest() {
+	      if (!this._request) {
+	        return;
+	      }
+	
+	      this._request.abort();
+	    }
+	  }]);
+	
+	  return TopoJSONTile;
+	})(_Tile3['default']);
+	
+	exports['default'] = function (quadcode, path, layer) {
+	  return new TopoJSONTile(quadcode, path, layer);
+	};
+	
+	;
+	module.exports = exports['default'];
+
+/***/ },
+/* 52 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+	  * Reqwest! A general purpose XHR connection manager
+	  * license MIT (c) Dustin Diaz 2015
+	  * https://github.com/ded/reqwest
+	  */
+	
+	!function (name, context, definition) {
+	  if (typeof module != 'undefined' && module.exports) module.exports = definition()
+	  else if (true) !(__WEBPACK_AMD_DEFINE_FACTORY__ = (definition), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
+	  else context[name] = definition()
+	}('reqwest', this, function () {
+	
+	  var context = this
+	
+	  if ('window' in context) {
+	    var doc = document
+	      , byTag = 'getElementsByTagName'
+	      , head = doc[byTag]('head')[0]
+	  } else {
+	    var XHR2
+	    try {
+	      XHR2 = __webpack_require__(53)
+	    } catch (ex) {
+	      throw new Error('Peer dependency `xhr2` required! Please npm install xhr2')
+	    }
+	  }
+	
+	
+	  var httpsRe = /^http/
+	    , protocolRe = /(^\w+):\/\//
+	    , twoHundo = /^(20\d|1223)$/ //http://stackoverflow.com/questions/10046972/msie-returns-status-code-of-1223-for-ajax-request
+	    , readyState = 'readyState'
+	    , contentType = 'Content-Type'
+	    , requestedWith = 'X-Requested-With'
+	    , uniqid = 0
+	    , callbackPrefix = 'reqwest_' + (+new Date())
+	    , lastValue // data stored by the most recent JSONP callback
+	    , xmlHttpRequest = 'XMLHttpRequest'
+	    , xDomainRequest = 'XDomainRequest'
+	    , noop = function () {}
+	
+	    , isArray = typeof Array.isArray == 'function'
+	        ? Array.isArray
+	        : function (a) {
+	            return a instanceof Array
+	          }
+	
+	    , defaultHeaders = {
+	          'contentType': 'application/x-www-form-urlencoded'
+	        , 'requestedWith': xmlHttpRequest
+	        , 'accept': {
+	              '*':  'text/javascript, text/html, application/xml, text/xml, */*'
+	            , 'xml':  'application/xml, text/xml'
+	            , 'html': 'text/html'
+	            , 'text': 'text/plain'
+	            , 'json': 'application/json, text/javascript'
+	            , 'js':   'application/javascript, text/javascript'
+	          }
+	      }
+	
+	    , xhr = function(o) {
+	        // is it x-domain
+	        if (o['crossOrigin'] === true) {
+	          var xhr = context[xmlHttpRequest] ? new XMLHttpRequest() : null
+	          if (xhr && 'withCredentials' in xhr) {
+	            return xhr
+	          } else if (context[xDomainRequest]) {
+	            return new XDomainRequest()
+	          } else {
+	            throw new Error('Browser does not support cross-origin requests')
+	          }
+	        } else if (context[xmlHttpRequest]) {
+	          return new XMLHttpRequest()
+	        } else if (XHR2) {
+	          return new XHR2()
+	        } else {
+	          return new ActiveXObject('Microsoft.XMLHTTP')
+	        }
+	      }
+	    , globalSetupOptions = {
+	        dataFilter: function (data) {
+	          return data
+	        }
+	      }
+	
+	  function succeed(r) {
+	    var protocol = protocolRe.exec(r.url)
+	    protocol = (protocol && protocol[1]) || context.location.protocol
+	    return httpsRe.test(protocol) ? twoHundo.test(r.request.status) : !!r.request.response
+	  }
+	
+	  function handleReadyState(r, success, error) {
+	    return function () {
+	      // use _aborted to mitigate against IE err c00c023f
+	      // (can't read props on aborted request objects)
+	      if (r._aborted) return error(r.request)
+	      if (r._timedOut) return error(r.request, 'Request is aborted: timeout')
+	      if (r.request && r.request[readyState] == 4) {
+	        r.request.onreadystatechange = noop
+	        if (succeed(r)) success(r.request)
+	        else
+	          error(r.request)
+	      }
+	    }
+	  }
+	
+	  function setHeaders(http, o) {
+	    var headers = o['headers'] || {}
+	      , h
+	
+	    headers['Accept'] = headers['Accept']
+	      || defaultHeaders['accept'][o['type']]
+	      || defaultHeaders['accept']['*']
+	
+	    var isAFormData = typeof FormData !== 'undefined' && (o['data'] instanceof FormData);
+	    // breaks cross-origin requests with legacy browsers
+	    if (!o['crossOrigin'] && !headers[requestedWith]) headers[requestedWith] = defaultHeaders['requestedWith']
+	    if (!headers[contentType] && !isAFormData) headers[contentType] = o['contentType'] || defaultHeaders['contentType']
+	    for (h in headers)
+	      headers.hasOwnProperty(h) && 'setRequestHeader' in http && http.setRequestHeader(h, headers[h])
+	  }
+	
+	  function setCredentials(http, o) {
+	    if (typeof o['withCredentials'] !== 'undefined' && typeof http.withCredentials !== 'undefined') {
+	      http.withCredentials = !!o['withCredentials']
+	    }
+	  }
+	
+	  function generalCallback(data) {
+	    lastValue = data
+	  }
+	
+	  function urlappend (url, s) {
+	    return url + (/\?/.test(url) ? '&' : '?') + s
+	  }
+	
+	  function handleJsonp(o, fn, err, url) {
+	    var reqId = uniqid++
+	      , cbkey = o['jsonpCallback'] || 'callback' // the 'callback' key
+	      , cbval = o['jsonpCallbackName'] || reqwest.getcallbackPrefix(reqId)
+	      , cbreg = new RegExp('((^|\\?|&)' + cbkey + ')=([^&]+)')
+	      , match = url.match(cbreg)
+	      , script = doc.createElement('script')
+	      , loaded = 0
+	      , isIE10 = navigator.userAgent.indexOf('MSIE 10.0') !== -1
+	
+	    if (match) {
+	      if (match[3] === '?') {
+	        url = url.replace(cbreg, '$1=' + cbval) // wildcard callback func name
+	      } else {
+	        cbval = match[3] // provided callback func name
+	      }
+	    } else {
+	      url = urlappend(url, cbkey + '=' + cbval) // no callback details, add 'em
+	    }
+	
+	    context[cbval] = generalCallback
+	
+	    script.type = 'text/javascript'
+	    script.src = url
+	    script.async = true
+	    if (typeof script.onreadystatechange !== 'undefined' && !isIE10) {
+	      // need this for IE due to out-of-order onreadystatechange(), binding script
+	      // execution to an event listener gives us control over when the script
+	      // is executed. See http://jaubourg.net/2010/07/loading-script-as-onclick-handler-of.html
+	      script.htmlFor = script.id = '_reqwest_' + reqId
+	    }
+	
+	    script.onload = script.onreadystatechange = function () {
+	      if ((script[readyState] && script[readyState] !== 'complete' && script[readyState] !== 'loaded') || loaded) {
+	        return false
+	      }
+	      script.onload = script.onreadystatechange = null
+	      script.onclick && script.onclick()
+	      // Call the user callback with the last value stored and clean up values and scripts.
+	      fn(lastValue)
+	      lastValue = undefined
+	      head.removeChild(script)
+	      loaded = 1
+	    }
+	
+	    // Add the script to the DOM head
+	    head.appendChild(script)
+	
+	    // Enable JSONP timeout
+	    return {
+	      abort: function () {
+	        script.onload = script.onreadystatechange = null
+	        err({}, 'Request is aborted: timeout', {})
+	        lastValue = undefined
+	        head.removeChild(script)
+	        loaded = 1
+	      }
+	    }
+	  }
+	
+	  function getRequest(fn, err) {
+	    var o = this.o
+	      , method = (o['method'] || 'GET').toUpperCase()
+	      , url = typeof o === 'string' ? o : o['url']
+	      // convert non-string objects to query-string form unless o['processData'] is false
+	      , data = (o['processData'] !== false && o['data'] && typeof o['data'] !== 'string')
+	        ? reqwest.toQueryString(o['data'])
+	        : (o['data'] || null)
+	      , http
+	      , sendWait = false
+	
+	    // if we're working on a GET request and we have data then we should append
+	    // query string to end of URL and not post data
+	    if ((o['type'] == 'jsonp' || method == 'GET') && data) {
+	      url = urlappend(url, data)
+	      data = null
+	    }
+	
+	    if (o['type'] == 'jsonp') return handleJsonp(o, fn, err, url)
+	
+	    // get the xhr from the factory if passed
+	    // if the factory returns null, fall-back to ours
+	    http = (o.xhr && o.xhr(o)) || xhr(o)
+	
+	    http.open(method, url, o['async'] === false ? false : true)
+	    setHeaders(http, o)
+	    setCredentials(http, o)
+	    if (context[xDomainRequest] && http instanceof context[xDomainRequest]) {
+	        http.onload = fn
+	        http.onerror = err
+	        // NOTE: see
+	        // http://social.msdn.microsoft.com/Forums/en-US/iewebdevelopment/thread/30ef3add-767c-4436-b8a9-f1ca19b4812e
+	        http.onprogress = function() {}
+	        sendWait = true
+	    } else {
+	      http.onreadystatechange = handleReadyState(this, fn, err)
+	    }
+	    o['before'] && o['before'](http)
+	    if (sendWait) {
+	      setTimeout(function () {
+	        http.send(data)
+	      }, 200)
+	    } else {
+	      http.send(data)
+	    }
+	    return http
+	  }
+	
+	  function Reqwest(o, fn) {
+	    this.o = o
+	    this.fn = fn
+	
+	    init.apply(this, arguments)
+	  }
+	
+	  function setType(header) {
+	    // json, javascript, text/plain, text/html, xml
+	    if (header === null) return undefined; //In case of no content-type.
+	    if (header.match('json')) return 'json'
+	    if (header.match('javascript')) return 'js'
+	    if (header.match('text')) return 'html'
+	    if (header.match('xml')) return 'xml'
+	  }
+	
+	  function init(o, fn) {
+	
+	    this.url = typeof o == 'string' ? o : o['url']
+	    this.timeout = null
+	
+	    // whether request has been fulfilled for purpose
+	    // of tracking the Promises
+	    this._fulfilled = false
+	    // success handlers
+	    this._successHandler = function(){}
+	    this._fulfillmentHandlers = []
+	    // error handlers
+	    this._errorHandlers = []
+	    // complete (both success and fail) handlers
+	    this._completeHandlers = []
+	    this._erred = false
+	    this._responseArgs = {}
+	
+	    var self = this
+	
+	    fn = fn || function () {}
+	
+	    if (o['timeout']) {
+	      this.timeout = setTimeout(function () {
+	        timedOut()
+	      }, o['timeout'])
+	    }
+	
+	    if (o['success']) {
+	      this._successHandler = function () {
+	        o['success'].apply(o, arguments)
+	      }
+	    }
+	
+	    if (o['error']) {
+	      this._errorHandlers.push(function () {
+	        o['error'].apply(o, arguments)
+	      })
+	    }
+	
+	    if (o['complete']) {
+	      this._completeHandlers.push(function () {
+	        o['complete'].apply(o, arguments)
+	      })
+	    }
+	
+	    function complete (resp) {
+	      o['timeout'] && clearTimeout(self.timeout)
+	      self.timeout = null
+	      while (self._completeHandlers.length > 0) {
+	        self._completeHandlers.shift()(resp)
+	      }
+	    }
+	
+	    function success (resp) {
+	      var type = o['type'] || resp && setType(resp.getResponseHeader('Content-Type')) // resp can be undefined in IE
+	      resp = (type !== 'jsonp') ? self.request : resp
+	      // use global data filter on response text
+	      var filteredResponse = globalSetupOptions.dataFilter(resp.responseText, type)
+	        , r = filteredResponse
+	      try {
+	        resp.responseText = r
+	      } catch (e) {
+	        // can't assign this in IE<=8, just ignore
+	      }
+	      if (r) {
+	        switch (type) {
+	        case 'json':
+	          try {
+	            resp = context.JSON ? context.JSON.parse(r) : eval('(' + r + ')')
+	          } catch (err) {
+	            return error(resp, 'Could not parse JSON in response', err)
+	          }
+	          break
+	        case 'js':
+	          resp = eval(r)
+	          break
+	        case 'html':
+	          resp = r
+	          break
+	        case 'xml':
+	          resp = resp.responseXML
+	              && resp.responseXML.parseError // IE trololo
+	              && resp.responseXML.parseError.errorCode
+	              && resp.responseXML.parseError.reason
+	            ? null
+	            : resp.responseXML
+	          break
+	        }
+	      }
+	
+	      self._responseArgs.resp = resp
+	      self._fulfilled = true
+	      fn(resp)
+	      self._successHandler(resp)
+	      while (self._fulfillmentHandlers.length > 0) {
+	        resp = self._fulfillmentHandlers.shift()(resp)
+	      }
+	
+	      complete(resp)
+	    }
+	
+	    function timedOut() {
+	      self._timedOut = true
+	      self.request.abort()
+	    }
+	
+	    function error(resp, msg, t) {
+	      resp = self.request
+	      self._responseArgs.resp = resp
+	      self._responseArgs.msg = msg
+	      self._responseArgs.t = t
+	      self._erred = true
+	      while (self._errorHandlers.length > 0) {
+	        self._errorHandlers.shift()(resp, msg, t)
+	      }
+	      complete(resp)
+	    }
+	
+	    this.request = getRequest.call(this, success, error)
+	  }
+	
+	  Reqwest.prototype = {
+	    abort: function () {
+	      this._aborted = true
+	      this.request.abort()
+	    }
+	
+	  , retry: function () {
+	      init.call(this, this.o, this.fn)
+	    }
+	
+	    /**
+	     * Small deviation from the Promises A CommonJs specification
+	     * http://wiki.commonjs.org/wiki/Promises/A
+	     */
+	
+	    /**
+	     * `then` will execute upon successful requests
+	     */
+	  , then: function (success, fail) {
+	      success = success || function () {}
+	      fail = fail || function () {}
+	      if (this._fulfilled) {
+	        this._responseArgs.resp = success(this._responseArgs.resp)
+	      } else if (this._erred) {
+	        fail(this._responseArgs.resp, this._responseArgs.msg, this._responseArgs.t)
+	      } else {
+	        this._fulfillmentHandlers.push(success)
+	        this._errorHandlers.push(fail)
+	      }
+	      return this
+	    }
+	
+	    /**
+	     * `always` will execute whether the request succeeds or fails
+	     */
+	  , always: function (fn) {
+	      if (this._fulfilled || this._erred) {
+	        fn(this._responseArgs.resp)
+	      } else {
+	        this._completeHandlers.push(fn)
+	      }
+	      return this
+	    }
+	
+	    /**
+	     * `fail` will execute when the request fails
+	     */
+	  , fail: function (fn) {
+	      if (this._erred) {
+	        fn(this._responseArgs.resp, this._responseArgs.msg, this._responseArgs.t)
+	      } else {
+	        this._errorHandlers.push(fn)
+	      }
+	      return this
+	    }
+	  , 'catch': function (fn) {
+	      return this.fail(fn)
+	    }
+	  }
+	
+	  function reqwest(o, fn) {
+	    return new Reqwest(o, fn)
+	  }
+	
+	  // normalize newline variants according to spec -> CRLF
+	  function normalize(s) {
+	    return s ? s.replace(/\r?\n/g, '\r\n') : ''
+	  }
+	
+	  function serial(el, cb) {
+	    var n = el.name
+	      , t = el.tagName.toLowerCase()
+	      , optCb = function (o) {
+	          // IE gives value="" even where there is no value attribute
+	          // 'specified' ref: http://www.w3.org/TR/DOM-Level-3-Core/core.html#ID-862529273
+	          if (o && !o['disabled'])
+	            cb(n, normalize(o['attributes']['value'] && o['attributes']['value']['specified'] ? o['value'] : o['text']))
+	        }
+	      , ch, ra, val, i
+	
+	    // don't serialize elements that are disabled or without a name
+	    if (el.disabled || !n) return
+	
+	    switch (t) {
+	    case 'input':
+	      if (!/reset|button|image|file/i.test(el.type)) {
+	        ch = /checkbox/i.test(el.type)
+	        ra = /radio/i.test(el.type)
+	        val = el.value
+	        // WebKit gives us "" instead of "on" if a checkbox has no value, so correct it here
+	        ;(!(ch || ra) || el.checked) && cb(n, normalize(ch && val === '' ? 'on' : val))
+	      }
+	      break
+	    case 'textarea':
+	      cb(n, normalize(el.value))
+	      break
+	    case 'select':
+	      if (el.type.toLowerCase() === 'select-one') {
+	        optCb(el.selectedIndex >= 0 ? el.options[el.selectedIndex] : null)
+	      } else {
+	        for (i = 0; el.length && i < el.length; i++) {
+	          el.options[i].selected && optCb(el.options[i])
+	        }
+	      }
+	      break
+	    }
+	  }
+	
+	  // collect up all form elements found from the passed argument elements all
+	  // the way down to child elements; pass a '<form>' or form fields.
+	  // called with 'this'=callback to use for serial() on each element
+	  function eachFormElement() {
+	    var cb = this
+	      , e, i
+	      , serializeSubtags = function (e, tags) {
+	          var i, j, fa
+	          for (i = 0; i < tags.length; i++) {
+	            fa = e[byTag](tags[i])
+	            for (j = 0; j < fa.length; j++) serial(fa[j], cb)
+	          }
+	        }
+	
+	    for (i = 0; i < arguments.length; i++) {
+	      e = arguments[i]
+	      if (/input|select|textarea/i.test(e.tagName)) serial(e, cb)
+	      serializeSubtags(e, [ 'input', 'select', 'textarea' ])
+	    }
+	  }
+	
+	  // standard query string style serialization
+	  function serializeQueryString() {
+	    return reqwest.toQueryString(reqwest.serializeArray.apply(null, arguments))
+	  }
+	
+	  // { 'name': 'value', ... } style serialization
+	  function serializeHash() {
+	    var hash = {}
+	    eachFormElement.apply(function (name, value) {
+	      if (name in hash) {
+	        hash[name] && !isArray(hash[name]) && (hash[name] = [hash[name]])
+	        hash[name].push(value)
+	      } else hash[name] = value
+	    }, arguments)
+	    return hash
+	  }
+	
+	  // [ { name: 'name', value: 'value' }, ... ] style serialization
+	  reqwest.serializeArray = function () {
+	    var arr = []
+	    eachFormElement.apply(function (name, value) {
+	      arr.push({name: name, value: value})
+	    }, arguments)
+	    return arr
+	  }
+	
+	  reqwest.serialize = function () {
+	    if (arguments.length === 0) return ''
+	    var opt, fn
+	      , args = Array.prototype.slice.call(arguments, 0)
+	
+	    opt = args.pop()
+	    opt && opt.nodeType && args.push(opt) && (opt = null)
+	    opt && (opt = opt.type)
+	
+	    if (opt == 'map') fn = serializeHash
+	    else if (opt == 'array') fn = reqwest.serializeArray
+	    else fn = serializeQueryString
+	
+	    return fn.apply(null, args)
+	  }
+	
+	  reqwest.toQueryString = function (o, trad) {
+	    var prefix, i
+	      , traditional = trad || false
+	      , s = []
+	      , enc = encodeURIComponent
+	      , add = function (key, value) {
+	          // If value is a function, invoke it and return its value
+	          value = ('function' === typeof value) ? value() : (value == null ? '' : value)
+	          s[s.length] = enc(key) + '=' + enc(value)
+	        }
+	    // If an array was passed in, assume that it is an array of form elements.
+	    if (isArray(o)) {
+	      for (i = 0; o && i < o.length; i++) add(o[i]['name'], o[i]['value'])
+	    } else {
+	      // If traditional, encode the "old" way (the way 1.3.2 or older
+	      // did it), otherwise encode params recursively.
+	      for (prefix in o) {
+	        if (o.hasOwnProperty(prefix)) buildParams(prefix, o[prefix], traditional, add)
+	      }
+	    }
+	
+	    // spaces should be + according to spec
+	    return s.join('&').replace(/%20/g, '+')
+	  }
+	
+	  function buildParams(prefix, obj, traditional, add) {
+	    var name, i, v
+	      , rbracket = /\[\]$/
+	
+	    if (isArray(obj)) {
+	      // Serialize array item.
+	      for (i = 0; obj && i < obj.length; i++) {
+	        v = obj[i]
+	        if (traditional || rbracket.test(prefix)) {
+	          // Treat each array item as a scalar.
+	          add(prefix, v)
+	        } else {
+	          buildParams(prefix + '[' + (typeof v === 'object' ? i : '') + ']', v, traditional, add)
+	        }
+	      }
+	    } else if (obj && obj.toString() === '[object Object]') {
+	      // Serialize object item.
+	      for (name in obj) {
+	        buildParams(prefix + '[' + name + ']', obj[name], traditional, add)
+	      }
+	
+	    } else {
+	      // Serialize scalar item.
+	      add(prefix, obj)
+	    }
+	  }
+	
+	  reqwest.getcallbackPrefix = function () {
+	    return callbackPrefix
+	  }
+	
+	  // jQuery and Zepto compatibility, differences can be remapped here so you can call
+	  // .ajax.compat(options, callback)
+	  reqwest.compat = function (o, fn) {
+	    if (o) {
+	      o['type'] && (o['method'] = o['type']) && delete o['type']
+	      o['dataType'] && (o['type'] = o['dataType'])
+	      o['jsonpCallback'] && (o['jsonpCallbackName'] = o['jsonpCallback']) && delete o['jsonpCallback']
+	      o['jsonp'] && (o['jsonpCallback'] = o['jsonp'])
+	    }
+	    return new Reqwest(o, fn)
+	  }
+	
+	  reqwest.ajaxSetup = function (options) {
+	    options = options || {}
+	    for (var k in options) {
+	      globalSetupOptions[k] = options[k]
+	    }
+	  }
+	
+	  return reqwest
+	});
+
+
+/***/ },
+/* 53 */
+/***/ function(module, exports) {
+
+	/* (ignored) */
+
+/***/ },
+/* 54 */
+/***/ function(module, exports, __webpack_require__) {
+
+	(function (global, factory) {
+	   true ? factory(exports) :
+	  typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	  (factory((global.topojson = {})));
+	}(this, function (exports) { 'use strict';
+	
+	  function noop() {}
+	
+	  function absolute(transform) {
+	    if (!transform) return noop;
+	    var x0,
+	        y0,
+	        kx = transform.scale[0],
+	        ky = transform.scale[1],
+	        dx = transform.translate[0],
+	        dy = transform.translate[1];
+	    return function(point, i) {
+	      if (!i) x0 = y0 = 0;
+	      point[0] = (x0 += point[0]) * kx + dx;
+	      point[1] = (y0 += point[1]) * ky + dy;
+	    };
+	  }
+	
+	  function relative(transform) {
+	    if (!transform) return noop;
+	    var x0,
+	        y0,
+	        kx = transform.scale[0],
+	        ky = transform.scale[1],
+	        dx = transform.translate[0],
+	        dy = transform.translate[1];
+	    return function(point, i) {
+	      if (!i) x0 = y0 = 0;
+	      var x1 = (point[0] - dx) / kx | 0,
+	          y1 = (point[1] - dy) / ky | 0;
+	      point[0] = x1 - x0;
+	      point[1] = y1 - y0;
+	      x0 = x1;
+	      y0 = y1;
+	    };
+	  }
+	
+	  function reverse(array, n) {
+	    var t, j = array.length, i = j - n;
+	    while (i < --j) t = array[i], array[i++] = array[j], array[j] = t;
+	  }
+	
+	  function bisect(a, x) {
+	    var lo = 0, hi = a.length;
+	    while (lo < hi) {
+	      var mid = lo + hi >>> 1;
+	      if (a[mid] < x) lo = mid + 1;
+	      else hi = mid;
+	    }
+	    return lo;
+	  }
+	
+	  function feature(topology, o) {
+	    return o.type === "GeometryCollection" ? {
+	      type: "FeatureCollection",
+	      features: o.geometries.map(function(o) { return feature$1(topology, o); })
+	    } : feature$1(topology, o);
+	  }
+	
+	  function feature$1(topology, o) {
+	    var f = {
+	      type: "Feature",
+	      id: o.id,
+	      properties: o.properties || {},
+	      geometry: object(topology, o)
+	    };
+	    if (o.id == null) delete f.id;
+	    return f;
+	  }
+	
+	  function object(topology, o) {
+	    var absolute$$ = absolute(topology.transform),
+	        arcs = topology.arcs;
+	
+	    function arc(i, points) {
+	      if (points.length) points.pop();
+	      for (var a = arcs[i < 0 ? ~i : i], k = 0, n = a.length, p; k < n; ++k) {
+	        points.push(p = a[k].slice());
+	        absolute$$(p, k);
+	      }
+	      if (i < 0) reverse(points, n);
+	    }
+	
+	    function point(p) {
+	      p = p.slice();
+	      absolute$$(p, 0);
+	      return p;
+	    }
+	
+	    function line(arcs) {
+	      var points = [];
+	      for (var i = 0, n = arcs.length; i < n; ++i) arc(arcs[i], points);
+	      if (points.length < 2) points.push(points[0].slice());
+	      return points;
+	    }
+	
+	    function ring(arcs) {
+	      var points = line(arcs);
+	      while (points.length < 4) points.push(points[0].slice());
+	      return points;
+	    }
+	
+	    function polygon(arcs) {
+	      return arcs.map(ring);
+	    }
+	
+	    function geometry(o) {
+	      var t = o.type;
+	      return t === "GeometryCollection" ? {type: t, geometries: o.geometries.map(geometry)}
+	          : t in geometryType ? {type: t, coordinates: geometryType[t](o)}
+	          : null;
+	    }
+	
+	    var geometryType = {
+	      Point: function(o) { return point(o.coordinates); },
+	      MultiPoint: function(o) { return o.coordinates.map(point); },
+	      LineString: function(o) { return line(o.arcs); },
+	      MultiLineString: function(o) { return o.arcs.map(line); },
+	      Polygon: function(o) { return polygon(o.arcs); },
+	      MultiPolygon: function(o) { return o.arcs.map(polygon); }
+	    };
+	
+	    return geometry(o);
+	  }
+	
+	  function stitchArcs(topology, arcs) {
+	    var stitchedArcs = {},
+	        fragmentByStart = {},
+	        fragmentByEnd = {},
+	        fragments = [],
+	        emptyIndex = -1;
+	
+	    // Stitch empty arcs first, since they may be subsumed by other arcs.
+	    arcs.forEach(function(i, j) {
+	      var arc = topology.arcs[i < 0 ? ~i : i], t;
+	      if (arc.length < 3 && !arc[1][0] && !arc[1][1]) {
+	        t = arcs[++emptyIndex], arcs[emptyIndex] = i, arcs[j] = t;
+	      }
+	    });
+	
+	    arcs.forEach(function(i) {
+	      var e = ends(i),
+	          start = e[0],
+	          end = e[1],
+	          f, g;
+	
+	      if (f = fragmentByEnd[start]) {
+	        delete fragmentByEnd[f.end];
+	        f.push(i);
+	        f.end = end;
+	        if (g = fragmentByStart[end]) {
+	          delete fragmentByStart[g.start];
+	          var fg = g === f ? f : f.concat(g);
+	          fragmentByStart[fg.start = f.start] = fragmentByEnd[fg.end = g.end] = fg;
+	        } else {
+	          fragmentByStart[f.start] = fragmentByEnd[f.end] = f;
+	        }
+	      } else if (f = fragmentByStart[end]) {
+	        delete fragmentByStart[f.start];
+	        f.unshift(i);
+	        f.start = start;
+	        if (g = fragmentByEnd[start]) {
+	          delete fragmentByEnd[g.end];
+	          var gf = g === f ? f : g.concat(f);
+	          fragmentByStart[gf.start = g.start] = fragmentByEnd[gf.end = f.end] = gf;
+	        } else {
+	          fragmentByStart[f.start] = fragmentByEnd[f.end] = f;
+	        }
+	      } else {
+	        f = [i];
+	        fragmentByStart[f.start = start] = fragmentByEnd[f.end = end] = f;
+	      }
+	    });
+	
+	    function ends(i) {
+	      var arc = topology.arcs[i < 0 ? ~i : i], p0 = arc[0], p1;
+	      if (topology.transform) p1 = [0, 0], arc.forEach(function(dp) { p1[0] += dp[0], p1[1] += dp[1]; });
+	      else p1 = arc[arc.length - 1];
+	      return i < 0 ? [p1, p0] : [p0, p1];
+	    }
+	
+	    function flush(fragmentByEnd, fragmentByStart) {
+	      for (var k in fragmentByEnd) {
+	        var f = fragmentByEnd[k];
+	        delete fragmentByStart[f.start];
+	        delete f.start;
+	        delete f.end;
+	        f.forEach(function(i) { stitchedArcs[i < 0 ? ~i : i] = 1; });
+	        fragments.push(f);
+	      }
+	    }
+	
+	    flush(fragmentByEnd, fragmentByStart);
+	    flush(fragmentByStart, fragmentByEnd);
+	    arcs.forEach(function(i) { if (!stitchedArcs[i < 0 ? ~i : i]) fragments.push([i]); });
+	
+	    return fragments;
+	  }
+	
+	  function mesh(topology) {
+	    return object(topology, meshArcs.apply(this, arguments));
+	  }
+	
+	  function meshArcs(topology, o, filter) {
+	    var arcs = [];
+	
+	    function arc(i) {
+	      var j = i < 0 ? ~i : i;
+	      (geomsByArc[j] || (geomsByArc[j] = [])).push({i: i, g: geom});
+	    }
+	
+	    function line(arcs) {
+	      arcs.forEach(arc);
+	    }
+	
+	    function polygon(arcs) {
+	      arcs.forEach(line);
+	    }
+	
+	    function geometry(o) {
+	      if (o.type === "GeometryCollection") o.geometries.forEach(geometry);
+	      else if (o.type in geometryType) geom = o, geometryType[o.type](o.arcs);
+	    }
+	
+	    if (arguments.length > 1) {
+	      var geomsByArc = [],
+	          geom;
+	
+	      var geometryType = {
+	        LineString: line,
+	        MultiLineString: polygon,
+	        Polygon: polygon,
+	        MultiPolygon: function(arcs) { arcs.forEach(polygon); }
+	      };
+	
+	      geometry(o);
+	
+	      geomsByArc.forEach(arguments.length < 3
+	          ? function(geoms) { arcs.push(geoms[0].i); }
+	          : function(geoms) { if (filter(geoms[0].g, geoms[geoms.length - 1].g)) arcs.push(geoms[0].i); });
+	    } else {
+	      for (var i = 0, n = topology.arcs.length; i < n; ++i) arcs.push(i);
+	    }
+	
+	    return {type: "MultiLineString", arcs: stitchArcs(topology, arcs)};
+	  }
+	
+	  function triangle(triangle) {
+	    var a = triangle[0], b = triangle[1], c = triangle[2];
+	    return Math.abs((a[0] - c[0]) * (b[1] - a[1]) - (a[0] - b[0]) * (c[1] - a[1]));
+	  }
+	
+	  function ring(ring) {
+	    var i = -1,
+	        n = ring.length,
+	        a,
+	        b = ring[n - 1],
+	        area = 0;
+	
+	    while (++i < n) {
+	      a = b;
+	      b = ring[i];
+	      area += a[0] * b[1] - a[1] * b[0];
+	    }
+	
+	    return area / 2;
+	  }
+	
+	  function merge(topology) {
+	    return object(topology, mergeArcs.apply(this, arguments));
+	  }
+	
+	  function mergeArcs(topology, objects) {
+	    var polygonsByArc = {},
+	        polygons = [],
+	        components = [];
+	
+	    objects.forEach(function(o) {
+	      if (o.type === "Polygon") register(o.arcs);
+	      else if (o.type === "MultiPolygon") o.arcs.forEach(register);
+	    });
+	
+	    function register(polygon) {
+	      polygon.forEach(function(ring$$) {
+	        ring$$.forEach(function(arc) {
+	          (polygonsByArc[arc = arc < 0 ? ~arc : arc] || (polygonsByArc[arc] = [])).push(polygon);
+	        });
+	      });
+	      polygons.push(polygon);
+	    }
+	
+	    function exterior(ring$$) {
+	      return ring(object(topology, {type: "Polygon", arcs: [ring$$]}).coordinates[0]) > 0; // TODO allow spherical?
+	    }
+	
+	    polygons.forEach(function(polygon) {
+	      if (!polygon._) {
+	        var component = [],
+	            neighbors = [polygon];
+	        polygon._ = 1;
+	        components.push(component);
+	        while (polygon = neighbors.pop()) {
+	          component.push(polygon);
+	          polygon.forEach(function(ring$$) {
+	            ring$$.forEach(function(arc) {
+	              polygonsByArc[arc < 0 ? ~arc : arc].forEach(function(polygon) {
+	                if (!polygon._) {
+	                  polygon._ = 1;
+	                  neighbors.push(polygon);
+	                }
+	              });
+	            });
+	          });
+	        }
+	      }
+	    });
+	
+	    polygons.forEach(function(polygon) {
+	      delete polygon._;
+	    });
+	
+	    return {
+	      type: "MultiPolygon",
+	      arcs: components.map(function(polygons) {
+	        var arcs = [], n;
+	
+	        // Extract the exterior (unique) arcs.
+	        polygons.forEach(function(polygon) {
+	          polygon.forEach(function(ring$$) {
+	            ring$$.forEach(function(arc) {
+	              if (polygonsByArc[arc < 0 ? ~arc : arc].length < 2) {
+	                arcs.push(arc);
+	              }
+	            });
+	          });
+	        });
+	
+	        // Stitch the arcs into one or more rings.
+	        arcs = stitchArcs(topology, arcs);
+	
+	        // If more than one ring is returned,
+	        // at most one of these rings can be the exterior;
+	        // this exterior ring has the same winding order
+	        // as any exterior ring in the original polygons.
+	        if ((n = arcs.length) > 1) {
+	          var sgn = exterior(polygons[0][0]);
+	          for (var i = 0, t; i < n; ++i) {
+	            if (sgn === exterior(arcs[i])) {
+	              t = arcs[0], arcs[0] = arcs[i], arcs[i] = t;
+	              break;
+	            }
+	          }
+	        }
+	
+	        return arcs;
+	      })
+	    };
+	  }
+	
+	  function neighbors(objects) {
+	    var indexesByArc = {}, // arc index -> array of object indexes
+	        neighbors = objects.map(function() { return []; });
+	
+	    function line(arcs, i) {
+	      arcs.forEach(function(a) {
+	        if (a < 0) a = ~a;
+	        var o = indexesByArc[a];
+	        if (o) o.push(i);
+	        else indexesByArc[a] = [i];
+	      });
+	    }
+	
+	    function polygon(arcs, i) {
+	      arcs.forEach(function(arc) { line(arc, i); });
+	    }
+	
+	    function geometry(o, i) {
+	      if (o.type === "GeometryCollection") o.geometries.forEach(function(o) { geometry(o, i); });
+	      else if (o.type in geometryType) geometryType[o.type](o.arcs, i);
+	    }
+	
+	    var geometryType = {
+	      LineString: line,
+	      MultiLineString: polygon,
+	      Polygon: polygon,
+	      MultiPolygon: function(arcs, i) { arcs.forEach(function(arc) { polygon(arc, i); }); }
+	    };
+	
+	    objects.forEach(geometry);
+	
+	    for (var i in indexesByArc) {
+	      for (var indexes = indexesByArc[i], m = indexes.length, j = 0; j < m; ++j) {
+	        for (var k = j + 1; k < m; ++k) {
+	          var ij = indexes[j], ik = indexes[k], n;
+	          if ((n = neighbors[ij])[i = bisect(n, ik)] !== ik) n.splice(i, 0, ik);
+	          if ((n = neighbors[ik])[i = bisect(n, ij)] !== ij) n.splice(i, 0, ij);
+	        }
+	      }
+	    }
+	
+	    return neighbors;
+	  }
+	
+	  function compareArea(a, b) {
+	    return a[1][2] - b[1][2];
+	  }
+	
+	  function minAreaHeap() {
+	    var heap = {},
+	        array = [],
+	        size = 0;
+	
+	    heap.push = function(object) {
+	      up(array[object._ = size] = object, size++);
+	      return size;
+	    };
+	
+	    heap.pop = function() {
+	      if (size <= 0) return;
+	      var removed = array[0], object;
+	      if (--size > 0) object = array[size], down(array[object._ = 0] = object, 0);
+	      return removed;
+	    };
+	
+	    heap.remove = function(removed) {
+	      var i = removed._, object;
+	      if (array[i] !== removed) return; // invalid request
+	      if (i !== --size) object = array[size], (compareArea(object, removed) < 0 ? up : down)(array[object._ = i] = object, i);
+	      return i;
+	    };
+	
+	    function up(object, i) {
+	      while (i > 0) {
+	        var j = ((i + 1) >> 1) - 1,
+	            parent = array[j];
+	        if (compareArea(object, parent) >= 0) break;
+	        array[parent._ = i] = parent;
+	        array[object._ = i = j] = object;
+	      }
+	    }
+	
+	    function down(object, i) {
+	      while (true) {
+	        var r = (i + 1) << 1,
+	            l = r - 1,
+	            j = i,
+	            child = array[j];
+	        if (l < size && compareArea(array[l], child) < 0) child = array[j = l];
+	        if (r < size && compareArea(array[r], child) < 0) child = array[j = r];
+	        if (j === i) break;
+	        array[child._ = i] = child;
+	        array[object._ = i = j] = object;
+	      }
+	    }
+	
+	    return heap;
+	  }
+	
+	  function presimplify(topology, triangleArea) {
+	    var absolute$$ = absolute(topology.transform),
+	        relative$$ = relative(topology.transform),
+	        heap = minAreaHeap();
+	
+	    if (!triangleArea) triangleArea = triangle;
+	
+	    topology.arcs.forEach(function(arc) {
+	      var triangles = [],
+	          maxArea = 0,
+	          triangle,
+	          i,
+	          n,
+	          p;
+	
+	      // To store each point’s effective area, we create a new array rather than
+	      // extending the passed-in point to workaround a Chrome/V8 bug (getting
+	      // stuck in smi mode). For midpoints, the initial effective area of
+	      // Infinity will be computed in the next step.
+	      for (i = 0, n = arc.length; i < n; ++i) {
+	        p = arc[i];
+	        absolute$$(arc[i] = [p[0], p[1], Infinity], i);
+	      }
+	
+	      for (i = 1, n = arc.length - 1; i < n; ++i) {
+	        triangle = arc.slice(i - 1, i + 2);
+	        triangle[1][2] = triangleArea(triangle);
+	        triangles.push(triangle);
+	        heap.push(triangle);
+	      }
+	
+	      for (i = 0, n = triangles.length; i < n; ++i) {
+	        triangle = triangles[i];
+	        triangle.previous = triangles[i - 1];
+	        triangle.next = triangles[i + 1];
+	      }
+	
+	      while (triangle = heap.pop()) {
+	        var previous = triangle.previous,
+	            next = triangle.next;
+	
+	        // If the area of the current point is less than that of the previous point
+	        // to be eliminated, use the latter's area instead. This ensures that the
+	        // current point cannot be eliminated without eliminating previously-
+	        // eliminated points.
+	        if (triangle[1][2] < maxArea) triangle[1][2] = maxArea;
+	        else maxArea = triangle[1][2];
+	
+	        if (previous) {
+	          previous.next = next;
+	          previous[2] = triangle[2];
+	          update(previous);
+	        }
+	
+	        if (next) {
+	          next.previous = previous;
+	          next[0] = triangle[0];
+	          update(next);
+	        }
+	      }
+	
+	      arc.forEach(relative$$);
+	    });
+	
+	    function update(triangle) {
+	      heap.remove(triangle);
+	      triangle[1][2] = triangleArea(triangle);
+	      heap.push(triangle);
+	    }
+	
+	    return topology;
+	  }
+	
+	  var version = "1.6.24";
+	
+	  exports.version = version;
+	  exports.mesh = mesh;
+	  exports.meshArcs = meshArcs;
+	  exports.merge = merge;
+	  exports.mergeArcs = mergeArcs;
+	  exports.feature = feature;
+	  exports.neighbors = neighbors;
+	  exports.presimplify = presimplify;
+	
+	}));
+
+/***/ },
+/* 55 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	module.exports = earcut;
+	
+	function earcut(data, holeIndices, dim) {
+	
+	    dim = dim || 2;
+	
+	    var hasHoles = holeIndices && holeIndices.length,
+	        outerLen = hasHoles ? holeIndices[0] * dim : data.length,
+	        outerNode = linkedList(data, 0, outerLen, dim, true),
+	        triangles = [];
+	
+	    if (!outerNode) return triangles;
+	
+	    var minX, minY, maxX, maxY, x, y, size;
+	
+	    if (hasHoles) outerNode = eliminateHoles(data, holeIndices, outerNode, dim);
+	
+	    // if the shape is not too simple, we'll use z-order curve hash later; calculate polygon bbox
+	    if (data.length > 80 * dim) {
+	        minX = maxX = data[0];
+	        minY = maxY = data[1];
+	
+	        for (var i = dim; i < outerLen; i += dim) {
+	            x = data[i];
+	            y = data[i + 1];
+	            if (x < minX) minX = x;
+	            if (y < minY) minY = y;
+	            if (x > maxX) maxX = x;
+	            if (y > maxY) maxY = y;
+	        }
+	
+	        // minX, minY and size are later used to transform coords into integers for z-order calculation
+	        size = Math.max(maxX - minX, maxY - minY);
+	    }
+	
+	    earcutLinked(outerNode, triangles, dim, minX, minY, size);
+	
+	    return triangles;
+	}
+	
+	// create a circular doubly linked list from polygon points in the specified winding order
+	function linkedList(data, start, end, dim, clockwise) {
+	    var sum = 0,
+	        i, j, last;
+	
+	    // calculate original winding order of a polygon ring
+	    for (i = start, j = end - dim; i < end; i += dim) {
+	        sum += (data[j] - data[i]) * (data[i + 1] + data[j + 1]);
+	        j = i;
+	    }
+	
+	    // link points into circular doubly-linked list in the specified winding order
+	    if (clockwise === (sum > 0)) {
+	        for (i = start; i < end; i += dim) last = insertNode(i, data[i], data[i + 1], last);
+	    } else {
+	        for (i = end - dim; i >= start; i -= dim) last = insertNode(i, data[i], data[i + 1], last);
+	    }
+	
+	    return last;
+	}
+	
+	// eliminate colinear or duplicate points
+	function filterPoints(start, end) {
+	    if (!start) return start;
+	    if (!end) end = start;
+	
+	    var p = start,
+	        again;
+	    do {
+	        again = false;
+	
+	        if (!p.steiner && (equals(p, p.next) || area(p.prev, p, p.next) === 0)) {
+	            removeNode(p);
+	            p = end = p.prev;
+	            if (p === p.next) return null;
+	            again = true;
+	
+	        } else {
+	            p = p.next;
+	        }
+	    } while (again || p !== end);
+	
+	    return end;
+	}
+	
+	// main ear slicing loop which triangulates a polygon (given as a linked list)
+	function earcutLinked(ear, triangles, dim, minX, minY, size, pass) {
+	    if (!ear) return;
+	
+	    // interlink polygon nodes in z-order
+	    if (!pass && size) indexCurve(ear, minX, minY, size);
+	
+	    var stop = ear,
+	        prev, next;
+	
+	    // iterate through ears, slicing them one by one
+	    while (ear.prev !== ear.next) {
+	        prev = ear.prev;
+	        next = ear.next;
+	
+	        if (size ? isEarHashed(ear, minX, minY, size) : isEar(ear)) {
+	            // cut off the triangle
+	            triangles.push(prev.i / dim);
+	            triangles.push(ear.i / dim);
+	            triangles.push(next.i / dim);
+	
+	            removeNode(ear);
+	
+	            // skipping the next vertice leads to less sliver triangles
+	            ear = next.next;
+	            stop = next.next;
+	
+	            continue;
+	        }
+	
+	        ear = next;
+	
+	        // if we looped through the whole remaining polygon and can't find any more ears
+	        if (ear === stop) {
+	            // try filtering points and slicing again
+	            if (!pass) {
+	                earcutLinked(filterPoints(ear), triangles, dim, minX, minY, size, 1);
+	
+	            // if this didn't work, try curing all small self-intersections locally
+	            } else if (pass === 1) {
+	                ear = cureLocalIntersections(ear, triangles, dim);
+	                earcutLinked(ear, triangles, dim, minX, minY, size, 2);
+	
+	            // as a last resort, try splitting the remaining polygon into two
+	            } else if (pass === 2) {
+	                splitEarcut(ear, triangles, dim, minX, minY, size);
+	            }
+	
+	            break;
+	        }
+	    }
+	}
+	
+	// check whether a polygon node forms a valid ear with adjacent nodes
+	function isEar(ear) {
+	    var a = ear.prev,
+	        b = ear,
+	        c = ear.next;
+	
+	    if (area(a, b, c) >= 0) return false; // reflex, can't be an ear
+	
+	    // now make sure we don't have other points inside the potential ear
+	    var p = ear.next.next;
+	
+	    while (p !== ear.prev) {
+	        if (pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) &&
+	            area(p.prev, p, p.next) >= 0) return false;
+	        p = p.next;
+	    }
+	
+	    return true;
+	}
+	
+	function isEarHashed(ear, minX, minY, size) {
+	    var a = ear.prev,
+	        b = ear,
+	        c = ear.next;
+	
+	    if (area(a, b, c) >= 0) return false; // reflex, can't be an ear
+	
+	    // triangle bbox; min & max are calculated like this for speed
+	    var minTX = a.x < b.x ? (a.x < c.x ? a.x : c.x) : (b.x < c.x ? b.x : c.x),
+	        minTY = a.y < b.y ? (a.y < c.y ? a.y : c.y) : (b.y < c.y ? b.y : c.y),
+	        maxTX = a.x > b.x ? (a.x > c.x ? a.x : c.x) : (b.x > c.x ? b.x : c.x),
+	        maxTY = a.y > b.y ? (a.y > c.y ? a.y : c.y) : (b.y > c.y ? b.y : c.y);
+	
+	    // z-order range for the current triangle bbox;
+	    var minZ = zOrder(minTX, minTY, minX, minY, size),
+	        maxZ = zOrder(maxTX, maxTY, minX, minY, size);
+	
+	    // first look for points inside the triangle in increasing z-order
+	    var p = ear.nextZ;
+	
+	    while (p && p.z <= maxZ) {
+	        if (p !== ear.prev && p !== ear.next &&
+	            pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) &&
+	            area(p.prev, p, p.next) >= 0) return false;
+	        p = p.nextZ;
+	    }
+	
+	    // then look for points in decreasing z-order
+	    p = ear.prevZ;
+	
+	    while (p && p.z >= minZ) {
+	        if (p !== ear.prev && p !== ear.next &&
+	            pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) &&
+	            area(p.prev, p, p.next) >= 0) return false;
+	        p = p.prevZ;
+	    }
+	
+	    return true;
+	}
+	
+	// go through all polygon nodes and cure small local self-intersections
+	function cureLocalIntersections(start, triangles, dim) {
+	    var p = start;
+	    do {
+	        var a = p.prev,
+	            b = p.next.next;
+	
+	        // a self-intersection where edge (v[i-1],v[i]) intersects (v[i+1],v[i+2])
+	        if (intersects(a, p, p.next, b) && locallyInside(a, b) && locallyInside(b, a)) {
+	
+	            triangles.push(a.i / dim);
+	            triangles.push(p.i / dim);
+	            triangles.push(b.i / dim);
+	
+	            // remove two nodes involved
+	            removeNode(p);
+	            removeNode(p.next);
+	
+	            p = start = b;
+	        }
+	        p = p.next;
+	    } while (p !== start);
+	
+	    return p;
+	}
+	
+	// try splitting polygon into two and triangulate them independently
+	function splitEarcut(start, triangles, dim, minX, minY, size) {
+	    // look for a valid diagonal that divides the polygon into two
+	    var a = start;
+	    do {
+	        var b = a.next.next;
+	        while (b !== a.prev) {
+	            if (a.i !== b.i && isValidDiagonal(a, b)) {
+	                // split the polygon in two by the diagonal
+	                var c = splitPolygon(a, b);
+	
+	                // filter colinear points around the cuts
+	                a = filterPoints(a, a.next);
+	                c = filterPoints(c, c.next);
+	
+	                // run earcut on each half
+	                earcutLinked(a, triangles, dim, minX, minY, size);
+	                earcutLinked(c, triangles, dim, minX, minY, size);
+	                return;
+	            }
+	            b = b.next;
+	        }
+	        a = a.next;
+	    } while (a !== start);
+	}
+	
+	// link every hole into the outer loop, producing a single-ring polygon without holes
+	function eliminateHoles(data, holeIndices, outerNode, dim) {
+	    var queue = [],
+	        i, len, start, end, list;
+	
+	    for (i = 0, len = holeIndices.length; i < len; i++) {
+	        start = holeIndices[i] * dim;
+	        end = i < len - 1 ? holeIndices[i + 1] * dim : data.length;
+	        list = linkedList(data, start, end, dim, false);
+	        if (list === list.next) list.steiner = true;
+	        queue.push(getLeftmost(list));
+	    }
+	
+	    queue.sort(compareX);
+	
+	    // process holes from left to right
+	    for (i = 0; i < queue.length; i++) {
+	        eliminateHole(queue[i], outerNode);
+	        outerNode = filterPoints(outerNode, outerNode.next);
+	    }
+	
+	    return outerNode;
+	}
+	
+	function compareX(a, b) {
+	    return a.x - b.x;
+	}
+	
+	// find a bridge between vertices that connects hole with an outer ring and and link it
+	function eliminateHole(hole, outerNode) {
+	    outerNode = findHoleBridge(hole, outerNode);
+	    if (outerNode) {
+	        var b = splitPolygon(outerNode, hole);
+	        filterPoints(b, b.next);
+	    }
+	}
+	
+	// David Eberly's algorithm for finding a bridge between hole and outer polygon
+	function findHoleBridge(hole, outerNode) {
+	    var p = outerNode,
+	        hx = hole.x,
+	        hy = hole.y,
+	        qx = -Infinity,
+	        m;
+	
+	    // find a segment intersected by a ray from the hole's leftmost point to the left;
+	    // segment's endpoint with lesser x will be potential connection point
+	    do {
+	        if (hy <= p.y && hy >= p.next.y) {
+	            var x = p.x + (hy - p.y) * (p.next.x - p.x) / (p.next.y - p.y);
+	            if (x <= hx && x > qx) {
+	                qx = x;
+	                m = p.x < p.next.x ? p : p.next;
+	            }
+	        }
+	        p = p.next;
+	    } while (p !== outerNode);
+	
+	    if (!m) return null;
+	
+	    if (hole.x === m.x) return m.prev; // hole touches outer segment; pick lower endpoint
+	
+	    // look for points inside the triangle of hole point, segment intersection and endpoint;
+	    // if there are no points found, we have a valid connection;
+	    // otherwise choose the point of the minimum angle with the ray as connection point
+	
+	    var stop = m,
+	        tanMin = Infinity,
+	        tan;
+	
+	    p = m.next;
+	
+	    while (p !== stop) {
+	        if (hx >= p.x && p.x >= m.x &&
+	                pointInTriangle(hy < m.y ? hx : qx, hy, m.x, m.y, hy < m.y ? qx : hx, hy, p.x, p.y)) {
+	
+	            tan = Math.abs(hy - p.y) / (hx - p.x); // tangential
+	
+	            if ((tan < tanMin || (tan === tanMin && p.x > m.x)) && locallyInside(p, hole)) {
+	                m = p;
+	                tanMin = tan;
+	            }
+	        }
+	
+	        p = p.next;
+	    }
+	
+	    return m;
+	}
+	
+	// interlink polygon nodes in z-order
+	function indexCurve(start, minX, minY, size) {
+	    var p = start;
+	    do {
+	        if (p.z === null) p.z = zOrder(p.x, p.y, minX, minY, size);
+	        p.prevZ = p.prev;
+	        p.nextZ = p.next;
+	        p = p.next;
+	    } while (p !== start);
+	
+	    p.prevZ.nextZ = null;
+	    p.prevZ = null;
+	
+	    sortLinked(p);
+	}
+	
+	// Simon Tatham's linked list merge sort algorithm
+	// http://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
+	function sortLinked(list) {
+	    var i, p, q, e, tail, numMerges, pSize, qSize,
+	        inSize = 1;
+	
+	    do {
+	        p = list;
+	        list = null;
+	        tail = null;
+	        numMerges = 0;
+	
+	        while (p) {
+	            numMerges++;
+	            q = p;
+	            pSize = 0;
+	            for (i = 0; i < inSize; i++) {
+	                pSize++;
+	                q = q.nextZ;
+	                if (!q) break;
+	            }
+	
+	            qSize = inSize;
+	
+	            while (pSize > 0 || (qSize > 0 && q)) {
+	
+	                if (pSize === 0) {
+	                    e = q;
+	                    q = q.nextZ;
+	                    qSize--;
+	                } else if (qSize === 0 || !q) {
+	                    e = p;
+	                    p = p.nextZ;
+	                    pSize--;
+	                } else if (p.z <= q.z) {
+	                    e = p;
+	                    p = p.nextZ;
+	                    pSize--;
+	                } else {
+	                    e = q;
+	                    q = q.nextZ;
+	                    qSize--;
+	                }
+	
+	                if (tail) tail.nextZ = e;
+	                else list = e;
+	
+	                e.prevZ = tail;
+	                tail = e;
+	            }
+	
+	            p = q;
+	        }
+	
+	        tail.nextZ = null;
+	        inSize *= 2;
+	
+	    } while (numMerges > 1);
+	
+	    return list;
+	}
+	
+	// z-order of a point given coords and size of the data bounding box
+	function zOrder(x, y, minX, minY, size) {
+	    // coords are transformed into non-negative 15-bit integer range
+	    x = 32767 * (x - minX) / size;
+	    y = 32767 * (y - minY) / size;
+	
+	    x = (x | (x << 8)) & 0x00FF00FF;
+	    x = (x | (x << 4)) & 0x0F0F0F0F;
+	    x = (x | (x << 2)) & 0x33333333;
+	    x = (x | (x << 1)) & 0x55555555;
+	
+	    y = (y | (y << 8)) & 0x00FF00FF;
+	    y = (y | (y << 4)) & 0x0F0F0F0F;
+	    y = (y | (y << 2)) & 0x33333333;
+	    y = (y | (y << 1)) & 0x55555555;
+	
+	    return x | (y << 1);
+	}
+	
+	// find the leftmost node of a polygon ring
+	function getLeftmost(start) {
+	    var p = start,
+	        leftmost = start;
+	    do {
+	        if (p.x < leftmost.x) leftmost = p;
+	        p = p.next;
+	    } while (p !== start);
+	
+	    return leftmost;
+	}
+	
+	// check if a point lies within a convex triangle
+	function pointInTriangle(ax, ay, bx, by, cx, cy, px, py) {
+	    return (cx - px) * (ay - py) - (ax - px) * (cy - py) >= 0 &&
+	           (ax - px) * (by - py) - (bx - px) * (ay - py) >= 0 &&
+	           (bx - px) * (cy - py) - (cx - px) * (by - py) >= 0;
+	}
+	
+	// check if a diagonal between two polygon nodes is valid (lies in polygon interior)
+	function isValidDiagonal(a, b) {
+	    return equals(a, b) || a.next.i !== b.i && a.prev.i !== b.i && !intersectsPolygon(a, b) &&
+	           locallyInside(a, b) && locallyInside(b, a) && middleInside(a, b);
+	}
+	
+	// signed area of a triangle
+	function area(p, q, r) {
+	    return (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
+	}
+	
+	// check if two points are equal
+	function equals(p1, p2) {
+	    return p1.x === p2.x && p1.y === p2.y;
+	}
+	
+	// check if two segments intersect
+	function intersects(p1, q1, p2, q2) {
+	    return area(p1, q1, p2) > 0 !== area(p1, q1, q2) > 0 &&
+	           area(p2, q2, p1) > 0 !== area(p2, q2, q1) > 0;
+	}
+	
+	// check if a polygon diagonal intersects any polygon segments
+	function intersectsPolygon(a, b) {
+	    var p = a;
+	    do {
+	        if (p.i !== a.i && p.next.i !== a.i && p.i !== b.i && p.next.i !== b.i &&
+	                intersects(p, p.next, a, b)) return true;
+	        p = p.next;
+	    } while (p !== a);
+	
+	    return false;
+	}
+	
+	// check if a polygon diagonal is locally inside the polygon
+	function locallyInside(a, b) {
+	    return area(a.prev, a, a.next) < 0 ?
+	        area(a, b, a.next) >= 0 && area(a, a.prev, b) >= 0 :
+	        area(a, b, a.prev) < 0 || area(a, a.next, b) < 0;
+	}
+	
+	// check if the middle point of a polygon diagonal is inside the polygon
+	function middleInside(a, b) {
+	    var p = a,
+	        inside = false,
+	        px = (a.x + b.x) / 2,
+	        py = (a.y + b.y) / 2;
+	    do {
+	        if (((p.y > py) !== (p.next.y > py)) && (px < (p.next.x - p.x) * (py - p.y) / (p.next.y - p.y) + p.x))
+	            inside = !inside;
+	        p = p.next;
+	    } while (p !== a);
+	
+	    return inside;
+	}
+	
+	// link two polygon vertices with a bridge; if the vertices belong to the same ring, it splits polygon into two;
+	// if one belongs to the outer ring and another to a hole, it merges it into a single ring
+	function splitPolygon(a, b) {
+	    var a2 = new Node(a.i, a.x, a.y),
+	        b2 = new Node(b.i, b.x, b.y),
+	        an = a.next,
+	        bp = b.prev;
+	
+	    a.next = b;
+	    b.prev = a;
+	
+	    a2.next = an;
+	    an.prev = a2;
+	
+	    b2.next = a2;
+	    a2.prev = b2;
+	
+	    bp.next = b2;
+	    b2.prev = bp;
+	
+	    return b2;
+	}
+	
+	// create a node and optionally link it with previous one (in a circular doubly linked list)
+	function insertNode(i, x, y, last) {
+	    var p = new Node(i, x, y);
+	
+	    if (!last) {
+	        p.prev = p;
+	        p.next = p;
+	
+	    } else {
+	        p.next = last.next;
+	        p.prev = last;
+	        last.next.prev = p;
+	        last.next = p;
+	    }
+	    return p;
+	}
+	
+	function removeNode(p) {
+	    p.next.prev = p.prev;
+	    p.prev.next = p.next;
+	
+	    if (p.prevZ) p.prevZ.nextZ = p.nextZ;
+	    if (p.nextZ) p.nextZ.prevZ = p.prevZ;
+	}
+	
+	function Node(i, x, y) {
+	    // vertice index in coordinates array
+	    this.i = i;
+	
+	    // vertex coordinates
+	    this.x = x;
+	    this.y = y;
+	
+	    // previous and next vertice nodes in a polygon ring
+	    this.prev = null;
+	    this.next = null;
+	
+	    // z-order curve value
+	    this.z = null;
+	
+	    // previous and next nodes in z-order
+	    this.prevZ = null;
+	    this.nextZ = null;
+	
+	    // indicates whether this is a steiner point
+	    this.steiner = false;
+	}
 
 
 /***/ }

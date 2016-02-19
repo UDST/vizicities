@@ -13,7 +13,7 @@ class ImageTile extends Tile {
     setTimeout(() => {
       if (!this._mesh) {
         this._mesh = this._createMesh();
-        this._requestTexture();
+        this._requestTile();
       }
     }, 0);
   }
@@ -48,13 +48,15 @@ class ImageTile extends Tile {
 
     mesh.add(localMesh);
 
+    mesh.renderOrder = 0;
+
     mesh.position.x = this._center[0];
     mesh.position.z = this._center[1];
 
-    var box = new BoxHelper(localMesh);
-    mesh.add(box);
-
-    mesh.add(this._createDebugMesh());
+    // var box = new BoxHelper(localMesh);
+    // mesh.add(box);
+    //
+    // mesh.add(this._createDebugMesh());
 
     return mesh;
   }
@@ -96,7 +98,7 @@ class ImageTile extends Tile {
     return mesh;
   }
 
-  _requestTexture() {
+  _requestTile() {
     var urlParams = {
       x: this._tile[0],
       y: this._tile[1],
