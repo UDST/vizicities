@@ -50,7 +50,17 @@ class TopoJSONTileLayer extends TileLayer {
   }
 
   _createTile(quadcode, layer) {
-    return TopoJSONTile(quadcode, this._path, layer);
+    var options = {};
+
+    if (this._options.filter) {
+      options.filter = this._options.filter;
+    }
+
+    if (this._options.style) {
+      options.style = this._options.style;
+    }
+
+    return TopoJSONTile(quadcode, this._path, layer, options);
   }
 
   // Destroys the layer and removes it from the scene and memory

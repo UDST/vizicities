@@ -7966,7 +7966,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_createTile',
 	    value: function _createTile(quadcode, layer) {
-	      return (0, _TopoJSONTile2['default'])(quadcode, this._path, layer);
+	      var options = {};
+	
+	      if (this._options.filter) {
+	        options.filter = this._options.filter;
+	      }
+	
+	      if (this._options.style) {
+	        options.style = this._options.style;
+	      }
+	
+	      return (0, _TopoJSONTile2['default'])(quadcode, this._path, layer, options);
 	    }
 	
 	    // Destroys the layer and removes it from the scene and memory
@@ -8043,13 +8053,54 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _earcut2 = _interopRequireDefault(_earcut);
 	
+	var _lodashAssign = __webpack_require__(3);
+	
+	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
+	
+	// TODO: Perform tile request and processing in a Web Worker
+	//
+	// Use Operative (https://github.com/padolsey/operative)
+	//
+	// Would it make sense to have the worker functionality defined in a static
+	// method so it only gets initialised once and not on every tile instance?
+	//
+	// Otherwise, worker processing logic would have to go in the tile layer so not
+	// to waste loads of time setting up a brand new worker with three.js for each
+	// tile every single time.
+	//
+	// Unsure of the best way to get three.js and VIZI into the worker
+	//
+	// Would need to set up a CRS / projection identical to the world instance
+	//
+	// Is it possible to bypass requirements on external script by having multiple
+	// simple worker methods that each take enough inputs to perform a single task
+	// without requiring VIZI or three.js? So long as the heaviest logic is done in
+	// the worker and transferrable objects are used then it should be better than
+	// nothing. Would probably still need things like earcut...
+	//
+	// After all, the three.js logic and object creation will still need to be
+	// done on the main thread regardless so the worker should try to do as much as
+	// possible with as few dependencies as possible.
+	//
+	// Have a look at how this is done in Tangram before implementing anything as
+	// the approach there is pretty similar and robust.
+	
 	var TopoJSONTile = (function (_Tile) {
 	  _inherits(TopoJSONTile, _Tile);
 	
-	  function TopoJSONTile(quadcode, path, layer) {
+	  function TopoJSONTile(quadcode, path, layer, options) {
 	    _classCallCheck(this, TopoJSONTile);
 	
 	    _get(Object.getPrototypeOf(TopoJSONTile.prototype), 'constructor', this).call(this, quadcode, path, layer);
+	
+	    var defaults = {
+	      filter: null,
+	      style: {
+	        color: '#ff0000'
+	      }
+	    };
+	
+	    this._options = (0, _lodashAssign2['default'])(defaults, options);
 	  }
 	
 	  // Initialise without requiring new keyword
@@ -8199,13 +8250,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      var allVertices = [];
 	      var allFaces = [];
+	      var allColours = [];
 	      var facesCount = 0;
 	
-	      geojson.features.forEach(function (feature) {
+	      var colour = new _three2['default'].Color();
+	
+	      var features = geojson.features;
+	
+	      // Run filter, if provided
+	      if (this._options.filter) {
+	        features = geojson.features.filter(this._options.filter);
+	      }
+	
+	      var style = this._options.style;
+	
+	      features.forEach(function (feature) {
 	        // feature.geometry, feature.properties
+	
+	        // Get style object, if provided
+	        if (typeof _this3._options.style === 'function') {
+	          style = _this3._options.style(feature);
+	        }
+	
+	        // console.log(style);
 	
 	        var coordinates = feature.geometry.coordinates;
 	
+	        // Skip if geometry is a point
+	        //
+	        // This should be a user-defined filter as it would be wrong to assume
+	        // that people won't want to output points
 	        if (!coordinates[0] || !coordinates[0][0] || !Array.isArray(coordinates[0][0])) {
 	          return;
 	        }
@@ -8222,7 +8296,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        faces = _this3._triangulate(earcutData.vertices, earcutData.holes, earcutData.dimensions);
 	
+	        colour.set(style.color);
+	
 	        allVertices.push(earcutData.vertices);
+	        allColours.push([colour.r, colour.g, colour.b]);
 	        allFaces.push(faces);
 	
 	        facesCount += faces.length;
@@ -8311,38 +8388,99 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // Three components per vertex per face (3 x 3 = 9)
 	      var vertices = new Float32Array(facesCount * 9);
+	      var normals = new Float32Array(facesCount * 9);
+	      var colours = new Float32Array(facesCount * 9);
+	
+	      var pA = new _three2['default'].Vector3();
+	      var pB = new _three2['default'].Vector3();
+	      var pC = new _three2['default'].Vector3();
+	
+	      var cb = new _three2['default'].Vector3();
+	      var ab = new _three2['default'].Vector3();
 	
 	      var dim = 2;
 	
 	      var index;
 	      var _faces;
 	      var _vertices;
+	      var _colour;
 	      var lastIndex = 0;
 	      for (var i = 0; i < allFaces.length; i++) {
 	        _faces = allFaces[i];
 	        _vertices = allVertices[i];
+	        _colour = allColours[i];
 	
 	        for (var j = 0; j < _faces.length; j++) {
 	          // Array of vertex indexes for the face
 	          index = _faces[j][0];
 	
-	          vertices[lastIndex * 9 + 0] = _vertices[index * dim] + offset.x;
-	          vertices[lastIndex * 9 + 1] = 0;
-	          vertices[lastIndex * 9 + 2] = _vertices[index * dim + 1] + offset.y;
+	          var ax = _vertices[index * dim] + offset.x;
+	          var ay = 0;
+	          var az = _vertices[index * dim + 1] + offset.y;
 	
-	          // Array of vertex indexes for the face
 	          index = _faces[j][1];
 	
-	          vertices[lastIndex * 9 + 3] = _vertices[index * dim] + offset.x;
-	          vertices[lastIndex * 9 + 4] = 0;
-	          vertices[lastIndex * 9 + 5] = _vertices[index * dim + 1] + offset.y;
+	          var bx = _vertices[index * dim] + offset.x;
+	          var by = 0;
+	          var bz = _vertices[index * dim + 1] + offset.y;
 	
-	          // Array of vertex indexes for the face
 	          index = _faces[j][2];
 	
-	          vertices[lastIndex * 9 + 6] = _vertices[index * dim] + offset.x;
-	          vertices[lastIndex * 9 + 7] = 0;
-	          vertices[lastIndex * 9 + 8] = _vertices[index * dim + 1] + offset.y;
+	          var cx = _vertices[index * dim] + offset.x;
+	          var cy = 0;
+	          var cz = _vertices[index * dim + 1] + offset.y;
+	
+	          // Flat face normals
+	          // From: http://threejs.org/examples/webgl_buffergeometry.html
+	          pA.set(ax, ay, az);
+	          pB.set(bx, by, bz);
+	          pC.set(cx, cy, cz);
+	
+	          cb.subVectors(pC, pB);
+	          ab.subVectors(pA, pB);
+	          cb.cross(ab);
+	
+	          cb.normalize();
+	
+	          var nx = cb.x;
+	          var ny = cb.y;
+	          var nz = cb.z;
+	
+	          vertices[lastIndex * 9 + 0] = ax;
+	          vertices[lastIndex * 9 + 1] = ay;
+	          vertices[lastIndex * 9 + 2] = az;
+	
+	          normals[lastIndex * 9 + 0] = nx;
+	          normals[lastIndex * 9 + 1] = ny;
+	          normals[lastIndex * 9 + 2] = nz;
+	
+	          colours[lastIndex * 9 + 0] = _colour[0];
+	          colours[lastIndex * 9 + 1] = _colour[1];
+	          colours[lastIndex * 9 + 2] = _colour[2];
+	
+	          vertices[lastIndex * 9 + 3] = bx;
+	          vertices[lastIndex * 9 + 4] = by;
+	          vertices[lastIndex * 9 + 5] = bz;
+	
+	          normals[lastIndex * 9 + 3] = nx;
+	          normals[lastIndex * 9 + 4] = ny;
+	          normals[lastIndex * 9 + 5] = nz;
+	
+	          colours[lastIndex * 9 + 3] = _colour[0];
+	          colours[lastIndex * 9 + 4] = _colour[1];
+	          colours[lastIndex * 9 + 5] = _colour[2];
+	
+	          vertices[lastIndex * 9 + 6] = cx;
+	          vertices[lastIndex * 9 + 7] = cy;
+	          vertices[lastIndex * 9 + 8] = cz;
+	
+	          normals[lastIndex * 9 + 6] = nx;
+	          normals[lastIndex * 9 + 7] = ny;
+	          normals[lastIndex * 9 + 8] = nz;
+	
+	          colours[lastIndex * 9 + 6] = _colour[0];
+	          colours[lastIndex * 9 + 7] = _colour[1];
+	          colours[lastIndex * 9 + 8] = _colour[2];
 	
 	          lastIndex++;
 	        }
@@ -8350,8 +8488,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // itemSize = 3 because there are 3 values (components) per vertex
 	      geometry.addAttribute('position', new _three2['default'].BufferAttribute(vertices, 3));
+	      geometry.addAttribute('normal', new _three2['default'].BufferAttribute(normals, 3));
+	      geometry.addAttribute('color', new _three2['default'].BufferAttribute(colours, 3));
+	
+	      geometry.computeBoundingBox();
+	
 	      var material = new _three2['default'].MeshBasicMaterial({
-	        color: 0x0000ff,
+	        vertexColors: _three2['default'].VertexColors,
 	        side: _three2['default'].BackSide,
 	        depthWrite: false
 	      });
@@ -8413,8 +8556,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return TopoJSONTile;
 	})(_Tile3['default']);
 	
-	exports['default'] = function (quadcode, path, layer) {
-	  return new TopoJSONTile(quadcode, path, layer);
+	exports['default'] = function (quadcode, path, layer, options) {
+	  return new TopoJSONTile(quadcode, path, layer, options);
 	};
 	
 	;
