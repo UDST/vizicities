@@ -93,8 +93,11 @@ function build() {
 
     // Don't mangle class names so we can use them in the console
     // jscs:disable
-    .pipe($.uglify({ mangle: { keep_fnames: true }}))
+    // .pipe($.uglify({ mangle: { keep_fnames: true }}))
     // jscs:enable
+
+    // Using the mangle option above breaks the sourcemap for some reason
+    .pipe($.uglify())
 
     .pipe($.sourcemaps.write('./'))
     .pipe(gulp.dest(destinationFolder))

@@ -7,6 +7,7 @@ import Point from '../../geo/Point';
 import LatLon from '../../geo/LatLon';
 import earcut from 'earcut';
 import extend from 'lodash.assign';
+import extrudePolygon from '../../util/extrudePolygon';
 
 // TODO: Perform tile request and processing in a Web Worker
 //
@@ -168,6 +169,8 @@ class TopoJSONTile extends Tile {
   }
 
   _processTileData(data) {
+    console.time(this._tile);
+
     var geojson = topojson.feature(data, data.objects.vectile);
 
     var offset = Point(0, 0);
@@ -177,7 +180,6 @@ class TopoJSONTile extends Tile {
     var coordinates;
     var earcutData;
     var faces;
-    // var geometry;
 
     var allVertices = [];
     var allFaces = [];
@@ -227,84 +229,28 @@ class TopoJSONTile extends Tile {
 
       faces = this._triangulate(earcutData.vertices, earcutData.holes, earcutData.dimensions);
 
+      var groupedVertices = [];
+      for (i = 0, il = earcutData.vertices.length; i < il; i += earcutData.dimensions) {
+        groupedVertices.push(earcutData.vertices.slice(i, i + earcutData.dimensions));
+      }
+
+      var extruded = extrudePolygon(groupedVertices, faces);
+
       colour.set(style.color);
 
-      allVertices.push(earcutData.vertices);
+      // allVertices.push(earcutData.vertices);
+      // allColours.push([colour.r, colour.g, colour.b]);
+      // allFaces.push(faces);
+
+      allVertices.push(extruded.positions);
       allColours.push([colour.r, colour.g, colour.b]);
-      allFaces.push(faces);
+      allFaces.push(extruded.faces);
 
-      facesCount += faces.length;
-
-      // console.log(earcutData.vertices);
-      // console.log(faces);
-      // return;
-
-      // geometry = new THREE.BufferGeometry();
-      //
-      // // Three components per vertex per face (3 x 3 = 9)
-      // var vertices = new Float32Array(faces.length * 9);
-      //
-      // var index;
-      // for (var i = 0; i < faces.length; i++) {
-      //   // Array of vertex indexes for the face
-      //   index = faces[i][0];
-      //
-      //   vertices[i * 9 + 0] = earcutData.vertices[index * dim];
-      //   vertices[i * 9 + 1] = 0;
-      //   vertices[i * 9 + 2] = earcutData.vertices[index * dim + 1];
-      //
-      //   // Array of vertex indexes for the face
-      //   index = faces[i][1];
-      //
-      //   vertices[i * 9 + 3] = earcutData.vertices[index * dim];
-      //   vertices[i * 9 + 4] = 0;
-      //   vertices[i * 9 + 5] = earcutData.vertices[index * dim + 1];
-      //
-      //   // Array of vertex indexes for the face
-      //   index = faces[i][2];
-      //
-      //   vertices[i * 9 + 6] = earcutData.vertices[index * dim];
-      //   vertices[i * 9 + 7] = 0;
-      //   vertices[i * 9 + 8] = earcutData.vertices[index * dim + 1];
-      // }
-
-      // var shape = new THREE.Shape();
-      //
-      // var outer = coordinates.shift();
-      // var inners = coordinates;
-      //
-      // if (!outer || !outer[0] || !Array.isArray(outer[0])) {
-      //   return;
-      // }
-      //
-      // // Create outer shape
-      // outer.forEach((coord, index) => {
-      //   var latlon = LatLon(coord[1], coord[0]);
-      //   var point = this._layer._world.latLonToPoint(latlon);
-      //
-      //   // Move if first coordinate
-      //   if (index === 0) {
-      //     shape.moveTo(point.x + offset.x, point.y + offset.y);
-      //   } else {
-      //     shape.lineTo(point.x + offset.x, point.y + offset.y);
-      //   }
-      // });
-      //
-      // var geom = new THREE.ShapeGeometry(shape);
-      // var mesh = new THREE.Mesh(geom, new THREE.MeshBasicMaterial({
-      //   color: 0x0000ff,
-      //   side: THREE.BackSide,
-      //   depthWrite: false
-      // }));
-      //
-      // // Offset
-      // // mesh.position.x = -1 * offset.x;
-      // // mesh.position.z = -1 * offset.y;
-      //
-      // mesh.rotation.x = 90 * Math.PI / 180;
-      //
-      // this._mesh.add(mesh);
+      facesCount += extruded.faces.length;
     });
+
+    // console.log(allVertices);
+    // return;
 
     // Skip if no faces
     //
@@ -344,22 +290,38 @@ class TopoJSONTile extends Tile {
       for (var j = 0; j < _faces.length; j++) {
         // Array of vertex indexes for the face
         index = _faces[j][0];
+        //
+        // var ax = _vertices[index * dim] + offset.x;
+        // var ay = 0;
+        // var az = _vertices[index * dim + 1] + offset.y;
+        //
+        // index = _faces[j][1];
+        //
+        // var bx = _vertices[index * dim] + offset.x;
+        // var by = 0;
+        // var bz = _vertices[index * dim + 1] + offset.y;
+        //
+        // index = _faces[j][2];
+        //
+        // var cx = _vertices[index * dim] + offset.x;
+        // var cy = 0;
+        // var cz = _vertices[index * dim + 1] + offset.y;
 
-        var ax = _vertices[index * dim] + offset.x;
-        var ay = 0;
-        var az = _vertices[index * dim + 1] + offset.y;
+        var ax = _vertices[index][0] + offset.x;
+        var ay = _vertices[index][1];
+        var az = _vertices[index][2] + offset.y;
 
         index = _faces[j][1];
 
-        var bx = _vertices[index * dim] + offset.x;
-        var by = 0;
-        var bz = _vertices[index * dim + 1] + offset.y;
+        var bx = _vertices[index][0] + offset.x;
+        var by = _vertices[index][1];
+        var bz = _vertices[index][2] + offset.y;
 
         index = _faces[j][2];
 
-        var cx = _vertices[index * dim] + offset.x;
-        var cy = 0;
-        var cz = _vertices[index * dim + 1] + offset.y;
+        var cx = _vertices[index][0] + offset.x;
+        var cy = _vertices[index][1];
+        var cz = _vertices[index][2] + offset.y;
 
         // Flat face normals
         // From: http://threejs.org/examples/webgl_buffergeometry.html
@@ -424,17 +386,19 @@ class TopoJSONTile extends Tile {
 
     geometry.computeBoundingBox();
 
-    var material = new THREE.MeshBasicMaterial({
+    var material = new THREE.MeshPhongMaterial({
       vertexColors: THREE.VertexColors,
-      side: THREE.BackSide,
-      depthWrite: false
+      side: THREE.BackSide
+      // depthWrite: false
     });
     var mesh = new THREE.Mesh(geometry, material);
-    mesh.renderOrder = 1;
+    // mesh.renderOrder = 1;
 
     this._mesh.add(mesh);
 
     this._ready = true;
+    console.timeEnd(this._tile);
+    console.log(`${this._tile}: ${features.length} features`);
   }
 
   _toEarcut(data) {

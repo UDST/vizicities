@@ -7913,7 +7913,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _classCallCheck(this, TopoJSONTileLayer);
 	
 	    var defaults = {
-	      maxLOD: 13,
+	      maxLOD: 14,
 	      distance: 2000
 	    };
 	
@@ -8056,6 +8056,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _lodashAssign = __webpack_require__(3);
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
+	
+	var _utilExtrudePolygon = __webpack_require__(56);
+	
+	var _utilExtrudePolygon2 = _interopRequireDefault(_utilExtrudePolygon);
 	
 	// TODO: Perform tile request and processing in a Web Worker
 	//
@@ -8237,6 +8241,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _processTileData(data) {
 	      var _this3 = this;
 	
+	      console.time(this._tile);
+	
 	      var geojson = _topojson2['default'].feature(data, data.objects.vectile);
 	
 	      var offset = (0, _geoPoint2['default'])(0, 0);
@@ -8246,7 +8252,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var coordinates;
 	      var earcutData;
 	      var faces;
-	      // var geometry;
 	
 	      var allVertices = [];
 	      var allFaces = [];
@@ -8296,84 +8301,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        faces = _this3._triangulate(earcutData.vertices, earcutData.holes, earcutData.dimensions);
 	
+	        var groupedVertices = [];
+	        for (i = 0, il = earcutData.vertices.length; i < il; i += earcutData.dimensions) {
+	          groupedVertices.push(earcutData.vertices.slice(i, i + earcutData.dimensions));
+	        }
+	
+	        var extruded = (0, _utilExtrudePolygon2['default'])(groupedVertices, faces);
+	
 	        colour.set(style.color);
 	
-	        allVertices.push(earcutData.vertices);
+	        // allVertices.push(earcutData.vertices);
+	        // allColours.push([colour.r, colour.g, colour.b]);
+	        // allFaces.push(faces);
+	
+	        allVertices.push(extruded.positions);
 	        allColours.push([colour.r, colour.g, colour.b]);
-	        allFaces.push(faces);
+	        allFaces.push(extruded.faces);
 	
-	        facesCount += faces.length;
-	
-	        // console.log(earcutData.vertices);
-	        // console.log(faces);
-	        // return;
-	
-	        // geometry = new THREE.BufferGeometry();
-	        //
-	        // // Three components per vertex per face (3 x 3 = 9)
-	        // var vertices = new Float32Array(faces.length * 9);
-	        //
-	        // var index;
-	        // for (var i = 0; i < faces.length; i++) {
-	        //   // Array of vertex indexes for the face
-	        //   index = faces[i][0];
-	        //
-	        //   vertices[i * 9 + 0] = earcutData.vertices[index * dim];
-	        //   vertices[i * 9 + 1] = 0;
-	        //   vertices[i * 9 + 2] = earcutData.vertices[index * dim + 1];
-	        //
-	        //   // Array of vertex indexes for the face
-	        //   index = faces[i][1];
-	        //
-	        //   vertices[i * 9 + 3] = earcutData.vertices[index * dim];
-	        //   vertices[i * 9 + 4] = 0;
-	        //   vertices[i * 9 + 5] = earcutData.vertices[index * dim + 1];
-	        //
-	        //   // Array of vertex indexes for the face
-	        //   index = faces[i][2];
-	        //
-	        //   vertices[i * 9 + 6] = earcutData.vertices[index * dim];
-	        //   vertices[i * 9 + 7] = 0;
-	        //   vertices[i * 9 + 8] = earcutData.vertices[index * dim + 1];
-	        // }
-	
-	        // var shape = new THREE.Shape();
-	        //
-	        // var outer = coordinates.shift();
-	        // var inners = coordinates;
-	        //
-	        // if (!outer || !outer[0] || !Array.isArray(outer[0])) {
-	        //   return;
-	        // }
-	        //
-	        // // Create outer shape
-	        // outer.forEach((coord, index) => {
-	        //   var latlon = LatLon(coord[1], coord[0]);
-	        //   var point = this._layer._world.latLonToPoint(latlon);
-	        //
-	        //   // Move if first coordinate
-	        //   if (index === 0) {
-	        //     shape.moveTo(point.x + offset.x, point.y + offset.y);
-	        //   } else {
-	        //     shape.lineTo(point.x + offset.x, point.y + offset.y);
-	        //   }
-	        // });
-	        //
-	        // var geom = new THREE.ShapeGeometry(shape);
-	        // var mesh = new THREE.Mesh(geom, new THREE.MeshBasicMaterial({
-	        //   color: 0x0000ff,
-	        //   side: THREE.BackSide,
-	        //   depthWrite: false
-	        // }));
-	        //
-	        // // Offset
-	        // // mesh.position.x = -1 * offset.x;
-	        // // mesh.position.z = -1 * offset.y;
-	        //
-	        // mesh.rotation.x = 90 * Math.PI / 180;
-	        //
-	        // this._mesh.add(mesh);
+	        facesCount += extruded.faces.length;
 	      });
+	
+	      // console.log(allVertices);
+	      // return;
 	
 	      // Skip if no faces
 	      //
@@ -8413,22 +8362,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	        for (var j = 0; j < _faces.length; j++) {
 	          // Array of vertex indexes for the face
 	          index = _faces[j][0];
+	          //
+	          // var ax = _vertices[index * dim] + offset.x;
+	          // var ay = 0;
+	          // var az = _vertices[index * dim + 1] + offset.y;
+	          //
+	          // index = _faces[j][1];
+	          //
+	          // var bx = _vertices[index * dim] + offset.x;
+	          // var by = 0;
+	          // var bz = _vertices[index * dim + 1] + offset.y;
+	          //
+	          // index = _faces[j][2];
+	          //
+	          // var cx = _vertices[index * dim] + offset.x;
+	          // var cy = 0;
+	          // var cz = _vertices[index * dim + 1] + offset.y;
 	
-	          var ax = _vertices[index * dim] + offset.x;
-	          var ay = 0;
-	          var az = _vertices[index * dim + 1] + offset.y;
+	          var ax = _vertices[index][0] + offset.x;
+	          var ay = _vertices[index][1];
+	          var az = _vertices[index][2] + offset.y;
 	
 	          index = _faces[j][1];
 	
-	          var bx = _vertices[index * dim] + offset.x;
-	          var by = 0;
-	          var bz = _vertices[index * dim + 1] + offset.y;
+	          var bx = _vertices[index][0] + offset.x;
+	          var by = _vertices[index][1];
+	          var bz = _vertices[index][2] + offset.y;
 	
 	          index = _faces[j][2];
 	
-	          var cx = _vertices[index * dim] + offset.x;
-	          var cy = 0;
-	          var cz = _vertices[index * dim + 1] + offset.y;
+	          var cx = _vertices[index][0] + offset.x;
+	          var cy = _vertices[index][1];
+	          var cz = _vertices[index][2] + offset.y;
 	
 	          // Flat face normals
 	          // From: http://threejs.org/examples/webgl_buffergeometry.html
@@ -8493,17 +8458,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      geometry.computeBoundingBox();
 	
-	      var material = new _three2['default'].MeshBasicMaterial({
+	      var material = new _three2['default'].MeshPhongMaterial({
 	        vertexColors: _three2['default'].VertexColors,
-	        side: _three2['default'].BackSide,
-	        depthWrite: false
+	        side: _three2['default'].BackSide
+	        // depthWrite: false
 	      });
 	      var mesh = new _three2['default'].Mesh(geometry, material);
-	      mesh.renderOrder = 1;
+	      // mesh.renderOrder = 1;
 	
 	      this._mesh.add(mesh);
 	
 	      this._ready = true;
+	      console.timeEnd(this._tile);
+	      console.log(this._tile + ': ' + features.length + ' features');
 	    }
 	  }, {
 	    key: '_toEarcut',
@@ -10347,6 +10314,93 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.steiner = false;
 	}
 
+
+/***/ },
+/* 56 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	/*
+	 * Extrude a polygon given its vertices and triangulated faces
+	 *
+	 * Based on:
+	 * https://github.com/freeman-lab/extrude
+	 */
+	
+	var _lodashAssign = __webpack_require__(3);
+	
+	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
+	
+	var extrudePolygon = function extrudePolygon(points, faces, _options) {
+	  var defaults = {
+	    top: 1,
+	    bottom: 0,
+	    closed: true
+	  };
+	
+	  var options = (0, _lodashAssign2['default'])(defaults, _options);
+	
+	  var n = points.length;
+	  var positions;
+	  var cells;
+	
+	  // If bottom and top values are identical then return the flat shape
+	  options.top === options.bottom ? flat() : full();
+	
+	  function flat() {
+	    positions = points.map(function (p) {
+	      return [p[0], options.top, p[1]];
+	    });
+	    cells = faces;
+	  }
+	
+	  function full() {
+	    positions = [];
+	    points.forEach(function (p) {
+	      positions.push([p[0], options.top, p[1]]);
+	    });
+	    points.forEach(function (p) {
+	      positions.push([p[0], options.bottom, p[1]]);
+	    });
+	
+	    cells = [];
+	    for (var i = 0; i < n; i++) {
+	      if (i === n - 1) {
+	        cells.push([i + n, n, i]);
+	        cells.push([0, i, n]);
+	      } else {
+	        cells.push([i + n, i + n + 1, i]);
+	        cells.push([i + 1, i, i + n + 1]);
+	      }
+	    }
+	
+	    if (options.closed) {
+	      var top = faces;
+	      var bottom = top.map(function (p) {
+	        return p.map(function (v) {
+	          return v + n;
+	        });
+	      });
+	      bottom = bottom.map(function (p) {
+	        return [p[0], p[2], p[1]];
+	      });
+	      cells = cells.concat(top).concat(bottom);
+	    }
+	  }
+	
+	  return {
+	    positions: positions,
+	    faces: cells
+	  };
+	};
+	
+	exports['default'] = extrudePolygon;
+	module.exports = exports['default'];
 
 /***/ }
 /******/ ])

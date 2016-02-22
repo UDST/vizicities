@@ -16,15 +16,15 @@ var imageTileLayer = VIZI.ImageTileLayer('http://{s}.basemaps.cartocdn.com/light
 }).addTo(world);
 
 var topoJSONTileLayer = VIZI.TopoJSONTileLayer('https://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.topojson', {
-  style: (feature) => {
+  style: function(feature) {
     return {
       color: (feature.properties.area > 10000) ? '#ff0000' : '#0000ff'
     };
   },
-  filter: (feature) => {
-    // Only show features with an area larger than 5000 (metres squared in
-    // projected units)
-    return feature.properties.area > 5000;
-  },
+  // filter: function(feature) {
+  //   // Only show features with an area larger than 5000 (metres squared in
+  //   // projected units)
+  //   return feature.properties.area > 5000;
+  // },
   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://whosonfirst.mapzen.com#License">Who\'s On First</a>.'
 }).addTo(world);

@@ -7,7 +7,7 @@ import THREE from 'three';
 class TopoJSONTileLayer extends TileLayer {
   constructor(path, options) {
     var defaults = {
-      maxLOD: 13,
+      maxLOD: 14,
       distance: 2000
     };
 

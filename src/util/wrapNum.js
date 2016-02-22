@@ -5,7 +5,7 @@
  * https://github.com/Leaflet/Leaflet/blob/master/src/core/Util.js
  */
 
-const wrapNum = function(x, range, includeMax) {
+var wrapNum = function(x, range, includeMax) {
   var max = range[1];
   var min = range[0];
   var d = max - min;
