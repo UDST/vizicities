@@ -1,6 +1,6 @@
 import THREE from 'three';
 
-export default function(colour) {
+export default function(colour, skybox) {
   var canvas = document.createElement('canvas');
   canvas.width = 1;
   canvas.height = 1;
@@ -26,10 +26,17 @@ export default function(colour) {
 
   texture.needsUpdate = true;
 
-  var material = new THREE.MeshBasicMaterial({
-    map: texture,
+  // var material = new THREE.MeshBasicMaterial({
+  //   map: texture,
+  //   depthWrite: false
+  // });
+
+  var material = new THREE.MeshStandardMaterial({
     depthWrite: false
   });
+  material.roughness = 1;
+  material.metalness = 0.2;
+  material.envMap = skybox;
 
   return material;
 };

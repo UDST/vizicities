@@ -72,11 +72,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _layerEnvironmentEnvironmentLayer2 = _interopRequireDefault(_layerEnvironmentEnvironmentLayer);
 	
-	var _layerTileImageTileLayer = __webpack_require__(33);
+	var _layerTileImageTileLayer = __webpack_require__(37);
 	
 	var _layerTileImageTileLayer2 = _interopRequireDefault(_layerTileImageTileLayer);
 	
-	var _layerTileTopoJSONTileLayer = __webpack_require__(50);
+	var _layerTileTopoJSONTileLayer = __webpack_require__(52);
 	
 	var _layerTileTopoJSONTileLayer2 = _interopRequireDefault(_layerTileTopoJSONTileLayer);
 	
@@ -245,9 +245,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        controls.update();
 	      });
 	
-	      this.emit('preUpdate');
+	      this.emit('preUpdate', delta);
 	      this._engine.update(delta);
-	      this.emit('postUpdate');
+	      this.emit('postUpdate', delta);
 	    }
 	
 	    // Set world view
@@ -3060,7 +3060,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports['default'] = (function () {
 	  var scene = new _three2['default'].Scene();
-	  scene.fog = new _three2['default'].Fog(0xffffff, 1, 15000);
+	
+	  // TODO: Re-enable when this works with the skybox
+	  // scene.fog = new THREE.Fog(0xffffff, 1, 15000);
 	  return scene;
 	})();
 	
@@ -3092,7 +3094,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    antialias: true
 	  });
 	
-	  renderer.setClearColor(_Scene2['default'].fog.color, 1);
+	  // TODO: Re-enable when this works with the skybox
+	  // renderer.setClearColor(Scene.fog.color, 1);
 	
 	  // Gamma settings make things look nicer
 	  renderer.gammaInput = true;
@@ -3134,7 +3137,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// http://stackoverflow.com/q/26655930/997339
 	
 	exports['default'] = function (container) {
-	  var camera = new _three2['default'].PerspectiveCamera(45, 1, 1, 40000);
+	  var camera = new _three2['default'].PerspectiveCamera(45, 1, 1, 2000000);
 	  camera.position.y = 400;
 	  camera.position.z = 400;
 	
@@ -4382,6 +4385,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
+	var _Skybox = __webpack_require__(33);
+	
+	var _Skybox2 = _interopRequireDefault(_Skybox);
+	
 	var EnvironmentLayer = (function (_Layer) {
 	  _inherits(EnvironmentLayer, _Layer);
 	
@@ -4389,16 +4396,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _classCallCheck(this, EnvironmentLayer);
 	
 	    _get(Object.getPrototypeOf(EnvironmentLayer.prototype), 'constructor', this).call(this);
-	
-	    this._initLights();
-	    // this._initGrid();
 	  }
 	
 	  // Initialise without requiring new keyword
 	
 	  _createClass(EnvironmentLayer, [{
 	    key: '_onAdd',
-	    value: function _onAdd() {}
+	    value: function _onAdd() {
+	      this._initLights();
+	      this._initSkybox();
+	      // this._initGrid();
+	    }
 	
 	    // Not fleshed out or thought through yet
 	    //
@@ -4410,26 +4418,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Position doesn't really matter (the angle is important), however it's
 	      // used here so the helpers look more natural.
 	
-	      var directionalLight = new _three2['default'].DirectionalLight(0x999999);
-	      directionalLight.intesity = 0.1;
-	      directionalLight.position.x = 100;
-	      directionalLight.position.y = 100;
-	      directionalLight.position.z = 100;
+	      // var directionalLight = new THREE.DirectionalLight(0x999999);
+	      // directionalLight.intesity = 0.1;
+	      // directionalLight.position.x = 100;
+	      // directionalLight.position.y = 100;
+	      // directionalLight.position.z = 100;
+	      //
+	      // var directionalLight2 = new THREE.DirectionalLight(0x999999);
+	      // directionalLight2.intesity = 0.1;
+	      // directionalLight2.position.x = -100;
+	      // directionalLight2.position.y = 100;
+	      // directionalLight2.position.z = -100;
+	      //
+	      // var helper = new THREE.DirectionalLightHelper(directionalLight, 10);
+	      // var helper2 = new THREE.DirectionalLightHelper(directionalLight2, 10);
+	      //
+	      // this._layer.add(directionalLight);
+	      // this._layer.add(directionalLight2);
+	      //
+	      // this._layer.add(helper);
+	      // this._layer.add(helper2);
 	
-	      var directionalLight2 = new _three2['default'].DirectionalLight(0x999999);
-	      directionalLight2.intesity = 0.1;
-	      directionalLight2.position.x = -100;
-	      directionalLight2.position.y = 100;
-	      directionalLight2.position.z = -100;
+	      // Ambient light
+	      // var ambient = new THREE.AmbientLight(0xeeeeee);
+	      // this._layer.add(ambient);
 	
-	      var helper = new _three2['default'].DirectionalLightHelper(directionalLight, 10);
-	      var helper2 = new _three2['default'].DirectionalLightHelper(directionalLight2, 10);
+	      // var ambient = new THREE.AmbientLight(0x050505);
+	      // this._layer.add(ambient);
 	
-	      this._layer.add(directionalLight);
-	      this._layer.add(directionalLight2);
-	
-	      this._layer.add(helper);
-	      this._layer.add(helper2);
+	      // Directional light that will be projected from the sun
+	      this._sunLight = new _three2['default'].DirectionalLight(0xffffff, 1);
+	      this._layer.add(this._sunLight);
+	    }
+	  }, {
+	    key: '_initSkybox',
+	    value: function _initSkybox() {
+	      this._skybox = (0, _Skybox2['default'])(this._world, this._sunLight);
+	      this._layer.add(this._skybox._mesh);
 	    }
 	
 	    // Add grid helper for context during initial development
@@ -4538,6 +4563,752 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	var _three = __webpack_require__(24);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var _Sky = __webpack_require__(34);
+	
+	var _Sky2 = _interopRequireDefault(_Sky);
+	
+	var _lodashThrottle = __webpack_require__(35);
+	
+	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
+	
+	// TODO: Sync a directional light with sun position
+	
+	var cubemap = {
+	  vertexShader: ['varying vec3 vPosition;', 'void main() {', 'vPosition = position;', 'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );', '}'].join('\n'),
+	
+	  fragmentShader: ['uniform samplerCube cubemap;', 'varying vec3 vPosition;', 'void main() {', 'gl_FragColor = textureCube(cubemap, normalize(vPosition));', '}'].join('\n')
+	};
+	
+	var Skybox = (function () {
+	  function Skybox(world, light) {
+	    _classCallCheck(this, Skybox);
+	
+	    this._world = world;
+	    this._light = light;
+	
+	    this._settings = {
+	      distance: 400000,
+	      turbidity: 10,
+	      reileigh: 2,
+	      mieCoefficient: 0.005,
+	      mieDirectionalG: 0.8,
+	      luminance: 1,
+	      inclination: 0.1, // elevation / inclination
+	      azimuth: 0.25, // Facing front,
+	      sun: !true
+	    };
+	
+	    this._initSkybox();
+	    this._updateUniforms();
+	
+	    this._initEvents();
+	  }
+	
+	  // Initialise without requiring new keyword
+	
+	  _createClass(Skybox, [{
+	    key: '_initEvents',
+	    value: function _initEvents() {
+	      // Run LOD calculations based on render calls
+	      //
+	      // Throttled to 1 LOD calculation per 100ms
+	      this._throttledWorldUpdate = (0, _lodashThrottle2['default'])(this._update, 100);
+	
+	      this._world.on('preUpdate', this._throttledWorldUpdate, this);
+	    }
+	  }, {
+	    key: '_initSkybox',
+	    value: function _initSkybox() {
+	      // Cube camera for skybox
+	      this._cubeCamera = new _three2['default'].CubeCamera(1, 2000000, 128);
+	
+	      // Cube material
+	      var cubeTarget = this._cubeCamera.renderTarget;
+	
+	      // Add Sky Mesh
+	      this._sky = new _Sky2['default']();
+	      this._skyScene = new _three2['default'].Scene();
+	      this._skyScene.add(this._sky.mesh);
+	
+	      // Add Sun Helper
+	      this._sunSphere = new _three2['default'].Mesh(new _three2['default'].SphereBufferGeometry(20000, 16, 8), new _three2['default'].MeshBasicMaterial({
+	        color: 0xffffff
+	      }));
+	      this._sunSphere.position.y = -700000;
+	      this._sunSphere.visible = false;
+	
+	      // // --------------------------------------------------------
+	      // // Irradiance level 1
+	      // // --------------------------------------------------------
+	      // var irrLvl1Uniforms = {
+	      //   cubemap: { type: "t", value: cubeTarget },
+	      //   axis: { type: "v3", value: new THREE.Vector3( 1, 0, 0 ) }
+	      // };
+	      //
+	      // var irrLvl1Mat = new THREE.ShaderMaterial({
+	      //   uniforms: irrLvl1Uniforms,
+	      //   vertexShader: document.getElementById( 'downsample_vertex_shader' ).textContent,
+	      //   fragmentShader: document.getElementById( 'downsample_fragment_shader' ).textContent,
+	      //   side: THREE.BackSide
+	      // });
+	      //
+	      // var irrLvl1CubeCamera = new THREE.CubeCamera( 1, 2000000, 64 );
+	      //
+	      // var irrLvl1Mesh = new THREE.Mesh( new THREE.BoxGeometry(2000000, 2000000, 2000000), irrLvl1Mat);
+	      // skyScene.add(irrLvl1Mesh);
+	      //
+	      // // --------------------------------------------------------
+	      // // Irradiance level 2
+	      // // --------------------------------------------------------
+	      // var irrLvl2Uniforms = {
+	      //   cubemap: { type: "t", value: irrLvl1CubeCamera.renderTarget },
+	      //   axis: { type: "v3", value: new THREE.Vector3( 0, 0, 1 ) }
+	      // };
+	      //
+	      // var irrLvl2Mat = new THREE.ShaderMaterial({
+	      //   uniforms: irrLvl2Uniforms,
+	      //   vertexShader: document.getElementById( 'downsample_vertex_shader' ).textContent,
+	      //   fragmentShader: document.getElementById( 'downsample_fragment_shader' ).textContent,
+	      //   side: THREE.BackSide
+	      // });
+	      //
+	      // var irrLvl2CubeCamera = new THREE.CubeCamera( 1, 2000000, 64 );
+	      //
+	      // var irrLvl2Mesh = new THREE.Mesh( new THREE.BoxGeometry(2000000, 2000000, 2000000), irrLvl2Mat);
+	      // skyScene.add(irrLvl2Mesh);
+	      //
+	      // // --------------------------------------------------------
+	      // // Irradiance level 3
+	      // // --------------------------------------------------------
+	      // var irrLvl3Uniforms = {
+	      //   cubemap: { type: "t", value: irrLvl2CubeCamera.renderTarget },
+	      //   axis: { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) }
+	      // };
+	      //
+	      // var irrLvl3Mat = new THREE.ShaderMaterial({
+	      //   uniforms: irrLvl3Uniforms,
+	      //   vertexShader: document.getElementById( 'downsample_vertex_shader' ).textContent,
+	      //   fragmentShader: document.getElementById( 'downsample_fragment_shader' ).textContent,
+	      //   side: THREE.BackSide
+	      // });
+	      //
+	      // var irrLvl3CubeCamera = new THREE.CubeCamera( 1, 2000000, 64 );
+	      //
+	      // var irrLvl3Mesh = new THREE.Mesh( new THREE.BoxGeometry(2000000, 2000000, 2000000), irrLvl3Mat);
+	      // skyScene.add(irrLvl3Mesh);
+	
+	      // Skybox in real scene
+	      var skyboxUniforms = {
+	        cubemap: { type: 't', value: cubeTarget }
+	      };
+	
+	      var skyboxMat = new _three2['default'].ShaderMaterial({
+	        uniforms: skyboxUniforms,
+	        vertexShader: cubemap.vertexShader,
+	        fragmentShader: cubemap.fragmentShader,
+	        side: _three2['default'].BackSide
+	      });
+	
+	      this._mesh = new _three2['default'].Mesh(new _three2['default'].BoxGeometry(40000, 40000, 40000), skyboxMat);
+	      // this._mesh = this._sky.mesh;
+	    }
+	  }, {
+	    key: '_updateUniforms',
+	    value: function _updateUniforms() {
+	      var settings = this._settings;
+	      var uniforms = this._sky.uniforms;
+	      uniforms.turbidity.value = settings.turbidity;
+	      uniforms.reileigh.value = settings.reileigh;
+	      uniforms.luminance.value = settings.luminance;
+	      uniforms.mieCoefficient.value = settings.mieCoefficient;
+	      uniforms.mieDirectionalG.value = settings.mieDirectionalG;
+	
+	      var theta = Math.PI * (settings.inclination - 0.5);
+	      var phi = 2 * Math.PI * (settings.azimuth - 0.5);
+	
+	      this._sunSphere.position.x = settings.distance * Math.cos(phi);
+	      this._sunSphere.position.y = settings.distance * Math.sin(phi) * Math.sin(theta);
+	      this._sunSphere.position.z = settings.distance * Math.sin(phi) * Math.cos(theta);
+	
+	      // Move directional light to sun position
+	      this._light.position.copy(this._sunSphere.position);
+	
+	      this._sky.uniforms.sunPosition.value.copy(this._sunSphere.position);
+	    }
+	  }, {
+	    key: '_update',
+	    value: function _update(delta) {
+	      if (!this._done) {
+	        this._done = true;
+	      } else {
+	        return;
+	      }
+	
+	      // if (!this._angle) {
+	      //   this._angle = 0;
+	      // }
+	
+	      // Animate inclination
+	      // this._angle += Math.PI * delta;
+	      // this._settings.inclination = 0.5 * (Math.sin(this._angle) / 2 + 0.5);
+	
+	      // Update light intensity depending on elevation of sun (day to night)
+	      this._light.intensity = 1 - 0.95 * (this._settings.inclination / 0.5);
+	
+	      // console.log(delta, this._angle, this._settings.inclination);
+	
+	      // TODO: Only do this when the uniforms have been changed
+	      // this._updateUniforms();
+	
+	      // TODO: Only do this when the cubemap has actually changed
+	      this._cubeCamera.updateCubeMap(this._world._engine._renderer, this._skyScene);
+	    }
+	
+	    // Destroy the skybox and remove it from memory
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {}
+	  }]);
+	
+	  return Skybox;
+	})();
+	
+	exports['default'] = function (world, light) {
+	  return new Skybox(world, light);
+	};
+	
+	;
+	module.exports = exports['default'];
+
+/***/ },
+/* 34 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+		value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	// jscs:disable
+	/*eslint eqeqeq:0*/
+	
+	/**
+	 * @author zz85 / https://github.com/zz85
+	 *
+	 * Based on 'A Practical Analytic Model for Daylight'
+	 * aka The Preetham Model, the de facto standard analytic skydome model
+	 * http://www.cs.utah.edu/~shirley/papers/sunsky/sunsky.pdf
+	 *
+	 * First implemented by Simon Wallner
+	 * http://www.simonwallner.at/projects/atmospheric-scattering
+	 *
+	 * Improved by Martin Upitis
+	 * http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR
+	 *
+	 * Three.js integration by zz85 http://twitter.com/blurspline
+	*/
+	
+	var _three = __webpack_require__(24);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	_three2['default'].ShaderLib['sky'] = {
+	
+		uniforms: {
+	
+			luminance: { type: 'f', value: 1 },
+			turbidity: { type: 'f', value: 2 },
+			reileigh: { type: 'f', value: 1 },
+			mieCoefficient: { type: 'f', value: 0.005 },
+			mieDirectionalG: { type: 'f', value: 0.8 },
+			sunPosition: { type: 'v3', value: new _three2['default'].Vector3() }
+	
+		},
+	
+		vertexShader: ['varying vec3 vWorldPosition;', 'void main() {', 'vec4 worldPosition = modelMatrix * vec4( position, 1.0 );', 'vWorldPosition = worldPosition.xyz;', 'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );', '}'].join('\n'),
+	
+		fragmentShader: ['uniform sampler2D skySampler;', 'uniform vec3 sunPosition;', 'varying vec3 vWorldPosition;', 'vec3 cameraPos = vec3(0., 0., 0.);', '// uniform sampler2D sDiffuse;', '// const float turbidity = 10.0; //', '// const float reileigh = 2.; //', '// const float luminance = 1.0; //', '// const float mieCoefficient = 0.005;', '// const float mieDirectionalG = 0.8;', 'uniform float luminance;', 'uniform float turbidity;', 'uniform float reileigh;', 'uniform float mieCoefficient;', 'uniform float mieDirectionalG;', '// constants for atmospheric scattering', 'const float e = 2.71828182845904523536028747135266249775724709369995957;', 'const float pi = 3.141592653589793238462643383279502884197169;', 'const float n = 1.0003; // refractive index of air', 'const float N = 2.545E25; // number of molecules per unit volume for air at', '// 288.15K and 1013mb (sea level -45 celsius)', 'const float pn = 0.035;	// depolatization factor for standard air', '// wavelength of used primaries, according to preetham', 'const vec3 lambda = vec3(680E-9, 550E-9, 450E-9);', '// mie stuff', '// K coefficient for the primaries', 'const vec3 K = vec3(0.686, 0.678, 0.666);', 'const float v = 4.0;', '// optical length at zenith for molecules', 'const float rayleighZenithLength = 8.4E3;', 'const float mieZenithLength = 1.25E3;', 'const vec3 up = vec3(0.0, 1.0, 0.0);', 'const float EE = 1000.0;', 'const float sunAngularDiameterCos = 0.999956676946448443553574619906976478926848692873900859324;', '// 66 arc seconds -> degrees, and the cosine of that', '// earth shadow hack', 'const float cutoffAngle = pi/1.95;', 'const float steepness = 1.5;', 'vec3 totalRayleigh(vec3 lambda)', '{', 'return (8.0 * pow(pi, 3.0) * pow(pow(n, 2.0) - 1.0, 2.0) * (6.0 + 3.0 * pn)) / (3.0 * N * pow(lambda, vec3(4.0)) * (6.0 - 7.0 * pn));', '}',
+	
+		// see http://blenderartists.org/forum/showthread.php?321110-Shaders-and-Skybox-madness
+		'// A simplied version of the total Reayleigh scattering to works on browsers that use ANGLE', 'vec3 simplifiedRayleigh()', '{', 'return 0.0005 / vec3(94, 40, 18);',
+		// return 0.00054532832366 / (3.0 * 2.545E25 * pow(vec3(680E-9, 550E-9, 450E-9), vec3(4.0)) * 6.245);
+		'}', 'float rayleighPhase(float cosTheta)', '{	 ', 'return (3.0 / (16.0*pi)) * (1.0 + pow(cosTheta, 2.0));', '//	return (1.0 / (3.0*pi)) * (1.0 + pow(cosTheta, 2.0));', '//	return (3.0 / 4.0) * (1.0 + pow(cosTheta, 2.0));', '}', 'vec3 totalMie(vec3 lambda, vec3 K, float T)', '{', 'float c = (0.2 * T ) * 10E-18;', 'return 0.434 * c * pi * pow((2.0 * pi) / lambda, vec3(v - 2.0)) * K;', '}', 'float hgPhase(float cosTheta, float g)', '{', 'return (1.0 / (4.0*pi)) * ((1.0 - pow(g, 2.0)) / pow(1.0 - 2.0*g*cosTheta + pow(g, 2.0), 1.5));', '}', 'float sunIntensity(float zenithAngleCos)', '{', 'return EE * max(0.0, 1.0 - exp(-((cutoffAngle - acos(zenithAngleCos))/steepness)));', '}', '// float logLuminance(vec3 c)', '// {', '// 	return log(c.r * 0.2126 + c.g * 0.7152 + c.b * 0.0722);', '// }', '// Filmic ToneMapping http://filmicgames.com/archives/75', 'float A = 0.15;', 'float B = 0.50;', 'float C = 0.10;', 'float D = 0.20;', 'float E = 0.02;', 'float F = 0.30;', 'float W = 1000.0;', 'vec3 Uncharted2Tonemap(vec3 x)', '{', 'return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;', '}', 'void main() ', '{', 'float sunfade = 1.0-clamp(1.0-exp((sunPosition.y/450000.0)),0.0,1.0);', '// luminance =  1.0 ;// vWorldPosition.y / 450000. + 0.5; //sunPosition.y / 450000. * 1. + 0.5;', '// gl_FragColor = vec4(sunfade, sunfade, sunfade, 1.0);', 'float reileighCoefficient = reileigh - (1.0* (1.0-sunfade));', 'vec3 sunDirection = normalize(sunPosition);', 'float sunE = sunIntensity(dot(sunDirection, up));', '// extinction (absorbtion + out scattering) ', '// rayleigh coefficients',
+	
+		// 'vec3 betaR = totalRayleigh(lambda) * reileighCoefficient;',
+		'vec3 betaR = simplifiedRayleigh() * reileighCoefficient;', '// mie coefficients', 'vec3 betaM = totalMie(lambda, K, turbidity) * mieCoefficient;', '// optical length', '// cutoff angle at 90 to avoid singularity in next formula.', 'float zenithAngle = acos(max(0.0, dot(up, normalize(vWorldPosition - cameraPos))));', 'float sR = rayleighZenithLength / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));', 'float sM = mieZenithLength / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));', '// combined extinction factor	', 'vec3 Fex = exp(-(betaR * sR + betaM * sM));', '// in scattering', 'float cosTheta = dot(normalize(vWorldPosition - cameraPos), sunDirection);', 'float rPhase = rayleighPhase(cosTheta*0.5+0.5);', 'vec3 betaRTheta = betaR * rPhase;', 'float mPhase = hgPhase(cosTheta, mieDirectionalG);', 'vec3 betaMTheta = betaM * mPhase;', 'vec3 Lin = pow(sunE * ((betaRTheta + betaMTheta) / (betaR + betaM)) * (1.0 - Fex),vec3(1.5));', 'Lin *= mix(vec3(1.0),pow(sunE * ((betaRTheta + betaMTheta) / (betaR + betaM)) * Fex,vec3(1.0/2.0)),clamp(pow(1.0-dot(up, sunDirection),5.0),0.0,1.0));', '//nightsky', 'vec3 direction = normalize(vWorldPosition - cameraPos);', 'float theta = acos(direction.y); // elevation --> y-axis, [-pi/2, pi/2]', 'float phi = atan(direction.z, direction.x); // azimuth --> x-axis [-pi/2, pi/2]', 'vec2 uv = vec2(phi, theta) / vec2(2.0*pi, pi) + vec2(0.5, 0.0);', '// vec3 L0 = texture2D(skySampler, uv).rgb+0.1 * Fex;', 'vec3 L0 = vec3(0.1) * Fex;', '// composition + solar disc', '//if (cosTheta > sunAngularDiameterCos)', 'float sundisk = smoothstep(sunAngularDiameterCos,sunAngularDiameterCos+0.00002,cosTheta);', '// if (normalize(vWorldPosition - cameraPos).y>0.0)', 'L0 += (sunE * 19000.0 * Fex)*sundisk;', 'vec3 whiteScale = 1.0/Uncharted2Tonemap(vec3(W));', 'vec3 texColor = (Lin+L0);   ', 'texColor *= 0.04 ;', 'texColor += vec3(0.0,0.001,0.0025)*0.3;', 'float g_fMaxLuminance = 1.0;', 'float fLumScaled = 0.1 / luminance;     ', 'float fLumCompressed = (fLumScaled * (1.0 + (fLumScaled / (g_fMaxLuminance * g_fMaxLuminance)))) / (1.0 + fLumScaled); ', 'float ExposureBias = fLumCompressed;', 'vec3 curr = Uncharted2Tonemap((log2(2.0/pow(luminance,4.0)))*texColor);', 'vec3 color = curr*whiteScale;', 'vec3 retColor = pow(color,vec3(1.0/(1.2+(1.2*sunfade))));', 'gl_FragColor.rgb = retColor;', 'gl_FragColor.a = 1.0;', '}'].join('\n')
+	
+	};
+	
+	var Sky = function Sky() {
+	
+		var skyShader = _three2['default'].ShaderLib['sky'];
+		var skyUniforms = _three2['default'].UniformsUtils.clone(skyShader.uniforms);
+	
+		var skyMat = new _three2['default'].ShaderMaterial({
+			fragmentShader: skyShader.fragmentShader,
+			vertexShader: skyShader.vertexShader,
+			uniforms: skyUniforms,
+			side: _three2['default'].BackSide
+		});
+	
+		var skyGeo = new _three2['default'].SphereBufferGeometry(450000, 32, 15);
+		var skyMesh = new _three2['default'].Mesh(skyGeo, skyMat);
+	
+		// Expose variables
+		this.mesh = skyMesh;
+		this.uniforms = skyUniforms;
+	};
+	
+	exports['default'] = Sky;
+	module.exports = exports['default'];
+
+/***/ },
+/* 35 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * lodash 4.0.0 (Custom Build) <https://lodash.com/>
+	 * Build: `lodash modularize exports="npm" -o ./`
+	 * Copyright 2012-2016 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2016 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <https://lodash.com/license>
+	 */
+	var debounce = __webpack_require__(36);
+	
+	/** Used as the `TypeError` message for "Functions" methods. */
+	var FUNC_ERROR_TEXT = 'Expected a function';
+	
+	/**
+	 * Creates a throttled function that only invokes `func` at most once per
+	 * every `wait` milliseconds. The throttled function comes with a `cancel`
+	 * method to cancel delayed `func` invocations and a `flush` method to
+	 * immediately invoke them. Provide an options object to indicate whether
+	 * `func` should be invoked on the leading and/or trailing edge of the `wait`
+	 * timeout. The `func` is invoked with the last arguments provided to the
+	 * throttled function. Subsequent calls to the throttled function return the
+	 * result of the last `func` invocation.
+	 *
+	 * **Note:** If `leading` and `trailing` options are `true`, `func` is invoked
+	 * on the trailing edge of the timeout only if the the throttled function is
+	 * invoked more than once during the `wait` timeout.
+	 *
+	 * See [David Corbacho's article](http://drupalmotion.com/article/debounce-and-throttle-visual-explanation)
+	 * for details over the differences between `_.throttle` and `_.debounce`.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Function
+	 * @param {Function} func The function to throttle.
+	 * @param {number} [wait=0] The number of milliseconds to throttle invocations to.
+	 * @param {Object} [options] The options object.
+	 * @param {boolean} [options.leading=true] Specify invoking on the leading
+	 *  edge of the timeout.
+	 * @param {boolean} [options.trailing=true] Specify invoking on the trailing
+	 *  edge of the timeout.
+	 * @returns {Function} Returns the new throttled function.
+	 * @example
+	 *
+	 * // avoid excessively updating the position while scrolling
+	 * jQuery(window).on('scroll', _.throttle(updatePosition, 100));
+	 *
+	 * // invoke `renewToken` when the click event is fired, but not more than once every 5 minutes
+	 * var throttled = _.throttle(renewToken, 300000, { 'trailing': false });
+	 * jQuery(element).on('click', throttled);
+	 *
+	 * // cancel a trailing throttled invocation
+	 * jQuery(window).on('popstate', throttled.cancel);
+	 */
+	function throttle(func, wait, options) {
+	  var leading = true,
+	      trailing = true;
+	
+	  if (typeof func != 'function') {
+	    throw new TypeError(FUNC_ERROR_TEXT);
+	  }
+	  if (isObject(options)) {
+	    leading = 'leading' in options ? !!options.leading : leading;
+	    trailing = 'trailing' in options ? !!options.trailing : trailing;
+	  }
+	  return debounce(func, wait, { 'leading': leading, 'maxWait': wait, 'trailing': trailing });
+	}
+	
+	/**
+	 * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
+	 * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+	 * @example
+	 *
+	 * _.isObject({});
+	 * // => true
+	 *
+	 * _.isObject([1, 2, 3]);
+	 * // => true
+	 *
+	 * _.isObject(_.noop);
+	 * // => true
+	 *
+	 * _.isObject(null);
+	 * // => false
+	 */
+	function isObject(value) {
+	  // Avoid a V8 JIT bug in Chrome 19-20.
+	  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
+	  var type = typeof value;
+	  return !!value && (type == 'object' || type == 'function');
+	}
+	
+	module.exports = throttle;
+
+
+/***/ },
+/* 36 */
+/***/ function(module, exports) {
+
+	/**
+	 * lodash 4.0.1 (Custom Build) <https://lodash.com/>
+	 * Build: `lodash modularize exports="npm" -o ./`
+	 * Copyright 2012-2016 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2016 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <https://lodash.com/license>
+	 */
+	
+	/** Used as the `TypeError` message for "Functions" methods. */
+	var FUNC_ERROR_TEXT = 'Expected a function';
+	
+	/** Used as references for various `Number` constants. */
+	var NAN = 0 / 0;
+	
+	/** `Object#toString` result references. */
+	var funcTag = '[object Function]',
+	    genTag = '[object GeneratorFunction]';
+	
+	/** Used to match leading and trailing whitespace. */
+	var reTrim = /^\s+|\s+$/g;
+	
+	/** Used to detect bad signed hexadecimal string values. */
+	var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
+	
+	/** Used to detect binary string values. */
+	var reIsBinary = /^0b[01]+$/i;
+	
+	/** Used to detect octal string values. */
+	var reIsOctal = /^0o[0-7]+$/i;
+	
+	/** Built-in method references without a dependency on `root`. */
+	var freeParseInt = parseInt;
+	
+	/** Used for built-in method references. */
+	var objectProto = Object.prototype;
+	
+	/**
+	 * Used to resolve the [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
+	 * of values.
+	 */
+	var objectToString = objectProto.toString;
+	
+	/* Built-in method references for those with the same name as other `lodash` methods. */
+	var nativeMax = Math.max;
+	
+	/**
+	 * Gets the timestamp of the number of milliseconds that have elapsed since
+	 * the Unix epoch (1 January 1970 00:00:00 UTC).
+	 *
+	 * @static
+	 * @memberOf _
+	 * @type Function
+	 * @category Date
+	 * @returns {number} Returns the timestamp.
+	 * @example
+	 *
+	 * _.defer(function(stamp) {
+	 *   console.log(_.now() - stamp);
+	 * }, _.now());
+	 * // => logs the number of milliseconds it took for the deferred function to be invoked
+	 */
+	var now = Date.now;
+	
+	/**
+	 * Creates a debounced function that delays invoking `func` until after `wait`
+	 * milliseconds have elapsed since the last time the debounced function was
+	 * invoked. The debounced function comes with a `cancel` method to cancel
+	 * delayed `func` invocations and a `flush` method to immediately invoke them.
+	 * Provide an options object to indicate whether `func` should be invoked on
+	 * the leading and/or trailing edge of the `wait` timeout. The `func` is invoked
+	 * with the last arguments provided to the debounced function. Subsequent calls
+	 * to the debounced function return the result of the last `func` invocation.
+	 *
+	 * **Note:** If `leading` and `trailing` options are `true`, `func` is invoked
+	 * on the trailing edge of the timeout only if the the debounced function is
+	 * invoked more than once during the `wait` timeout.
+	 *
+	 * See [David Corbacho's article](http://drupalmotion.com/article/debounce-and-throttle-visual-explanation)
+	 * for details over the differences between `_.debounce` and `_.throttle`.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Function
+	 * @param {Function} func The function to debounce.
+	 * @param {number} [wait=0] The number of milliseconds to delay.
+	 * @param {Object} [options] The options object.
+	 * @param {boolean} [options.leading=false] Specify invoking on the leading
+	 *  edge of the timeout.
+	 * @param {number} [options.maxWait] The maximum time `func` is allowed to be
+	 *  delayed before it's invoked.
+	 * @param {boolean} [options.trailing=true] Specify invoking on the trailing
+	 *  edge of the timeout.
+	 * @returns {Function} Returns the new debounced function.
+	 * @example
+	 *
+	 * // Avoid costly calculations while the window size is in flux.
+	 * jQuery(window).on('resize', _.debounce(calculateLayout, 150));
+	 *
+	 * // Invoke `sendMail` when clicked, debouncing subsequent calls.
+	 * jQuery(element).on('click', _.debounce(sendMail, 300, {
+	 *   'leading': true,
+	 *   'trailing': false
+	 * }));
+	 *
+	 * // Ensure `batchLog` is invoked once after 1 second of debounced calls.
+	 * var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });
+	 * var source = new EventSource('/stream');
+	 * jQuery(source).on('message', debounced);
+	 *
+	 * // Cancel the trailing debounced invocation.
+	 * jQuery(window).on('popstate', debounced.cancel);
+	 */
+	function debounce(func, wait, options) {
+	  var args,
+	      maxTimeoutId,
+	      result,
+	      stamp,
+	      thisArg,
+	      timeoutId,
+	      trailingCall,
+	      lastCalled = 0,
+	      leading = false,
+	      maxWait = false,
+	      trailing = true;
+	
+	  if (typeof func != 'function') {
+	    throw new TypeError(FUNC_ERROR_TEXT);
+	  }
+	  wait = toNumber(wait) || 0;
+	  if (isObject(options)) {
+	    leading = !!options.leading;
+	    maxWait = 'maxWait' in options && nativeMax(toNumber(options.maxWait) || 0, wait);
+	    trailing = 'trailing' in options ? !!options.trailing : trailing;
+	  }
+	
+	  function cancel() {
+	    if (timeoutId) {
+	      clearTimeout(timeoutId);
+	    }
+	    if (maxTimeoutId) {
+	      clearTimeout(maxTimeoutId);
+	    }
+	    lastCalled = 0;
+	    args = maxTimeoutId = thisArg = timeoutId = trailingCall = undefined;
+	  }
+	
+	  function complete(isCalled, id) {
+	    if (id) {
+	      clearTimeout(id);
+	    }
+	    maxTimeoutId = timeoutId = trailingCall = undefined;
+	    if (isCalled) {
+	      lastCalled = now();
+	      result = func.apply(thisArg, args);
+	      if (!timeoutId && !maxTimeoutId) {
+	        args = thisArg = undefined;
+	      }
+	    }
+	  }
+	
+	  function delayed() {
+	    var remaining = wait - (now() - stamp);
+	    if (remaining <= 0 || remaining > wait) {
+	      complete(trailingCall, maxTimeoutId);
+	    } else {
+	      timeoutId = setTimeout(delayed, remaining);
+	    }
+	  }
+	
+	  function flush() {
+	    if ((timeoutId && trailingCall) || (maxTimeoutId && trailing)) {
+	      result = func.apply(thisArg, args);
+	    }
+	    cancel();
+	    return result;
+	  }
+	
+	  function maxDelayed() {
+	    complete(trailing, timeoutId);
+	  }
+	
+	  function debounced() {
+	    args = arguments;
+	    stamp = now();
+	    thisArg = this;
+	    trailingCall = trailing && (timeoutId || !leading);
+	
+	    if (maxWait === false) {
+	      var leadingCall = leading && !timeoutId;
+	    } else {
+	      if (!maxTimeoutId && !leading) {
+	        lastCalled = stamp;
+	      }
+	      var remaining = maxWait - (stamp - lastCalled),
+	          isCalled = remaining <= 0 || remaining > maxWait;
+	
+	      if (isCalled) {
+	        if (maxTimeoutId) {
+	          maxTimeoutId = clearTimeout(maxTimeoutId);
+	        }
+	        lastCalled = stamp;
+	        result = func.apply(thisArg, args);
+	      }
+	      else if (!maxTimeoutId) {
+	        maxTimeoutId = setTimeout(maxDelayed, remaining);
+	      }
+	    }
+	    if (isCalled && timeoutId) {
+	      timeoutId = clearTimeout(timeoutId);
+	    }
+	    else if (!timeoutId && wait !== maxWait) {
+	      timeoutId = setTimeout(delayed, wait);
+	    }
+	    if (leadingCall) {
+	      isCalled = true;
+	      result = func.apply(thisArg, args);
+	    }
+	    if (isCalled && !timeoutId && !maxTimeoutId) {
+	      args = thisArg = undefined;
+	    }
+	    return result;
+	  }
+	  debounced.cancel = cancel;
+	  debounced.flush = flush;
+	  return debounced;
+	}
+	
+	/**
+	 * Checks if `value` is classified as a `Function` object.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
+	 * @example
+	 *
+	 * _.isFunction(_);
+	 * // => true
+	 *
+	 * _.isFunction(/abc/);
+	 * // => false
+	 */
+	function isFunction(value) {
+	  // The use of `Object#toString` avoids issues with the `typeof` operator
+	  // in Safari 8 which returns 'object' for typed array constructors, and
+	  // PhantomJS 1.9 which returns 'function' for `NodeList` instances.
+	  var tag = isObject(value) ? objectToString.call(value) : '';
+	  return tag == funcTag || tag == genTag;
+	}
+	
+	/**
+	 * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
+	 * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+	 * @example
+	 *
+	 * _.isObject({});
+	 * // => true
+	 *
+	 * _.isObject([1, 2, 3]);
+	 * // => true
+	 *
+	 * _.isObject(_.noop);
+	 * // => true
+	 *
+	 * _.isObject(null);
+	 * // => false
+	 */
+	function isObject(value) {
+	  var type = typeof value;
+	  return !!value && (type == 'object' || type == 'function');
+	}
+	
+	/**
+	 * Converts `value` to a number.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Lang
+	 * @param {*} value The value to process.
+	 * @returns {number} Returns the number.
+	 * @example
+	 *
+	 * _.toNumber(3);
+	 * // => 3
+	 *
+	 * _.toNumber(Number.MIN_VALUE);
+	 * // => 5e-324
+	 *
+	 * _.toNumber(Infinity);
+	 * // => Infinity
+	 *
+	 * _.toNumber('3');
+	 * // => 3
+	 */
+	function toNumber(value) {
+	  if (isObject(value)) {
+	    var other = isFunction(value.valueOf) ? value.valueOf() : value;
+	    value = isObject(other) ? (other + '') : other;
+	  }
+	  if (typeof value != 'string') {
+	    return value === 0 ? value : +value;
+	  }
+	  value = value.replace(reTrim, '');
+	  var isBinary = reIsBinary.test(value);
+	  return (isBinary || reIsOctal.test(value))
+	    ? freeParseInt(value.slice(2), isBinary ? 2 : 8)
+	    : (reIsBadHex.test(value) ? NAN : +value);
+	}
+	
+	module.exports = debounce;
+
+
+/***/ },
+/* 37 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
 	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
@@ -4546,25 +5317,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _TileLayer2 = __webpack_require__(34);
+	var _TileLayer2 = __webpack_require__(38);
 	
 	var _TileLayer3 = _interopRequireDefault(_TileLayer2);
 	
-	var _ImageTile = __webpack_require__(44);
+	var _ImageTile = __webpack_require__(48);
 	
 	var _ImageTile2 = _interopRequireDefault(_ImageTile);
 	
-	var _ImageTileLayerBaseMaterial = __webpack_require__(47);
+	var _ImageTileLayerBaseMaterial = __webpack_require__(51);
 	
 	var _ImageTileLayerBaseMaterial2 = _interopRequireDefault(_ImageTileLayerBaseMaterial);
 	
-	var _lodashThrottle = __webpack_require__(48);
+	var _lodashThrottle = __webpack_require__(35);
 	
 	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
 	
 	var _three = __webpack_require__(24);
 	
 	var _three2 = _interopRequireDefault(_three);
+	
+	var _lodashAssign = __webpack_require__(3);
+	
+	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
 	// DONE: Find a way to avoid the flashing caused by the gap between old tiles
 	// being removed and the new tiles being ready for display
@@ -4611,6 +5386,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function ImageTileLayer(path, options) {
 	    _classCallCheck(this, ImageTileLayer);
 	
+	    var defaults = {
+	      distance: 40000
+	    };
+	
+	    options = (0, _lodashAssign2['default'])(defaults, options);
+	
 	    _get(Object.getPrototypeOf(ImageTileLayer.prototype), 'constructor', this).call(this, options);
 	
 	    this._path = path;
@@ -4627,7 +5408,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // Add base layer
 	      var geom = new _three2['default'].PlaneBufferGeometry(40000, 40000, 1);
-	      var mesh = new _three2['default'].Mesh(geom, (0, _ImageTileLayerBaseMaterial2['default'])('#f5f5f3'));
+	      var mesh = new _three2['default'].Mesh(geom, (0, _ImageTileLayerBaseMaterial2['default'])('#f5f5f3', this._options.skybox));
 	      mesh.rotation.x = -90 * Math.PI / 180;
 	
 	      this._baseLayer = mesh;
@@ -4714,7 +5495,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 34 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -4739,7 +5520,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _TileCache = __webpack_require__(35);
+	var _TileCache = __webpack_require__(39);
 	
 	var _TileCache2 = _interopRequireDefault(_TileCache);
 	
@@ -5064,7 +5845,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 35 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -5077,7 +5858,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var _lruCache = __webpack_require__(36);
+	var _lruCache = __webpack_require__(40);
 	
 	var _lruCache2 = _interopRequireDefault(_lruCache);
 	
@@ -5143,18 +5924,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 36 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = LRUCache
 	
 	// This will be a proper iterable 'Map' in engines that support it,
 	// or a fakey-fake PseudoMap in older versions.
-	var Map = __webpack_require__(37)
-	var util = __webpack_require__(40)
+	var Map = __webpack_require__(41)
+	var util = __webpack_require__(44)
 	
 	// A linked list to keep track of recently-used-ness
-	var Yallist = __webpack_require__(43)
+	var Yallist = __webpack_require__(47)
 	
 	// use symbols if possible, otherwise just _props
 	var symbols = {}
@@ -5617,7 +6398,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 37 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {if (process.env.npm_package_name === 'pseudomap' &&
@@ -5627,13 +6408,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	if (typeof Map === 'function' && !process.env.TEST_PSEUDOMAP) {
 	  module.exports = Map
 	} else {
-	  module.exports = __webpack_require__(39)
+	  module.exports = __webpack_require__(43)
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(38)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(42)))
 
 /***/ },
-/* 38 */
+/* 42 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -5730,7 +6511,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 39 */
+/* 43 */
 /***/ function(module, exports) {
 
 	var hasOwnProperty = Object.prototype.hasOwnProperty
@@ -5849,7 +6630,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 40 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -6377,7 +7158,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.isPrimitive = isPrimitive;
 	
-	exports.isBuffer = __webpack_require__(41);
+	exports.isBuffer = __webpack_require__(45);
 	
 	function objectToString(o) {
 	  return Object.prototype.toString.call(o);
@@ -6421,7 +7202,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *     prototype.
 	 * @param {function} superCtor Constructor function to inherit prototype from.
 	 */
-	exports.inherits = __webpack_require__(42);
+	exports.inherits = __webpack_require__(46);
 	
 	exports._extend = function(origin, add) {
 	  // Don't do anything if add isn't an object
@@ -6439,10 +7220,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return Object.prototype.hasOwnProperty.call(obj, prop);
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(38)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(42)))
 
 /***/ },
-/* 41 */
+/* 45 */
 /***/ function(module, exports) {
 
 	module.exports = function isBuffer(arg) {
@@ -6453,7 +7234,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 42 */
+/* 46 */
 /***/ function(module, exports) {
 
 	if (typeof Object.create === 'function') {
@@ -6482,7 +7263,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 43 */
+/* 47 */
 /***/ function(module, exports) {
 
 	module.exports = Yallist
@@ -6848,7 +7629,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 44 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -6865,11 +7646,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Tile2 = __webpack_require__(45);
+	var _Tile2 = __webpack_require__(49);
 	
 	var _Tile3 = _interopRequireDefault(_Tile2);
 	
-	var _vendorBoxHelper = __webpack_require__(46);
+	var _vendorBoxHelper = __webpack_require__(50);
 	
 	var _vendorBoxHelper2 = _interopRequireDefault(_vendorBoxHelper);
 	
@@ -6927,9 +7708,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var mesh = new _three2['default'].Object3D();
 	      var geom = new _three2['default'].PlaneBufferGeometry(this._side, this._side, 1);
 	
-	      var material = new _three2['default'].MeshBasicMaterial({
+	      // var material = new THREE.MeshBasicMaterial({
+	      //   depthWrite: false
+	      // });
+	
+	      // var material = new THREE.MeshPhongMaterial({
+	      //   depthWrite: false
+	      // });
+	
+	      // Other MeshStandardMaterial settings
+	      //
+	      // material.envMapIntensity will change the amount of colour reflected(?)
+	      // from the environment map – can be greater than 1 for more intensity
+	
+	      var material = new _three2['default'].MeshStandardMaterial({
+	        // Does this do anything?
+	        // combine: THREE.MixOperation,
 	        depthWrite: false
 	      });
+	      material.roughness = 1;
+	      material.metalness = 0.1;
+	      material.envMap = this._layer._options.skybox;
 	
 	      var localMesh = new _three2['default'].Mesh(geom, material);
 	      localMesh.rotation.x = -90 * Math.PI / 180;
@@ -7062,7 +7861,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 45 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -7300,7 +8099,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 46 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -7390,7 +8189,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 47 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -7403,7 +8202,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	exports['default'] = function (colour) {
+	exports['default'] = function (colour, skybox) {
 	  var canvas = document.createElement('canvas');
 	  canvas.width = 1;
 	  canvas.height = 1;
@@ -7429,10 +8228,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  texture.needsUpdate = true;
 	
-	  var material = new _three2['default'].MeshBasicMaterial({
-	    map: texture,
+	  // var material = new THREE.MeshBasicMaterial({
+	  //   map: texture,
+	  //   depthWrite: false
+	  // });
+	
+	  var material = new _three2['default'].MeshStandardMaterial({
 	    depthWrite: false
 	  });
+	  material.roughness = 1;
+	  material.metalness = 0.2;
+	  material.envMap = skybox;
 	
 	  return material;
 	};
@@ -7441,435 +8247,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 48 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * lodash 4.0.0 (Custom Build) <https://lodash.com/>
-	 * Build: `lodash modularize exports="npm" -o ./`
-	 * Copyright 2012-2016 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2016 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <https://lodash.com/license>
-	 */
-	var debounce = __webpack_require__(49);
-	
-	/** Used as the `TypeError` message for "Functions" methods. */
-	var FUNC_ERROR_TEXT = 'Expected a function';
-	
-	/**
-	 * Creates a throttled function that only invokes `func` at most once per
-	 * every `wait` milliseconds. The throttled function comes with a `cancel`
-	 * method to cancel delayed `func` invocations and a `flush` method to
-	 * immediately invoke them. Provide an options object to indicate whether
-	 * `func` should be invoked on the leading and/or trailing edge of the `wait`
-	 * timeout. The `func` is invoked with the last arguments provided to the
-	 * throttled function. Subsequent calls to the throttled function return the
-	 * result of the last `func` invocation.
-	 *
-	 * **Note:** If `leading` and `trailing` options are `true`, `func` is invoked
-	 * on the trailing edge of the timeout only if the the throttled function is
-	 * invoked more than once during the `wait` timeout.
-	 *
-	 * See [David Corbacho's article](http://drupalmotion.com/article/debounce-and-throttle-visual-explanation)
-	 * for details over the differences between `_.throttle` and `_.debounce`.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Function
-	 * @param {Function} func The function to throttle.
-	 * @param {number} [wait=0] The number of milliseconds to throttle invocations to.
-	 * @param {Object} [options] The options object.
-	 * @param {boolean} [options.leading=true] Specify invoking on the leading
-	 *  edge of the timeout.
-	 * @param {boolean} [options.trailing=true] Specify invoking on the trailing
-	 *  edge of the timeout.
-	 * @returns {Function} Returns the new throttled function.
-	 * @example
-	 *
-	 * // avoid excessively updating the position while scrolling
-	 * jQuery(window).on('scroll', _.throttle(updatePosition, 100));
-	 *
-	 * // invoke `renewToken` when the click event is fired, but not more than once every 5 minutes
-	 * var throttled = _.throttle(renewToken, 300000, { 'trailing': false });
-	 * jQuery(element).on('click', throttled);
-	 *
-	 * // cancel a trailing throttled invocation
-	 * jQuery(window).on('popstate', throttled.cancel);
-	 */
-	function throttle(func, wait, options) {
-	  var leading = true,
-	      trailing = true;
-	
-	  if (typeof func != 'function') {
-	    throw new TypeError(FUNC_ERROR_TEXT);
-	  }
-	  if (isObject(options)) {
-	    leading = 'leading' in options ? !!options.leading : leading;
-	    trailing = 'trailing' in options ? !!options.trailing : trailing;
-	  }
-	  return debounce(func, wait, { 'leading': leading, 'maxWait': wait, 'trailing': trailing });
-	}
-	
-	/**
-	 * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
-	 * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Lang
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is an object, else `false`.
-	 * @example
-	 *
-	 * _.isObject({});
-	 * // => true
-	 *
-	 * _.isObject([1, 2, 3]);
-	 * // => true
-	 *
-	 * _.isObject(_.noop);
-	 * // => true
-	 *
-	 * _.isObject(null);
-	 * // => false
-	 */
-	function isObject(value) {
-	  // Avoid a V8 JIT bug in Chrome 19-20.
-	  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
-	  var type = typeof value;
-	  return !!value && (type == 'object' || type == 'function');
-	}
-	
-	module.exports = throttle;
-
-
-/***/ },
-/* 49 */
-/***/ function(module, exports) {
-
-	/**
-	 * lodash 4.0.1 (Custom Build) <https://lodash.com/>
-	 * Build: `lodash modularize exports="npm" -o ./`
-	 * Copyright 2012-2016 The Dojo Foundation <http://dojofoundation.org/>
-	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2016 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <https://lodash.com/license>
-	 */
-	
-	/** Used as the `TypeError` message for "Functions" methods. */
-	var FUNC_ERROR_TEXT = 'Expected a function';
-	
-	/** Used as references for various `Number` constants. */
-	var NAN = 0 / 0;
-	
-	/** `Object#toString` result references. */
-	var funcTag = '[object Function]',
-	    genTag = '[object GeneratorFunction]';
-	
-	/** Used to match leading and trailing whitespace. */
-	var reTrim = /^\s+|\s+$/g;
-	
-	/** Used to detect bad signed hexadecimal string values. */
-	var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
-	
-	/** Used to detect binary string values. */
-	var reIsBinary = /^0b[01]+$/i;
-	
-	/** Used to detect octal string values. */
-	var reIsOctal = /^0o[0-7]+$/i;
-	
-	/** Built-in method references without a dependency on `root`. */
-	var freeParseInt = parseInt;
-	
-	/** Used for built-in method references. */
-	var objectProto = Object.prototype;
-	
-	/**
-	 * Used to resolve the [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
-	 * of values.
-	 */
-	var objectToString = objectProto.toString;
-	
-	/* Built-in method references for those with the same name as other `lodash` methods. */
-	var nativeMax = Math.max;
-	
-	/**
-	 * Gets the timestamp of the number of milliseconds that have elapsed since
-	 * the Unix epoch (1 January 1970 00:00:00 UTC).
-	 *
-	 * @static
-	 * @memberOf _
-	 * @type Function
-	 * @category Date
-	 * @returns {number} Returns the timestamp.
-	 * @example
-	 *
-	 * _.defer(function(stamp) {
-	 *   console.log(_.now() - stamp);
-	 * }, _.now());
-	 * // => logs the number of milliseconds it took for the deferred function to be invoked
-	 */
-	var now = Date.now;
-	
-	/**
-	 * Creates a debounced function that delays invoking `func` until after `wait`
-	 * milliseconds have elapsed since the last time the debounced function was
-	 * invoked. The debounced function comes with a `cancel` method to cancel
-	 * delayed `func` invocations and a `flush` method to immediately invoke them.
-	 * Provide an options object to indicate whether `func` should be invoked on
-	 * the leading and/or trailing edge of the `wait` timeout. The `func` is invoked
-	 * with the last arguments provided to the debounced function. Subsequent calls
-	 * to the debounced function return the result of the last `func` invocation.
-	 *
-	 * **Note:** If `leading` and `trailing` options are `true`, `func` is invoked
-	 * on the trailing edge of the timeout only if the the debounced function is
-	 * invoked more than once during the `wait` timeout.
-	 *
-	 * See [David Corbacho's article](http://drupalmotion.com/article/debounce-and-throttle-visual-explanation)
-	 * for details over the differences between `_.debounce` and `_.throttle`.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Function
-	 * @param {Function} func The function to debounce.
-	 * @param {number} [wait=0] The number of milliseconds to delay.
-	 * @param {Object} [options] The options object.
-	 * @param {boolean} [options.leading=false] Specify invoking on the leading
-	 *  edge of the timeout.
-	 * @param {number} [options.maxWait] The maximum time `func` is allowed to be
-	 *  delayed before it's invoked.
-	 * @param {boolean} [options.trailing=true] Specify invoking on the trailing
-	 *  edge of the timeout.
-	 * @returns {Function} Returns the new debounced function.
-	 * @example
-	 *
-	 * // Avoid costly calculations while the window size is in flux.
-	 * jQuery(window).on('resize', _.debounce(calculateLayout, 150));
-	 *
-	 * // Invoke `sendMail` when clicked, debouncing subsequent calls.
-	 * jQuery(element).on('click', _.debounce(sendMail, 300, {
-	 *   'leading': true,
-	 *   'trailing': false
-	 * }));
-	 *
-	 * // Ensure `batchLog` is invoked once after 1 second of debounced calls.
-	 * var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });
-	 * var source = new EventSource('/stream');
-	 * jQuery(source).on('message', debounced);
-	 *
-	 * // Cancel the trailing debounced invocation.
-	 * jQuery(window).on('popstate', debounced.cancel);
-	 */
-	function debounce(func, wait, options) {
-	  var args,
-	      maxTimeoutId,
-	      result,
-	      stamp,
-	      thisArg,
-	      timeoutId,
-	      trailingCall,
-	      lastCalled = 0,
-	      leading = false,
-	      maxWait = false,
-	      trailing = true;
-	
-	  if (typeof func != 'function') {
-	    throw new TypeError(FUNC_ERROR_TEXT);
-	  }
-	  wait = toNumber(wait) || 0;
-	  if (isObject(options)) {
-	    leading = !!options.leading;
-	    maxWait = 'maxWait' in options && nativeMax(toNumber(options.maxWait) || 0, wait);
-	    trailing = 'trailing' in options ? !!options.trailing : trailing;
-	  }
-	
-	  function cancel() {
-	    if (timeoutId) {
-	      clearTimeout(timeoutId);
-	    }
-	    if (maxTimeoutId) {
-	      clearTimeout(maxTimeoutId);
-	    }
-	    lastCalled = 0;
-	    args = maxTimeoutId = thisArg = timeoutId = trailingCall = undefined;
-	  }
-	
-	  function complete(isCalled, id) {
-	    if (id) {
-	      clearTimeout(id);
-	    }
-	    maxTimeoutId = timeoutId = trailingCall = undefined;
-	    if (isCalled) {
-	      lastCalled = now();
-	      result = func.apply(thisArg, args);
-	      if (!timeoutId && !maxTimeoutId) {
-	        args = thisArg = undefined;
-	      }
-	    }
-	  }
-	
-	  function delayed() {
-	    var remaining = wait - (now() - stamp);
-	    if (remaining <= 0 || remaining > wait) {
-	      complete(trailingCall, maxTimeoutId);
-	    } else {
-	      timeoutId = setTimeout(delayed, remaining);
-	    }
-	  }
-	
-	  function flush() {
-	    if ((timeoutId && trailingCall) || (maxTimeoutId && trailing)) {
-	      result = func.apply(thisArg, args);
-	    }
-	    cancel();
-	    return result;
-	  }
-	
-	  function maxDelayed() {
-	    complete(trailing, timeoutId);
-	  }
-	
-	  function debounced() {
-	    args = arguments;
-	    stamp = now();
-	    thisArg = this;
-	    trailingCall = trailing && (timeoutId || !leading);
-	
-	    if (maxWait === false) {
-	      var leadingCall = leading && !timeoutId;
-	    } else {
-	      if (!maxTimeoutId && !leading) {
-	        lastCalled = stamp;
-	      }
-	      var remaining = maxWait - (stamp - lastCalled),
-	          isCalled = remaining <= 0 || remaining > maxWait;
-	
-	      if (isCalled) {
-	        if (maxTimeoutId) {
-	          maxTimeoutId = clearTimeout(maxTimeoutId);
-	        }
-	        lastCalled = stamp;
-	        result = func.apply(thisArg, args);
-	      }
-	      else if (!maxTimeoutId) {
-	        maxTimeoutId = setTimeout(maxDelayed, remaining);
-	      }
-	    }
-	    if (isCalled && timeoutId) {
-	      timeoutId = clearTimeout(timeoutId);
-	    }
-	    else if (!timeoutId && wait !== maxWait) {
-	      timeoutId = setTimeout(delayed, wait);
-	    }
-	    if (leadingCall) {
-	      isCalled = true;
-	      result = func.apply(thisArg, args);
-	    }
-	    if (isCalled && !timeoutId && !maxTimeoutId) {
-	      args = thisArg = undefined;
-	    }
-	    return result;
-	  }
-	  debounced.cancel = cancel;
-	  debounced.flush = flush;
-	  return debounced;
-	}
-	
-	/**
-	 * Checks if `value` is classified as a `Function` object.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Lang
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
-	 * @example
-	 *
-	 * _.isFunction(_);
-	 * // => true
-	 *
-	 * _.isFunction(/abc/);
-	 * // => false
-	 */
-	function isFunction(value) {
-	  // The use of `Object#toString` avoids issues with the `typeof` operator
-	  // in Safari 8 which returns 'object' for typed array constructors, and
-	  // PhantomJS 1.9 which returns 'function' for `NodeList` instances.
-	  var tag = isObject(value) ? objectToString.call(value) : '';
-	  return tag == funcTag || tag == genTag;
-	}
-	
-	/**
-	 * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
-	 * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Lang
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is an object, else `false`.
-	 * @example
-	 *
-	 * _.isObject({});
-	 * // => true
-	 *
-	 * _.isObject([1, 2, 3]);
-	 * // => true
-	 *
-	 * _.isObject(_.noop);
-	 * // => true
-	 *
-	 * _.isObject(null);
-	 * // => false
-	 */
-	function isObject(value) {
-	  var type = typeof value;
-	  return !!value && (type == 'object' || type == 'function');
-	}
-	
-	/**
-	 * Converts `value` to a number.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @category Lang
-	 * @param {*} value The value to process.
-	 * @returns {number} Returns the number.
-	 * @example
-	 *
-	 * _.toNumber(3);
-	 * // => 3
-	 *
-	 * _.toNumber(Number.MIN_VALUE);
-	 * // => 5e-324
-	 *
-	 * _.toNumber(Infinity);
-	 * // => Infinity
-	 *
-	 * _.toNumber('3');
-	 * // => 3
-	 */
-	function toNumber(value) {
-	  if (isObject(value)) {
-	    var other = isFunction(value.valueOf) ? value.valueOf() : value;
-	    value = isObject(other) ? (other + '') : other;
-	  }
-	  if (typeof value != 'string') {
-	    return value === 0 ? value : +value;
-	  }
-	  value = value.replace(reTrim, '');
-	  var isBinary = reIsBinary.test(value);
-	  return (isBinary || reIsOctal.test(value))
-	    ? freeParseInt(value.slice(2), isBinary ? 2 : 8)
-	    : (reIsBadHex.test(value) ? NAN : +value);
-	}
-	
-	module.exports = debounce;
-
-
-/***/ },
-/* 50 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -7886,7 +8264,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _TileLayer2 = __webpack_require__(34);
+	var _TileLayer2 = __webpack_require__(38);
 	
 	var _TileLayer3 = _interopRequireDefault(_TileLayer2);
 	
@@ -7894,11 +8272,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _TopoJSONTile = __webpack_require__(51);
+	var _TopoJSONTile = __webpack_require__(53);
 	
 	var _TopoJSONTile2 = _interopRequireDefault(_TopoJSONTile);
 	
-	var _lodashThrottle = __webpack_require__(48);
+	var _lodashThrottle = __webpack_require__(35);
 	
 	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
 	
@@ -8004,7 +8382,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 51 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -8021,11 +8399,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Tile2 = __webpack_require__(45);
+	var _Tile2 = __webpack_require__(49);
 	
 	var _Tile3 = _interopRequireDefault(_Tile2);
 	
-	var _vendorBoxHelper = __webpack_require__(46);
+	var _vendorBoxHelper = __webpack_require__(50);
 	
 	var _vendorBoxHelper2 = _interopRequireDefault(_vendorBoxHelper);
 	
@@ -8033,11 +8411,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _reqwest = __webpack_require__(52);
+	var _reqwest = __webpack_require__(54);
 	
 	var _reqwest2 = _interopRequireDefault(_reqwest);
 	
-	var _topojson = __webpack_require__(54);
+	var _topojson = __webpack_require__(56);
 	
 	var _topojson2 = _interopRequireDefault(_topojson);
 	
@@ -8049,7 +8427,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _geoLatLon2 = _interopRequireDefault(_geoLatLon);
 	
-	var _earcut = __webpack_require__(55);
+	var _earcut = __webpack_require__(57);
 	
 	var _earcut2 = _interopRequireDefault(_earcut);
 	
@@ -8057,7 +8435,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _utilExtrudePolygon = __webpack_require__(56);
+	var _utilExtrudePolygon = __webpack_require__(58);
 	
 	var _utilExtrudePolygon2 = _interopRequireDefault(_utilExtrudePolygon);
 	
@@ -8458,11 +8836,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      geometry.computeBoundingBox();
 	
-	      var material = new _three2['default'].MeshPhongMaterial({
+	      // var material = new THREE.MeshPhongMaterial({
+	      //   vertexColors: THREE.VertexColors,
+	      //   side: THREE.BackSide
+	      //   // depthWrite: false
+	      // });
+	
+	      var material = new _three2['default'].MeshStandardMaterial({
 	        vertexColors: _three2['default'].VertexColors,
 	        side: _three2['default'].BackSide
-	        // depthWrite: false
 	      });
+	      material.roughness = 1;
+	      material.metalness = 0.1;
+	      material.envMapIntensity = 3;
+	      material.envMap = this._layer._options.skybox;
+	
 	      var mesh = new _three2['default'].Mesh(geometry, material);
 	      // mesh.renderOrder = 1;
 	
@@ -8531,7 +8919,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 52 */
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -8555,7 +8943,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  } else {
 	    var XHR2
 	    try {
-	      XHR2 = __webpack_require__(53)
+	      XHR2 = __webpack_require__(55)
 	    } catch (ex) {
 	      throw new Error('Peer dependency `xhr2` required! Please npm install xhr2')
 	    }
@@ -9167,13 +9555,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 53 */
+/* 55 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 54 */
+/* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(function (global, factory) {
@@ -9726,7 +10114,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}));
 
 /***/ },
-/* 55 */
+/* 57 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -10316,7 +10704,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 56 */
+/* 58 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {

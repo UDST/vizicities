@@ -86,9 +86,9 @@ class World extends EventEmitter {
       controls.update();
     });
 
-    this.emit('preUpdate');
+    this.emit('preUpdate', delta);
     this._engine.update(delta);
-    this.emit('postUpdate');
+    this.emit('postUpdate', delta);
   }
 
   // Set world view

@@ -39,9 +39,27 @@ class ImageTile extends Tile {
     var mesh = new THREE.Object3D();
     var geom = new THREE.PlaneBufferGeometry(this._side, this._side, 1);
 
-    var material = new THREE.MeshBasicMaterial({
+    // var material = new THREE.MeshBasicMaterial({
+    //   depthWrite: false
+    // });
+
+    // var material = new THREE.MeshPhongMaterial({
+    //   depthWrite: false
+    // });
+
+    // Other MeshStandardMaterial settings
+    //
+    // material.envMapIntensity will change the amount of colour reflected(?)
+    // from the environment map – can be greater than 1 for more intensity
+
+    var material = new THREE.MeshStandardMaterial({
+      // Does this do anything?
+      // combine: THREE.MixOperation,
       depthWrite: false
     });
+    material.roughness = 1;
+    material.metalness = 0.1;
+    material.envMap = this._layer._options.skybox;
 
     var localMesh = new THREE.Mesh(geom, material);
     localMesh.rotation.x = -90 * Math.PI / 180;

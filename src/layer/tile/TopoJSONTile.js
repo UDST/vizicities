@@ -386,11 +386,21 @@ class TopoJSONTile extends Tile {
 
     geometry.computeBoundingBox();
 
-    var material = new THREE.MeshPhongMaterial({
+    // var material = new THREE.MeshPhongMaterial({
+    //   vertexColors: THREE.VertexColors,
+    //   side: THREE.BackSide
+    //   // depthWrite: false
+    // });
+
+    var material = new THREE.MeshStandardMaterial({
       vertexColors: THREE.VertexColors,
       side: THREE.BackSide
-      // depthWrite: false
     });
+    material.roughness = 1;
+    material.metalness = 0.1;
+    material.envMapIntensity = 3;
+    material.envMap = this._layer._options.skybox;
+
     var mesh = new THREE.Mesh(geometry, material);
     // mesh.renderOrder = 1;
 
