@@ -2,8 +2,6 @@ import THREE from 'three';
 import Sky from './Sky';
 import throttle from 'lodash.throttle';
 
-// TODO: Sync a directional light with sun position
-
 var cubemap = {
   vertexShader: [
 		'varying vec3 vPosition;',
@@ -29,29 +27,24 @@ class Skybox {
     this._light = light;
 
     this._settings = {
-      distance: 400000,
+      distance: 40000,
       turbidity: 10,
       reileigh: 2,
       mieCoefficient: 0.005,
       mieDirectionalG: 0.8,
       luminance: 1,
-      inclination: 0.1, // elevation / inclination
-      azimuth: 0.25, // Facing front,
-      sun: !true
+      inclination: 0.48, // Elevation / inclination
+      azimuth: 0.25, // Facing front
     };
 
     this._initSkybox();
     this._updateUniforms();
-
     this._initEvents();
   }
 
   _initEvents() {
-    // Run LOD calculations based on render calls
-    //
-    // Throttled to 1 LOD calculation per 100ms
+    // Throttled to 1 per 100ms
     this._throttledWorldUpdate = throttle(this._update, 100);
-
     this._world.on('preUpdate', this._throttledWorldUpdate, this);
   }
 
@@ -69,7 +62,7 @@ class Skybox {
 
     // Add Sun Helper
     this._sunSphere = new THREE.Mesh(
-      new THREE.SphereBufferGeometry(20000, 16, 8),
+      new THREE.SphereBufferGeometry(2000, 16, 8),
       new THREE.MeshBasicMaterial({
         color: 0xffffff
       })
@@ -77,67 +70,6 @@ class Skybox {
     this._sunSphere.position.y = -700000;
     this._sunSphere.visible = false;
 
-    // // --------------------------------------------------------
-    // // Irradiance level 1
-    // // --------------------------------------------------------
-    // var irrLvl1Uniforms = {
-    //   cubemap: { type: "t", value: cubeTarget },
-    //   axis: { type: "v3", value: new THREE.Vector3( 1, 0, 0 ) }
-    // };
-    //
-    // var irrLvl1Mat = new THREE.ShaderMaterial({
-    //   uniforms: irrLvl1Uniforms,
-    //   vertexShader: document.getElementById( 'downsample_vertex_shader' ).textContent,
-    //   fragmentShader: document.getElementById( 'downsample_fragment_shader' ).textContent,
-    //   side: THREE.BackSide
-    // });
-    //
-    // var irrLvl1CubeCamera = new THREE.CubeCamera( 1, 2000000, 64 );
-    //
-    // var irrLvl1Mesh = new THREE.Mesh( new THREE.BoxGeometry(2000000, 2000000, 2000000), irrLvl1Mat);
-    // skyScene.add(irrLvl1Mesh);
-    //
-    // // --------------------------------------------------------
-    // // Irradiance level 2
-    // // --------------------------------------------------------
-    // var irrLvl2Uniforms = {
-    //   cubemap: { type: "t", value: irrLvl1CubeCamera.renderTarget },
-    //   axis: { type: "v3", value: new THREE.Vector3( 0, 0, 1 ) }
-    // };
-    //
-    // var irrLvl2Mat = new THREE.ShaderMaterial({
-    //   uniforms: irrLvl2Uniforms,
-    //   vertexShader: document.getElementById( 'downsample_vertex_shader' ).textContent,
-    //   fragmentShader: document.getElementById( 'downsample_fragment_shader' ).textContent,
-    //   side: THREE.BackSide
-    // });
-    //
-    // var irrLvl2CubeCamera = new THREE.CubeCamera( 1, 2000000, 64 );
-    //
-    // var irrLvl2Mesh = new THREE.Mesh( new THREE.BoxGeometry(2000000, 2000000, 2000000), irrLvl2Mat);
-    // skyScene.add(irrLvl2Mesh);
-    //
-    // // --------------------------------------------------------
-    // // Irradiance level 3
-    // // --------------------------------------------------------
-    // var irrLvl3Uniforms = {
-    //   cubemap: { type: "t", value: irrLvl2CubeCamera.renderTarget },
-    //   axis: { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) }
-    // };
-    //
-    // var irrLvl3Mat = new THREE.ShaderMaterial({
-    //   uniforms: irrLvl3Uniforms,
-    //   vertexShader: document.getElementById( 'downsample_vertex_shader' ).textContent,
-    //   fragmentShader: document.getElementById( 'downsample_fragment_shader' ).textContent,
-    //   side: THREE.BackSide
-    // });
-    //
-    // var irrLvl3CubeCamera = new THREE.CubeCamera( 1, 2000000, 64 );
-    //
-    // var irrLvl3Mesh = new THREE.Mesh( new THREE.BoxGeometry(2000000, 2000000, 2000000), irrLvl3Mat);
-    // skyScene.add(irrLvl3Mesh);
-
-    // Skybox in real scene
     var skyboxUniforms = {
       cubemap: { type: 't', value: cubeTarget }
     };
@@ -149,8 +81,7 @@ class Skybox {
       side: THREE.BackSide
     });
 
-    this._mesh = new THREE.Mesh(new THREE.BoxGeometry(40000, 40000, 40000), skyboxMat);
-    // this._mesh = this._sky.mesh;
+    this._mesh = new THREE.Mesh(new THREE.BoxGeometry(190000, 190000, 190000), skyboxMat);
   }
 
   _updateUniforms() {
@@ -185,25 +116,76 @@ class Skybox {
     // if (!this._angle) {
     //   this._angle = 0;
     // }
-
-    // Animate inclination
+    //
+    // // Animate inclination
     // this._angle += Math.PI * delta;
     // this._settings.inclination = 0.5 * (Math.sin(this._angle) / 2 + 0.5);
 
     // Update light intensity depending on elevation of sun (day to night)
     this._light.intensity = 1 - 0.95 * (this._settings.inclination / 0.5);
 
-    // console.log(delta, this._angle, this._settings.inclination);
-
+    // // console.log(delta, this._angle, this._settings.inclination);
+    //
     // TODO: Only do this when the uniforms have been changed
-    // this._updateUniforms();
+    this._updateUniforms();
 
     // TODO: Only do this when the cubemap has actually changed
     this._cubeCamera.updateCubeMap(this._world._engine._renderer, this._skyScene);
   }
 
+  getRenderTarget() {
+    return this._cubeCamera.renderTarget;
+  }
+
   // Destroy the skybox and remove it from memory
   destroy() {
+    this._world.off('preUpdate', this._throttledWorldUpdate);
+    this._throttledWorldUpdate = null;
+
+    this._world = null;
+    this._light = null;
+
+    this._cubeCamera = null;
+
+    this._sky.mesh.geometry.dispose();
+    this._sky.mesh.geometry = null;
+
+    if (this._sky.mesh.material.map) {
+      this._sky.mesh.material.map.dispose();
+      this._sky.mesh.material.map = null;
+    }
+
+    this._sky.mesh.material.dispose();
+    this._sky.mesh.material = null;
+
+    this._sky.mesh = null;
+    this._sky = null;
+
+    this._skyScene = null;
+
+    this._sunSphere.geometry.dispose();
+    this._sunSphere.geometry = null;
+
+    if (this._sunSphere.material.map) {
+      this._sunSphere.material.map.dispose();
+      this._sunSphere.material.map = null;
+    }
+
+    this._sunSphere.material.dispose();
+    this._sunSphere.material = null;
+
+    this._sunSphere = null;
+
+    this._mesh.geometry.dispose();
+    this._mesh.geometry = null;
+
+    if (this._mesh.material.map) {
+      this._mesh.material.map.dispose();
+      this._mesh.material.map = null;
+    }
+
+    this._mesh.material.dispose();
+    this._mesh.material = null;
   }
 }
 

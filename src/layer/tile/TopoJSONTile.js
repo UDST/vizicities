@@ -44,7 +44,7 @@ class TopoJSONTile extends Tile {
     var defaults = {
       filter: null,
       style: {
-        color: '#ff0000'
+        color: '#ffffff'
       }
     };
 
@@ -81,8 +81,6 @@ class TopoJSONTile extends Tile {
     }
 
     var mesh = new THREE.Object3D();
-
-    mesh.renderOrder = 1;
 
     mesh.position.x = this._center[0];
     mesh.position.z = this._center[1];
@@ -386,22 +384,26 @@ class TopoJSONTile extends Tile {
 
     geometry.computeBoundingBox();
 
-    // var material = new THREE.MeshPhongMaterial({
-    //   vertexColors: THREE.VertexColors,
-    //   side: THREE.BackSide
-    //   // depthWrite: false
-    // });
-
-    var material = new THREE.MeshStandardMaterial({
-      vertexColors: THREE.VertexColors,
-      side: THREE.BackSide
-    });
-    material.roughness = 1;
-    material.metalness = 0.1;
-    material.envMapIntensity = 3;
-    material.envMap = this._layer._options.skybox;
+    var material;
+    if (!this._world._environment._skybox) {
+      material = new THREE.MeshPhongMaterial({
+        vertexColors: THREE.VertexColors,
+        side: THREE.BackSide
+      });
+    } else {
+      material = new THREE.MeshStandardMaterial({
+        vertexColors: THREE.VertexColors,
+        side: THREE.BackSide
+      });
+      material.roughness = 1;
+      material.metalness = 0.1;
+      material.envMapIntensity = 3;
+      material.envMap = this._world._environment._skybox.getRenderTarget();
+    }
 
     var mesh = new THREE.Mesh(geometry, material);
+
+    // This is only useful for flat objects
     // mesh.renderOrder = 1;
 
     this._mesh.add(mesh);

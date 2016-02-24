@@ -10,6 +10,7 @@ var tileURLRegex = /\{([szxy])\}/g;
 class Tile {
   constructor(quadcode, path, layer) {
     this._layer = layer;
+    this._world = layer._world;
     this._quadcode = quadcode;
     this._path = path;
 
@@ -64,8 +65,9 @@ class Tile {
   // Ensure that this leaves no trace of the tile – no textures, no meshes,
   // nothing in memory or the GPU
   destroy() {
-    // Delete reference to layer
+    // Delete reference to layer and world
     this._layer = null;
+    thos._world = null;
 
     // Delete location references
     this._boundsLatLon = null;
@@ -111,7 +113,7 @@ class Tile {
   _getTileURL(urlParams) {
     if (!urlParams.s) {
       // Default to a random choice of a, b or c
-      s = String.fromCharCode(97 + Math.floor(Math.random() * 3));
+      urlParams.s = String.fromCharCode(97 + Math.floor(Math.random() * 3));
     }
 
     tileURLRegex.lastIndex = 0;

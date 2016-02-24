@@ -158,7 +158,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _get(Object.getPrototypeOf(World.prototype), 'constructor', this).call(this);
 	
 	    var defaults = {
-	      crs: _geoCRSIndex2['default'].EPSG3857
+	      crs: _geoCRSIndex2['default'].EPSG3857,
+	      skybox: false
 	    };
 	
 	    this.options = (0, _lodashAssign2['default'])(defaults, options);
@@ -168,6 +169,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    this._initContainer(domId);
 	    this._initEngine();
+	    this._initEnvironment();
 	    this._initEvents();
 	
 	    // Kick off the update and render loop
@@ -191,6 +193,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Consider proxying these through events on World for public access
 	      // this._engine.on('preRender', () => {});
 	      // this._engine.on('postRender', () => {});
+	    }
+	  }, {
+	    key: '_initEnvironment',
+	    value: function _initEnvironment() {
+	      // Not sure if I want to keep this as a private API
+	      //
+	      // Makes sense to allow others to customise their environment so perhaps
+	      // add some method of disable / overriding the environment settings
+	      this._environment = VIZI.EnvironmentLayer({
+	        skybox: this.options.skybox
+	      }).addTo(this);
 	    }
 	  }, {
 	    key: '_initEvents',
@@ -3097,6 +3110,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // TODO: Re-enable when this works with the skybox
 	  // renderer.setClearColor(Scene.fog.color, 1);
 	
+	  renderer.setClearColor(0xffffff, 1);
+	
 	  // Gamma settings make things look nicer
 	  renderer.gammaInput = true;
 	  renderer.gammaOutput = true;
@@ -3137,7 +3152,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// http://stackoverflow.com/q/26655930/997339
 	
 	exports['default'] = function (container) {
-	  var camera = new _three2['default'].PerspectiveCamera(45, 1, 1, 2000000);
+	  var camera = new _three2['default'].PerspectiveCamera(45, 1, 1, 200000);
 	  camera.position.y = 400;
 	  camera.position.z = 400;
 	
@@ -4381,6 +4396,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
+	var _lodashAssign = __webpack_require__(3);
+	
+	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
+	
 	var _three = __webpack_require__(24);
 	
 	var _three2 = _interopRequireDefault(_three);
@@ -4392,10 +4411,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	var EnvironmentLayer = (function (_Layer) {
 	  _inherits(EnvironmentLayer, _Layer);
 	
-	  function EnvironmentLayer() {
+	  function EnvironmentLayer(options) {
 	    _classCallCheck(this, EnvironmentLayer);
 	
 	    _get(Object.getPrototypeOf(EnvironmentLayer.prototype), 'constructor', this).call(this);
+	
+	    var defaults = {
+	      skybox: false
+	    };
+	
+	    this._options = (0, _lodashAssign2['default'])(defaults, options);
 	  }
 	
 	  // Initialise without requiring new keyword
@@ -4404,7 +4429,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_onAdd',
 	    value: function _onAdd() {
 	      this._initLights();
-	      this._initSkybox();
+	
+	      if (this._options.skybox) {
+	        this._initSkybox();
+	      }
+	
 	      // this._initGrid();
 	    }
 	
@@ -4418,42 +4447,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Position doesn't really matter (the angle is important), however it's
 	      // used here so the helpers look more natural.
 	
-	      // var directionalLight = new THREE.DirectionalLight(0x999999);
-	      // directionalLight.intesity = 0.1;
-	      // directionalLight.position.x = 100;
-	      // directionalLight.position.y = 100;
-	      // directionalLight.position.z = 100;
-	      //
-	      // var directionalLight2 = new THREE.DirectionalLight(0x999999);
-	      // directionalLight2.intesity = 0.1;
-	      // directionalLight2.position.x = -100;
-	      // directionalLight2.position.y = 100;
-	      // directionalLight2.position.z = -100;
-	      //
-	      // var helper = new THREE.DirectionalLightHelper(directionalLight, 10);
-	      // var helper2 = new THREE.DirectionalLightHelper(directionalLight2, 10);
-	      //
-	      // this._layer.add(directionalLight);
-	      // this._layer.add(directionalLight2);
-	      //
-	      // this._layer.add(helper);
-	      // this._layer.add(helper2);
+	      if (!this._options.skybox) {
+	        var directionalLight = new _three2['default'].DirectionalLight(0x999999);
+	        directionalLight.intesity = 0.1;
+	        directionalLight.position.x = 100;
+	        directionalLight.position.y = 100;
+	        directionalLight.position.z = 100;
 	
-	      // Ambient light
-	      // var ambient = new THREE.AmbientLight(0xeeeeee);
-	      // this._layer.add(ambient);
+	        var directionalLight2 = new _three2['default'].DirectionalLight(0x999999);
+	        directionalLight2.intesity = 0.1;
+	        directionalLight2.position.x = -100;
+	        directionalLight2.position.y = 100;
+	        directionalLight2.position.z = -100;
 	
-	      // var ambient = new THREE.AmbientLight(0x050505);
-	      // this._layer.add(ambient);
+	        var helper = new _three2['default'].DirectionalLightHelper(directionalLight, 10);
+	        var helper2 = new _three2['default'].DirectionalLightHelper(directionalLight2, 10);
 	
-	      // Directional light that will be projected from the sun
-	      this._sunLight = new _three2['default'].DirectionalLight(0xffffff, 1);
-	      this._layer.add(this._sunLight);
+	        this._layer.add(directionalLight);
+	        this._layer.add(directionalLight2);
+	
+	        this._layer.add(helper);
+	        this._layer.add(helper2);
+	      } else {
+	        // Directional light that will be projected from the sun
+	        this._skyboxLight = new _three2['default'].DirectionalLight(0xffffff, 1);
+	        this._layer.add(this._skyboxLight);
+	      }
 	    }
 	  }, {
 	    key: '_initSkybox',
 	    value: function _initSkybox() {
-	      this._skybox = (0, _Skybox2['default'])(this._world, this._sunLight);
+	      this._skybox = (0, _Skybox2['default'])(this._world, this._skyboxLight);
 	      this._layer.add(this._skybox._mesh);
 	    }
 	
@@ -4467,13 +4491,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var gridHelper = new _three2['default'].GridHelper(size, step);
 	      this._layer.add(gridHelper);
 	    }
+	
+	    // Clean up environment
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {
+	      this._skyboxLight = null;
+	
+	      this._layer.remove(this._skybox._mesh);
+	      this._skybox.destroy();
+	      this._skybox = null;
+	
+	      _get(Object.getPrototypeOf(EnvironmentLayer.prototype), 'destroy', this).call(this);
+	    }
 	  }]);
 	
 	  return EnvironmentLayer;
 	})(_Layer3['default']);
 	
-	exports['default'] = function () {
-	  return new EnvironmentLayer();
+	exports['default'] = function (options) {
+	  return new EnvironmentLayer(options);
 	};
 	
 	;
@@ -4579,8 +4616,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
 	
-	// TODO: Sync a directional light with sun position
-	
 	var cubemap = {
 	  vertexShader: ['varying vec3 vPosition;', 'void main() {', 'vPosition = position;', 'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );', '}'].join('\n'),
 	
@@ -4595,20 +4630,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._light = light;
 	
 	    this._settings = {
-	      distance: 400000,
+	      distance: 40000,
 	      turbidity: 10,
 	      reileigh: 2,
 	      mieCoefficient: 0.005,
 	      mieDirectionalG: 0.8,
 	      luminance: 1,
-	      inclination: 0.1, // elevation / inclination
-	      azimuth: 0.25, // Facing front,
-	      sun: !true
-	    };
+	      inclination: 0.48, // Elevation / inclination
+	      azimuth: 0.25 };
 	
+	    // Facing front
 	    this._initSkybox();
 	    this._updateUniforms();
-	
 	    this._initEvents();
 	  }
 	
@@ -4617,11 +4650,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(Skybox, [{
 	    key: '_initEvents',
 	    value: function _initEvents() {
-	      // Run LOD calculations based on render calls
-	      //
-	      // Throttled to 1 LOD calculation per 100ms
+	      // Throttled to 1 per 100ms
 	      this._throttledWorldUpdate = (0, _lodashThrottle2['default'])(this._update, 100);
-	
 	      this._world.on('preUpdate', this._throttledWorldUpdate, this);
 	    }
 	  }, {
@@ -4639,73 +4669,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._skyScene.add(this._sky.mesh);
 	
 	      // Add Sun Helper
-	      this._sunSphere = new _three2['default'].Mesh(new _three2['default'].SphereBufferGeometry(20000, 16, 8), new _three2['default'].MeshBasicMaterial({
+	      this._sunSphere = new _three2['default'].Mesh(new _three2['default'].SphereBufferGeometry(2000, 16, 8), new _three2['default'].MeshBasicMaterial({
 	        color: 0xffffff
 	      }));
 	      this._sunSphere.position.y = -700000;
 	      this._sunSphere.visible = false;
 	
-	      // // --------------------------------------------------------
-	      // // Irradiance level 1
-	      // // --------------------------------------------------------
-	      // var irrLvl1Uniforms = {
-	      //   cubemap: { type: "t", value: cubeTarget },
-	      //   axis: { type: "v3", value: new THREE.Vector3( 1, 0, 0 ) }
-	      // };
-	      //
-	      // var irrLvl1Mat = new THREE.ShaderMaterial({
-	      //   uniforms: irrLvl1Uniforms,
-	      //   vertexShader: document.getElementById( 'downsample_vertex_shader' ).textContent,
-	      //   fragmentShader: document.getElementById( 'downsample_fragment_shader' ).textContent,
-	      //   side: THREE.BackSide
-	      // });
-	      //
-	      // var irrLvl1CubeCamera = new THREE.CubeCamera( 1, 2000000, 64 );
-	      //
-	      // var irrLvl1Mesh = new THREE.Mesh( new THREE.BoxGeometry(2000000, 2000000, 2000000), irrLvl1Mat);
-	      // skyScene.add(irrLvl1Mesh);
-	      //
-	      // // --------------------------------------------------------
-	      // // Irradiance level 2
-	      // // --------------------------------------------------------
-	      // var irrLvl2Uniforms = {
-	      //   cubemap: { type: "t", value: irrLvl1CubeCamera.renderTarget },
-	      //   axis: { type: "v3", value: new THREE.Vector3( 0, 0, 1 ) }
-	      // };
-	      //
-	      // var irrLvl2Mat = new THREE.ShaderMaterial({
-	      //   uniforms: irrLvl2Uniforms,
-	      //   vertexShader: document.getElementById( 'downsample_vertex_shader' ).textContent,
-	      //   fragmentShader: document.getElementById( 'downsample_fragment_shader' ).textContent,
-	      //   side: THREE.BackSide
-	      // });
-	      //
-	      // var irrLvl2CubeCamera = new THREE.CubeCamera( 1, 2000000, 64 );
-	      //
-	      // var irrLvl2Mesh = new THREE.Mesh( new THREE.BoxGeometry(2000000, 2000000, 2000000), irrLvl2Mat);
-	      // skyScene.add(irrLvl2Mesh);
-	      //
-	      // // --------------------------------------------------------
-	      // // Irradiance level 3
-	      // // --------------------------------------------------------
-	      // var irrLvl3Uniforms = {
-	      //   cubemap: { type: "t", value: irrLvl2CubeCamera.renderTarget },
-	      //   axis: { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) }
-	      // };
-	      //
-	      // var irrLvl3Mat = new THREE.ShaderMaterial({
-	      //   uniforms: irrLvl3Uniforms,
-	      //   vertexShader: document.getElementById( 'downsample_vertex_shader' ).textContent,
-	      //   fragmentShader: document.getElementById( 'downsample_fragment_shader' ).textContent,
-	      //   side: THREE.BackSide
-	      // });
-	      //
-	      // var irrLvl3CubeCamera = new THREE.CubeCamera( 1, 2000000, 64 );
-	      //
-	      // var irrLvl3Mesh = new THREE.Mesh( new THREE.BoxGeometry(2000000, 2000000, 2000000), irrLvl3Mat);
-	      // skyScene.add(irrLvl3Mesh);
-	
-	      // Skybox in real scene
 	      var skyboxUniforms = {
 	        cubemap: { type: 't', value: cubeTarget }
 	      };
@@ -4717,8 +4686,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        side: _three2['default'].BackSide
 	      });
 	
-	      this._mesh = new _three2['default'].Mesh(new _three2['default'].BoxGeometry(40000, 40000, 40000), skyboxMat);
-	      // this._mesh = this._sky.mesh;
+	      this._mesh = new _three2['default'].Mesh(new _three2['default'].BoxGeometry(190000, 190000, 190000), skyboxMat);
 	    }
 	  }, {
 	    key: '_updateUniforms',
@@ -4755,27 +4723,80 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // if (!this._angle) {
 	      //   this._angle = 0;
 	      // }
-	
-	      // Animate inclination
+	      //
+	      // // Animate inclination
 	      // this._angle += Math.PI * delta;
 	      // this._settings.inclination = 0.5 * (Math.sin(this._angle) / 2 + 0.5);
 	
 	      // Update light intensity depending on elevation of sun (day to night)
 	      this._light.intensity = 1 - 0.95 * (this._settings.inclination / 0.5);
 	
-	      // console.log(delta, this._angle, this._settings.inclination);
-	
+	      // // console.log(delta, this._angle, this._settings.inclination);
+	      //
 	      // TODO: Only do this when the uniforms have been changed
-	      // this._updateUniforms();
+	      this._updateUniforms();
 	
 	      // TODO: Only do this when the cubemap has actually changed
 	      this._cubeCamera.updateCubeMap(this._world._engine._renderer, this._skyScene);
+	    }
+	  }, {
+	    key: 'getRenderTarget',
+	    value: function getRenderTarget() {
+	      return this._cubeCamera.renderTarget;
 	    }
 	
 	    // Destroy the skybox and remove it from memory
 	  }, {
 	    key: 'destroy',
-	    value: function destroy() {}
+	    value: function destroy() {
+	      this._world.off('preUpdate', this._throttledWorldUpdate);
+	      this._throttledWorldUpdate = null;
+	
+	      this._world = null;
+	      this._light = null;
+	
+	      this._cubeCamera = null;
+	
+	      this._sky.mesh.geometry.dispose();
+	      this._sky.mesh.geometry = null;
+	
+	      if (this._sky.mesh.material.map) {
+	        this._sky.mesh.material.map.dispose();
+	        this._sky.mesh.material.map = null;
+	      }
+	
+	      this._sky.mesh.material.dispose();
+	      this._sky.mesh.material = null;
+	
+	      this._sky.mesh = null;
+	      this._sky = null;
+	
+	      this._skyScene = null;
+	
+	      this._sunSphere.geometry.dispose();
+	      this._sunSphere.geometry = null;
+	
+	      if (this._sunSphere.material.map) {
+	        this._sunSphere.material.map.dispose();
+	        this._sunSphere.material.map = null;
+	      }
+	
+	      this._sunSphere.material.dispose();
+	      this._sunSphere.material = null;
+	
+	      this._sunSphere = null;
+	
+	      this._mesh.geometry.dispose();
+	      this._mesh.geometry = null;
+	
+	      if (this._mesh.material.map) {
+	        this._mesh.material.map.dispose();
+	        this._mesh.material.map = null;
+	      }
+	
+	      this._mesh.material.dispose();
+	      this._mesh.material = null;
+	    }
 	  }]);
 	
 	  return Skybox;
@@ -5407,8 +5428,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      _get(Object.getPrototypeOf(ImageTileLayer.prototype), '_onAdd', this).call(this, world);
 	
 	      // Add base layer
-	      var geom = new _three2['default'].PlaneBufferGeometry(40000, 40000, 1);
-	      var mesh = new _three2['default'].Mesh(geom, (0, _ImageTileLayerBaseMaterial2['default'])('#f5f5f3', this._options.skybox));
+	      var geom = new _three2['default'].PlaneBufferGeometry(200000, 200000, 1);
+	
+	      var baseMaterial;
+	      if (this._world._environment._skybox) {
+	        baseMaterial = (0, _ImageTileLayerBaseMaterial2['default'])('#f5f5f3', this._world._environment._skybox.getRenderTarget());
+	      } else {
+	        baseMaterial = (0, _ImageTileLayerBaseMaterial2['default'])('#f5f5f3');
+	      }
+	
+	      var mesh = new _three2['default'].Mesh(geom, baseMaterial);
 	      mesh.rotation.x = -90 * Math.PI / 180;
 	
 	      this._baseLayer = mesh;
@@ -7708,33 +7737,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var mesh = new _three2['default'].Object3D();
 	      var geom = new _three2['default'].PlaneBufferGeometry(this._side, this._side, 1);
 	
-	      // var material = new THREE.MeshBasicMaterial({
-	      //   depthWrite: false
-	      // });
+	      var material;
+	      if (!this._world._environment._skybox) {
+	        material = new _three2['default'].MeshBasicMaterial({
+	          depthWrite: false
+	        });
 	
-	      // var material = new THREE.MeshPhongMaterial({
-	      //   depthWrite: false
-	      // });
+	        // var material = new THREE.MeshPhongMaterial({
+	        //   depthWrite: false
+	        // });
+	      } else {
+	          // Other MeshStandardMaterial settings
+	          //
+	          // material.envMapIntensity will change the amount of colour reflected(?)
+	          // from the environment map – can be greater than 1 for more intensity
 	
-	      // Other MeshStandardMaterial settings
-	      //
-	      // material.envMapIntensity will change the amount of colour reflected(?)
-	      // from the environment map – can be greater than 1 for more intensity
-	
-	      var material = new _three2['default'].MeshStandardMaterial({
-	        // Does this do anything?
-	        // combine: THREE.MixOperation,
-	        depthWrite: false
-	      });
-	      material.roughness = 1;
-	      material.metalness = 0.1;
-	      material.envMap = this._layer._options.skybox;
+	          material = new _three2['default'].MeshStandardMaterial({
+	            depthWrite: false
+	          });
+	          material.roughness = 1;
+	          material.metalness = 0.1;
+	          material.envMap = this._world._environment._skybox.getRenderTarget();
+	        }
 	
 	      var localMesh = new _three2['default'].Mesh(geom, material);
 	      localMesh.rotation.x = -90 * Math.PI / 180;
 	
 	      mesh.add(localMesh);
-	
 	      mesh.renderOrder = 0;
 	
 	      mesh.position.x = this._center[0];
@@ -7893,6 +7922,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _classCallCheck(this, Tile);
 	
 	    this._layer = layer;
+	    this._world = layer._world;
 	    this._quadcode = quadcode;
 	    this._path = path;
 	
@@ -7959,8 +7989,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'destroy',
 	    value: function destroy() {
-	      // Delete reference to layer
+	      // Delete reference to layer and world
 	      this._layer = null;
+	      thos._world = null;
 	
 	      // Delete location references
 	      this._boundsLatLon = null;
@@ -8010,7 +8041,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _getTileURL(urlParams) {
 	      if (!urlParams.s) {
 	        // Default to a random choice of a, b or c
-	        s = String.fromCharCode(97 + Math.floor(Math.random() * 3));
+	        urlParams.s = String.fromCharCode(97 + Math.floor(Math.random() * 3));
 	      }
 	
 	      tileURLRegex.lastIndex = 0;
@@ -8202,7 +8233,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	exports['default'] = function (colour, skybox) {
+	exports['default'] = function (colour, skyboxTarget) {
 	  var canvas = document.createElement('canvas');
 	  canvas.width = 1;
 	  canvas.height = 1;
@@ -8228,17 +8259,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  texture.needsUpdate = true;
 	
-	  // var material = new THREE.MeshBasicMaterial({
-	  //   map: texture,
-	  //   depthWrite: false
-	  // });
+	  var material;
 	
-	  var material = new _three2['default'].MeshStandardMaterial({
-	    depthWrite: false
-	  });
-	  material.roughness = 1;
-	  material.metalness = 0.2;
-	  material.envMap = skybox;
+	  if (!skyboxTarget) {
+	    material = new _three2['default'].MeshBasicMaterial({
+	      map: texture,
+	      depthWrite: false
+	    });
+	  } else {
+	    material = new _three2['default'].MeshStandardMaterial({
+	      depthWrite: false
+	    });
+	    material.roughness = 1;
+	    material.metalness = 0.1;
+	    material.envMap = skyboxTarget;
+	  }
 	
 	  return material;
 	};
@@ -8478,7 +8513,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var defaults = {
 	      filter: null,
 	      style: {
-	        color: '#ff0000'
+	        color: '#ffffff'
 	      }
 	    };
 	
@@ -8524,8 +8559,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      var mesh = new _three2['default'].Object3D();
-	
-	      mesh.renderOrder = 1;
 	
 	      mesh.position.x = this._center[0];
 	      mesh.position.z = this._center[1];
@@ -8836,22 +8869,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      geometry.computeBoundingBox();
 	
-	      // var material = new THREE.MeshPhongMaterial({
-	      //   vertexColors: THREE.VertexColors,
-	      //   side: THREE.BackSide
-	      //   // depthWrite: false
-	      // });
-	
-	      var material = new _three2['default'].MeshStandardMaterial({
-	        vertexColors: _three2['default'].VertexColors,
-	        side: _three2['default'].BackSide
-	      });
-	      material.roughness = 1;
-	      material.metalness = 0.1;
-	      material.envMapIntensity = 3;
-	      material.envMap = this._layer._options.skybox;
+	      var material;
+	      if (!this._world._environment._skybox) {
+	        material = new _three2['default'].MeshPhongMaterial({
+	          vertexColors: _three2['default'].VertexColors,
+	          side: _three2['default'].BackSide
+	        });
+	      } else {
+	        material = new _three2['default'].MeshStandardMaterial({
+	          vertexColors: _three2['default'].VertexColors,
+	          side: _three2['default'].BackSide
+	        });
+	        material.roughness = 1;
+	        material.metalness = 0.1;
+	        material.envMapIntensity = 3;
+	        material.envMap = this._world._environment._skybox.getRenderTarget();
+	      }
 	
 	      var mesh = new _three2['default'].Mesh(geometry, material);
+	
+	      // This is only useful for flat objects
 	      // mesh.renderOrder = 1;
 	
 	      this._mesh.add(mesh);
