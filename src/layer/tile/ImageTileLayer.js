@@ -3,6 +3,7 @@ import ImageTile from './ImageTile';
 import ImageTileLayerBaseMaterial from './ImageTileLayerBaseMaterial';
 import throttle from 'lodash.throttle';
 import THREE from 'three';
+import extend from 'lodash.assign';
 
 // DONE: Find a way to avoid the flashing caused by the gap between old tiles
 // being removed and the new tiles being ready for display
@@ -45,6 +46,12 @@ import THREE from 'three';
 
 class ImageTileLayer extends TileLayer {
   constructor(path, options) {
+    var defaults = {
+      distance: 40000
+    };
+
+    options = extend(defaults, options);
+
     super(options);
 
     this._path = path;
@@ -54,8 +61,16 @@ class ImageTileLayer extends TileLayer {
     super._onAdd(world);
 
     // Add base layer
-    var geom = new THREE.PlaneBufferGeometry(40000, 40000, 1);
-    var mesh = new THREE.Mesh(geom, ImageTileLayerBaseMaterial('#f5f5f3'));
+    var geom = new THREE.PlaneBufferGeometry(200000, 200000, 1);
+
+    var baseMaterial;
+    if (this._world._environment._skybox) {
+      baseMaterial = ImageTileLayerBaseMaterial('#f5f5f3', this._world._environment._skybox.getRenderTarget());
+    } else {
+      baseMaterial = ImageTileLayerBaseMaterial('#f5f5f3');
+    }
+
+    var mesh = new THREE.Mesh(geom, baseMaterial);
     mesh.rotation.x = -90 * Math.PI / 180;
 
     this._baseLayer = mesh;

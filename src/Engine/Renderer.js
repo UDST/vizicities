@@ -9,7 +9,10 @@ export default function(container) {
     antialias: true
   });
 
-  renderer.setClearColor(Scene.fog.color, 1);
+  // TODO: Re-enable when this works with the skybox
+  // renderer.setClearColor(Scene.fog.color, 1);
+
+  renderer.setClearColor(0xffffff, 1);
 
   // Gamma settings make things look nicer
   renderer.gammaInput = true;

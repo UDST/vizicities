@@ -5,6 +5,8 @@ import THREE from 'three';
 
 export default (function() {
   var scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0xffffff, 1, 15000);
+
+  // TODO: Re-enable when this works with the skybox
+  // scene.fog = new THREE.Fog(0xffffff, 1, 15000);
   return scene;
 })();
