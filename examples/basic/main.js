@@ -15,7 +15,7 @@ var topoJSONTileLayer = VIZI.TopoJSONTileLayer('https://vector.mapzen.com/osm/bu
   style: function(feature) {
     return {
       // color: (feature.properties.area > 10000) ? '#ff0000' : '#0000ff'
-      color: '#cccccc'
+      color: '#ffffff'
     };
   },
   // filter: function(feature) {

@@ -67,7 +67,7 @@ class Tile {
   destroy() {
     // Delete reference to layer and world
     this._layer = null;
-    thos._world = null;
+    this._world = null;
 
     // Delete location references
     this._boundsLatLon = null;
