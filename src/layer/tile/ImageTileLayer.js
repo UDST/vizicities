@@ -78,7 +78,7 @@ class ImageTileLayer extends TileLayer {
     mesh.receiveShadow = true;
 
     this._baseLayer = mesh;
-    this._layer.add(mesh);
+    this.add(mesh);
 
     // Trigger initial quadtree calculation on the next frame
     //

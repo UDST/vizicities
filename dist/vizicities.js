@@ -4501,11 +4501,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var helper = new _three2['default'].DirectionalLightHelper(directionalLight, 10);
 	        var helper2 = new _three2['default'].DirectionalLightHelper(directionalLight2, 10);
 	
-	        this._layer.add(directionalLight);
-	        this._layer.add(directionalLight2);
+	        this.add(directionalLight);
+	        this.add(directionalLight2);
 	
-	        this._layer.add(helper);
-	        this._layer.add(helper2);
+	        this.add(helper);
+	        this.add(helper2);
 	      } else {
 	        // Directional light that will be projected from the sun
 	        this._skyboxLight = new _three2['default'].DirectionalLight(0xffffff, 1);
@@ -4530,14 +4530,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // this._layer.add(new THREE.CameraHelper(this._skyboxLight.shadow.camera));
 	
-	        this._layer.add(this._skyboxLight);
+	        this.add(this._skyboxLight);
 	      }
 	    }
 	  }, {
 	    key: '_initSkybox',
 	    value: function _initSkybox() {
 	      this._skybox = (0, _Skybox2['default'])(this._world, this._skyboxLight);
-	      this._layer.add(this._skybox._mesh);
+	      this.add(this._skybox._mesh);
 	    }
 	
 	    // Add grid helper for context during initial development
@@ -4548,7 +4548,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var step = 100;
 	
 	      var gridHelper = new _three2['default'].GridHelper(size, step);
-	      this._layer.add(gridHelper);
+	      this.add(gridHelper);
 	    }
 	
 	    // Clean up environment
@@ -4557,7 +4557,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function destroy() {
 	      this._skyboxLight = null;
 	
-	      this._layer.remove(this._skybox._mesh);
+	      this.remove(this._skybox._mesh);
 	      this._skybox.destroy();
 	      this._skybox = null;
 	
@@ -4616,9 +4616,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._layer = new _three2['default'].Object3D();
 	  }
 	
-	  // Add layer to world instance and store world reference
+	  // Add THREE object directly to layer
 	
 	  _createClass(Layer, [{
+	    key: 'add',
+	    value: function add(object) {
+	      this._layer.add(object);
+	    }
+	
+	    // Remove THREE object from to layer
+	  }, {
+	    key: 'remove',
+	    value: function remove(object) {
+	      this._layer.remove(object);
+	    }
+	
+	    // Add layer to world instance and store world reference
+	  }, {
 	    key: 'addTo',
 	    value: function addTo(world) {
 	      world.addLayer(this);
@@ -4638,6 +4652,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'destroy',
 	    value: function destroy() {
+	      // Remove everything else in the layer
+	      var child;
+	      for (i = this._layer.children.length - 1; i >= 0; i--) {
+	        child = this._layer.children[i];
+	
+	        if (!child) {
+	          continue;
+	        }
+	
+	        this.remove(child);
+	
+	        if (child.geometry) {
+	          // Dispose of mesh and materials
+	          child.geometry.dispose();
+	          child.geometry = null;
+	        }
+	
+	        if (child.material) {
+	          if (child.material.map) {
+	            child.material.map.dispose();
+	            child.material.map = null;
+	          }
+	
+	          child.material.dispose();
+	          child.material = null;
+	        }
+	      }
+	
 	      this._world = null;
 	      this._layer = null;
 	    }
@@ -5508,7 +5550,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      mesh.receiveShadow = true;
 	
 	      this._baseLayer = mesh;
-	      this._layer.add(mesh);
+	      this.add(mesh);
 	
 	      // Trigger initial quadtree calculation on the next frame
 	      //
@@ -5696,7 +5738,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(TileLayer, [{
 	    key: '_onAdd',
 	    value: function _onAdd(world) {
-	      this._layer.add(this._tiles);
+	      this.add(this._tiles);
 	    }
 	  }, {
 	    key: '_updateFrustum',
@@ -5900,7 +5942,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_destroyTile',
 	    value: function _destroyTile(tile) {
 	      // Remove tile from scene
-	      this._layer.remove(tile);
+	      this._tiles.remove(tile.getMesh());
 	
 	      // Delete any references to the tile within this component
 	
@@ -5919,18 +5961,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._tiles.remove(this._tiles.children[i]);
 	      }
 	
-	      // Remove everything else in the layer
-	      for (i = this._layer.children.length - 1; i >= 0; i--) {
-	        this._layer.remove(this._layer.children[i]);
-	      }
-	
 	      this._tileCache.destroy();
 	      this._tileCache = null;
 	
-	      this._world = null;
 	      this._tiles = null;
-	      this._layer = null;
 	      this._frustum = null;
+	
+	      _get(Object.getPrototypeOf(TileLayer.prototype), 'destroy', this).call(this);
 	    }
 	  }]);
 	

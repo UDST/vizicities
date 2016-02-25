@@ -9,6 +9,16 @@ class Layer extends EventEmitter {
     this._layer = new THREE.Object3D();
   }
 
+  // Add THREE object directly to layer
+  add(object) {
+    this._layer.add(object);
+  }
+
+  // Remove THREE object from to layer
+  remove(object) {
+    this._layer.remove(object);
+  }
+
   // Add layer to world instance and store world reference
   addTo(world) {
     world.addLayer(this);
@@ -24,6 +34,34 @@ class Layer extends EventEmitter {
 
   // Destroys the layer and removes it from the scene and memory
   destroy() {
+    // Remove everything else in the layer
+    var child;
+    for (i = this._layer.children.length - 1; i >= 0; i--) {
+      child = this._layer.children[i];
+
+      if (!child) {
+        continue;
+      }
+
+      this.remove(child);
+
+      if (child.geometry) {
+        // Dispose of mesh and materials
+        child.geometry.dispose();
+        child.geometry = null;
+      }
+
+      if (child.material) {
+        if (child.material.map) {
+          child.material.map.dispose();
+          child.material.map = null;
+        }
+
+        child.material.dispose();
+        child.material = null;
+      }
+    }
+
     this._world = null;
     this._layer = null;
   }

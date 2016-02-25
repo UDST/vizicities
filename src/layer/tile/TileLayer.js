@@ -67,7 +67,7 @@ class TileLayer extends Layer {
   }
 
   _onAdd(world) {
-    this._layer.add(this._tiles);
+    this.add(this._tiles);
   }
 
   _updateFrustum() {
@@ -258,7 +258,7 @@ class TileLayer extends Layer {
 
   _destroyTile(tile) {
     // Remove tile from scene
-    this._layer.remove(tile);
+    this._tiles.remove(tile.getMesh());
 
     // Delete any references to the tile within this component
 
@@ -275,18 +275,13 @@ class TileLayer extends Layer {
       this._tiles.remove(this._tiles.children[i]);
     }
 
-    // Remove everything else in the layer
-    for (i = this._layer.children.length - 1; i >= 0; i--) {
-      this._layer.remove(this._layer.children[i]);
-    }
-
     this._tileCache.destroy();
     this._tileCache = null;
 
-    this._world = null;
     this._tiles = null;
-    this._layer = null;
     this._frustum = null;
+
+    super.destroy();
   }
 }
 

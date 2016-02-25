@@ -48,11 +48,11 @@ class EnvironmentLayer extends Layer {
       var helper = new THREE.DirectionalLightHelper(directionalLight, 10);
       var helper2 = new THREE.DirectionalLightHelper(directionalLight2, 10);
 
-      this._layer.add(directionalLight);
-      this._layer.add(directionalLight2);
+      this.add(directionalLight);
+      this.add(directionalLight2);
 
-      this._layer.add(helper);
-      this._layer.add(helper2);
+      this.add(helper);
+      this.add(helper2);
     } else {
       // Directional light that will be projected from the sun
       this._skyboxLight = new THREE.DirectionalLight(0xffffff, 1);
@@ -77,13 +77,13 @@ class EnvironmentLayer extends Layer {
 
       // this._layer.add(new THREE.CameraHelper(this._skyboxLight.shadow.camera));
 
-      this._layer.add(this._skyboxLight);
+      this.add(this._skyboxLight);
     }
   }
 
   _initSkybox() {
     this._skybox = Skybox(this._world, this._skyboxLight);
-    this._layer.add(this._skybox._mesh);
+    this.add(this._skybox._mesh);
   }
 
   // Add grid helper for context during initial development
@@ -92,14 +92,14 @@ class EnvironmentLayer extends Layer {
     var step = 100;
 
     var gridHelper = new THREE.GridHelper(size, step);
-    this._layer.add(gridHelper);
+    this.add(gridHelper);
   }
 
   // Clean up environment
   destroy() {
     this._skyboxLight = null;
 
-    this._layer.remove(this._skybox._mesh);
+    this.remove(this._skybox._mesh);
     this._skybox.destroy();
     this._skybox = null;
 
