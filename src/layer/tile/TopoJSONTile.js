@@ -203,14 +203,14 @@ class TopoJSONTile extends Tile {
         style = this._options.style(feature);
       }
 
-      // console.log(style);
-
       var coordinates = feature.geometry.coordinates;
 
       // Skip if geometry is a point
       //
       // This should be a user-defined filter as it would be wrong to assume
       // that people won't want to output points
+      //
+      // The default use-case should be to output points in a different way
       if (!coordinates[0] || !coordinates[0][0] || !Array.isArray(coordinates[0][0])) {
         return;
       }
@@ -232,13 +232,19 @@ class TopoJSONTile extends Tile {
         groupedVertices.push(earcutData.vertices.slice(i, i + earcutData.dimensions));
       }
 
-      var extruded = extrudePolygon(groupedVertices, faces);
+      var height = 0;
+
+      if (style.height) {
+        // console.log(style.height, this._world.metresToWorld(style.height, this._pointScale), this._pointScale);
+        height = this._world.metresToWorld(style.height, this._pointScale);
+      }
+
+      var extruded = extrudePolygon(groupedVertices, faces, {
+        bottom: 0,
+        top: height
+      });
 
       colour.set(style.color);
-
-      // allVertices.push(earcutData.vertices);
-      // allColours.push([colour.r, colour.g, colour.b]);
-      // allFaces.push(faces);
 
       allVertices.push(extruded.positions);
       allColours.push([colour.r, colour.g, colour.b]);
@@ -246,9 +252,6 @@ class TopoJSONTile extends Tile {
 
       facesCount += extruded.faces.length;
     });
-
-    // console.log(allVertices);
-    // return;
 
     // Skip if no faces
     //
@@ -288,22 +291,6 @@ class TopoJSONTile extends Tile {
       for (var j = 0; j < _faces.length; j++) {
         // Array of vertex indexes for the face
         index = _faces[j][0];
-        //
-        // var ax = _vertices[index * dim] + offset.x;
-        // var ay = 0;
-        // var az = _vertices[index * dim + 1] + offset.y;
-        //
-        // index = _faces[j][1];
-        //
-        // var bx = _vertices[index * dim] + offset.x;
-        // var by = 0;
-        // var bz = _vertices[index * dim + 1] + offset.y;
-        //
-        // index = _faces[j][2];
-        //
-        // var cx = _vertices[index * dim] + offset.x;
-        // var cy = 0;
-        // var cz = _vertices[index * dim + 1] + offset.y;
 
         var ax = _vertices[index][0] + offset.x;
         var ay = _vertices[index][1];

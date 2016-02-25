@@ -1,3 +1,4 @@
+import Point from '../../geo/Point';
 import LatLon from '../../geo/LatLon';
 import THREE from 'three';
 
@@ -27,8 +28,16 @@ class Tile {
     // Tile center in world coordinates
     this._center = this._boundsToCenter(this._boundsWorld);
 
+    // Tile center in projected coordinates
+    this._centerLatlon = this._world.pointToLatLon(VIZI.Point(this._center[0], this._center[1]));
+
     // Length of a tile side in world coorindates
     this._side = this._getSide(this._boundsWorld);
+
+    // Point scale for tile (for unit conversion)
+    this._pointScale = this._world.pointScale(this._centerLatlon);
+
+    // console.log(this._center, this._centerLatlon, this._pointScale);
   }
 
   // Returns true if the tile mesh and texture are ready to be used

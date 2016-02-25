@@ -163,6 +163,25 @@ class World extends EventEmitter {
     return this.unproject(projectedPoint);
   }
 
+  // Return pointscale for a given geographic coordinate
+  pointScale(latlon, accurate) {
+    return this.options.crs.pointScale(latlon, accurate);
+  }
+
+  // Convert from real meters to world units
+  //
+  // TODO: Would be nice not to have to pass in a pointscale here
+  metresToWorld(metres, pointScale, zoom) {
+    return this.options.crs.metresToWorld(metres, pointScale, zoom);
+  }
+
+  // Convert from real meters to world units
+  //
+  // TODO: Would be nice not to have to pass in a pointscale here
+  worldToMetres(worldUnits, pointScale, zoom) {
+    return this.options.crs.worldToMetres(worldUnits, pointScale, zoom);
+  }
+
   // Unsure if it's a good idea to expose this here for components like
   // GridLayer to use (eg. to keep track of a frustum)
   getCamera() {

@@ -11,11 +11,20 @@ var imageTileLayer = VIZI.ImageTileLayer('http://{s}.basemaps.cartocdn.com/light
   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
 }).addTo(world);
 
-var topoJSONTileLayer = VIZI.TopoJSONTileLayer('https://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.topojson', {
+var topoJSONTileLayer = VIZI.TopoJSONTileLayer('https://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
   style: function(feature) {
+    var height;
+
+    if (feature.properties.height) {
+      height = feature.properties.height;
+    } else {
+      height = 10 + Math.random() * 10;
+    }
+
     return {
       // color: (feature.properties.area > 10000) ? '#ff0000' : '#0000ff'
-      color: '#ffffff'
+      color: '#ffffff',
+      height: height
     };
   },
   // filter: function(feature) {

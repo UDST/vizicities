@@ -45,9 +45,7 @@ class TopoJSONTileLayer extends TileLayer {
     this._calculateLOD();
   }
 
-  _onWorldMove(latlon, point) {
-    // this._moveBaseLayer(point);
-  }
+  _onWorldMove(latlon, point) {}
 
   _createTile(quadcode, layer) {
     var options = {};

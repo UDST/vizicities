@@ -335,6 +335,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return this.unproject(projectedPoint);
 	    }
 	
+	    // Return pointscale for a given geographic coordinate
+	  }, {
+	    key: 'pointScale',
+	    value: function pointScale(latlon, accurate) {
+	      return this.options.crs.pointScale(latlon, accurate);
+	    }
+	
+	    // Convert from real meters to world units
+	    //
+	    // TODO: Would be nice not to have to pass in a pointscale here
+	  }, {
+	    key: 'metresToWorld',
+	    value: function metresToWorld(metres, pointScale, zoom) {
+	      return this.options.crs.metresToWorld(metres, pointScale, zoom);
+	    }
+	
+	    // Convert from real meters to world units
+	    //
+	    // TODO: Would be nice not to have to pass in a pointscale here
+	  }, {
+	    key: 'worldToMetres',
+	    value: function worldToMetres(worldUnits, pointScale, zoom) {
+	      return this.options.crs.worldToMetres(worldUnits, pointScale, zoom);
+	    }
+	
 	    // Unsure if it's a good idea to expose this here for components like
 	    // GridLayer to use (eg. to keep track of a frustum)
 	  }, {
@@ -7903,6 +7928,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
+	var _geoPoint = __webpack_require__(11);
+	
+	var _geoPoint2 = _interopRequireDefault(_geoPoint);
+	
 	var _geoLatLon = __webpack_require__(10);
 	
 	var _geoLatLon2 = _interopRequireDefault(_geoLatLon);
@@ -7939,8 +7968,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Tile center in world coordinates
 	    this._center = this._boundsToCenter(this._boundsWorld);
 	
+	    // Tile center in projected coordinates
+	    this._centerLatlon = this._world.pointToLatLon(VIZI.Point(this._center[0], this._center[1]));
+	
 	    // Length of a tile side in world coorindates
 	    this._side = this._getSide(this._boundsWorld);
+	
+	    // Point scale for tile (for unit conversion)
+	    this._pointScale = this._world.pointScale(this._centerLatlon);
+	
+	    // console.log(this._center, this._centerLatlon, this._pointScale);
 	  }
 	
 	  // Returns true if the tile mesh and texture are ready to be used
@@ -8373,9 +8410,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }, {
 	    key: '_onWorldMove',
-	    value: function _onWorldMove(latlon, point) {
-	      // this._moveBaseLayer(point);
-	    }
+	    value: function _onWorldMove(latlon, point) {}
 	  }, {
 	    key: '_createTile',
 	    value: function _createTile(quadcode, layer) {
@@ -8688,14 +8723,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	          style = _this3._options.style(feature);
 	        }
 	
-	        // console.log(style);
-	
 	        var coordinates = feature.geometry.coordinates;
 	
 	        // Skip if geometry is a point
 	        //
 	        // This should be a user-defined filter as it would be wrong to assume
 	        // that people won't want to output points
+	        //
+	        // The default use-case should be to output points in a different way
 	        if (!coordinates[0] || !coordinates[0][0] || !Array.isArray(coordinates[0][0])) {
 	          return;
 	        }
@@ -8717,13 +8752,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	          groupedVertices.push(earcutData.vertices.slice(i, i + earcutData.dimensions));
 	        }
 	
-	        var extruded = (0, _utilExtrudePolygon2['default'])(groupedVertices, faces);
+	        var height = 0;
+	
+	        if (style.height) {
+	          // console.log(style.height, this._world.metresToWorld(style.height, this._pointScale), this._pointScale);
+	          height = _this3._world.metresToWorld(style.height, _this3._pointScale);
+	        }
+	
+	        var extruded = (0, _utilExtrudePolygon2['default'])(groupedVertices, faces, {
+	          bottom: 0,
+	          top: height
+	        });
 	
 	        colour.set(style.color);
-	
-	        // allVertices.push(earcutData.vertices);
-	        // allColours.push([colour.r, colour.g, colour.b]);
-	        // allFaces.push(faces);
 	
 	        allVertices.push(extruded.positions);
 	        allColours.push([colour.r, colour.g, colour.b]);
@@ -8731,9 +8772,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        facesCount += extruded.faces.length;
 	      });
-	
-	      // console.log(allVertices);
-	      // return;
 	
 	      // Skip if no faces
 	      //
@@ -8773,22 +8811,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        for (var j = 0; j < _faces.length; j++) {
 	          // Array of vertex indexes for the face
 	          index = _faces[j][0];
-	          //
-	          // var ax = _vertices[index * dim] + offset.x;
-	          // var ay = 0;
-	          // var az = _vertices[index * dim + 1] + offset.y;
-	          //
-	          // index = _faces[j][1];
-	          //
-	          // var bx = _vertices[index * dim] + offset.x;
-	          // var by = 0;
-	          // var bz = _vertices[index * dim + 1] + offset.y;
-	          //
-	          // index = _faces[j][2];
-	          //
-	          // var cx = _vertices[index * dim] + offset.x;
-	          // var cy = 0;
-	          // var cz = _vertices[index * dim + 1] + offset.y;
 	
 	          var ax = _vertices[index][0] + offset.x;
 	          var ay = _vertices[index][1];
