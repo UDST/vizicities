@@ -3151,6 +3151,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  renderer.gammaInput = true;
 	  renderer.gammaOutput = true;
 	
+	  renderer.shadowMap.enabled = true;
+	  renderer.shadowMap.cullFace = _three2['default'].CullFaceBack;
+	
 	  container.appendChild(renderer.domElement);
 	
 	  var updateSize = function updateSize() {
@@ -4506,6 +4509,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	      } else {
 	        // Directional light that will be projected from the sun
 	        this._skyboxLight = new _three2['default'].DirectionalLight(0xffffff, 1);
+	
+	        this._skyboxLight.castShadow = true;
+	
+	        var d = 1000;
+	        this._skyboxLight.shadow.camera.left = -d;
+	        this._skyboxLight.shadow.camera.right = d;
+	        this._skyboxLight.shadow.camera.top = d;
+	        this._skyboxLight.shadow.camera.bottom = -d;
+	
+	        this._skyboxLight.shadow.camera.near = 10000;
+	        this._skyboxLight.shadow.camera.far = 70000;
+	
+	        // TODO: Need to dial in on a good shadowmap size
+	        this._skyboxLight.shadow.mapSize.width = 2048;
+	        this._skyboxLight.shadow.mapSize.height = 2048;
+	
+	        // this._skyboxLight.shadowBias = -0.0010;
+	        // this._skyboxLight.shadow.darkness = 0.15;
+	
+	        // this._layer.add(new THREE.CameraHelper(this._skyboxLight.shadow.camera));
+	
 	        this._layer.add(this._skyboxLight);
 	      }
 	    }
@@ -4665,12 +4689,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._light = light;
 	
 	    this._settings = {
-	      distance: 40000,
+	      distance: 38000,
 	      turbidity: 10,
 	      reileigh: 2,
 	      mieCoefficient: 0.005,
 	      mieDirectionalG: 0.8,
 	      luminance: 1,
+	      // 0.48 is a cracking dusk / sunset
+	      // 0.4 is a beautiful early-morning / late-afternoon
+	      // 0.2 is a nice day time
 	      inclination: 0.48, // Elevation / inclination
 	      azimuth: 0.25 };
 	
@@ -4707,8 +4734,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._sunSphere = new _three2['default'].Mesh(new _three2['default'].SphereBufferGeometry(2000, 16, 8), new _three2['default'].MeshBasicMaterial({
 	        color: 0xffffff
 	      }));
-	      this._sunSphere.position.y = -700000;
-	      this._sunSphere.visible = false;
+	
+	      // TODO: This isn't actually visible because it's not added to the layer
+	      // this._sunSphere.visible = true;
 	
 	      var skyboxUniforms = {
 	        cubemap: { type: 't', value: cubeTarget }
@@ -5474,6 +5502,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      var mesh = new _three2['default'].Mesh(geom, baseMaterial);
 	      mesh.rotation.x = -90 * Math.PI / 180;
+	
+	      // TODO: It might be overkill to receive a shadow on the base layer as it's
+	      // rarely seen (good to have if performance difference is negligible)
+	      mesh.receiveShadow = true;
 	
 	      this._baseLayer = mesh;
 	      this._layer.add(mesh);
@@ -7798,6 +7830,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var localMesh = new _three2['default'].Mesh(geom, material);
 	      localMesh.rotation.x = -90 * Math.PI / 180;
 	
+	      localMesh.receiveShadow = true;
+	
 	      mesh.add(localMesh);
 	      mesh.renderOrder = 0;
 	
@@ -8916,6 +8950,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      var mesh = new _three2['default'].Mesh(geometry, material);
+	
+	      mesh.castShadow = true;
+	      mesh.receiveShadow = true;
 	
 	      // This is only useful for flat objects
 	      // mesh.renderOrder = 1;

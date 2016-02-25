@@ -18,6 +18,9 @@ export default function(container) {
   renderer.gammaInput = true;
   renderer.gammaOutput = true;
 
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.cullFace = THREE.CullFaceBack;
+
   container.appendChild(renderer.domElement);
 
   var updateSize = function() {

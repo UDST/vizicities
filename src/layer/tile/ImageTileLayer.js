@@ -73,6 +73,10 @@ class ImageTileLayer extends TileLayer {
     var mesh = new THREE.Mesh(geom, baseMaterial);
     mesh.rotation.x = -90 * Math.PI / 180;
 
+    // TODO: It might be overkill to receive a shadow on the base layer as it's
+    // rarely seen (good to have if performance difference is negligible)
+    mesh.receiveShadow = true;
+
     this._baseLayer = mesh;
     this._layer.add(mesh);
 

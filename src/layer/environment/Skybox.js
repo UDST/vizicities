@@ -27,12 +27,15 @@ class Skybox {
     this._light = light;
 
     this._settings = {
-      distance: 40000,
+      distance: 38000,
       turbidity: 10,
       reileigh: 2,
       mieCoefficient: 0.005,
       mieDirectionalG: 0.8,
       luminance: 1,
+      // 0.48 is a cracking dusk / sunset
+      // 0.4 is a beautiful early-morning / late-afternoon
+      // 0.2 is a nice day time
       inclination: 0.48, // Elevation / inclination
       azimuth: 0.25, // Facing front
     };
@@ -67,8 +70,9 @@ class Skybox {
         color: 0xffffff
       })
     );
-    this._sunSphere.position.y = -700000;
-    this._sunSphere.visible = false;
+
+    // TODO: This isn't actually visible because it's not added to the layer
+    // this._sunSphere.visible = true;
 
     var skyboxUniforms = {
       cubemap: { type: 't', value: cubeTarget }

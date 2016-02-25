@@ -389,6 +389,9 @@ class TopoJSONTile extends Tile {
 
     var mesh = new THREE.Mesh(geometry, material);
 
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+
     // This is only useful for flat objects
     // mesh.renderOrder = 1;
 

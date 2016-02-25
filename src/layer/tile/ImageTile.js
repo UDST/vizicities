@@ -65,6 +65,8 @@ class ImageTile extends Tile {
     var localMesh = new THREE.Mesh(geom, material);
     localMesh.rotation.x = -90 * Math.PI / 180;
 
+    localMesh.receiveShadow = true;
+
     mesh.add(localMesh);
     mesh.renderOrder = 0;
 
