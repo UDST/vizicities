@@ -235,7 +235,6 @@ class TopoJSONTile extends Tile {
       var height = 0;
 
       if (style.height) {
-        // console.log(style.height, this._world.metresToWorld(style.height, this._pointScale), this._pointScale);
         height = this._world.metresToWorld(style.height, this._pointScale);
       }
 

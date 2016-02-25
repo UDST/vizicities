@@ -1976,7 +1976,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    // Scale projected metres
-	    var scaledMetres = scale * (this.transformScale * projectedMetres) / pointScale[1];
+	    var scaledMetres = scale * (this.transformScale * projectedMetres);
+	
+	    // Not entirely sure why this is neccessary
+	    if (zoom) {
+	      scaledMetres /= pointScale[1];
+	    }
 	
 	    return scaledMetres;
 	  },
@@ -1990,8 +1995,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      scale /= 2;
 	    }
 	
-	    var projectedUnits = worldUnits / scale / this.transformScale * pointScale[1];
+	    var projectedUnits = worldUnits / scale / this.transformScale;
 	    var realMetres = this.projectedToMetres(projectedUnits, pointScale);
+	
+	    // Not entirely sure why this is neccessary
+	    if (zoom) {
+	      realMetres *= pointScale[1];
+	    }
 	
 	    return realMetres;
 	  }
@@ -7976,8 +7986,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // Point scale for tile (for unit conversion)
 	    this._pointScale = this._world.pointScale(this._centerLatlon);
-	
-	    // console.log(this._center, this._centerLatlon, this._pointScale);
 	  }
 	
 	  // Returns true if the tile mesh and texture are ready to be used
@@ -8755,7 +8763,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var height = 0;
 	
 	        if (style.height) {
-	          // console.log(style.height, this._world.metresToWorld(style.height, this._pointScale), this._pointScale);
 	          height = _this3._world.metresToWorld(style.height, _this3._pointScale);
 	        }
 	

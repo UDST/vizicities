@@ -36,8 +36,6 @@ class Tile {
 
     // Point scale for tile (for unit conversion)
     this._pointScale = this._world.pointScale(this._centerLatlon);
-
-    // console.log(this._center, this._centerLatlon, this._pointScale);
   }
 
   // Returns true if the tile mesh and texture are ready to be used

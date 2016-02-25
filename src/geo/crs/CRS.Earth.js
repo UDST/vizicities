@@ -98,7 +98,12 @@ const Earth = {
     }
 
     // Scale projected metres
-    var scaledMetres = (scale * (this.transformScale * projectedMetres)) / pointScale[1];
+    var scaledMetres = (scale * (this.transformScale * projectedMetres));
+
+    // Not entirely sure why this is neccessary
+    if (zoom) {
+      scaledMetres /= pointScale[1];
+    }
 
     return scaledMetres;
   },
@@ -112,8 +117,13 @@ const Earth = {
       scale /= 2;
     }
 
-    var projectedUnits = ((worldUnits / scale) / this.transformScale) * pointScale[1];
+    var projectedUnits = ((worldUnits / scale) / this.transformScale);
     var realMetres = this.projectedToMetres(projectedUnits, pointScale);
+
+    // Not entirely sure why this is neccessary
+    if (zoom) {
+      realMetres *= pointScale[1];
+    }
 
     return realMetres;
   }
