@@ -186,6 +186,9 @@ class TopoJSONTile extends Tile {
 
     var colour = new THREE.Color();
 
+    var light = new THREE.Color(0xffffff);
+    var shadow  = new THREE.Color(0x666666);
+
     var features = geojson.features;
 
     // Run filter, if provided
@@ -245,11 +248,54 @@ class TopoJSONTile extends Tile {
 
       colour.set(style.color);
 
-      allVertices.push(extruded.positions);
-      allColours.push([colour.r, colour.g, colour.b]);
-      allFaces.push(extruded.faces);
+      var topColor = colour.clone().multiply(light);
+      var bottomColor = colour.clone().multiply(shadow);
 
-      facesCount += extruded.faces.length;
+      var _faces = [];
+      var _colours = [];
+
+      allVertices.push(extruded.positions);
+
+      var _colour;
+      extruded.top.forEach((face, fi) => {
+        _colour = [];
+
+        _colour.push([colour.r, colour.g, colour.b]);
+        _colour.push([colour.r, colour.g, colour.b]);
+        _colour.push([colour.r, colour.g, colour.b]);
+
+        _faces.push(face);
+        _colours.push(_colour);
+      });
+
+      // Set up colours for every vertex with poor-mans AO on the sides
+      extruded.sides.forEach((face, fi) => {
+        _colour = [];
+
+        // First face is always bottom-bottom-top
+        if (fi % 2 === 0) {
+          _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+          _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+          _colour.push([topColor.r, topColor.g, topColor.b]);
+        // Reverse winding for the second face
+        // top-top-bottom
+        } else {
+          _colour.push([topColor.r, topColor.g, topColor.b]);
+          _colour.push([topColor.r, topColor.g, topColor.b]);
+          _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+        }
+
+        _faces.push(face);
+        _colours.push(_colour);
+      });
+
+      // Skip bottom as there's no point rendering it
+      // allFaces.push(extruded.faces);
+
+      allFaces.push(_faces);
+      allColours.push(_colours);
+
+      facesCount += _faces.length;
     });
 
     // Skip if no faces
@@ -295,17 +341,23 @@ class TopoJSONTile extends Tile {
         var ay = _vertices[index][1];
         var az = _vertices[index][2] + offset.y;
 
+        var c1 = _colour[j][0];
+
         index = _faces[j][1];
 
         var bx = _vertices[index][0] + offset.x;
         var by = _vertices[index][1];
         var bz = _vertices[index][2] + offset.y;
 
+        var c2 = _colour[j][1];
+
         index = _faces[j][2];
 
         var cx = _vertices[index][0] + offset.x;
         var cy = _vertices[index][1];
         var cz = _vertices[index][2] + offset.y;
+
+        var c3 = _colour[j][2];
 
         // Flat face normals
         // From: http://threejs.org/examples/webgl_buffergeometry.html
@@ -331,9 +383,9 @@ class TopoJSONTile extends Tile {
         normals[lastIndex * 9 + 1] = ny;
         normals[lastIndex * 9 + 2] = nz;
 
-        colours[lastIndex * 9 + 0] = _colour[0];
-        colours[lastIndex * 9 + 1] = _colour[1];
-        colours[lastIndex * 9 + 2] = _colour[2];
+        colours[lastIndex * 9 + 0] = c1[0];
+        colours[lastIndex * 9 + 1] = c1[1];
+        colours[lastIndex * 9 + 2] = c1[2];
 
         vertices[lastIndex * 9 + 3] = bx;
         vertices[lastIndex * 9 + 4] = by;
@@ -343,9 +395,9 @@ class TopoJSONTile extends Tile {
         normals[lastIndex * 9 + 4] = ny;
         normals[lastIndex * 9 + 5] = nz;
 
-        colours[lastIndex * 9 + 3] = _colour[0];
-        colours[lastIndex * 9 + 4] = _colour[1];
-        colours[lastIndex * 9 + 5] = _colour[2];
+        colours[lastIndex * 9 + 3] = c2[0];
+        colours[lastIndex * 9 + 4] = c2[1];
+        colours[lastIndex * 9 + 5] = c2[2];
 
         vertices[lastIndex * 9 + 6] = cx;
         vertices[lastIndex * 9 + 7] = cy;
@@ -355,9 +407,9 @@ class TopoJSONTile extends Tile {
         normals[lastIndex * 9 + 7] = ny;
         normals[lastIndex * 9 + 8] = nz;
 
-        colours[lastIndex * 9 + 6] = _colour[0];
-        colours[lastIndex * 9 + 7] = _colour[1];
-        colours[lastIndex * 9 + 8] = _colour[2];
+        colours[lastIndex * 9 + 6] = c3[0];
+        colours[lastIndex * 9 + 7] = c3[1];
+        colours[lastIndex * 9 + 8] = c3[2];
 
         lastIndex++;
       }
