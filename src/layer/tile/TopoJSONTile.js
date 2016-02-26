@@ -8,6 +8,7 @@ import LatLon from '../../geo/LatLon';
 import earcut from 'earcut';
 import extend from 'lodash.assign';
 import extrudePolygon from '../../util/extrudePolygon';
+import Offset from 'polygon-offset';
 
 // TODO: Perform tile request and processing in a Web Worker
 //
@@ -57,6 +58,7 @@ class TopoJSONTile extends Tile {
     setTimeout(() => {
       if (!this._mesh) {
         this._mesh = this._createMesh();
+        // this._shadowCanvas = this._createShadowCanvas();
         this._requestTile();
       }
     }, 0);
@@ -139,6 +141,61 @@ class TopoJSONTile extends Tile {
     mesh.position.y = 0.1;
 
     return mesh;
+  }
+
+  _createShadowCanvas() {
+    var canvas = document.createElement('canvas');
+
+    // Rendered at a low resolution and later scaled up for a low-quality blur
+    canvas.width = 512;
+    canvas.height = 512;
+
+    return canvas;
+  }
+
+  _addShadow(coordinates) {
+    var ctx = this._shadowCanvas.getContext('2d');
+    var width = this._shadowCanvas.width;
+    var height = this._shadowCanvas.height;
+
+    var _coords;
+    var _offset;
+    var offset = new Offset();
+
+    // Transform coordinates to shadowCanvas space and draw on canvas
+    coordinates.forEach((ring, index) => {
+      ctx.beginPath();
+
+      _coords = ring.map(coord => {
+        var xFrac = (coord[0] - this._boundsWorld[0]) / this._side;
+        var yFrac = (coord[1] - this._boundsWorld[3]) / this._side;
+        return [xFrac * width, yFrac * height];
+      });
+
+      if (index > 0) {
+        _offset = _coords;
+      } else {
+        _offset = offset.data(_coords).padding(1.3);
+      }
+
+      // TODO: This is super flaky and crashes the browser if run on anything
+      // put the outer ring (potentially due to winding)
+      _offset.forEach((coord, index) => {
+        // var xFrac = (coord[0] - this._boundsWorld[0]) / this._side;
+        // var yFrac = (coord[1] - this._boundsWorld[3]) / this._side;
+
+        if (index === 0) {
+          ctx.moveTo(coord[0], coord[1]);
+        } else {
+          ctx.lineTo(coord[0], coord[1]);
+        }
+      });
+
+      ctx.closePath();
+    });
+
+    ctx.fillStyle = 'rgba(80, 80, 80, 0.7)';
+    ctx.fill();
   }
 
   _requestTile() {
@@ -226,6 +283,12 @@ class TopoJSONTile extends Tile {
         });
       });
 
+      // Draw footprint on shadow canvas
+      //
+      // TODO: Disabled for the time-being until it can be sped up / moved to
+      // a worker
+      // this._addShadow(coordinates);
+
       earcutData = this._toEarcut(coordinates);
 
       faces = this._triangulate(earcutData.vertices, earcutData.holes, earcutData.dimensions);
@@ -297,6 +360,51 @@ class TopoJSONTile extends Tile {
 
       facesCount += _faces.length;
     });
+
+    // Output shadow canvas
+    //
+    // TODO: Disabled for the time-being until it can be sped up / moved to
+    // a worker
+
+    // var texture = new THREE.Texture(this._shadowCanvas);
+    //
+    // // Silky smooth images when tilted
+    // texture.magFilter = THREE.LinearFilter;
+    // texture.minFilter = THREE.LinearMipMapLinearFilter;
+    //
+    // // TODO: Set this to renderer.getMaxAnisotropy() / 4
+    // texture.anisotropy = 4;
+    //
+    // texture.needsUpdate = true;
+    //
+    // var material;
+    // if (!this._world._environment._skybox) {
+    //   material = new THREE.MeshBasicMaterial({
+    //     map: texture,
+    //     transparent: true,
+    //     depthWrite: false
+    //   });
+    // } else {
+    //   material = new THREE.MeshStandardMaterial({
+    //     map: texture,
+    //     transparent: true,
+    //     depthWrite: false
+    //   });
+    //   material.roughness = 1;
+    //   material.metalness = 0.1;
+    //   material.envMap = this._world._environment._skybox.getRenderTarget();
+    // }
+    //
+    // var geom = new THREE.PlaneBufferGeometry(this._side, this._side, 1);
+    // var mesh = new THREE.Mesh(geom, material);
+    //
+    // mesh.castShadow = false;
+    // mesh.receiveShadow = false;
+    // mesh.renderOrder = 1;
+    //
+    // mesh.rotation.x = -90 * Math.PI / 180;
+    //
+    // this._mesh.add(mesh);
 
     // Skip if no faces
     //
