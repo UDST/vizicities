@@ -13,6 +13,7 @@ export default function(container) {
   // renderer.setClearColor(Scene.fog.color, 1);
 
   renderer.setClearColor(0xffffff, 1);
+  renderer.setPixelRatio(window.devicePixelRatio);
 
   // Gamma settings make things look nicer
   renderer.gammaInput = true;

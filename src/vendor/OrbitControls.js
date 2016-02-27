@@ -963,6 +963,10 @@ var OrbitControls = function ( object, domElement ) {
 			return;
 		}
 
+		if (event.pointerType === 'mouse') {
+			return;
+		}
+
 		if (event.pointers.length === 1) {
 			if (scope.enablePan === false) {
 				return;
@@ -985,10 +989,20 @@ var OrbitControls = function ( object, domElement ) {
 		}
 	});
 
-	scope.hammer.on('panend', onTouchEnd);
+	scope.hammer.on('panend', function(event) {
+		if (event.pointerType === 'mouse') {
+			return;
+		}
+
+		onTouchEnd(event);
+	});
 
 	scope.hammer.on('panmove', function(event) {
 		if ( scope.enabled === false ) return;
+
+		if (event.pointerType === 'mouse') {
+			return;
+		}
 
 		// event.preventDefault();
 		// event.stopPropagation();
@@ -1019,6 +1033,10 @@ var OrbitControls = function ( object, domElement ) {
 	scope.hammer.on('pinchstart', function(event) {
 		if ( scope.enabled === false ) return;
 
+		if (event.pointerType === 'mouse') {
+			return;
+		}
+
 		if ( scope.enableZoom === false ) return;
 
 		handleTouchStartDolly( event );
@@ -1037,10 +1055,20 @@ var OrbitControls = function ( object, domElement ) {
 		}
 	});
 
-	scope.hammer.on('pinchend', onTouchEnd);
+	scope.hammer.on('pinchend', function(event) {
+		if (event.pointerType === 'mouse') {
+			return;
+		}
+
+		onTouchEnd(event);
+	});
 
 	scope.hammer.on('pinchmove', function(event) {
 		if ( scope.enabled === false ) return;
+
+		if (event.pointerType === 'mouse') {
+			return;
+		}
 
 		// event.preventDefault();
 		// event.stopPropagation();

@@ -3146,6 +3146,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // renderer.setClearColor(Scene.fog.color, 1);
 	
 	  renderer.setClearColor(0xffffff, 1);
+	  renderer.setPixelRatio(window.devicePixelRatio);
 	
 	  // Gamma settings make things look nicer
 	  renderer.gammaInput = true;
@@ -4308,6 +4309,10 @@ return /******/ (function(modules) { // webpackBootstrap
 				return;
 			}
 	
+			if (event.pointerType === 'mouse') {
+				return;
+			}
+	
 			if (event.pointers.length === 1) {
 				if (scope.enablePan === false) {
 					return;
@@ -4330,10 +4335,20 @@ return /******/ (function(modules) { // webpackBootstrap
 			}
 		});
 	
-		scope.hammer.on('panend', onTouchEnd);
+		scope.hammer.on('panend', function (event) {
+			if (event.pointerType === 'mouse') {
+				return;
+			}
+	
+			onTouchEnd(event);
+		});
 	
 		scope.hammer.on('panmove', function (event) {
 			if (scope.enabled === false) return;
+	
+			if (event.pointerType === 'mouse') {
+				return;
+			}
 	
 			// event.preventDefault();
 			// event.stopPropagation();
@@ -4364,6 +4379,10 @@ return /******/ (function(modules) { // webpackBootstrap
 		scope.hammer.on('pinchstart', function (event) {
 			if (scope.enabled === false) return;
 	
+			if (event.pointerType === 'mouse') {
+				return;
+			}
+	
 			if (scope.enableZoom === false) return;
 	
 			handleTouchStartDolly(event);
@@ -4382,10 +4401,20 @@ return /******/ (function(modules) { // webpackBootstrap
 			}
 		});
 	
-		scope.hammer.on('pinchend', onTouchEnd);
+		scope.hammer.on('pinchend', function (event) {
+			if (event.pointerType === 'mouse') {
+				return;
+			}
+	
+			onTouchEnd(event);
+		});
 	
 		scope.hammer.on('pinchmove', function (event) {
 			if (scope.enabled === false) return;
+	
+			if (event.pointerType === 'mouse') {
+				return;
+			}
 	
 			// event.preventDefault();
 			// event.stopPropagation();
