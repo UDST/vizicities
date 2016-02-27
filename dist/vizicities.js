@@ -130,9 +130,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _geoCRSIndex = __webpack_require__(6);
+	var _geoCrsIndex = __webpack_require__(6);
 	
-	var _geoCRSIndex2 = _interopRequireDefault(_geoCRSIndex);
+	var _geoCrsIndex2 = _interopRequireDefault(_geoCrsIndex);
 	
 	var _geoPoint = __webpack_require__(11);
 	
@@ -158,7 +158,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _get(Object.getPrototypeOf(World.prototype), 'constructor', this).call(this);
 	
 	    var defaults = {
-	      crs: _geoCRSIndex2['default'].EPSG3857,
+	      crs: _geoCrsIndex2['default'].EPSG3857,
 	      skybox: false
 	    };
 	
@@ -5506,6 +5506,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	// Pending tiles should continue to be requested and output to the scene on each
 	// frame, but no new LOD calculations should be made.
 	
+	// This tile layer both updates the quadtree and outputs tiles on every frame
+	// (throttled to some amount)
+	//
+	// This is because the computational complexity of image tiles is generally low
+	// and so there isn't much jank when running these calculations and outputs in
+	// realtime
+	//
+	// The benefit to doing this is that the underlying map layer continues to
+	// refresh and update during movement, which is an arguably better experience
+	
 	var ImageTileLayer = (function (_TileLayer) {
 	  _inherits(ImageTileLayer, _TileLayer);
 	
@@ -5576,6 +5586,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_onWorldUpdate',
 	    value: function _onWorldUpdate() {
 	      this._calculateLOD();
+	      this._outputTiles();
 	    }
 	  }, {
 	    key: '_onWorldMove',
@@ -5727,6 +5738,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      _this._destroyTile(tile);
 	    });
 	
+	    // List of tiles from the previous LOD calculation
+	    this._tileList = [];
+	
 	    // TODO: Work out why changing the minLOD causes loads of issues
 	    this._minLOD = 3;
 	    this._maxLOD = this._options.maxLOD;
@@ -5756,10 +5770,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var bounds = tile.getBounds();
 	      return this._frustum.intersectsBox(new _three2['default'].Box3(new _three2['default'].Vector3(bounds[0], 0, bounds[3]), new _three2['default'].Vector3(bounds[2], 0, bounds[1])));
 	    }
+	
+	    // Update and output tiles from the previous LOD checklist
+	  }, {
+	    key: '_outputTiles',
+	    value: function _outputTiles() {
+	      var _this2 = this;
+	
+	      // Remove all tiles from layer
+	      this._removeTiles();
+	
+	      // Add / re-add tiles
+	      this._tileList.forEach(function (tile) {
+	        // Are the mesh and texture ready?
+	        //
+	        // If yes, continue
+	        // If no, skip
+	        if (!tile.isReady()) {
+	          return;
+	        }
+	
+	        // Add tile to layer (and to scene) if not already there
+	        _this2._tiles.add(tile.getMesh());
+	      });
+	    }
+	
+	    // Works out tiles in the view frustum and stores them in an array
+	    //
+	    // Does not output the tiles, deferring this to _outputTiles()
 	  }, {
 	    key: '_calculateLOD',
 	    value: function _calculateLOD() {
-	      var _this2 = this;
+	      var _this3 = this;
 	
 	      if (this._stop || !this._world) {
 	        return;
@@ -5783,24 +5825,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // 3. Call Divide, passing in the check list
 	      this._divide(checkList);
 	
-	      // 4. Remove all tiles from layer
-	      this._removeTiles();
+	      // // 4. Remove all tiles from layer
+	      //
+	      // Moved to _outputTiles() for now
+	      // this._removeTiles();
 	
-	      // 5. Render the tiles remaining in the check list
-	      checkList.forEach(function (tile, index) {
+	      // 5. Filter the tiles remaining in the check list
+	      this._tileList = checkList.filter(function (tile, index) {
 	        // Skip tile if it's not in the current view frustum
-	        if (!_this2._tileInFrustum(tile)) {
-	          return;
+	        if (!_this3._tileInFrustum(tile)) {
+	          return false;
 	        }
 	
-	        if (_this2._options.distance && _this2._options.distance > 0) {
+	        if (_this3._options.distance && _this3._options.distance > 0) {
 	          // TODO: Can probably speed this up
 	          var center = tile.getCenter();
 	          var dist = new _three2['default'].Vector3(center[0], 0, center[1]).sub(camera.position).length();
 	
 	          // Manual distance limit to cut down on tiles so far away
-	          if (dist > _this2._options.distance) {
-	            return;
+	          if (dist > _this3._options.distance) {
+	            return false;
 	          }
 	        }
 	
@@ -5810,19 +5854,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // If no, generate tile mesh, request texture and skip
 	        if (!tile.getMesh()) {
 	          tile.requestTileAsync();
-	          return;
 	        }
+	
+	        return true;
 	
 	        // Are the mesh and texture ready?
 	        //
 	        // If yes, continue
 	        // If no, skip
-	        if (!tile.isReady()) {
-	          return;
-	        }
-	
-	        // Add tile to layer (and to scene)
-	        _this2._tiles.add(tile.getMesh());
+	        // if (!tile.isReady()) {
+	        //   return;
+	        // }
+	        //
+	        // // Add tile to layer (and to scene)
+	        // this._tiles.add(tile.getMesh());
 	      });
 	
 	      // console.log(performance.now() - start);
@@ -8435,6 +8480,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
+	// TODO: Consider pausing per-frame output during movement so there's little to
+	// no jank caused by previous tiles still processing
+	
+	// This tile layer only updates the quadtree after world movement has occurred
+	//
+	// Tiles from previous quadtree updates are updated and outputted every frame
+	// (or at least every frame, throttled to some amount)
+	//
+	// This is because the complexity of TopoJSON tiles requires a lot of processing
+	// and so makes movement janky if updates occur every frame – only updating
+	// after movement means frame drops are less obvious due to heavy processing
+	// occurring while the view is generally stationary
+	//
+	// The downside is that until new tiles are requested and outputted you will
+	// see blank spaces as you orbit and move around
+	//
+	// An added benefit is that it dramatically reduces the number of tiles being
+	// requested over a period of time and the time it takes to go from request to
+	// screen output
+	//
+	// It may be possible to perform these updates per-frame once Web Worker
+	// processing is added
+	
 	var TopoJSONTileLayer = (function (_TileLayer) {
 	  _inherits(TopoJSONTileLayer, _TileLayer);
 	
@@ -8481,15 +8549,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      this._world.on('preUpdate', this._throttledWorldUpdate, this);
 	      this._world.on('move', this._onWorldMove, this);
+	      this._world.on('controlsMove', this._onControlsMove, this);
 	    }
+	
+	    // Update and output tiles each frame (throttled)
 	  }, {
 	    key: '_onWorldUpdate',
 	    value: function _onWorldUpdate() {
-	      this._calculateLOD();
+	      if (this._pauseOutput) {
+	        return;
+	      }
+	
+	      this._outputTiles();
 	    }
+	
+	    // Update tiles grid after world move, but don't output them
 	  }, {
 	    key: '_onWorldMove',
-	    value: function _onWorldMove(latlon, point) {}
+	    value: function _onWorldMove(latlon, point) {
+	      this._pauseOutput = false;
+	      this._calculateLOD();
+	    }
+	
+	    // Pause updates during control movement for less visual jank
+	  }, {
+	    key: '_onControlsMove',
+	    value: function _onControlsMove() {
+	      this._pauseOutput = true;
+	    }
 	  }, {
 	    key: '_createTile',
 	    value: function _createTile(quadcode, layer) {

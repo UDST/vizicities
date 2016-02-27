@@ -44,6 +44,16 @@ import extend from 'lodash.assign';
 // Pending tiles should continue to be requested and output to the scene on each
 // frame, but no new LOD calculations should be made.
 
+// This tile layer both updates the quadtree and outputs tiles on every frame
+// (throttled to some amount)
+//
+// This is because the computational complexity of image tiles is generally low
+// and so there isn't much jank when running these calculations and outputs in
+// realtime
+//
+// The benefit to doing this is that the underlying map layer continues to
+// refresh and update during movement, which is an arguably better experience
+
 class ImageTileLayer extends TileLayer {
   constructor(path, options) {
     var defaults = {
@@ -102,6 +112,7 @@ class ImageTileLayer extends TileLayer {
 
   _onWorldUpdate() {
     this._calculateLOD();
+    this._outputTiles();
   }
 
   _onWorldMove(latlon, point) {

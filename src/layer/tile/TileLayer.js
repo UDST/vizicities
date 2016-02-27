@@ -58,6 +58,9 @@ class TileLayer extends Layer {
       this._destroyTile(tile);
     });
 
+    // List of tiles from the previous LOD calculation
+    this._tileList = [];
+
     // TODO: Work out why changing the minLOD causes loads of issues
     this._minLOD = 3;
     this._maxLOD = this._options.maxLOD;
@@ -84,6 +87,29 @@ class TileLayer extends Layer {
     return this._frustum.intersectsBox(new THREE.Box3(new THREE.Vector3(bounds[0], 0, bounds[3]), new THREE.Vector3(bounds[2], 0, bounds[1])));
   }
 
+  // Update and output tiles from the previous LOD checklist
+  _outputTiles() {
+    // Remove all tiles from layer
+    this._removeTiles();
+
+    // Add / re-add tiles
+    this._tileList.forEach(tile => {
+      // Are the mesh and texture ready?
+      //
+      // If yes, continue
+      // If no, skip
+      if (!tile.isReady()) {
+        return;
+      }
+
+      // Add tile to layer (and to scene) if not already there
+      this._tiles.add(tile.getMesh());
+    });
+  }
+
+  // Works out tiles in the view frustum and stores them in an array
+  //
+  // Does not output the tiles, deferring this to _outputTiles()
   _calculateLOD() {
     if (this._stop || !this._world) {
       return;
@@ -107,14 +133,16 @@ class TileLayer extends Layer {
     // 3. Call Divide, passing in the check list
     this._divide(checkList);
 
-    // 4. Remove all tiles from layer
-    this._removeTiles();
+    // // 4. Remove all tiles from layer
+    //
+    // Moved to _outputTiles() for now
+    // this._removeTiles();
 
-    // 5. Render the tiles remaining in the check list
-    checkList.forEach((tile, index) => {
+    // 5. Filter the tiles remaining in the check list
+    this._tileList = checkList.filter((tile, index) => {
       // Skip tile if it's not in the current view frustum
       if (!this._tileInFrustum(tile)) {
-        return;
+        return false;
       }
 
       if (this._options.distance && this._options.distance > 0) {
@@ -124,7 +152,7 @@ class TileLayer extends Layer {
 
         // Manual distance limit to cut down on tiles so far away
         if (dist > this._options.distance) {
-          return;
+          return false;
         }
       }
 
@@ -134,19 +162,20 @@ class TileLayer extends Layer {
       // If no, generate tile mesh, request texture and skip
       if (!tile.getMesh()) {
         tile.requestTileAsync();
-        return;
       }
+
+      return true;
 
       // Are the mesh and texture ready?
       //
       // If yes, continue
       // If no, skip
-      if (!tile.isReady()) {
-        return;
-      }
-
-      // Add tile to layer (and to scene)
-      this._tiles.add(tile.getMesh());
+      // if (!tile.isReady()) {
+      //   return;
+      // }
+      //
+      // // Add tile to layer (and to scene)
+      // this._tiles.add(tile.getMesh());
     });
 
     // console.log(performance.now() - start);
