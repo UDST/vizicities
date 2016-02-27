@@ -80,7 +80,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _layerTileGeoJSONTileLayer2 = _interopRequireDefault(_layerTileGeoJSONTileLayer);
 	
-	var _layerTileTopoJSONTileLayer = __webpack_require__(68);
+	var _layerTileTopoJSONTileLayer = __webpack_require__(70);
 	
 	var _layerTileTopoJSONTileLayer2 = _interopRequireDefault(_layerTileTopoJSONTileLayer);
 	
@@ -8293,6 +8293,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      var mesh = new _three2['default'].Mesh(geom, baseMaterial);
+	      mesh.renderOrder = -2;
 	      mesh.rotation.x = -90 * Math.PI / 180;
 	
 	      // TODO: It might be overkill to receive a shadow on the base layer as it's
@@ -10655,7 +10656,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      localMesh.receiveShadow = true;
 	
 	      mesh.add(localMesh);
-	      mesh.renderOrder = 0;
+	      mesh.renderOrder = -1;
 	
 	      mesh.position.x = this._center[0];
 	      mesh.position.z = this._center[1];
@@ -11423,6 +11424,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _polygonOffset2 = _interopRequireDefault(_polygonOffset);
 	
+	var _geojsonMerge = __webpack_require__(68);
+	
+	var _geojsonMerge2 = _interopRequireDefault(_geojsonMerge);
+	
 	// TODO: Perform tile request and processing in a Web Worker
 	//
 	// Use Operative (https://github.com/padolsey/operative)
@@ -11459,12 +11464,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    _get(Object.getPrototypeOf(GeoJSONTile.prototype), 'constructor', this).call(this, quadcode, path, layer);
 	
+	    this._defaultStyle = {
+	      color: '#ffffff',
+	      height: 0,
+	      lineOpacity: 1,
+	      lineTransparent: false,
+	      lineColor: '#ffffff',
+	      lineWidth: 1,
+	      lineBlending: _three2['default'].NormalBlending
+	    };
+	
 	    var defaults = {
 	      topojson: false,
 	      filter: null,
-	      style: {
-	        color: '#ffffff'
-	      }
+	      style: this._defaultStyle
 	    };
 	
 	    this._options = (0, _lodashAssign2['default'])(defaults, options);
@@ -11658,37 +11671,111 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	    }
 	  }, {
+	    key: '_processLineString',
+	    value: function _processLineString(coordinates, colour) {
+	      var _this4 = this;
+	
+	      coordinates = coordinates.map(function (coordinate) {
+	        var latlon = (0, _geoLatLon2['default'])(coordinate[1], coordinate[0]);
+	        var point = _this4._layer._world.latLonToPoint(latlon);
+	        return [point.x, point.y];
+	      });
+	
+	      var _coords = [];
+	      var _colours = [];
+	
+	      var nextCoord;
+	
+	      // Connect coordinate with the next to make a pair
+	      //
+	      // LineSegments requires pairs of vertices so repeat the last point if
+	      // there's an odd number of vertices
+	      coordinates.forEach(function (coordinate, index) {
+	        // TODO: Don't hardcode y-value
+	        _colours.push([colour.r, colour.g, colour.b]);
+	        _coords.push([coordinate[0], 0, coordinate[1]]);
+	
+	        nextCoord = coordinates[index + 1] ? coordinates[index + 1] : coordinate;
+	
+	        _colours.push([colour.r, colour.g, colour.b]);
+	        _coords.push([nextCoord[0], 0, nextCoord[1]]);
+	      });
+	
+	      return [_coords, _colours];
+	    }
+	  }, {
+	    key: '_processMultiLineString',
+	    value: function _processMultiLineString(coordinates, colour) {
+	      var _this5 = this;
+	
+	      var _coords = [];
+	      var _colours = [];
+	
+	      var result;
+	      coordinates.forEach(function (coordinate) {
+	        result = _this5._processLineString(coordinate, colour);
+	
+	        result[0].forEach(function (coord) {
+	          _coords.push(coord);
+	        });
+	
+	        result[1].forEach(function (colour) {
+	          _colours.push(colour);
+	        });
+	      });
+	
+	      return [_coords, _colours];
+	    }
+	  }, {
 	    key: '_processTileData',
 	    value: function _processTileData(data) {
-	      var _this4 = this;
+	      var _this6 = this;
 	
 	      console.time(this._tile);
 	
-	      var geojson = data;
+	      var geojson;
 	
 	      if (this._options.topojson) {
-	        // TODO: Allow TopoJSON object to be customised so this isn't tied to
-	        // Mapzen tiles
-	        geojson = _topojson2['default'].feature(data, data.objects.vectile);
+	        // TODO: Allow TopoJSON objects to be overridden as an option
+	
+	        var collections = [];
+	
+	        // If not overridden, merge all features from all objects
+	        for (var key in data.objects) {
+	          collections.push(_topojson2['default'].feature(data, data.objects[key]));
+	        }
+	
+	        geojson = (0, _geojsonMerge2['default'])(collections);
+	      } else {
+	        // If root doesn't have a type then let's see if there are features in the
+	        // next step down
+	        if (!data.type) {
+	          // TODO: Allow GeoJSON objects to be overridden as an option
+	
+	          var collections = [];
+	
+	          // If not overridden, merge all features from all objects
+	          for (var key in data) {
+	            if (!data[key].type) {
+	              continue;
+	            }
+	
+	            collections.push(data[key]);
+	          }
+	
+	          geojson = (0, _geojsonMerge2['default'])(collections);
+	        } else {
+	          geojson = data;
+	        }
 	      }
+	
+	      // TODO: Check that GeoJSON is valid / usable
 	
 	      var offset = (0, _geoPoint2['default'])(0, 0);
 	      offset.x = -1 * this._center[0];
 	      offset.y = -1 * this._center[1];
 	
 	      var coordinates;
-	      var earcutData;
-	      var faces;
-	
-	      var allVertices = [];
-	      var allFaces = [];
-	      var allColours = [];
-	      var facesCount = 0;
-	
-	      var colour = new _three2['default'].Color();
-	
-	      var light = new _three2['default'].Color(0xffffff);
-	      var shadow = new _three2['default'].Color(0x666666);
 	
 	      var features = geojson.features;
 	
@@ -11699,116 +11786,161 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      var style = this._options.style;
 	
-	      var allFlat = true;
+	      var polygons = {
+	        vertices: [],
+	        faces: [],
+	        colours: [],
+	        facesCount: 0,
+	        allFlat: true
+	      };
+	
+	      var lines = {
+	        vertices: [],
+	        colours: [],
+	        verticesCount: 0
+	      };
+	
+	      // Polygon variables
+	      var earcutData;
+	      var faces;
+	
+	      var colour = new _three2['default'].Color();
+	
+	      // Light and dark colours used for poor-mans AO gradient on object sides
+	      var light = new _three2['default'].Color(0xffffff);
+	      var shadow = new _three2['default'].Color(0x666666);
 	
 	      features.forEach(function (feature) {
 	        // feature.geometry, feature.properties
 	
-	        // Skip features that aren't polygons
+	        // Skip features that aren't supported
 	        //
 	        // TODO: Add support for all GeoJSON geometry types, including Multi...
 	        // geometry types
-	        if (feature.geometry.type !== 'Polygon') {
+	        if (feature.geometry.type !== 'Polygon' && feature.geometry.type !== 'LineString' && feature.geometry.type !== 'MultiLineString') {
 	          return;
 	        }
 	
 	        // Get style object, if provided
-	        if (typeof _this4._options.style === 'function') {
-	          style = _this4._options.style(feature);
+	        if (typeof _this6._options.style === 'function') {
+	          style = (0, _lodashAssign2['default'])(_this6._defaultStyle, _this6._options.style(feature));
 	        }
 	
 	        var coordinates = feature.geometry.coordinates;
 	
-	        coordinates = coordinates.map(function (ring) {
-	          return ring.map(function (coordinate) {
-	            var latlon = (0, _geoLatLon2['default'])(coordinate[1], coordinate[0]);
-	            var point = _this4._layer._world.latLonToPoint(latlon);
-	            return [point.x, point.y];
+	        // if (feature.geometry.type === 'LineString') {
+	        if (feature.geometry.type === 'LineString') {
+	          colour.set(style.lineColor);
+	
+	          var linestringResults = _this6._processLineString(coordinates, colour);
+	
+	          lines.vertices.push(linestringResults[0]);
+	          lines.colours.push(linestringResults[1]);
+	          lines.verticesCount += linestringResults[0].length;
+	        }
+	
+	        if (feature.geometry.type === 'MultiLineString') {
+	          colour.set(style.lineColor);
+	
+	          var multiLinestringResults = _this6._processMultiLineString(coordinates, colour);
+	
+	          lines.vertices.push(multiLinestringResults[0]);
+	          lines.colours.push(multiLinestringResults[1]);
+	          lines.verticesCount += multiLinestringResults[0].length;
+	        }
+	
+	        if (feature.geometry.type === 'Polygon') {
+	          colour.set(style.color);
+	
+	          coordinates = coordinates.map(function (ring) {
+	            return ring.map(function (coordinate) {
+	              var latlon = (0, _geoLatLon2['default'])(coordinate[1], coordinate[0]);
+	              var point = _this6._layer._world.latLonToPoint(latlon);
+	              return [point.x, point.y];
+	            });
 	          });
-	        });
 	
-	        // Draw footprint on shadow canvas
-	        //
-	        // TODO: Disabled for the time-being until it can be sped up / moved to
-	        // a worker
-	        // this._addShadow(coordinates);
+	          // Draw footprint on shadow canvas
+	          //
+	          // TODO: Disabled for the time-being until it can be sped up / moved to
+	          // a worker
+	          // this._addShadow(coordinates);
 	
-	        earcutData = _this4._toEarcut(coordinates);
+	          earcutData = _this6._toEarcut(coordinates);
 	
-	        faces = _this4._triangulate(earcutData.vertices, earcutData.holes, earcutData.dimensions);
+	          faces = _this6._triangulate(earcutData.vertices, earcutData.holes, earcutData.dimensions);
 	
-	        var groupedVertices = [];
-	        for (i = 0, il = earcutData.vertices.length; i < il; i += earcutData.dimensions) {
-	          groupedVertices.push(earcutData.vertices.slice(i, i + earcutData.dimensions));
-	        }
-	
-	        var height = 0;
-	
-	        if (style.height) {
-	          height = _this4._world.metresToWorld(style.height, _this4._pointScale);
-	        }
-	
-	        var extruded = (0, _utilExtrudePolygon2['default'])(groupedVertices, faces, {
-	          bottom: 0,
-	          top: height
-	        });
-	
-	        colour.set(style.color);
-	
-	        var topColor = colour.clone().multiply(light);
-	        var bottomColor = colour.clone().multiply(shadow);
-	
-	        var _faces = [];
-	        var _colours = [];
-	
-	        allVertices.push(extruded.positions);
-	
-	        var _colour;
-	        extruded.top.forEach(function (face, fi) {
-	          _colour = [];
-	
-	          _colour.push([colour.r, colour.g, colour.b]);
-	          _colour.push([colour.r, colour.g, colour.b]);
-	          _colour.push([colour.r, colour.g, colour.b]);
-	
-	          _faces.push(face);
-	          _colours.push(_colour);
-	        });
-	
-	        if (extruded.sides) {
-	          if (allFlat) {
-	            allFlat = false;
+	          var groupedVertices = [];
+	          for (i = 0, il = earcutData.vertices.length; i < il; i += earcutData.dimensions) {
+	            groupedVertices.push(earcutData.vertices.slice(i, i + earcutData.dimensions));
 	          }
 	
-	          // Set up colours for every vertex with poor-mans AO on the sides
-	          extruded.sides.forEach(function (face, fi) {
+	          var height = 0;
+	
+	          if (style.height) {
+	            height = _this6._world.metresToWorld(style.height, _this6._pointScale);
+	          }
+	
+	          var extruded = (0, _utilExtrudePolygon2['default'])(groupedVertices, faces, {
+	            bottom: 0,
+	            top: height
+	          });
+	
+	          var topColor = colour.clone().multiply(light);
+	          var bottomColor = colour.clone().multiply(shadow);
+	
+	          var _faces = [];
+	          var _colours = [];
+	
+	          polygons.vertices.push(extruded.positions);
+	
+	          var _colour;
+	          extruded.top.forEach(function (face, fi) {
 	            _colour = [];
 	
-	            // First face is always bottom-bottom-top
-	            if (fi % 2 === 0) {
-	              _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-	              _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-	              _colour.push([topColor.r, topColor.g, topColor.b]);
-	              // Reverse winding for the second face
-	              // top-top-bottom
-	            } else {
-	                _colour.push([topColor.r, topColor.g, topColor.b]);
-	                _colour.push([topColor.r, topColor.g, topColor.b]);
-	                _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-	              }
+	            _colour.push([colour.r, colour.g, colour.b]);
+	            _colour.push([colour.r, colour.g, colour.b]);
+	            _colour.push([colour.r, colour.g, colour.b]);
 	
 	            _faces.push(face);
 	            _colours.push(_colour);
 	          });
+	
+	          if (extruded.sides) {
+	            if (polygons.allFlat) {
+	              polygons.allFlat = false;
+	            }
+	
+	            // Set up colours for every vertex with poor-mans AO on the sides
+	            extruded.sides.forEach(function (face, fi) {
+	              _colour = [];
+	
+	              // First face is always bottom-bottom-top
+	              if (fi % 2 === 0) {
+	                _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+	                _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+	                _colour.push([topColor.r, topColor.g, topColor.b]);
+	                // Reverse winding for the second face
+	                // top-top-bottom
+	              } else {
+	                  _colour.push([topColor.r, topColor.g, topColor.b]);
+	                  _colour.push([topColor.r, topColor.g, topColor.b]);
+	                  _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+	                }
+	
+	              _faces.push(face);
+	              _colours.push(_colour);
+	            });
+	          }
+	
+	          // Skip bottom as there's no point rendering it
+	          // allFaces.push(extruded.faces);
+	
+	          polygons.faces.push(_faces);
+	          polygons.colours.push(_colours);
+	
+	          polygons.facesCount += _faces.length;
 	        }
-	
-	        // Skip bottom as there's no point rendering it
-	        // allFaces.push(extruded.faces);
-	
-	        allFaces.push(_faces);
-	        allColours.push(_colours);
-	
-	        facesCount += _faces.length;
 	      });
 	
 	      // Output shadow canvas
@@ -11856,158 +11988,211 @@ return /******/ (function(modules) { // webpackBootstrap
 	      //
 	      // this._mesh.add(mesh);
 	
-	      // Skip if no faces
-	      //
-	      // Need to check way before this if there are no faces, before even doing
-	      // earcut triangulation.
-	      if (facesCount === 0) {
-	        this._ready = true;
-	        return;
-	      }
+	      // Output lines
+	      if (lines.vertices.length > 0) {
+	        var geometry = new _three2['default'].BufferGeometry();
 	
-	      var geometry = new _three2['default'].BufferGeometry();
+	        var vertices = new Float32Array(lines.verticesCount * 3);
+	        var colours = new Float32Array(lines.verticesCount * 3);
 	
-	      // Three components per vertex per face (3 x 3 = 9)
-	      var vertices = new Float32Array(facesCount * 9);
-	      var normals = new Float32Array(facesCount * 9);
-	      var colours = new Float32Array(facesCount * 9);
+	        var _vertices;
+	        var _colour;
 	
-	      var pA = new _three2['default'].Vector3();
-	      var pB = new _three2['default'].Vector3();
-	      var pC = new _three2['default'].Vector3();
+	        var lastIndex = 0;
 	
-	      var cb = new _three2['default'].Vector3();
-	      var ab = new _three2['default'].Vector3();
+	        for (var i = 0; i < lines.vertices.length; i++) {
+	          _vertices = lines.vertices[i];
+	          _colour = lines.colours[i];
 	
-	      var dim = 2;
+	          for (var j = 0; j < _vertices.length; j++) {
+	            var ax = _vertices[j][0] + offset.x;
+	            var ay = _vertices[j][1];
+	            var az = _vertices[j][2] + offset.y;
 	
-	      var index;
-	      var _faces;
-	      var _vertices;
-	      var _colour;
-	      var lastIndex = 0;
-	      for (var i = 0; i < allFaces.length; i++) {
-	        _faces = allFaces[i];
-	        _vertices = allVertices[i];
-	        _colour = allColours[i];
+	            var c1 = _colour[j];
 	
-	        for (var j = 0; j < _faces.length; j++) {
-	          // Array of vertex indexes for the face
-	          index = _faces[j][0];
+	            vertices[lastIndex * 3 + 0] = ax;
+	            vertices[lastIndex * 3 + 1] = ay;
+	            vertices[lastIndex * 3 + 2] = az;
 	
-	          var ax = _vertices[index][0] + offset.x;
-	          var ay = _vertices[index][1];
-	          var az = _vertices[index][2] + offset.y;
+	            colours[lastIndex * 3 + 0] = c1[0];
+	            colours[lastIndex * 3 + 1] = c1[1];
+	            colours[lastIndex * 3 + 2] = c1[2];
 	
-	          var c1 = _colour[j][0];
-	
-	          index = _faces[j][1];
-	
-	          var bx = _vertices[index][0] + offset.x;
-	          var by = _vertices[index][1];
-	          var bz = _vertices[index][2] + offset.y;
-	
-	          var c2 = _colour[j][1];
-	
-	          index = _faces[j][2];
-	
-	          var cx = _vertices[index][0] + offset.x;
-	          var cy = _vertices[index][1];
-	          var cz = _vertices[index][2] + offset.y;
-	
-	          var c3 = _colour[j][2];
-	
-	          // Flat face normals
-	          // From: http://threejs.org/examples/webgl_buffergeometry.html
-	          pA.set(ax, ay, az);
-	          pB.set(bx, by, bz);
-	          pC.set(cx, cy, cz);
-	
-	          cb.subVectors(pC, pB);
-	          ab.subVectors(pA, pB);
-	          cb.cross(ab);
-	
-	          cb.normalize();
-	
-	          var nx = cb.x;
-	          var ny = cb.y;
-	          var nz = cb.z;
-	
-	          vertices[lastIndex * 9 + 0] = ax;
-	          vertices[lastIndex * 9 + 1] = ay;
-	          vertices[lastIndex * 9 + 2] = az;
-	
-	          normals[lastIndex * 9 + 0] = nx;
-	          normals[lastIndex * 9 + 1] = ny;
-	          normals[lastIndex * 9 + 2] = nz;
-	
-	          colours[lastIndex * 9 + 0] = c1[0];
-	          colours[lastIndex * 9 + 1] = c1[1];
-	          colours[lastIndex * 9 + 2] = c1[2];
-	
-	          vertices[lastIndex * 9 + 3] = bx;
-	          vertices[lastIndex * 9 + 4] = by;
-	          vertices[lastIndex * 9 + 5] = bz;
-	
-	          normals[lastIndex * 9 + 3] = nx;
-	          normals[lastIndex * 9 + 4] = ny;
-	          normals[lastIndex * 9 + 5] = nz;
-	
-	          colours[lastIndex * 9 + 3] = c2[0];
-	          colours[lastIndex * 9 + 4] = c2[1];
-	          colours[lastIndex * 9 + 5] = c2[2];
-	
-	          vertices[lastIndex * 9 + 6] = cx;
-	          vertices[lastIndex * 9 + 7] = cy;
-	          vertices[lastIndex * 9 + 8] = cz;
-	
-	          normals[lastIndex * 9 + 6] = nx;
-	          normals[lastIndex * 9 + 7] = ny;
-	          normals[lastIndex * 9 + 8] = nz;
-	
-	          colours[lastIndex * 9 + 6] = c3[0];
-	          colours[lastIndex * 9 + 7] = c3[1];
-	          colours[lastIndex * 9 + 8] = c3[2];
-	
-	          lastIndex++;
+	            lastIndex++;
+	          }
 	        }
-	      }
 	
-	      // itemSize = 3 because there are 3 values (components) per vertex
-	      geometry.addAttribute('position', new _three2['default'].BufferAttribute(vertices, 3));
-	      geometry.addAttribute('normal', new _three2['default'].BufferAttribute(normals, 3));
-	      geometry.addAttribute('color', new _three2['default'].BufferAttribute(colours, 3));
+	        // itemSize = 3 because there are 3 values (components) per vertex
+	        geometry.addAttribute('position', new _three2['default'].BufferAttribute(vertices, 3));
+	        geometry.addAttribute('color', new _three2['default'].BufferAttribute(colours, 3));
 	
-	      geometry.computeBoundingBox();
+	        geometry.computeBoundingBox();
 	
-	      var material;
-	      if (!this._world._environment._skybox) {
-	        material = new _three2['default'].MeshPhongMaterial({
+	        var material = new _three2['default'].LineBasicMaterial({
 	          vertexColors: _three2['default'].VertexColors,
-	          side: _three2['default'].BackSide
+	          linewidth: style.lineWidth,
+	          transparent: style.lineTransparent,
+	          opacity: style.lineOpacity,
+	          blending: style.lineBlending
 	        });
-	      } else {
-	        material = new _three2['default'].MeshStandardMaterial({
-	          vertexColors: _three2['default'].VertexColors,
-	          side: _three2['default'].BackSide
-	        });
-	        material.roughness = 1;
-	        material.metalness = 0.1;
-	        material.envMapIntensity = 3;
-	        material.envMap = this._world._environment._skybox.getRenderTarget();
+	
+	        var mesh = new _three2['default'].LineSegments(geometry, material);
+	
+	        if (style.lineRenderOrder) {
+	          mesh.renderOrder = style.lineRenderOrder;
+	        }
+	
+	        // TODO: Can a line cast a shadow?
+	        // mesh.castShadow = true;
+	
+	        this._mesh.add(mesh);
 	      }
 	
-	      var mesh = new _three2['default'].Mesh(geometry, material);
+	      // Output polygons
+	      if (polygons.facesCount > 0) {
+	        var geometry = new _three2['default'].BufferGeometry();
 	
-	      mesh.castShadow = true;
-	      mesh.receiveShadow = true;
+	        // Three components per vertex per face (3 x 3 = 9)
+	        var vertices = new Float32Array(polygons.facesCount * 9);
+	        var normals = new Float32Array(polygons.facesCount * 9);
+	        var colours = new Float32Array(polygons.facesCount * 9);
 	
-	      if (allFlat) {
-	        // This is only useful for flat objects
-	        mesh.renderOrder = 1;
+	        var pA = new _three2['default'].Vector3();
+	        var pB = new _three2['default'].Vector3();
+	        var pC = new _three2['default'].Vector3();
+	
+	        var cb = new _three2['default'].Vector3();
+	        var ab = new _three2['default'].Vector3();
+	
+	        var index;
+	        var _faces;
+	        var _vertices;
+	        var _colour;
+	        var lastIndex = 0;
+	        for (var i = 0; i < polygons.faces.length; i++) {
+	          _faces = polygons.faces[i];
+	          _vertices = polygons.vertices[i];
+	          _colour = polygons.colours[i];
+	
+	          for (var j = 0; j < _faces.length; j++) {
+	            // Array of vertex indexes for the face
+	            index = _faces[j][0];
+	
+	            var ax = _vertices[index][0] + offset.x;
+	            var ay = _vertices[index][1];
+	            var az = _vertices[index][2] + offset.y;
+	
+	            var c1 = _colour[j][0];
+	
+	            index = _faces[j][1];
+	
+	            var bx = _vertices[index][0] + offset.x;
+	            var by = _vertices[index][1];
+	            var bz = _vertices[index][2] + offset.y;
+	
+	            var c2 = _colour[j][1];
+	
+	            index = _faces[j][2];
+	
+	            var cx = _vertices[index][0] + offset.x;
+	            var cy = _vertices[index][1];
+	            var cz = _vertices[index][2] + offset.y;
+	
+	            var c3 = _colour[j][2];
+	
+	            // Flat face normals
+	            // From: http://threejs.org/examples/webgl_buffergeometry.html
+	            pA.set(ax, ay, az);
+	            pB.set(bx, by, bz);
+	            pC.set(cx, cy, cz);
+	
+	            cb.subVectors(pC, pB);
+	            ab.subVectors(pA, pB);
+	            cb.cross(ab);
+	
+	            cb.normalize();
+	
+	            var nx = cb.x;
+	            var ny = cb.y;
+	            var nz = cb.z;
+	
+	            vertices[lastIndex * 9 + 0] = ax;
+	            vertices[lastIndex * 9 + 1] = ay;
+	            vertices[lastIndex * 9 + 2] = az;
+	
+	            normals[lastIndex * 9 + 0] = nx;
+	            normals[lastIndex * 9 + 1] = ny;
+	            normals[lastIndex * 9 + 2] = nz;
+	
+	            colours[lastIndex * 9 + 0] = c1[0];
+	            colours[lastIndex * 9 + 1] = c1[1];
+	            colours[lastIndex * 9 + 2] = c1[2];
+	
+	            vertices[lastIndex * 9 + 3] = bx;
+	            vertices[lastIndex * 9 + 4] = by;
+	            vertices[lastIndex * 9 + 5] = bz;
+	
+	            normals[lastIndex * 9 + 3] = nx;
+	            normals[lastIndex * 9 + 4] = ny;
+	            normals[lastIndex * 9 + 5] = nz;
+	
+	            colours[lastIndex * 9 + 3] = c2[0];
+	            colours[lastIndex * 9 + 4] = c2[1];
+	            colours[lastIndex * 9 + 5] = c2[2];
+	
+	            vertices[lastIndex * 9 + 6] = cx;
+	            vertices[lastIndex * 9 + 7] = cy;
+	            vertices[lastIndex * 9 + 8] = cz;
+	
+	            normals[lastIndex * 9 + 6] = nx;
+	            normals[lastIndex * 9 + 7] = ny;
+	            normals[lastIndex * 9 + 8] = nz;
+	
+	            colours[lastIndex * 9 + 6] = c3[0];
+	            colours[lastIndex * 9 + 7] = c3[1];
+	            colours[lastIndex * 9 + 8] = c3[2];
+	
+	            lastIndex++;
+	          }
+	        }
+	
+	        // itemSize = 3 because there are 3 values (components) per vertex
+	        geometry.addAttribute('position', new _three2['default'].BufferAttribute(vertices, 3));
+	        geometry.addAttribute('normal', new _three2['default'].BufferAttribute(normals, 3));
+	        geometry.addAttribute('color', new _three2['default'].BufferAttribute(colours, 3));
+	
+	        geometry.computeBoundingBox();
+	
+	        var material;
+	        if (!this._world._environment._skybox) {
+	          material = new _three2['default'].MeshPhongMaterial({
+	            vertexColors: _three2['default'].VertexColors,
+	            side: _three2['default'].BackSide
+	          });
+	        } else {
+	          material = new _three2['default'].MeshStandardMaterial({
+	            vertexColors: _three2['default'].VertexColors,
+	            side: _three2['default'].BackSide
+	          });
+	          material.roughness = 1;
+	          material.metalness = 0.1;
+	          material.envMapIntensity = 3;
+	          material.envMap = this._world._environment._skybox.getRenderTarget();
+	        }
+	
+	        var mesh = new _three2['default'].Mesh(geometry, material);
+	
+	        mesh.castShadow = true;
+	        mesh.receiveShadow = true;
+	
+	        if (polygons.allFlat) {
+	          // This is only useful for flat objects
+	          mesh.renderOrder = 1;
+	        }
+	
+	        this._mesh.add(mesh);
 	      }
-	
-	      this._mesh.add(mesh);
 	
 	      this._ready = true;
 	      console.timeEnd(this._tile);
@@ -14922,6 +15107,71 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 68 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var normalize = __webpack_require__(69);
+	
+	module.exports = function(inputs) {
+	    return {
+	        type: 'FeatureCollection',
+	        features: inputs.reduce(function(memo, input) {
+	            return memo.concat(normalize(input).features);
+	        }, [])
+	    };
+	};
+
+
+/***/ },
+/* 69 */
+/***/ function(module, exports) {
+
+	module.exports = normalize;
+	
+	var types = {
+	    Point: 'geometry',
+	    MultiPoint: 'geometry',
+	    LineString: 'geometry',
+	    MultiLineString: 'geometry',
+	    Polygon: 'geometry',
+	    MultiPolygon: 'geometry',
+	    GeometryCollection: 'geometry',
+	    Feature: 'feature',
+	    FeatureCollection: 'featurecollection'
+	};
+	
+	/**
+	 * Normalize a GeoJSON feature into a FeatureCollection.
+	 *
+	 * @param {object} gj geojson data
+	 * @returns {object} normalized geojson data
+	 */
+	function normalize(gj) {
+	    if (!gj || !gj.type) return null;
+	    var type = types[gj.type];
+	    if (!type) return null;
+	
+	    if (type === 'geometry') {
+	        return {
+	            type: 'FeatureCollection',
+	            features: [{
+	                type: 'Feature',
+	                properties: {},
+	                geometry: gj
+	            }]
+	        };
+	    } else if (type === 'feature') {
+	        return {
+	            type: 'FeatureCollection',
+	            features: [gj]
+	        };
+	    } else if (type === 'featurecollection') {
+	        return gj;
+	    }
+	}
+
+
+/***/ },
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {

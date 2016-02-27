@@ -11,7 +11,8 @@ var imageTileLayer = VIZI.ImageTileLayer('http://{s}.basemaps.cartocdn.com/light
   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
 }).addTo(world);
 
-var topoJSONTileLayer = VIZI.TopoJSONTileLayer('https://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
+// Building and roads from Mapzen (polygons and linestrings)
+var topoJSONTileLayer = VIZI.TopoJSONTileLayer('https://vector.mapzen.com/osm/buildings,roads/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
   style: function(feature) {
     var height;
 
@@ -22,15 +23,39 @@ var topoJSONTileLayer = VIZI.TopoJSONTileLayer('https://vector.mapzen.com/osm/bu
     }
 
     return {
-      // color: (feature.properties.area > 10000) ? '#ff0000' : '#0000ff'
-      color: '#ffffff',
-      height: height
+      height: height,
+      lineColor: '#f7c616',
+      lineWidth: 1,
+      lineTransparent: true,
+      lineOpacity: 0.2,
+      lineBlending: THREE.AdditiveBlending,
+      lineRenderOrder: 2
     };
   },
-  // filter: function(feature) {
-  //   // Only show features with an area larger than 5000 (metres squared in
-  //   // projected units)
-  //   return feature.properties.area > 5000;
-  // },
   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://whosonfirst.mapzen.com#License">Who\'s On First</a>.'
 }).addTo(world);
+
+// Just buildings from Mapzen (polygons)
+// var topoJSONTileLayer = VIZI.TopoJSONTileLayer('https://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
+//   style: function(feature) {
+//     var height;
+//
+//     if (feature.properties.height) {
+//       height = feature.properties.height;
+//     } else {
+//       height = 10 + Math.random() * 10;
+//     }
+//
+//     return {
+//       // color: (feature.properties.area > 10000) ? '#ff0000' : '#0000ff'
+//       color: '#ffffff',
+//       height: height
+//     };
+//   },
+//   // filter: function(feature) {
+//   //   // Only show features with an area larger than 5000 (metres squared in
+//   //   // projected units)
+//   //   return feature.properties.area > 5000;
+//   // },
+//   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://whosonfirst.mapzen.com#License">Who\'s On First</a>.'
+// }).addTo(world);

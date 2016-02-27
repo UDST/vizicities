@@ -9,6 +9,7 @@ import earcut from 'earcut';
 import extend from 'lodash.assign';
 import extrudePolygon from '../../util/extrudePolygon';
 import Offset from 'polygon-offset';
+import geojsonMerge from 'geojson-merge';
 
 // TODO: Perform tile request and processing in a Web Worker
 //
@@ -42,12 +43,20 @@ class GeoJSONTile extends Tile {
   constructor(quadcode, path, layer, options) {
     super(quadcode, path, layer);
 
+    this._defaultStyle = {
+      color: '#ffffff',
+      height: 0,
+      lineOpacity: 1,
+      lineTransparent: false,
+      lineColor: '#ffffff',
+      lineWidth: 1,
+      lineBlending: THREE.NormalBlending
+    };
+
     var defaults = {
       topojson: false,
       filter: null,
-      style: {
-        color: '#ffffff'
-      }
+      style: this._defaultStyle
     };
 
     this._options = extend(defaults, options);
@@ -224,34 +233,102 @@ class GeoJSONTile extends Tile {
     });
   }
 
+  _processLineString(coordinates, colour) {
+    coordinates = coordinates.map(coordinate => {
+      var latlon = LatLon(coordinate[1], coordinate[0]);
+      var point = this._layer._world.latLonToPoint(latlon);
+      return [point.x, point.y];
+    });
+
+    var _coords = [];
+    var _colours = [];
+
+    var nextCoord;
+
+    // Connect coordinate with the next to make a pair
+    //
+    // LineSegments requires pairs of vertices so repeat the last point if
+    // there's an odd number of vertices
+    coordinates.forEach((coordinate, index) => {
+      // TODO: Don't hardcode y-value
+      _colours.push([colour.r, colour.g, colour.b]);
+      _coords.push([coordinate[0], 0, coordinate[1]]);
+
+      nextCoord = (coordinates[index + 1]) ? coordinates[index + 1] : coordinate;
+
+      _colours.push([colour.r, colour.g, colour.b]);
+      _coords.push([nextCoord[0], 0, nextCoord[1]]);
+    });
+
+    return [_coords, _colours];
+  }
+
+  _processMultiLineString(coordinates, colour) {
+    var _coords = [];
+    var _colours = [];
+
+    var result;
+    coordinates.forEach(coordinate => {
+      result = this._processLineString(coordinate, colour);
+
+      result[0].forEach(coord => {
+        _coords.push(coord);
+      });
+
+      result[1].forEach(colour => {
+        _colours.push(colour);
+      });
+    });
+
+    return [_coords, _colours];
+  }
+
   _processTileData(data) {
     console.time(this._tile);
 
-    var geojson = data;
+    var geojson;
 
     if (this._options.topojson) {
-      // TODO: Allow TopoJSON object to be customised so this isn't tied to
-      // Mapzen tiles
-      geojson = topojson.feature(data, data.objects.vectile);
+      // TODO: Allow TopoJSON objects to be overridden as an option
+
+      var collections = [];
+
+      // If not overridden, merge all features from all objects
+      for (var key in data.objects) {
+        collections.push(topojson.feature(data, data.objects[key]));
+      }
+
+      geojson = geojsonMerge(collections);
+    } else {
+      // If root doesn't have a type then let's see if there are features in the
+      // next step down
+      if (!data.type) {
+        // TODO: Allow GeoJSON objects to be overridden as an option
+
+        var collections = [];
+
+        // If not overridden, merge all features from all objects
+        for (var key in data) {
+          if (!data[key].type) {
+            continue;
+          }
+
+          collections.push(data[key]);
+        }
+
+        geojson = geojsonMerge(collections);
+      } else {
+        geojson = data;
+      }
     }
+
+    // TODO: Check that GeoJSON is valid / usable
 
     var offset = Point(0, 0);
     offset.x = -1 * this._center[0];
     offset.y = -1 * this._center[1];
 
     var coordinates;
-    var earcutData;
-    var faces;
-
-    var allVertices = [];
-    var allFaces = [];
-    var allColours = [];
-    var facesCount = 0;
-
-    var colour = new THREE.Color();
-
-    var light = new THREE.Color(0xffffff);
-    var shadow  = new THREE.Color(0x666666);
 
     var features = geojson.features;
 
@@ -262,116 +339,165 @@ class GeoJSONTile extends Tile {
 
     var style = this._options.style;
 
-    var allFlat = true;
+    var polygons = {
+      vertices: [],
+      faces: [],
+      colours: [],
+      facesCount: 0,
+      allFlat: true
+    };
+
+    var lines = {
+      vertices: [],
+      colours: [],
+      verticesCount: 0
+    };
+
+    // Polygon variables
+    var earcutData;
+    var faces;
+
+    var colour = new THREE.Color();
+
+    // Light and dark colours used for poor-mans AO gradient on object sides
+    var light = new THREE.Color(0xffffff);
+    var shadow  = new THREE.Color(0x666666);
 
     features.forEach(feature => {
       // feature.geometry, feature.properties
 
-      // Skip features that aren't polygons
+      // Skip features that aren't supported
       //
       // TODO: Add support for all GeoJSON geometry types, including Multi...
       // geometry types
-      if (feature.geometry.type !== 'Polygon') {
+      if (
+        feature.geometry.type !== 'Polygon' &&
+        feature.geometry.type !== 'LineString' &&
+        feature.geometry.type !== 'MultiLineString'
+      ) {
         return;
       }
 
       // Get style object, if provided
       if (typeof this._options.style === 'function') {
-        style = this._options.style(feature);
+        style = extend(this._defaultStyle, this._options.style(feature));
       }
 
       var coordinates = feature.geometry.coordinates;
 
-      coordinates = coordinates.map(ring => {
-        return ring.map(coordinate => {
-          var latlon = LatLon(coordinate[1], coordinate[0]);
-          var point = this._layer._world.latLonToPoint(latlon);
-          return [point.x, point.y];
+      // if (feature.geometry.type === 'LineString') {
+      if (feature.geometry.type === 'LineString') {
+        colour.set(style.lineColor);
+
+        var linestringResults = this._processLineString(coordinates, colour);
+
+        lines.vertices.push(linestringResults[0]);
+        lines.colours.push(linestringResults[1]);
+        lines.verticesCount += linestringResults[0].length;
+      }
+
+      if (feature.geometry.type === 'MultiLineString') {
+        colour.set(style.lineColor);
+
+        var multiLinestringResults = this._processMultiLineString(coordinates, colour);
+
+        lines.vertices.push(multiLinestringResults[0]);
+        lines.colours.push(multiLinestringResults[1]);
+        lines.verticesCount += multiLinestringResults[0].length;
+      }
+
+      if (feature.geometry.type === 'Polygon') {
+        colour.set(style.color);
+
+        coordinates = coordinates.map(ring => {
+          return ring.map(coordinate => {
+            var latlon = LatLon(coordinate[1], coordinate[0]);
+            var point = this._layer._world.latLonToPoint(latlon);
+            return [point.x, point.y];
+          });
         });
-      });
 
-      // Draw footprint on shadow canvas
-      //
-      // TODO: Disabled for the time-being until it can be sped up / moved to
-      // a worker
-      // this._addShadow(coordinates);
+        // Draw footprint on shadow canvas
+        //
+        // TODO: Disabled for the time-being until it can be sped up / moved to
+        // a worker
+        // this._addShadow(coordinates);
 
-      earcutData = this._toEarcut(coordinates);
+        earcutData = this._toEarcut(coordinates);
 
-      faces = this._triangulate(earcutData.vertices, earcutData.holes, earcutData.dimensions);
+        faces = this._triangulate(earcutData.vertices, earcutData.holes, earcutData.dimensions);
 
-      var groupedVertices = [];
-      for (i = 0, il = earcutData.vertices.length; i < il; i += earcutData.dimensions) {
-        groupedVertices.push(earcutData.vertices.slice(i, i + earcutData.dimensions));
-      }
-
-      var height = 0;
-
-      if (style.height) {
-        height = this._world.metresToWorld(style.height, this._pointScale);
-      }
-
-      var extruded = extrudePolygon(groupedVertices, faces, {
-        bottom: 0,
-        top: height
-      });
-
-      colour.set(style.color);
-
-      var topColor = colour.clone().multiply(light);
-      var bottomColor = colour.clone().multiply(shadow);
-
-      var _faces = [];
-      var _colours = [];
-
-      allVertices.push(extruded.positions);
-
-      var _colour;
-      extruded.top.forEach((face, fi) => {
-        _colour = [];
-
-        _colour.push([colour.r, colour.g, colour.b]);
-        _colour.push([colour.r, colour.g, colour.b]);
-        _colour.push([colour.r, colour.g, colour.b]);
-
-        _faces.push(face);
-        _colours.push(_colour);
-      });
-
-      if (extruded.sides) {
-        if (allFlat) {
-          allFlat = false;
+        var groupedVertices = [];
+        for (i = 0, il = earcutData.vertices.length; i < il; i += earcutData.dimensions) {
+          groupedVertices.push(earcutData.vertices.slice(i, i + earcutData.dimensions));
         }
 
-        // Set up colours for every vertex with poor-mans AO on the sides
-        extruded.sides.forEach((face, fi) => {
+        var height = 0;
+
+        if (style.height) {
+          height = this._world.metresToWorld(style.height, this._pointScale);
+        }
+
+        var extruded = extrudePolygon(groupedVertices, faces, {
+          bottom: 0,
+          top: height
+        });
+
+        var topColor = colour.clone().multiply(light);
+        var bottomColor = colour.clone().multiply(shadow);
+
+        var _faces = [];
+        var _colours = [];
+
+        polygons.vertices.push(extruded.positions);
+
+        var _colour;
+        extruded.top.forEach((face, fi) => {
           _colour = [];
 
-          // First face is always bottom-bottom-top
-          if (fi % 2 === 0) {
-            _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-            _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-            _colour.push([topColor.r, topColor.g, topColor.b]);
-          // Reverse winding for the second face
-          // top-top-bottom
-          } else {
-            _colour.push([topColor.r, topColor.g, topColor.b]);
-            _colour.push([topColor.r, topColor.g, topColor.b]);
-            _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-          }
+          _colour.push([colour.r, colour.g, colour.b]);
+          _colour.push([colour.r, colour.g, colour.b]);
+          _colour.push([colour.r, colour.g, colour.b]);
 
           _faces.push(face);
           _colours.push(_colour);
         });
+
+        if (extruded.sides) {
+          if (polygons.allFlat) {
+            polygons.allFlat = false;
+          }
+
+          // Set up colours for every vertex with poor-mans AO on the sides
+          extruded.sides.forEach((face, fi) => {
+            _colour = [];
+
+            // First face is always bottom-bottom-top
+            if (fi % 2 === 0) {
+              _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+              _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+              _colour.push([topColor.r, topColor.g, topColor.b]);
+            // Reverse winding for the second face
+            // top-top-bottom
+            } else {
+              _colour.push([topColor.r, topColor.g, topColor.b]);
+              _colour.push([topColor.r, topColor.g, topColor.b]);
+              _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+            }
+
+            _faces.push(face);
+            _colours.push(_colour);
+          });
+        }
+
+        // Skip bottom as there's no point rendering it
+        // allFaces.push(extruded.faces);
+
+        polygons.faces.push(_faces);
+        polygons.colours.push(_colours);
+
+        polygons.facesCount += _faces.length;
       }
-
-      // Skip bottom as there's no point rendering it
-      // allFaces.push(extruded.faces);
-
-      allFaces.push(_faces);
-      allColours.push(_colours);
-
-      facesCount += _faces.length;
     });
 
     // Output shadow canvas
@@ -419,158 +545,211 @@ class GeoJSONTile extends Tile {
     //
     // this._mesh.add(mesh);
 
-    // Skip if no faces
-    //
-    // Need to check way before this if there are no faces, before even doing
-    // earcut triangulation.
-    if (facesCount === 0) {
-      this._ready = true;
-      return;
-    }
+    // Output lines
+    if (lines.vertices.length > 0) {
+      var geometry = new THREE.BufferGeometry();
 
-    var geometry = new THREE.BufferGeometry();
+      var vertices = new Float32Array(lines.verticesCount * 3);
+      var colours = new Float32Array(lines.verticesCount * 3);
 
-    // Three components per vertex per face (3 x 3 = 9)
-    var vertices = new Float32Array(facesCount * 9);
-    var normals = new Float32Array(facesCount * 9);
-    var colours = new Float32Array(facesCount * 9);
+      var _vertices;
+      var _colour;
 
-    var pA = new THREE.Vector3();
-    var pB = new THREE.Vector3();
-    var pC = new THREE.Vector3();
+      var lastIndex = 0;
 
-    var cb = new THREE.Vector3();
-    var ab = new THREE.Vector3();
+      for (var i = 0; i < lines.vertices.length; i++) {
+        _vertices = lines.vertices[i];
+        _colour = lines.colours[i];
 
-    var dim = 2;
+        for (var j = 0; j < _vertices.length; j++) {
+          var ax = _vertices[j][0] + offset.x;
+          var ay = _vertices[j][1];
+          var az = _vertices[j][2] + offset.y;
 
-    var index;
-    var _faces;
-    var _vertices;
-    var _colour;
-    var lastIndex = 0;
-    for (var i = 0; i < allFaces.length; i++) {
-      _faces = allFaces[i];
-      _vertices = allVertices[i];
-      _colour = allColours[i];
+          var c1 = _colour[j];
 
-      for (var j = 0; j < _faces.length; j++) {
-        // Array of vertex indexes for the face
-        index = _faces[j][0];
+          vertices[lastIndex * 3 + 0] = ax;
+          vertices[lastIndex * 3 + 1] = ay;
+          vertices[lastIndex * 3 + 2] = az;
 
-        var ax = _vertices[index][0] + offset.x;
-        var ay = _vertices[index][1];
-        var az = _vertices[index][2] + offset.y;
+          colours[lastIndex * 3 + 0] = c1[0];
+          colours[lastIndex * 3 + 1] = c1[1];
+          colours[lastIndex * 3 + 2] = c1[2];
 
-        var c1 = _colour[j][0];
-
-        index = _faces[j][1];
-
-        var bx = _vertices[index][0] + offset.x;
-        var by = _vertices[index][1];
-        var bz = _vertices[index][2] + offset.y;
-
-        var c2 = _colour[j][1];
-
-        index = _faces[j][2];
-
-        var cx = _vertices[index][0] + offset.x;
-        var cy = _vertices[index][1];
-        var cz = _vertices[index][2] + offset.y;
-
-        var c3 = _colour[j][2];
-
-        // Flat face normals
-        // From: http://threejs.org/examples/webgl_buffergeometry.html
-        pA.set(ax, ay, az);
-        pB.set(bx, by, bz);
-        pC.set(cx, cy, cz);
-
-        cb.subVectors(pC, pB);
-        ab.subVectors(pA, pB);
-        cb.cross(ab);
-
-        cb.normalize();
-
-        var nx = cb.x;
-        var ny = cb.y;
-        var nz = cb.z;
-
-        vertices[lastIndex * 9 + 0] = ax;
-        vertices[lastIndex * 9 + 1] = ay;
-        vertices[lastIndex * 9 + 2] = az;
-
-        normals[lastIndex * 9 + 0] = nx;
-        normals[lastIndex * 9 + 1] = ny;
-        normals[lastIndex * 9 + 2] = nz;
-
-        colours[lastIndex * 9 + 0] = c1[0];
-        colours[lastIndex * 9 + 1] = c1[1];
-        colours[lastIndex * 9 + 2] = c1[2];
-
-        vertices[lastIndex * 9 + 3] = bx;
-        vertices[lastIndex * 9 + 4] = by;
-        vertices[lastIndex * 9 + 5] = bz;
-
-        normals[lastIndex * 9 + 3] = nx;
-        normals[lastIndex * 9 + 4] = ny;
-        normals[lastIndex * 9 + 5] = nz;
-
-        colours[lastIndex * 9 + 3] = c2[0];
-        colours[lastIndex * 9 + 4] = c2[1];
-        colours[lastIndex * 9 + 5] = c2[2];
-
-        vertices[lastIndex * 9 + 6] = cx;
-        vertices[lastIndex * 9 + 7] = cy;
-        vertices[lastIndex * 9 + 8] = cz;
-
-        normals[lastIndex * 9 + 6] = nx;
-        normals[lastIndex * 9 + 7] = ny;
-        normals[lastIndex * 9 + 8] = nz;
-
-        colours[lastIndex * 9 + 6] = c3[0];
-        colours[lastIndex * 9 + 7] = c3[1];
-        colours[lastIndex * 9 + 8] = c3[2];
-
-        lastIndex++;
+          lastIndex++;
+        }
       }
-    }
 
-    // itemSize = 3 because there are 3 values (components) per vertex
-    geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
-    geometry.addAttribute('normal', new THREE.BufferAttribute(normals, 3));
-    geometry.addAttribute('color', new THREE.BufferAttribute(colours, 3));
+      // itemSize = 3 because there are 3 values (components) per vertex
+      geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
+      geometry.addAttribute('color', new THREE.BufferAttribute(colours, 3));
 
-    geometry.computeBoundingBox();
+      geometry.computeBoundingBox();
 
-    var material;
-    if (!this._world._environment._skybox) {
-      material = new THREE.MeshPhongMaterial({
+      var material = new THREE.LineBasicMaterial({
         vertexColors: THREE.VertexColors,
-        side: THREE.BackSide
+        linewidth: style.lineWidth,
+        transparent: style.lineTransparent,
+        opacity: style.lineOpacity,
+        blending: style.lineBlending
       });
-    } else {
-      material = new THREE.MeshStandardMaterial({
-        vertexColors: THREE.VertexColors,
-        side: THREE.BackSide
-      });
-      material.roughness = 1;
-      material.metalness = 0.1;
-      material.envMapIntensity = 3;
-      material.envMap = this._world._environment._skybox.getRenderTarget();
+
+      var mesh = new THREE.LineSegments(geometry, material);
+
+      if (style.lineRenderOrder) {
+        mesh.renderOrder = style.lineRenderOrder;
+      }
+
+      // TODO: Can a line cast a shadow?
+      // mesh.castShadow = true;
+
+      this._mesh.add(mesh);
     }
 
-    var mesh = new THREE.Mesh(geometry, material);
+    // Output polygons
+    if (polygons.facesCount > 0) {
+      var geometry = new THREE.BufferGeometry();
 
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
+      // Three components per vertex per face (3 x 3 = 9)
+      var vertices = new Float32Array(polygons.facesCount * 9);
+      var normals = new Float32Array(polygons.facesCount * 9);
+      var colours = new Float32Array(polygons.facesCount * 9);
 
-    if (allFlat) {
-      // This is only useful for flat objects
-      mesh.renderOrder = 1;
+      var pA = new THREE.Vector3();
+      var pB = new THREE.Vector3();
+      var pC = new THREE.Vector3();
+
+      var cb = new THREE.Vector3();
+      var ab = new THREE.Vector3();
+
+      var index;
+      var _faces;
+      var _vertices;
+      var _colour;
+      var lastIndex = 0;
+      for (var i = 0; i < polygons.faces.length; i++) {
+        _faces = polygons.faces[i];
+        _vertices = polygons.vertices[i];
+        _colour = polygons.colours[i];
+
+        for (var j = 0; j < _faces.length; j++) {
+          // Array of vertex indexes for the face
+          index = _faces[j][0];
+
+          var ax = _vertices[index][0] + offset.x;
+          var ay = _vertices[index][1];
+          var az = _vertices[index][2] + offset.y;
+
+          var c1 = _colour[j][0];
+
+          index = _faces[j][1];
+
+          var bx = _vertices[index][0] + offset.x;
+          var by = _vertices[index][1];
+          var bz = _vertices[index][2] + offset.y;
+
+          var c2 = _colour[j][1];
+
+          index = _faces[j][2];
+
+          var cx = _vertices[index][0] + offset.x;
+          var cy = _vertices[index][1];
+          var cz = _vertices[index][2] + offset.y;
+
+          var c3 = _colour[j][2];
+
+          // Flat face normals
+          // From: http://threejs.org/examples/webgl_buffergeometry.html
+          pA.set(ax, ay, az);
+          pB.set(bx, by, bz);
+          pC.set(cx, cy, cz);
+
+          cb.subVectors(pC, pB);
+          ab.subVectors(pA, pB);
+          cb.cross(ab);
+
+          cb.normalize();
+
+          var nx = cb.x;
+          var ny = cb.y;
+          var nz = cb.z;
+
+          vertices[lastIndex * 9 + 0] = ax;
+          vertices[lastIndex * 9 + 1] = ay;
+          vertices[lastIndex * 9 + 2] = az;
+
+          normals[lastIndex * 9 + 0] = nx;
+          normals[lastIndex * 9 + 1] = ny;
+          normals[lastIndex * 9 + 2] = nz;
+
+          colours[lastIndex * 9 + 0] = c1[0];
+          colours[lastIndex * 9 + 1] = c1[1];
+          colours[lastIndex * 9 + 2] = c1[2];
+
+          vertices[lastIndex * 9 + 3] = bx;
+          vertices[lastIndex * 9 + 4] = by;
+          vertices[lastIndex * 9 + 5] = bz;
+
+          normals[lastIndex * 9 + 3] = nx;
+          normals[lastIndex * 9 + 4] = ny;
+          normals[lastIndex * 9 + 5] = nz;
+
+          colours[lastIndex * 9 + 3] = c2[0];
+          colours[lastIndex * 9 + 4] = c2[1];
+          colours[lastIndex * 9 + 5] = c2[2];
+
+          vertices[lastIndex * 9 + 6] = cx;
+          vertices[lastIndex * 9 + 7] = cy;
+          vertices[lastIndex * 9 + 8] = cz;
+
+          normals[lastIndex * 9 + 6] = nx;
+          normals[lastIndex * 9 + 7] = ny;
+          normals[lastIndex * 9 + 8] = nz;
+
+          colours[lastIndex * 9 + 6] = c3[0];
+          colours[lastIndex * 9 + 7] = c3[1];
+          colours[lastIndex * 9 + 8] = c3[2];
+
+          lastIndex++;
+        }
+      }
+
+      // itemSize = 3 because there are 3 values (components) per vertex
+      geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
+      geometry.addAttribute('normal', new THREE.BufferAttribute(normals, 3));
+      geometry.addAttribute('color', new THREE.BufferAttribute(colours, 3));
+
+      geometry.computeBoundingBox();
+
+      var material;
+      if (!this._world._environment._skybox) {
+        material = new THREE.MeshPhongMaterial({
+          vertexColors: THREE.VertexColors,
+          side: THREE.BackSide
+        });
+      } else {
+        material = new THREE.MeshStandardMaterial({
+          vertexColors: THREE.VertexColors,
+          side: THREE.BackSide
+        });
+        material.roughness = 1;
+        material.metalness = 0.1;
+        material.envMapIntensity = 3;
+        material.envMap = this._world._environment._skybox.getRenderTarget();
+      }
+
+      var mesh = new THREE.Mesh(geometry, material);
+
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+
+      if (polygons.allFlat) {
+        // This is only useful for flat objects
+        mesh.renderOrder = 1;
+      }
+
+      this._mesh.add(mesh);
     }
-
-    this._mesh.add(mesh);
 
     this._ready = true;
     console.timeEnd(this._tile);
