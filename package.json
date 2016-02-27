@@ -81,6 +81,7 @@
   "dependencies": {
     "earcut": "^2.0.8",
     "eventemitter3": "^1.1.1",
+    "hammerjs": "^2.0.6",
     "lodash.assign": "^4.0.2",
     "lodash.throttle": "^4.0.0",
     "lru-cache": "^4.0.0",

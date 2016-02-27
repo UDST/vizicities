@@ -2,6 +2,7 @@
 /*eslint eqeqeq:0*/
 
 import THREE from 'three';
+import Hammer from 'hammerjs';
 
 /**
  * @author qiao / https://github.com/qiao
@@ -610,7 +611,7 @@ var OrbitControls = function ( object, domElement ) {
 
 		//console.log( 'handleTouchStartRotate' );
 
-		rotateStart.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
+		rotateStart.set( event.pointers[ 0 ].pageX, event.pointers[ 0 ].pageY );
 
 	}
 
@@ -618,8 +619,8 @@ var OrbitControls = function ( object, domElement ) {
 
 		//console.log( 'handleTouchStartDolly' );
 
-		var dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
-		var dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
+		var dx = event.pointers[ 0 ].pageX - event.pointers[ 1 ].pageX;
+		var dy = event.pointers[ 0 ].pageY - event.pointers[ 1 ].pageY;
 
 		var distance = Math.sqrt( dx * dx + dy * dy );
 
@@ -631,7 +632,7 @@ var OrbitControls = function ( object, domElement ) {
 
 		//console.log( 'handleTouchStartPan' );
 
-		panStart.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
+		panStart.set( event.deltaX, event.deltaY );
 
 	}
 
@@ -639,7 +640,7 @@ var OrbitControls = function ( object, domElement ) {
 
 		//console.log( 'handleTouchMoveRotate' );
 
-		rotateEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
+		rotateEnd.set( event.pointers[ 0 ].pageX, event.pointers[ 0 ].pageY );
 		rotateDelta.subVectors( rotateEnd, rotateStart );
 
 		var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
@@ -660,8 +661,8 @@ var OrbitControls = function ( object, domElement ) {
 
 		//console.log( 'handleTouchMoveDolly' );
 
-		var dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
-		var dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
+		var dx = event.pointers[ 0 ].pageX - event.pointers[ 1 ].pageX;
+		var dy = event.pointers[ 0 ].pageY - event.pointers[ 1 ].pageY;
 
 		var distance = Math.sqrt( dx * dx + dy * dy );
 
@@ -689,7 +690,7 @@ var OrbitControls = function ( object, domElement ) {
 
 		//console.log( 'handleTouchMovePan' );
 
-		panEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
+		panEnd.set( event.deltaX, event.deltaY );
 
 		panDelta.subVectors( panEnd, panStart );
 
@@ -941,9 +942,137 @@ var OrbitControls = function ( object, domElement ) {
 	scope.domElement.addEventListener( 'mousewheel', onMouseWheel, false );
 	scope.domElement.addEventListener( 'MozMousePixelScroll', onMouseWheel, false ); // firefox
 
-	scope.domElement.addEventListener( 'touchstart', onTouchStart, false );
-	scope.domElement.addEventListener( 'touchend', onTouchEnd, false );
-	scope.domElement.addEventListener( 'touchmove', onTouchMove, false );
+	// scope.domElement.addEventListener( 'touchstart', onTouchStart, false );
+	// scope.domElement.addEventListener( 'touchend', onTouchEnd, false );
+	// scope.domElement.addEventListener( 'touchmove', onTouchMove, false );
+
+	scope.hammer = new Hammer(scope.domElement);
+
+	scope.hammer.get('pan').set({
+		pointers: 0,
+		direction: Hammer.DIRECTION_ALL
+	});
+
+	scope.hammer.get('pinch').set({
+		enable: true,
+		threshold: 0.1
+	});
+
+	scope.hammer.on('panstart', function(event) {
+		if (scope.enabled === false) {
+			return;
+		}
+
+		if (event.pointers.length === 1) {
+			if (scope.enablePan === false) {
+				return;
+			}
+
+			handleTouchStartPan(event);
+			// panStart.set(event.deltaX, event.deltaY);
+
+			state = STATE.TOUCH_PAN;
+		} else if (event.pointers.length === 2) {
+			if ( scope.enableRotate === false ) return;
+
+			handleTouchStartRotate( event );
+
+			state = STATE.TOUCH_ROTATE;
+		}
+
+		if (state !== STATE.NONE) {
+			scope.dispatchEvent(startEvent);
+		}
+	});
+
+	scope.hammer.on('panend', onTouchEnd);
+
+	scope.hammer.on('panmove', function(event) {
+		if ( scope.enabled === false ) return;
+
+		// event.preventDefault();
+		// event.stopPropagation();
+
+		if (event.pointers.length === 1) {
+			if ( scope.enablePan === false ) return;
+			if ( state !== STATE.TOUCH_PAN ) return; // is this needed?...
+
+			handleTouchMovePan( event );
+
+			// panEnd.set( event.deltaX, event.deltaY );
+			//
+			// panDelta.subVectors( panEnd, panStart );
+			//
+			// pan( panDelta.x, panDelta.y );
+			//
+			// panStart.copy( panEnd );
+			//
+			// scope.update();
+		} else if (event.pointers.length === 2) {
+			if ( scope.enableRotate === false ) return;
+			if ( state !== STATE.TOUCH_ROTATE ) return; // is this needed?...
+
+			handleTouchMoveRotate( event );
+		}
+	});
+
+	scope.hammer.on('pinchstart', function(event) {
+		if ( scope.enabled === false ) return;
+
+		if ( scope.enableZoom === false ) return;
+
+		handleTouchStartDolly( event );
+
+		// var dx = event.pointers[ 0 ].pageX - event.pointers[ 1 ].pageX;
+		// var dy = event.pointers[ 0 ].pageY - event.pointers[ 1 ].pageY;
+		//
+		// var distance = Math.sqrt( dx * dx + dy * dy );
+		//
+		// dollyStart.set( 0, distance );
+		//
+		state = STATE.TOUCH_DOLLY;
+
+		if (state !== STATE.NONE) {
+			scope.dispatchEvent(startEvent);
+		}
+	});
+
+	scope.hammer.on('pinchend', onTouchEnd);
+
+	scope.hammer.on('pinchmove', function(event) {
+		if ( scope.enabled === false ) return;
+
+		// event.preventDefault();
+		// event.stopPropagation();
+
+		if ( scope.enableZoom === false ) return;
+		if ( state !== STATE.TOUCH_DOLLY ) return; // is this needed?...
+
+		handleTouchMoveDolly( event );
+
+		// var dx = event.pointers[ 0 ].pageX - event.pointers[ 1 ].pageX;
+		// var dy = event.pointers[ 0 ].pageY - event.pointers[ 1 ].pageY;
+		//
+		// var distance = Math.sqrt( dx * dx + dy * dy );
+		//
+		// dollyEnd.set( 0, distance );
+		//
+		// dollyDelta.subVectors( dollyEnd, dollyStart );
+		//
+		// if ( dollyDelta.y > 0 ) {
+		//
+		// 	dollyOut( getZoomScale() );
+		//
+		// } else if ( dollyDelta.y < 0 ) {
+		//
+		// 	dollyIn( getZoomScale() );
+		//
+		// }
+		//
+		// dollyStart.copy( dollyEnd );
+		//
+		// scope.update();
+	});
 
 	window.addEventListener( 'keydown', onKeyDown, false );
 
