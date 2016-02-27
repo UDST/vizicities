@@ -267,22 +267,20 @@ class GeoJSONTile extends Tile {
     features.forEach(feature => {
       // feature.geometry, feature.properties
 
+      // Skip features that aren't polygons
+      //
+      // TODO: Add support for all GeoJSON geometry types, including Multi...
+      // geometry types
+      if (feature.geometry.type !== 'Polygon') {
+        return;
+      }
+
       // Get style object, if provided
       if (typeof this._options.style === 'function') {
         style = this._options.style(feature);
       }
 
       var coordinates = feature.geometry.coordinates;
-
-      // Skip if geometry is a point
-      //
-      // This should be a user-defined filter as it would be wrong to assume
-      // that people won't want to output points
-      //
-      // The default use-case should be to output points in a different way
-      if (!coordinates[0] || !coordinates[0][0] || !Array.isArray(coordinates[0][0])) {
-        return;
-      }
 
       coordinates = coordinates.map(ring => {
         return ring.map(coordinate => {
