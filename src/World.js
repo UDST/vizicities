@@ -1,6 +1,6 @@
 import EventEmitter from 'eventemitter3';
 import extend from 'lodash.assign';
-import CRS from './geo/CRS/index';
+import CRS from './geo/crs/index';
 import Point from './geo/Point';
 import LatLon from './geo/LatLon';
 import Engine from './engine/Engine';
