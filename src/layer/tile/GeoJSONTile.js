@@ -38,11 +38,12 @@ import Offset from 'polygon-offset';
 // Have a look at how this is done in Tangram before implementing anything as
 // the approach there is pretty similar and robust.
 
-class TopoJSONTile extends Tile {
+class GeoJSONTile extends Tile {
   constructor(quadcode, path, layer, options) {
     super(quadcode, path, layer);
 
     var defaults = {
+      topojson: false,
       filter: null,
       style: {
         color: '#ffffff'
@@ -226,7 +227,13 @@ class TopoJSONTile extends Tile {
   _processTileData(data) {
     console.time(this._tile);
 
-    var geojson = topojson.feature(data, data.objects.vectile);
+    var geojson = data;
+
+    if (this._options.topojson) {
+      // TODO: Allow TopoJSON object to be customised so this isn't tied to
+      // Mapzen tiles
+      geojson = topojson.feature(data, data.objects.vectile);
+    }
 
     var offset = Point(0, 0);
     offset.x = -1 * this._center[0];
@@ -254,6 +261,8 @@ class TopoJSONTile extends Tile {
     }
 
     var style = this._options.style;
+
+    var allFlat = true;
 
     features.forEach(feature => {
       // feature.geometry, feature.properties
@@ -331,26 +340,32 @@ class TopoJSONTile extends Tile {
         _colours.push(_colour);
       });
 
-      // Set up colours for every vertex with poor-mans AO on the sides
-      extruded.sides.forEach((face, fi) => {
-        _colour = [];
-
-        // First face is always bottom-bottom-top
-        if (fi % 2 === 0) {
-          _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-          _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-          _colour.push([topColor.r, topColor.g, topColor.b]);
-        // Reverse winding for the second face
-        // top-top-bottom
-        } else {
-          _colour.push([topColor.r, topColor.g, topColor.b]);
-          _colour.push([topColor.r, topColor.g, topColor.b]);
-          _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+      if (extruded.sides) {
+        if (allFlat) {
+          allFlat = false;
         }
 
-        _faces.push(face);
-        _colours.push(_colour);
-      });
+        // Set up colours for every vertex with poor-mans AO on the sides
+        extruded.sides.forEach((face, fi) => {
+          _colour = [];
+
+          // First face is always bottom-bottom-top
+          if (fi % 2 === 0) {
+            _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+            _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+            _colour.push([topColor.r, topColor.g, topColor.b]);
+          // Reverse winding for the second face
+          // top-top-bottom
+          } else {
+            _colour.push([topColor.r, topColor.g, topColor.b]);
+            _colour.push([topColor.r, topColor.g, topColor.b]);
+            _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+          }
+
+          _faces.push(face);
+          _colours.push(_colour);
+        });
+      }
 
       // Skip bottom as there's no point rendering it
       // allFaces.push(extruded.faces);
@@ -552,8 +567,10 @@ class TopoJSONTile extends Tile {
     mesh.castShadow = true;
     mesh.receiveShadow = true;
 
-    // This is only useful for flat objects
-    // mesh.renderOrder = 1;
+    if (allFlat) {
+      // This is only useful for flat objects
+      mesh.renderOrder = 1;
+    }
 
     this._mesh.add(mesh);
 
@@ -608,5 +625,5 @@ class TopoJSONTile extends Tile {
 
 // Initialise without requiring new keyword
 export default function(quadcode, path, layer, options) {
-  return new TopoJSONTile(quadcode, path, layer, options);
+  return new GeoJSONTile(quadcode, path, layer, options);
 };

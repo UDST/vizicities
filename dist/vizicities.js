@@ -76,7 +76,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _layerTileImageTileLayer2 = _interopRequireDefault(_layerTileImageTileLayer);
 	
-	var _layerTileTopoJSONTileLayer = __webpack_require__(53);
+	var _layerTileGeoJSONTileLayer = __webpack_require__(53);
+	
+	var _layerTileGeoJSONTileLayer2 = _interopRequireDefault(_layerTileGeoJSONTileLayer);
+	
+	var _layerTileTopoJSONTileLayer = __webpack_require__(68);
 	
 	var _layerTileTopoJSONTileLayer2 = _interopRequireDefault(_layerTileTopoJSONTileLayer);
 	
@@ -96,6 +100,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Controls: _controlsIndex2['default'],
 	  EnvironmentLayer: _layerEnvironmentEnvironmentLayer2['default'],
 	  ImageTileLayer: _layerTileImageTileLayer2['default'],
+	  GeoJSONTileLayer: _layerTileGeoJSONTileLayer2['default'],
 	  TopoJSONTileLayer: _layerTileTopoJSONTileLayer2['default'],
 	  Point: _geoPoint2['default'],
 	  LatLon: _geoLatLon2['default']
@@ -11203,9 +11208,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _TopoJSONTile = __webpack_require__(54);
+	var _GeoJSONTile = __webpack_require__(54);
 	
-	var _TopoJSONTile2 = _interopRequireDefault(_TopoJSONTile);
+	var _GeoJSONTile2 = _interopRequireDefault(_GeoJSONTile);
 	
 	var _lodashThrottle = __webpack_require__(36);
 	
@@ -11238,11 +11243,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	// It may be possible to perform these updates per-frame once Web Worker
 	// processing is added
 	
-	var TopoJSONTileLayer = (function (_TileLayer) {
-	  _inherits(TopoJSONTileLayer, _TileLayer);
+	var GeoJSONTileLayer = (function (_TileLayer) {
+	  _inherits(GeoJSONTileLayer, _TileLayer);
 	
-	  function TopoJSONTileLayer(path, options) {
-	    _classCallCheck(this, TopoJSONTileLayer);
+	  function GeoJSONTileLayer(path, options) {
+	    _classCallCheck(this, GeoJSONTileLayer);
 	
 	    var defaults = {
 	      maxLOD: 14,
@@ -11251,19 +11256,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    options = (0, _lodashAssign2['default'])(defaults, options);
 	
-	    _get(Object.getPrototypeOf(TopoJSONTileLayer.prototype), 'constructor', this).call(this, options);
+	    _get(Object.getPrototypeOf(GeoJSONTileLayer.prototype), 'constructor', this).call(this, options);
 	
 	    this._path = path;
 	  }
 	
 	  // Initialise without requiring new keyword
 	
-	  _createClass(TopoJSONTileLayer, [{
+	  _createClass(GeoJSONTileLayer, [{
 	    key: '_onAdd',
 	    value: function _onAdd(world) {
 	      var _this = this;
 	
-	      _get(Object.getPrototypeOf(TopoJSONTileLayer.prototype), '_onAdd', this).call(this, world);
+	      _get(Object.getPrototypeOf(GeoJSONTileLayer.prototype), '_onAdd', this).call(this, world);
 	
 	      // Trigger initial quadtree calculation on the next frame
 	      //
@@ -11325,7 +11330,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        options.style = this._options.style;
 	      }
 	
-	      return (0, _TopoJSONTile2['default'])(quadcode, this._path, layer, options);
+	      if (this._options.topojson) {
+	        options.topojson = true;
+	      }
+	
+	      return (0, _GeoJSONTile2['default'])(quadcode, this._path, layer, options);
 	    }
 	
 	    // Destroys the layer and removes it from the scene and memory
@@ -11338,15 +11347,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._throttledWorldUpdate = null;
 	
 	      // Run common destruction logic from parent
-	      _get(Object.getPrototypeOf(TopoJSONTileLayer.prototype), 'destroy', this).call(this);
+	      _get(Object.getPrototypeOf(GeoJSONTileLayer.prototype), 'destroy', this).call(this);
 	    }
 	  }]);
 	
-	  return TopoJSONTileLayer;
+	  return GeoJSONTileLayer;
 	})(_TileLayer3['default']);
 	
 	exports['default'] = function (path, options) {
-	  return new TopoJSONTileLayer(path, options);
+	  return new GeoJSONTileLayer(path, options);
 	};
 	
 	;
@@ -11442,15 +11451,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	// Have a look at how this is done in Tangram before implementing anything as
 	// the approach there is pretty similar and robust.
 	
-	var TopoJSONTile = (function (_Tile) {
-	  _inherits(TopoJSONTile, _Tile);
+	var GeoJSONTile = (function (_Tile) {
+	  _inherits(GeoJSONTile, _Tile);
 	
-	  function TopoJSONTile(quadcode, path, layer, options) {
-	    _classCallCheck(this, TopoJSONTile);
+	  function GeoJSONTile(quadcode, path, layer, options) {
+	    _classCallCheck(this, GeoJSONTile);
 	
-	    _get(Object.getPrototypeOf(TopoJSONTile.prototype), 'constructor', this).call(this, quadcode, path, layer);
+	    _get(Object.getPrototypeOf(GeoJSONTile.prototype), 'constructor', this).call(this, quadcode, path, layer);
 	
 	    var defaults = {
+	      topojson: false,
 	      filter: null,
 	      style: {
 	        color: '#ffffff'
@@ -11464,7 +11474,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  // Request data for the tile
 	
-	  _createClass(TopoJSONTile, [{
+	  _createClass(GeoJSONTile, [{
 	    key: 'requestTileAsync',
 	    value: function requestTileAsync() {
 	      var _this = this;
@@ -11487,7 +11497,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Clear request reference
 	      this._request = null;
 	
-	      _get(Object.getPrototypeOf(TopoJSONTile.prototype), 'destroy', this).call(this);
+	      _get(Object.getPrototypeOf(GeoJSONTile.prototype), 'destroy', this).call(this);
 	    }
 	  }, {
 	    key: '_createMesh',
@@ -11654,7 +11664,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      console.time(this._tile);
 	
-	      var geojson = _topojson2['default'].feature(data, data.objects.vectile);
+	      var geojson = data;
+	
+	      if (this._options.topojson) {
+	        // TODO: Allow TopoJSON object to be customised so this isn't tied to
+	        // Mapzen tiles
+	        geojson = _topojson2['default'].feature(data, data.objects.vectile);
+	      }
 	
 	      var offset = (0, _geoPoint2['default'])(0, 0);
 	      offset.x = -1 * this._center[0];
@@ -11682,6 +11698,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      var style = this._options.style;
+	
+	      var allFlat = true;
 	
 	      features.forEach(function (feature) {
 	        // feature.geometry, feature.properties
@@ -11759,26 +11777,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	          _colours.push(_colour);
 	        });
 	
-	        // Set up colours for every vertex with poor-mans AO on the sides
-	        extruded.sides.forEach(function (face, fi) {
-	          _colour = [];
+	        if (extruded.sides) {
+	          if (allFlat) {
+	            allFlat = false;
+	          }
 	
-	          // First face is always bottom-bottom-top
-	          if (fi % 2 === 0) {
-	            _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-	            _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-	            _colour.push([topColor.r, topColor.g, topColor.b]);
-	            // Reverse winding for the second face
-	            // top-top-bottom
-	          } else {
-	              _colour.push([topColor.r, topColor.g, topColor.b]);
-	              _colour.push([topColor.r, topColor.g, topColor.b]);
+	          // Set up colours for every vertex with poor-mans AO on the sides
+	          extruded.sides.forEach(function (face, fi) {
+	            _colour = [];
+	
+	            // First face is always bottom-bottom-top
+	            if (fi % 2 === 0) {
 	              _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-	            }
+	              _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+	              _colour.push([topColor.r, topColor.g, topColor.b]);
+	              // Reverse winding for the second face
+	              // top-top-bottom
+	            } else {
+	                _colour.push([topColor.r, topColor.g, topColor.b]);
+	                _colour.push([topColor.r, topColor.g, topColor.b]);
+	                _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+	              }
 	
-	          _faces.push(face);
-	          _colours.push(_colour);
-	        });
+	            _faces.push(face);
+	            _colours.push(_colour);
+	          });
+	        }
 	
 	        // Skip bottom as there's no point rendering it
 	        // allFaces.push(extruded.faces);
@@ -11980,8 +12004,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      mesh.castShadow = true;
 	      mesh.receiveShadow = true;
 	
-	      // This is only useful for flat objects
-	      // mesh.renderOrder = 1;
+	      if (allFlat) {
+	        // This is only useful for flat objects
+	        mesh.renderOrder = 1;
+	      }
 	
 	      this._mesh.add(mesh);
 	
@@ -12037,11 +12063,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }]);
 	
-	  return TopoJSONTile;
+	  return GeoJSONTile;
 	})(_Tile3['default']);
 	
 	exports['default'] = function (quadcode, path, layer, options) {
-	  return new TopoJSONTile(quadcode, path, layer, options);
+	  return new GeoJSONTile(quadcode, path, layer, options);
 	};
 	
 	;
@@ -14895,6 +14921,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	    ];
 	};
 
+
+/***/ },
+/* 68 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _GeoJSONTileLayer = __webpack_require__(53);
+	
+	var _GeoJSONTileLayer2 = _interopRequireDefault(_GeoJSONTileLayer);
+	
+	var _lodashAssign = __webpack_require__(3);
+	
+	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
+	
+	// Initialise without requiring new keyword
+	
+	exports['default'] = function (path, options) {
+	  var defaults = {
+	    topojson: true
+	  };
+	
+	  options = (0, _lodashAssign2['default'])(defaults, options);
+	
+	  return (0, _GeoJSONTileLayer2['default'])(path, options);
+	};
+	
+	;
+	module.exports = exports['default'];
 
 /***/ }
 /******/ ])
