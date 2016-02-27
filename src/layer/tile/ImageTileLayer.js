@@ -81,7 +81,7 @@ class ImageTileLayer extends TileLayer {
     }
 
     var mesh = new THREE.Mesh(geom, baseMaterial);
-    mesh.renderOrder = -2;
+    mesh.renderOrder = 0;
     mesh.rotation.x = -90 * Math.PI / 180;
 
     // TODO: It might be overkill to receive a shadow on the base layer as it's

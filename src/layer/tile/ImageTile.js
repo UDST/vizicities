@@ -68,7 +68,7 @@ class ImageTile extends Tile {
     localMesh.receiveShadow = true;
 
     mesh.add(localMesh);
-    mesh.renderOrder = -1;
+    mesh.renderOrder = 0.1;
 
     mesh.position.x = this._center[0];
     mesh.position.z = this._center[1];

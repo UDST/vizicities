@@ -8293,7 +8293,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      var mesh = new _three2['default'].Mesh(geom, baseMaterial);
-	      mesh.renderOrder = -2;
+	      mesh.renderOrder = 0;
 	      mesh.rotation.x = -90 * Math.PI / 180;
 	
 	      // TODO: It might be overkill to receive a shadow on the base layer as it's
@@ -10656,7 +10656,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      localMesh.receiveShadow = true;
 	
 	      mesh.add(localMesh);
-	      mesh.renderOrder = -1;
+	      mesh.renderOrder = 0.1;
 	
 	      mesh.position.x = this._center[0];
 	      mesh.position.z = this._center[1];
