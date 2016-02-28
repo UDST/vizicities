@@ -14520,8 +14520,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      console.time('GeoJSON');
 	
-	      console.log(data);
-	
 	      var geojson = _utilGeoJSON2['default'].mergeFeatures(data, this._options.topojson);
 	
 	      // TODO: Check that GeoJSON is valid / usable

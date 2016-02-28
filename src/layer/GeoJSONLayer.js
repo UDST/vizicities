@@ -60,8 +60,6 @@ class GeoJSONLayer extends Layer {
   _processData(data) {
     console.time('GeoJSON');
 
-    console.log(data);
-
     var geojson = GeoJSON.mergeFeatures(data, this._options.topojson);
 
     // TODO: Check that GeoJSON is valid / usable
