@@ -7,7 +7,7 @@ export default function(path, options) {
     topojson: true
   };
 
-  options = extend(defaults, options);
+  options = extend({}, defaults, options);
 
   return GeoJSONTileLayer(path, options);
 };

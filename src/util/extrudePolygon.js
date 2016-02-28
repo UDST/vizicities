@@ -14,7 +14,7 @@ var extrudePolygon = function(points, faces, _options) {
     closed: true
   };
 
-  var options = extend(defaults, _options);
+  var options = extend({}, defaults, _options);
 
   var n = points.length;
   var positions;

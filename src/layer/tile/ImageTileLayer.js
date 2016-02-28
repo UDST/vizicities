@@ -62,7 +62,7 @@ class ImageTileLayer extends TileLayer {
       distance: 40000
     };
 
-    options = extend(defaults, options);
+    options = extend({}, defaults, options);
 
     super(options);
 

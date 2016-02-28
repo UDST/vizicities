@@ -36,7 +36,7 @@ class GeoJSONTileLayer extends TileLayer {
       distance: 2000
     };
 
-    options = extend(defaults, options);
+    options = extend({}, defaults, options);
 
     super(options);
 

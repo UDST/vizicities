@@ -84,6 +84,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _layerTileTopoJSONTileLayer2 = _interopRequireDefault(_layerTileTopoJSONTileLayer);
 	
+	var _layerGeoJSONLayer = __webpack_require__(65);
+	
+	var _layerGeoJSONLayer2 = _interopRequireDefault(_layerGeoJSONLayer);
+	
 	var _geoPoint = __webpack_require__(11);
 	
 	var _geoPoint2 = _interopRequireDefault(_geoPoint);
@@ -102,6 +106,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  ImageTileLayer: _layerTileImageTileLayer2['default'],
 	  GeoJSONTileLayer: _layerTileGeoJSONTileLayer2['default'],
 	  TopoJSONTileLayer: _layerTileTopoJSONTileLayer2['default'],
+	  GeoJSONLayer: _layerGeoJSONLayer2['default'],
 	  Point: _geoPoint2['default'],
 	  LatLon: _geoLatLon2['default']
 	};
@@ -151,6 +156,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _engineEngine2 = _interopRequireDefault(_engineEngine);
 	
+	// TODO: Make sure nothing is left behind in the heap after calling destroy()
+	
 	// Pretty much any event someone using ViziCities would need will be emitted or
 	// proxied by World (eg. render events, etc)
 	
@@ -167,7 +174,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      skybox: false
 	    };
 	
-	    this.options = (0, _lodashAssign2['default'])(defaults, options);
+	    this.options = (0, _lodashAssign2['default'])({}, defaults, options);
 	
 	    this._layers = [];
 	    this._controls = [];
@@ -7186,6 +7193,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Skybox2 = _interopRequireDefault(_Skybox);
 	
+	// TODO: Make sure nothing is left behind in the heap after calling destroy()
+	
 	var EnvironmentLayer = (function (_Layer) {
 	  _inherits(EnvironmentLayer, _Layer);
 	
@@ -7345,6 +7354,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _engineScene2 = _interopRequireDefault(_engineScene);
 	
+	// TODO: Make sure nothing is left behind in the heap after calling destroy()
+	
 	var Layer = (function (_EventEmitter) {
 	  _inherits(Layer, _EventEmitter);
 	
@@ -7456,6 +7467,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _lodashThrottle = __webpack_require__(36);
 	
 	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
+	
+	// TODO: Make sure nothing is left behind in the heap after calling destroy()
 	
 	var cubemap = {
 	  vertexShader: ['varying vec3 vPosition;', 'void main() {', 'vPosition = position;', 'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );', '}'].join('\n'),
@@ -8207,6 +8220,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
+	// TODO: Make sure nothing is left behind in the heap after calling destroy()
+	
 	// DONE: Find a way to avoid the flashing caused by the gap between old tiles
 	// being removed and the new tiles being ready for display
 	//
@@ -8266,7 +8281,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      distance: 40000
 	    };
 	
-	    options = (0, _lodashAssign2['default'])(defaults, options);
+	    options = (0, _lodashAssign2['default'])({}, defaults, options);
 	
 	    _get(Object.getPrototypeOf(ImageTileLayer.prototype), 'constructor', this).call(this, options);
 	
@@ -8418,6 +8433,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
+	// TODO: Make sure nothing is left behind in the heap after calling destroy()
+	
 	// TODO: Consider keeping a single TileLayer / LOD instance running by default
 	// that keeps a standard LOD grid for other layers to utilise, rather than
 	// having to create their own, unique LOD grid and duplicate calculations when
@@ -8473,7 +8490,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      maxLOD: 18
 	    };
 	
-	    this._options = (0, _lodashAssign2['default'])(defaults, options);
+	    this._options = (0, _lodashAssign2['default'])({}, defaults, options);
 	
 	    this._tileCache = (0, _TileCache2['default'])(this._options.maxCache, function (tile) {
 	      _this._destroyTile(tile);
@@ -8780,6 +8797,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _lruCache = __webpack_require__(41);
 	
 	var _lruCache2 = _interopRequireDefault(_lruCache);
+	
+	// TODO: Make sure nothing is left behind in the heap after calling destroy()
 	
 	// This process is based on a similar approach taken by OpenWebGlobe
 	// See: https://github.com/OpenWebGlobe/WebViewer/blob/master/source/core/globecache.js
@@ -10577,6 +10596,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
+	// TODO: Make sure nothing is left behind in the heap after calling destroy()
+	
 	var ImageTile = (function (_Tile) {
 	  _inherits(ImageTile, _Tile);
 	
@@ -10806,6 +10827,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _three = __webpack_require__(24);
 	
 	var _three2 = _interopRequireDefault(_three);
+	
+	// TODO: Make sure nothing is left behind in the heap after calling destroy()
 	
 	// Manages a single tile and its layers
 	
@@ -11221,6 +11244,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
+	// TODO: Make sure nothing is left behind in the heap after calling destroy()
+	
 	// TODO: Consider pausing per-frame output during movement so there's little to
 	// no jank caused by previous tiles still processing
 	
@@ -11255,7 +11280,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      distance: 2000
 	    };
 	
-	    options = (0, _lodashAssign2['default'])(defaults, options);
+	    options = (0, _lodashAssign2['default'])({}, defaults, options);
 	
 	    _get(Object.getPrototypeOf(GeoJSONTileLayer.prototype), 'constructor', this).call(this, options);
 	
@@ -11418,6 +11443,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
+	// TODO: Make sure nothing is left behind in the heap after calling destroy()
+	
 	// TODO: Perform tile request and processing in a Web Worker
 	//
 	// Use Operative (https://github.com/padolsey/operative)
@@ -11454,15 +11481,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    _get(Object.getPrototypeOf(GeoJSONTile.prototype), 'constructor', this).call(this, quadcode, path, layer);
 	
-	    this._defaultStyle = {
-	      color: '#ffffff',
-	      height: 0,
-	      lineOpacity: 1,
-	      lineTransparent: false,
-	      lineColor: '#ffffff',
-	      lineWidth: 1,
-	      lineBlending: _three2['default'].NormalBlending
-	    };
+	    this._defaultStyle = _utilGeoJSON2['default'].defaultStyle;
 	
 	    var defaults = {
 	      topojson: false,
@@ -11470,7 +11489,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      style: this._defaultStyle
 	    };
 	
-	    this._options = (0, _lodashAssign2['default'])(defaults, options);
+	    this._options = (0, _lodashAssign2['default'])({}, defaults, options);
+	
+	    if (typeof options.style === 'function') {
+	      this._options.style = options.style;
+	    } else {
+	      this._options.style = (0, _lodashAssign2['default'])({}, defaults.style, options.style);
+	    }
 	  }
 	
 	  // Initialise without requiring new keyword
@@ -11721,7 +11746,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // Get style object, if provided
 	        if (typeof _this3._options.style === 'function') {
-	          style = (0, _lodashAssign2['default'])(_this3._defaultStyle, _this3._options.style(feature));
+	          style = (0, _lodashAssign2['default'])({}, _this3._defaultStyle, _this3._options.style(feature));
 	        }
 	
 	        var coordinates = feature.geometry.coordinates;
@@ -11736,7 +11761,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return [point.x, point.y];
 	          });
 	
-	          var linestringAttributes = _utilGeoJSON2['default'].lineStringAttributes(coordinates, colour);
+	          var height = 0;
+	
+	          if (style.lineHeight) {
+	            height = _this3._world.metresToWorld(style.lineHeight, _this3._pointScale);
+	          }
+	
+	          var linestringAttributes = _utilGeoJSON2['default'].lineStringAttributes(coordinates, colour, height);
 	
 	          lines.vertices.push(linestringAttributes.vertices);
 	          lines.colours.push(linestringAttributes.colours);
@@ -11754,7 +11785,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            });
 	          });
 	
-	          var multiLinestringAttributes = _utilGeoJSON2['default'].multiLineStringAttributes(coordinates, colour);
+	          var height = 0;
+	
+	          if (style.lineHeight) {
+	            height = _this3._world.metresToWorld(style.lineHeight, _this3._pointScale);
+	          }
+	
+	          var multiLinestringAttributes = _utilGeoJSON2['default'].multiLineStringAttributes(coordinates, colour, height);
 	
 	          lines.vertices.push(multiLinestringAttributes.vertices);
 	          lines.colours.push(multiLinestringAttributes.colours);
@@ -11843,11 +11880,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	      //
 	      // this._mesh.add(mesh);
 	
+	      var geometry;
+	      var material;
+	      var mesh;
+	
 	      // Output lines
 	      if (lines.vertices.length > 0) {
-	        var geometry = _utilBuffer2['default'].createLineGeometry(lines, offset);
+	        geometry = _utilBuffer2['default'].createLineGeometry(lines, offset);
 	
-	        var material = new _three2['default'].LineBasicMaterial({
+	        material = new _three2['default'].LineBasicMaterial({
 	          vertexColors: _three2['default'].VertexColors,
 	          linewidth: style.lineWidth,
 	          transparent: style.lineTransparent,
@@ -11855,9 +11896,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	          blending: style.lineBlending
 	        });
 	
-	        var mesh = new _three2['default'].LineSegments(geometry, material);
+	        mesh = new _three2['default'].LineSegments(geometry, material);
 	
-	        if (style.lineRenderOrder) {
+	        if (style.lineRenderOrder !== undefined) {
+	          material.depthWrite = false;
 	          mesh.renderOrder = style.lineRenderOrder;
 	        }
 	
@@ -11869,9 +11911,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // Output polygons
 	      if (polygons.facesCount > 0) {
-	        var geometry = _utilBuffer2['default'].createGeometry(polygons, offset);
+	        geometry = _utilBuffer2['default'].createGeometry(polygons, offset);
 	
-	        var material;
 	        if (!this._world._environment._skybox) {
 	          material = new _three2['default'].MeshPhongMaterial({
 	            vertexColors: _three2['default'].VertexColors,
@@ -11888,13 +11929,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	          material.envMap = this._world._environment._skybox.getRenderTarget();
 	        }
 	
-	        var mesh = new _three2['default'].Mesh(geometry, material);
+	        mesh = new _three2['default'].Mesh(geometry, material);
 	
 	        mesh.castShadow = true;
 	        mesh.receiveShadow = true;
 	
 	        if (polygons.allFlat) {
-	          // This is only useful for flat objects
+	          material.depthWrite = false;
 	          mesh.renderOrder = 1;
 	        }
 	
@@ -12602,11 +12643,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _extrudePolygon2 = _interopRequireDefault(_extrudePolygon);
 	
+	// TODO: Make it so height can be per-coordinate for linestrings so you can do
+	// things like offsetting GPS points based on elevation at each point
+	
 	// Light and dark colours used for poor-mans AO gradient on object sides
 	var light = new _three2['default'].Color(0xffffff);
 	var shadow = new _three2['default'].Color(0x666666);
 	
 	var GeoJSON = (function () {
+	  var defaultStyle = {
+	    color: '#ffffff',
+	    height: 0,
+	    lineOpacity: 1,
+	    lineTransparent: false,
+	    lineColor: '#ffffff',
+	    lineWidth: 1,
+	    lineBlending: _three2['default'].NormalBlending
+	  };
+	
 	  // Attempts to merge together multiple GeoJSON Features or FeatureCollections
 	  // into a single FeatureCollection
 	  var mergeFeatures = function mergeFeatures(data, _topojson) {
@@ -12637,13 +12691,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        return (0, _geojsonMerge2['default'])(collections);
-	      } else {
+	      } else if (Array.isArray(data)) {
 	        return (0, _geojsonMerge2['default'])(data);
+	      } else {
+	        return data;
 	      }
 	    }
 	  };
 	
-	  var lineStringAttributes = function lineStringAttributes(coordinates, colour) {
+	  var lineStringAttributes = function lineStringAttributes(coordinates, colour, height) {
 	    var _coords = [];
 	    var _colours = [];
 	
@@ -12656,12 +12712,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    coordinates.forEach(function (coordinate, index) {
 	      // TODO: Don't hardcode y-value
 	      _colours.push([colour.r, colour.g, colour.b]);
-	      _coords.push([coordinate[0], 0, coordinate[1]]);
+	      _coords.push([coordinate[0], height, coordinate[1]]);
 	
 	      nextCoord = coordinates[index + 1] ? coordinates[index + 1] : coordinate;
 	
 	      _colours.push([colour.r, colour.g, colour.b]);
-	      _coords.push([nextCoord[0], 0, nextCoord[1]]);
+	      _coords.push([nextCoord[0], height, nextCoord[1]]);
 	    });
 	
 	    return {
@@ -12670,13 +12726,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	  };
 	
-	  var multiLineStringAttributes = function multiLineStringAttributes(coordinates, colour) {
+	  var multiLineStringAttributes = function multiLineStringAttributes(coordinates, colour, height) {
 	    var _coords = [];
 	    var _colours = [];
 	
 	    var result;
 	    coordinates.forEach(function (coordinate) {
-	      result = lineStringAttributes(coordinate, colour);
+	      result = lineStringAttributes(coordinate, colour, height);
 	
 	      result.vertices.forEach(function (coord) {
 	        _coords.push(coord);
@@ -12803,6 +12859,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	
 	  return {
+	    defaultStyle: defaultStyle,
 	    mergeFeatures: mergeFeatures,
 	    lineStringAttributes: lineStringAttributes,
 	    multiLineStringAttributes: multiLineStringAttributes,
@@ -14049,7 +14106,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    closed: true
 	  };
 	
-	  var options = (0, _lodashAssign2['default'])(defaults, _options);
+	  var options = (0, _lodashAssign2['default'])({}, defaults, _options);
 	
 	  var n = points.length;
 	  var positions;
@@ -14333,9 +14390,396 @@ return /******/ (function(modules) { // webpackBootstrap
 	    topojson: true
 	  };
 	
-	  options = (0, _lodashAssign2['default'])(defaults, options);
+	  options = (0, _lodashAssign2['default'])({}, defaults, options);
 	
 	  return (0, _GeoJSONTileLayer2['default'])(path, options);
+	};
+	
+	;
+	module.exports = exports['default'];
+
+/***/ },
+/* 65 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var _Layer2 = __webpack_require__(33);
+	
+	var _Layer3 = _interopRequireDefault(_Layer2);
+	
+	var _three = __webpack_require__(24);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var _reqwest = __webpack_require__(55);
+	
+	var _reqwest2 = _interopRequireDefault(_reqwest);
+	
+	var _lodashAssign = __webpack_require__(3);
+	
+	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
+	
+	var _geoPoint = __webpack_require__(11);
+	
+	var _geoPoint2 = _interopRequireDefault(_geoPoint);
+	
+	var _geoLatLon = __webpack_require__(10);
+	
+	var _geoLatLon2 = _interopRequireDefault(_geoLatLon);
+	
+	var _utilGeoJSON = __webpack_require__(57);
+	
+	var _utilGeoJSON2 = _interopRequireDefault(_utilGeoJSON);
+	
+	var _utilBuffer = __webpack_require__(63);
+	
+	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
+	
+	var GeoJSONLayer = (function (_Layer) {
+	  _inherits(GeoJSONLayer, _Layer);
+	
+	  function GeoJSONLayer(geojson, options) {
+	    _classCallCheck(this, GeoJSONLayer);
+	
+	    _get(Object.getPrototypeOf(GeoJSONLayer.prototype), 'constructor', this).call(this, options);
+	
+	    this._geojson = geojson;
+	
+	    this._defaultStyle = _utilGeoJSON2['default'].defaultStyle;
+	
+	    var defaults = {
+	      topojson: false,
+	      filter: null,
+	      style: this._defaultStyle
+	    };
+	
+	    this._options = (0, _lodashAssign2['default'])({}, defaults, options);
+	
+	    if (typeof options.style === 'function') {
+	      this._options.style = options.style;
+	    } else {
+	      this._options.style = (0, _lodashAssign2['default'])({}, defaults.style, options.style);
+	    }
+	  }
+	
+	  // Initialise without requiring new keyword
+	
+	  _createClass(GeoJSONLayer, [{
+	    key: '_onAdd',
+	    value: function _onAdd(world) {
+	      // Request data from URL if needed
+	      if (typeof this._geojson === 'string') {
+	        this._requestData(this._geojson);
+	      } else {
+	        // Process and add GeoJSON to layer
+	        this._processData(this._geojson);
+	      }
+	    }
+	  }, {
+	    key: '_requestData',
+	    value: function _requestData(url) {
+	      var _this = this;
+	
+	      this._request = (0, _reqwest2['default'])({
+	        url: url,
+	        type: 'json',
+	        crossOrigin: true
+	      }).then(function (res) {
+	        // Clear request reference
+	        _this._request = null;
+	        _this._processData(res);
+	      })['catch'](function (err) {
+	        console.error(err);
+	
+	        // Clear request reference
+	        _this._request = null;
+	      });
+	    }
+	  }, {
+	    key: '_processData',
+	    value: function _processData(data) {
+	      var _this2 = this;
+	
+	      console.time('GeoJSON');
+	
+	      console.log(data);
+	
+	      var geojson = _utilGeoJSON2['default'].mergeFeatures(data, this._options.topojson);
+	
+	      // TODO: Check that GeoJSON is valid / usable
+	
+	      var features = geojson.features;
+	
+	      // Run filter, if provided
+	      if (this._options.filter) {
+	        features = geojson.features.filter(this._options.filter);
+	      }
+	
+	      var style = this._options.style;
+	
+	      var offset;
+	
+	      // TODO: Wrap into a helper method so this isn't duplicated in the tiled
+	      // GeoJSON output layer
+	      //
+	      // Need to be careful as to not make it impossible to fork this off into a
+	      // worker script at a later stage
+	      //
+	      // Also unsure as to whether it's wise to lump so much into a black box
+	      //
+	      // var meshes = GeoJSON.createMeshes(features, offset, style);
+	
+	      var polygons = {
+	        vertices: [],
+	        faces: [],
+	        colours: [],
+	        facesCount: 0,
+	        allFlat: true
+	      };
+	
+	      var lines = {
+	        vertices: [],
+	        colours: [],
+	        verticesCount: 0
+	      };
+	
+	      var colour = new _three2['default'].Color();
+	
+	      features.forEach(function (feature) {
+	        // feature.geometry, feature.properties
+	
+	        // Skip features that aren't supported
+	        //
+	        // TODO: Add support for all GeoJSON geometry types, including Multi...
+	        // geometry types
+	        if (feature.geometry.type !== 'Polygon' && feature.geometry.type !== 'LineString' && feature.geometry.type !== 'MultiLineString') {
+	          return;
+	        }
+	
+	        // Get style object, if provided
+	        if (typeof _this2._options.style === 'function') {
+	          style = (0, _lodashAssign2['default'])(_this2._defaultStyle, _this2._options.style(feature));
+	        }
+	
+	        var coordinates = feature.geometry.coordinates;
+	
+	        // if (feature.geometry.type === 'LineString') {
+	        if (feature.geometry.type === 'LineString') {
+	          colour.set(style.lineColor);
+	
+	          coordinates = coordinates.map(function (coordinate) {
+	            var latlon = (0, _geoLatLon2['default'])(coordinate[1], coordinate[0]);
+	            var point = _this2._world.latLonToPoint(latlon);
+	
+	            if (!offset) {
+	              offset = (0, _geoPoint2['default'])(0, 0);
+	              offset.x = -1 * point.x;
+	              offset.y = -1 * point.y;
+	
+	              _this2._pointScale = _this2._world.pointScale(latlon);
+	            }
+	
+	            return [point.x, point.y];
+	          });
+	
+	          var height = 0;
+	
+	          if (style.lineHeight) {
+	            height = _this2._world.metresToWorld(style.lineHeight, _this2._pointScale);
+	          }
+	
+	          var linestringAttributes = _utilGeoJSON2['default'].lineStringAttributes(coordinates, colour, height);
+	
+	          lines.vertices.push(linestringAttributes.vertices);
+	          lines.colours.push(linestringAttributes.colours);
+	          lines.verticesCount += linestringAttributes.vertices.length;
+	        }
+	
+	        if (feature.geometry.type === 'MultiLineString') {
+	          colour.set(style.lineColor);
+	
+	          coordinates = coordinates.map(function (_coordinates) {
+	            return _coordinates.map(function (coordinate) {
+	              var latlon = (0, _geoLatLon2['default'])(coordinate[1], coordinate[0]);
+	              var point = _this2._world.latLonToPoint(latlon);
+	
+	              if (!offset) {
+	                offset = (0, _geoPoint2['default'])(0, 0);
+	                offset.x = -1 * point.x;
+	                offset.y = -1 * point.y;
+	
+	                _this2._pointScale = _this2._world.pointScale(latlon);
+	              }
+	
+	              return [point.x, point.y];
+	            });
+	          });
+	
+	          var height = 0;
+	
+	          if (style.lineHeight) {
+	            height = _this2._world.metresToWorld(style.lineHeight, _this2._pointScale);
+	          }
+	
+	          var multiLinestringAttributes = _utilGeoJSON2['default'].multiLineStringAttributes(coordinates, colour, height);
+	
+	          lines.vertices.push(multiLinestringAttributes.vertices);
+	          lines.colours.push(multiLinestringAttributes.colours);
+	          lines.verticesCount += multiLinestringAttributes.vertices.length;
+	        }
+	
+	        if (feature.geometry.type === 'Polygon') {
+	          colour.set(style.color);
+	
+	          coordinates = coordinates.map(function (ring) {
+	            return ring.map(function (coordinate) {
+	              var latlon = (0, _geoLatLon2['default'])(coordinate[1], coordinate[0]);
+	              var point = _this2._world.latLonToPoint(latlon);
+	
+	              if (!offset) {
+	                offset = (0, _geoPoint2['default'])(0, 0);
+	                offset.x = -1 * point.x;
+	                offset.y = -1 * point.y;
+	
+	                _this2._pointScale = _this2._world.pointScale(latlon);
+	              }
+	
+	              return [point.x, point.y];
+	            });
+	          });
+	
+	          var height = 0;
+	
+	          if (style.height) {
+	            height = _this2._world.metresToWorld(style.height, _this2._pointScale);
+	          }
+	
+	          var polygonAttributes = _utilGeoJSON2['default'].polygonAttributes(coordinates, colour, height);
+	
+	          polygons.vertices.push(polygonAttributes.vertices);
+	          polygons.faces.push(polygonAttributes.faces);
+	          polygons.colours.push(polygonAttributes.colours);
+	
+	          if (polygons.allFlat && !polygonAttributes.flat) {
+	            polygons.allFlat = false;
+	          }
+	
+	          polygons.facesCount += polygonAttributes.faces.length;
+	        }
+	      });
+	
+	      var geometry;
+	      var material;
+	      var mesh;
+	
+	      // Output lines
+	      if (lines.vertices.length > 0) {
+	        geometry = _utilBuffer2['default'].createLineGeometry(lines, offset);
+	
+	        material = new _three2['default'].LineBasicMaterial({
+	          vertexColors: _three2['default'].VertexColors,
+	          linewidth: style.lineWidth,
+	          transparent: style.lineTransparent,
+	          opacity: style.lineOpacity,
+	          blending: style.lineBlending
+	        });
+	
+	        mesh = new _three2['default'].LineSegments(geometry, material);
+	
+	        if (style.lineRenderOrder !== undefined) {
+	          material.depthWrite = false;
+	          mesh.renderOrder = style.lineRenderOrder;
+	        }
+	
+	        // TODO: Can a line cast a shadow?
+	        // mesh.castShadow = true;
+	
+	        this.add(mesh);
+	      }
+	
+	      // Output polygons
+	      if (polygons.facesCount > 0) {
+	        geometry = _utilBuffer2['default'].createGeometry(polygons, offset);
+	
+	        if (!this._world._environment._skybox) {
+	          material = new _three2['default'].MeshPhongMaterial({
+	            vertexColors: _three2['default'].VertexColors,
+	            side: _three2['default'].BackSide
+	          });
+	        } else {
+	          material = new _three2['default'].MeshStandardMaterial({
+	            vertexColors: _three2['default'].VertexColors,
+	            side: _three2['default'].BackSide
+	          });
+	          material.roughness = 1;
+	          material.metalness = 0.1;
+	          material.envMapIntensity = 3;
+	          material.envMap = this._world._environment._skybox.getRenderTarget();
+	        }
+	
+	        mesh = new _three2['default'].Mesh(geometry, material);
+	
+	        mesh.castShadow = true;
+	        mesh.receiveShadow = true;
+	
+	        if (polygons.allFlat) {
+	          material.depthWrite = false;
+	          mesh.renderOrder = 1;
+	        }
+	
+	        this.add(mesh);
+	      }
+	
+	      // Move layer to origin Point
+	      //
+	      // TODO: Is there a better way to ensure everything is aligned right and
+	      // able to be frustum-culled?
+	      this._layer.position.x = -offset.x;
+	      this._layer.position.z = -offset.y;
+	
+	      console.timeEnd('GeoJSON');
+	    }
+	  }, {
+	    key: '_abortRequest',
+	    value: function _abortRequest() {
+	      if (!this._request) {
+	        return;
+	      }
+	
+	      this._request.abort();
+	    }
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {
+	      // Cancel any pending requests
+	      this._abortRequest();
+	
+	      // Clear request reference
+	      this._request = null;
+	
+	      // Run common destruction logic from parent
+	      _get(Object.getPrototypeOf(GeoJSONLayer.prototype), 'destroy', this).call(this);
+	    }
+	  }]);
+	
+	  return GeoJSONLayer;
+	})(_Layer3['default']);
+	
+	exports['default'] = function (geojson, options) {
+	  return new GeoJSONLayer(geojson, options);
 	};
 	
 	;

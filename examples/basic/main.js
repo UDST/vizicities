@@ -35,7 +35,7 @@ var topoJSONTileLayer = VIZI.TopoJSONTileLayer('https://vector.mapzen.com/osm/bu
   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://whosonfirst.mapzen.com#License">Who\'s On First</a>.'
 }).addTo(world);
 
-// Just buildings from Mapzen (polygons)
+// // Just buildings from Mapzen (polygons)
 // var topoJSONTileLayer = VIZI.TopoJSONTileLayer('https://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
 //   style: function(feature) {
 //     var height;
@@ -58,4 +58,18 @@ var topoJSONTileLayer = VIZI.TopoJSONTileLayer('https://vector.mapzen.com/osm/bu
 //   //   return feature.properties.area > 5000;
 //   // },
 //   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://whosonfirst.mapzen.com#License">Who\'s On First</a>.'
+// }).addTo(world);
+
+// // London Underground lines
+// var geoJSONLayer = VIZI.GeoJSONLayer('https://rawgit.com/robhawkes/4acb9d6a6a5f00a377e2/raw/30ae704a44e10f2e13fb7e956e80c3b22e8e7e81/tfl_lines.json', {
+//   style: {
+//     lineColor: '#f7c616',
+//     // lineHeight: 20,
+//     lineWidth: 1,
+//     lineTransparent: true,
+//     lineOpacity: 0.5,
+//     lineBlending: THREE.AdditiveBlending,
+//     lineRenderOrder: 2
+//   },
+//   attribution: '&copy; Transport for London.'
 // }).addTo(world);

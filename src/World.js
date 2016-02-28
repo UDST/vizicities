@@ -19,7 +19,7 @@ class World extends EventEmitter {
       skybox: false
     };
 
-    this.options = extend(defaults, options);
+    this.options = extend({}, defaults, options);
 
     this._layers = [];
     this._controls = [];

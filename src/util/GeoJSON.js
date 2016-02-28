@@ -8,11 +8,24 @@ import geojsonMerge from 'geojson-merge';
 import earcut from 'earcut';
 import extrudePolygon from './extrudePolygon';
 
+// TODO: Make it so height can be per-coordinate for linestrings so you can do
+// things like offsetting GPS points based on elevation at each point
+
 // Light and dark colours used for poor-mans AO gradient on object sides
 var light = new THREE.Color(0xffffff);
 var shadow  = new THREE.Color(0x666666);
 
 var GeoJSON = (function() {
+  var defaultStyle = {
+    color: '#ffffff',
+    height: 0,
+    lineOpacity: 1,
+    lineTransparent: false,
+    lineColor: '#ffffff',
+    lineWidth: 1,
+    lineBlending: THREE.NormalBlending
+  };
+
   // Attempts to merge together multiple GeoJSON Features or FeatureCollections
   // into a single FeatureCollection
   var mergeFeatures = function(data, _topojson) {
@@ -43,13 +56,15 @@ var GeoJSON = (function() {
         }
 
         return geojsonMerge(collections);
-      } else {
+      } else if (Array.isArray(data)) {
         return geojsonMerge(data);
+      } else {
+        return data;
       }
     }
   };
 
-  var lineStringAttributes = function(coordinates, colour) {
+  var lineStringAttributes = function(coordinates, colour, height) {
     var _coords = [];
     var _colours = [];
 
@@ -62,12 +77,12 @@ var GeoJSON = (function() {
     coordinates.forEach((coordinate, index) => {
       // TODO: Don't hardcode y-value
       _colours.push([colour.r, colour.g, colour.b]);
-      _coords.push([coordinate[0], 0, coordinate[1]]);
+      _coords.push([coordinate[0], height, coordinate[1]]);
 
       nextCoord = (coordinates[index + 1]) ? coordinates[index + 1] : coordinate;
 
       _colours.push([colour.r, colour.g, colour.b]);
-      _coords.push([nextCoord[0], 0, nextCoord[1]]);
+      _coords.push([nextCoord[0], height, nextCoord[1]]);
     });
 
     return {
@@ -76,13 +91,13 @@ var GeoJSON = (function() {
     };
   };
 
-  var multiLineStringAttributes = function(coordinates, colour) {
+  var multiLineStringAttributes = function(coordinates, colour, height) {
     var _coords = [];
     var _colours = [];
 
     var result;
     coordinates.forEach(coordinate => {
-      result = lineStringAttributes(coordinate, colour);
+      result = lineStringAttributes(coordinate, colour, height);
 
       result.vertices.forEach(coord => {
         _coords.push(coord);
@@ -209,6 +224,7 @@ var GeoJSON = (function() {
   };
 
   return {
+    defaultStyle: defaultStyle,
     mergeFeatures: mergeFeatures,
     lineStringAttributes: lineStringAttributes,
     multiLineStringAttributes: multiLineStringAttributes,

@@ -43,15 +43,7 @@ class GeoJSONTile extends Tile {
   constructor(quadcode, path, layer, options) {
     super(quadcode, path, layer);
 
-    this._defaultStyle = {
-      color: '#ffffff',
-      height: 0,
-      lineOpacity: 1,
-      lineTransparent: false,
-      lineColor: '#ffffff',
-      lineWidth: 1,
-      lineBlending: THREE.NormalBlending
-    };
+    this._defaultStyle = GeoJSON.defaultStyle;
 
     var defaults = {
       topojson: false,
@@ -59,7 +51,13 @@ class GeoJSONTile extends Tile {
       style: this._defaultStyle
     };
 
-    this._options = extend(defaults, options);
+    this._options = extend({}, defaults, options);
+
+    if (typeof options.style === 'function') {
+      this._options.style = options.style;
+    } else {
+      this._options.style = extend({}, defaults.style, options.style);
+    }
   }
 
   // Request data for the tile
@@ -296,7 +294,7 @@ class GeoJSONTile extends Tile {
 
       // Get style object, if provided
       if (typeof this._options.style === 'function') {
-        style = extend(this._defaultStyle, this._options.style(feature));
+        style = extend({}, this._defaultStyle, this._options.style(feature));
       }
 
       var coordinates = feature.geometry.coordinates;
@@ -311,7 +309,13 @@ class GeoJSONTile extends Tile {
           return [point.x, point.y];
         });
 
-        var linestringAttributes = GeoJSON.lineStringAttributes(coordinates, colour);
+        var height = 0;
+
+        if (style.lineHeight) {
+          height = this._world.metresToWorld(style.lineHeight, this._pointScale);
+        }
+
+        var linestringAttributes = GeoJSON.lineStringAttributes(coordinates, colour, height);
 
         lines.vertices.push(linestringAttributes.vertices);
         lines.colours.push(linestringAttributes.colours);
@@ -329,7 +333,13 @@ class GeoJSONTile extends Tile {
           });
         });
 
-        var multiLinestringAttributes = GeoJSON.multiLineStringAttributes(coordinates, colour);
+        var height = 0;
+
+        if (style.lineHeight) {
+          height = this._world.metresToWorld(style.lineHeight, this._pointScale);
+        }
+
+        var multiLinestringAttributes = GeoJSON.multiLineStringAttributes(coordinates, colour, height);
 
         lines.vertices.push(multiLinestringAttributes.vertices);
         lines.colours.push(multiLinestringAttributes.colours);
@@ -418,11 +428,15 @@ class GeoJSONTile extends Tile {
     //
     // this._mesh.add(mesh);
 
+    var geometry;
+    var material;
+    var mesh;
+
     // Output lines
     if (lines.vertices.length > 0) {
-      var geometry = Buffer.createLineGeometry(lines, offset);
+      geometry = Buffer.createLineGeometry(lines, offset);
 
-      var material = new THREE.LineBasicMaterial({
+      material = new THREE.LineBasicMaterial({
         vertexColors: THREE.VertexColors,
         linewidth: style.lineWidth,
         transparent: style.lineTransparent,
@@ -430,9 +444,10 @@ class GeoJSONTile extends Tile {
         blending: style.lineBlending
       });
 
-      var mesh = new THREE.LineSegments(geometry, material);
+      mesh = new THREE.LineSegments(geometry, material);
 
-      if (style.lineRenderOrder) {
+      if (style.lineRenderOrder !== undefined) {
+        material.depthWrite = false;
         mesh.renderOrder = style.lineRenderOrder;
       }
 
@@ -444,9 +459,8 @@ class GeoJSONTile extends Tile {
 
     // Output polygons
     if (polygons.facesCount > 0) {
-      var geometry = Buffer.createGeometry(polygons, offset);
+      geometry = Buffer.createGeometry(polygons, offset);
 
-      var material;
       if (!this._world._environment._skybox) {
         material = new THREE.MeshPhongMaterial({
           vertexColors: THREE.VertexColors,
@@ -463,13 +477,13 @@ class GeoJSONTile extends Tile {
         material.envMap = this._world._environment._skybox.getRenderTarget();
       }
 
-      var mesh = new THREE.Mesh(geometry, material);
+      mesh = new THREE.Mesh(geometry, material);
 
       mesh.castShadow = true;
       mesh.receiveShadow = true;
 
       if (polygons.allFlat) {
-        // This is only useful for flat objects
+        material.depthWrite = false;
         mesh.renderOrder = 1;
       }
 
