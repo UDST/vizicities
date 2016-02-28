@@ -5,6 +5,8 @@ import Point from './geo/Point';
 import LatLon from './geo/LatLon';
 import Engine from './engine/Engine';
 
+// TODO: Make sure nothing is left behind in the heap after calling destroy()
+
 // Pretty much any event someone using ViziCities would need will be emitted or
 // proxied by World (eg. render events, etc)
 

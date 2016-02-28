@@ -3,6 +3,8 @@ import extend from 'lodash.assign';
 import TileCache from './TileCache';
 import THREE from 'three';
 
+// TODO: Make sure nothing is left behind in the heap after calling destroy()
+
 // TODO: Consider keeping a single TileLayer / LOD instance running by default
 // that keeps a standard LOD grid for other layers to utilise, rather than
 // having to create their own, unique LOD grid and duplicate calculations when

@@ -4,6 +4,8 @@ import GeoJSONTile from './GeoJSONTile';
 import throttle from 'lodash.throttle';
 import THREE from 'three';
 
+// TODO: Make sure nothing is left behind in the heap after calling destroy()
+
 // TODO: Consider pausing per-frame output during movement so there's little to
 // no jank caused by previous tiles still processing
 

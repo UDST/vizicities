@@ -9,6 +9,8 @@ import extend from 'lodash.assign';
 import GeoJSON from '../../util/GeoJSON';
 import Buffer from '../../util/Buffer';
 
+// TODO: Make sure nothing is left behind in the heap after calling destroy()
+
 // TODO: Perform tile request and processing in a Web Worker
 //
 // Use Operative (https://github.com/padolsey/operative)

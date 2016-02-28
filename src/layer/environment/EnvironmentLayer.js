@@ -3,6 +3,8 @@ import extend from 'lodash.assign';
 import THREE from 'three';
 import Skybox from './Skybox';
 
+// TODO: Make sure nothing is left behind in the heap after calling destroy()
+
 class EnvironmentLayer extends Layer {
   constructor(options) {
     super();

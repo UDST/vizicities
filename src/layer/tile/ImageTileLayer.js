@@ -5,6 +5,8 @@ import throttle from 'lodash.throttle';
 import THREE from 'three';
 import extend from 'lodash.assign';
 
+// TODO: Make sure nothing is left behind in the heap after calling destroy()
+
 // DONE: Find a way to avoid the flashing caused by the gap between old tiles
 // being removed and the new tiles being ready for display
 //

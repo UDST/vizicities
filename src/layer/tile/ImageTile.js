@@ -2,6 +2,8 @@ import Tile from './Tile';
 import BoxHelper from '../../vendor/BoxHelper';
 import THREE from 'three';
 
+// TODO: Make sure nothing is left behind in the heap after calling destroy()
+
 class ImageTile extends Tile {
   constructor(quadcode, path, layer) {
     super(quadcode, path, layer);

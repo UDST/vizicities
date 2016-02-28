@@ -2,6 +2,8 @@ import EventEmitter from 'eventemitter3';
 import THREE from 'three';
 import Scene from '../engine/Scene';
 
+// TODO: Make sure nothing is left behind in the heap after calling destroy()
+
 class Layer extends EventEmitter {
   constructor() {
     super();

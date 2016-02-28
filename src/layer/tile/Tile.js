@@ -2,6 +2,8 @@ import Point from '../../geo/Point';
 import LatLon from '../../geo/LatLon';
 import THREE from 'three';
 
+// TODO: Make sure nothing is left behind in the heap after calling destroy()
+
 // Manages a single tile and its layers
 
 var r2d = 180 / Math.PI;

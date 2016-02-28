@@ -1,5 +1,7 @@
 import LRUCache from 'lru-cache';
 
+// TODO: Make sure nothing is left behind in the heap after calling destroy()
+
 // This process is based on a similar approach taken by OpenWebGlobe
 // See: https://github.com/OpenWebGlobe/WebViewer/blob/master/source/core/globecache.js
 

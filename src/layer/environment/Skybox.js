@@ -2,6 +2,8 @@ import THREE from 'three';
 import Sky from './Sky';
 import throttle from 'lodash.throttle';
 
+// TODO: Make sure nothing is left behind in the heap after calling destroy()
+
 var cubemap = {
   vertexShader: [
 		'varying vec3 vPosition;',
