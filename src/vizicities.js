@@ -5,6 +5,7 @@ import ImageTileLayer from './layer/tile/ImageTileLayer';
 import GeoJSONTileLayer from './layer/tile/GeoJSONTileLayer';
 import TopoJSONTileLayer from './layer/tile/TopoJSONTileLayer';
 import GeoJSONLayer from './layer/GeoJSONLayer';
+import TopoJSONLayer from './layer/TopoJSONLayer';
 import Point from './geo/Point';
 import LatLon from './geo/LatLon';
 
@@ -19,6 +20,7 @@ const VIZI = {
   GeoJSONTileLayer: GeoJSONTileLayer,
   TopoJSONTileLayer: TopoJSONTileLayer,
   GeoJSONLayer: GeoJSONLayer,
+  TopoJSONLayer: TopoJSONLayer,
   Point: Point,
   LatLon: LatLon
 };

@@ -88,6 +88,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _layerGeoJSONLayer2 = _interopRequireDefault(_layerGeoJSONLayer);
 	
+	var _layerTopoJSONLayer = __webpack_require__(66);
+	
+	var _layerTopoJSONLayer2 = _interopRequireDefault(_layerTopoJSONLayer);
+	
 	var _geoPoint = __webpack_require__(11);
 	
 	var _geoPoint2 = _interopRequireDefault(_geoPoint);
@@ -107,6 +111,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  GeoJSONTileLayer: _layerTileGeoJSONTileLayer2['default'],
 	  TopoJSONTileLayer: _layerTileTopoJSONTileLayer2['default'],
 	  GeoJSONLayer: _layerGeoJSONLayer2['default'],
+	  TopoJSONLayer: _layerTopoJSONLayer2['default'],
 	  Point: _geoPoint2['default'],
 	  LatLon: _geoLatLon2['default']
 	};
@@ -14780,6 +14785,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports['default'] = function (geojson, options) {
 	  return new GeoJSONLayer(geojson, options);
+	};
+	
+	;
+	module.exports = exports['default'];
+
+/***/ },
+/* 66 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _GeoJSONLayer = __webpack_require__(65);
+	
+	var _GeoJSONLayer2 = _interopRequireDefault(_GeoJSONLayer);
+	
+	var _lodashAssign = __webpack_require__(3);
+	
+	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
+	
+	// Initialise without requiring new keyword
+	
+	exports['default'] = function (topojson, options) {
+	  var defaults = {
+	    topojson: true
+	  };
+	
+	  options = (0, _lodashAssign2['default'])({}, defaults, options);
+	
+	  return (0, _GeoJSONLayer2['default'])(topojson, options);
 	};
 	
 	;
