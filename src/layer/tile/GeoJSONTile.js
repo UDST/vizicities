@@ -2,14 +2,12 @@ import Tile from './Tile';
 import BoxHelper from '../../vendor/BoxHelper';
 import THREE from 'three';
 import reqwest from 'reqwest';
-import topojson from 'topojson';
 import Point from '../../geo/Point';
 import LatLon from '../../geo/LatLon';
-import earcut from 'earcut';
 import extend from 'lodash.assign';
-import extrudePolygon from '../../util/extrudePolygon';
-import Offset from 'polygon-offset';
-import geojsonMerge from 'geojson-merge';
+// import Offset from 'polygon-offset';
+import GeoJSON from '../../util/GeoJSON';
+import Buffer from '../../util/Buffer';
 
 // TODO: Perform tile request and processing in a Web Worker
 //
@@ -163,50 +161,50 @@ class GeoJSONTile extends Tile {
     return canvas;
   }
 
-  _addShadow(coordinates) {
-    var ctx = this._shadowCanvas.getContext('2d');
-    var width = this._shadowCanvas.width;
-    var height = this._shadowCanvas.height;
-
-    var _coords;
-    var _offset;
-    var offset = new Offset();
-
-    // Transform coordinates to shadowCanvas space and draw on canvas
-    coordinates.forEach((ring, index) => {
-      ctx.beginPath();
-
-      _coords = ring.map(coord => {
-        var xFrac = (coord[0] - this._boundsWorld[0]) / this._side;
-        var yFrac = (coord[1] - this._boundsWorld[3]) / this._side;
-        return [xFrac * width, yFrac * height];
-      });
-
-      if (index > 0) {
-        _offset = _coords;
-      } else {
-        _offset = offset.data(_coords).padding(1.3);
-      }
-
-      // TODO: This is super flaky and crashes the browser if run on anything
-      // put the outer ring (potentially due to winding)
-      _offset.forEach((coord, index) => {
-        // var xFrac = (coord[0] - this._boundsWorld[0]) / this._side;
-        // var yFrac = (coord[1] - this._boundsWorld[3]) / this._side;
-
-        if (index === 0) {
-          ctx.moveTo(coord[0], coord[1]);
-        } else {
-          ctx.lineTo(coord[0], coord[1]);
-        }
-      });
-
-      ctx.closePath();
-    });
-
-    ctx.fillStyle = 'rgba(80, 80, 80, 0.7)';
-    ctx.fill();
-  }
+  // _addShadow(coordinates) {
+  //   var ctx = this._shadowCanvas.getContext('2d');
+  //   var width = this._shadowCanvas.width;
+  //   var height = this._shadowCanvas.height;
+  //
+  //   var _coords;
+  //   var _offset;
+  //   var offset = new Offset();
+  //
+  //   // Transform coordinates to shadowCanvas space and draw on canvas
+  //   coordinates.forEach((ring, index) => {
+  //     ctx.beginPath();
+  //
+  //     _coords = ring.map(coord => {
+  //       var xFrac = (coord[0] - this._boundsWorld[0]) / this._side;
+  //       var yFrac = (coord[1] - this._boundsWorld[3]) / this._side;
+  //       return [xFrac * width, yFrac * height];
+  //     });
+  //
+  //     if (index > 0) {
+  //       _offset = _coords;
+  //     } else {
+  //       _offset = offset.data(_coords).padding(1.3);
+  //     }
+  //
+  //     // TODO: This is super flaky and crashes the browser if run on anything
+  //     // put the outer ring (potentially due to winding)
+  //     _offset.forEach((coord, index) => {
+  //       // var xFrac = (coord[0] - this._boundsWorld[0]) / this._side;
+  //       // var yFrac = (coord[1] - this._boundsWorld[3]) / this._side;
+  //
+  //       if (index === 0) {
+  //         ctx.moveTo(coord[0], coord[1]);
+  //       } else {
+  //         ctx.lineTo(coord[0], coord[1]);
+  //       }
+  //     });
+  //
+  //     ctx.closePath();
+  //   });
+  //
+  //   ctx.fillStyle = 'rgba(80, 80, 80, 0.7)';
+  //   ctx.fill();
+  // }
 
   _requestTile() {
     var urlParams = {
@@ -233,102 +231,12 @@ class GeoJSONTile extends Tile {
     });
   }
 
-  _processLineString(coordinates, colour) {
-    coordinates = coordinates.map(coordinate => {
-      var latlon = LatLon(coordinate[1], coordinate[0]);
-      var point = this._layer._world.latLonToPoint(latlon);
-      return [point.x, point.y];
-    });
-
-    var _coords = [];
-    var _colours = [];
-
-    var nextCoord;
-
-    // Connect coordinate with the next to make a pair
-    //
-    // LineSegments requires pairs of vertices so repeat the last point if
-    // there's an odd number of vertices
-    coordinates.forEach((coordinate, index) => {
-      // TODO: Don't hardcode y-value
-      _colours.push([colour.r, colour.g, colour.b]);
-      _coords.push([coordinate[0], 0, coordinate[1]]);
-
-      nextCoord = (coordinates[index + 1]) ? coordinates[index + 1] : coordinate;
-
-      _colours.push([colour.r, colour.g, colour.b]);
-      _coords.push([nextCoord[0], 0, nextCoord[1]]);
-    });
-
-    return [_coords, _colours];
-  }
-
-  _processMultiLineString(coordinates, colour) {
-    var _coords = [];
-    var _colours = [];
-
-    var result;
-    coordinates.forEach(coordinate => {
-      result = this._processLineString(coordinate, colour);
-
-      result[0].forEach(coord => {
-        _coords.push(coord);
-      });
-
-      result[1].forEach(colour => {
-        _colours.push(colour);
-      });
-    });
-
-    return [_coords, _colours];
-  }
-
   _processTileData(data) {
     console.time(this._tile);
 
-    var geojson;
-
-    if (this._options.topojson) {
-      // TODO: Allow TopoJSON objects to be overridden as an option
-
-      var collections = [];
-
-      // If not overridden, merge all features from all objects
-      for (var key in data.objects) {
-        collections.push(topojson.feature(data, data.objects[key]));
-      }
-
-      geojson = geojsonMerge(collections);
-    } else {
-      // If root doesn't have a type then let's see if there are features in the
-      // next step down
-      if (!data.type) {
-        // TODO: Allow GeoJSON objects to be overridden as an option
-
-        var collections = [];
-
-        // If not overridden, merge all features from all objects
-        for (var key in data) {
-          if (!data[key].type) {
-            continue;
-          }
-
-          collections.push(data[key]);
-        }
-
-        geojson = geojsonMerge(collections);
-      } else {
-        geojson = data;
-      }
-    }
+    var geojson = GeoJSON.mergeFeatures(data, this._options.topojson);
 
     // TODO: Check that GeoJSON is valid / usable
-
-    var offset = Point(0, 0);
-    offset.x = -1 * this._center[0];
-    offset.y = -1 * this._center[1];
-
-    var coordinates;
 
     var features = geojson.features;
 
@@ -338,6 +246,20 @@ class GeoJSONTile extends Tile {
     }
 
     var style = this._options.style;
+
+    var offset = Point(0, 0);
+    offset.x = -1 * this._center[0];
+    offset.y = -1 * this._center[1];
+
+    // TODO: Wrap into a helper method so this isn't duplicated in the non-tiled
+    // GeoJSON output layer
+    //
+    // Need to be careful as to not make it impossible to fork this off into a
+    // worker script at a later stage
+    //
+    // Also unsure as to whether it's wise to lump so much into a black box
+    //
+    // var meshes = GeoJSON.createMeshes(features, offset, style);
 
     var polygons = {
       vertices: [],
@@ -353,15 +275,7 @@ class GeoJSONTile extends Tile {
       verticesCount: 0
     };
 
-    // Polygon variables
-    var earcutData;
-    var faces;
-
     var colour = new THREE.Color();
-
-    // Light and dark colours used for poor-mans AO gradient on object sides
-    var light = new THREE.Color(0xffffff);
-    var shadow  = new THREE.Color(0x666666);
 
     features.forEach(feature => {
       // feature.geometry, feature.properties
@@ -389,21 +303,35 @@ class GeoJSONTile extends Tile {
       if (feature.geometry.type === 'LineString') {
         colour.set(style.lineColor);
 
-        var linestringResults = this._processLineString(coordinates, colour);
+        coordinates = coordinates.map(coordinate => {
+          var latlon = LatLon(coordinate[1], coordinate[0]);
+          var point = this._layer._world.latLonToPoint(latlon);
+          return [point.x, point.y];
+        });
 
-        lines.vertices.push(linestringResults[0]);
-        lines.colours.push(linestringResults[1]);
-        lines.verticesCount += linestringResults[0].length;
+        var linestringAttributes = GeoJSON.lineStringAttributes(coordinates, colour);
+
+        lines.vertices.push(linestringAttributes.vertices);
+        lines.colours.push(linestringAttributes.colours);
+        lines.verticesCount += linestringAttributes.vertices.length;
       }
 
       if (feature.geometry.type === 'MultiLineString') {
         colour.set(style.lineColor);
 
-        var multiLinestringResults = this._processMultiLineString(coordinates, colour);
+        coordinates = coordinates.map(_coordinates => {
+          return _coordinates.map(coordinate => {
+            var latlon = LatLon(coordinate[1], coordinate[0]);
+            var point = this._layer._world.latLonToPoint(latlon);
+            return [point.x, point.y];
+          });
+        });
 
-        lines.vertices.push(multiLinestringResults[0]);
-        lines.colours.push(multiLinestringResults[1]);
-        lines.verticesCount += multiLinestringResults[0].length;
+        var multiLinestringAttributes = GeoJSON.multiLineStringAttributes(coordinates, colour);
+
+        lines.vertices.push(multiLinestringAttributes.vertices);
+        lines.colours.push(multiLinestringAttributes.colours);
+        lines.verticesCount += multiLinestringAttributes.vertices.length;
       }
 
       if (feature.geometry.type === 'Polygon') {
@@ -417,86 +345,29 @@ class GeoJSONTile extends Tile {
           });
         });
 
-        // Draw footprint on shadow canvas
-        //
-        // TODO: Disabled for the time-being until it can be sped up / moved to
-        // a worker
-        // this._addShadow(coordinates);
-
-        earcutData = this._toEarcut(coordinates);
-
-        faces = this._triangulate(earcutData.vertices, earcutData.holes, earcutData.dimensions);
-
-        var groupedVertices = [];
-        for (i = 0, il = earcutData.vertices.length; i < il; i += earcutData.dimensions) {
-          groupedVertices.push(earcutData.vertices.slice(i, i + earcutData.dimensions));
-        }
-
         var height = 0;
 
         if (style.height) {
           height = this._world.metresToWorld(style.height, this._pointScale);
         }
 
-        var extruded = extrudePolygon(groupedVertices, faces, {
-          bottom: 0,
-          top: height
-        });
+        // Draw footprint on shadow canvas
+        //
+        // TODO: Disabled for the time-being until it can be sped up / moved to
+        // a worker
+        // this._addShadow(coordinates);
 
-        var topColor = colour.clone().multiply(light);
-        var bottomColor = colour.clone().multiply(shadow);
+        var polygonAttributes = GeoJSON.polygonAttributes(coordinates, colour, height);
 
-        var _faces = [];
-        var _colours = [];
+        polygons.vertices.push(polygonAttributes.vertices);
+        polygons.faces.push(polygonAttributes.faces);
+        polygons.colours.push(polygonAttributes.colours);
 
-        polygons.vertices.push(extruded.positions);
-
-        var _colour;
-        extruded.top.forEach((face, fi) => {
-          _colour = [];
-
-          _colour.push([colour.r, colour.g, colour.b]);
-          _colour.push([colour.r, colour.g, colour.b]);
-          _colour.push([colour.r, colour.g, colour.b]);
-
-          _faces.push(face);
-          _colours.push(_colour);
-        });
-
-        if (extruded.sides) {
-          if (polygons.allFlat) {
-            polygons.allFlat = false;
-          }
-
-          // Set up colours for every vertex with poor-mans AO on the sides
-          extruded.sides.forEach((face, fi) => {
-            _colour = [];
-
-            // First face is always bottom-bottom-top
-            if (fi % 2 === 0) {
-              _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-              _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-              _colour.push([topColor.r, topColor.g, topColor.b]);
-            // Reverse winding for the second face
-            // top-top-bottom
-            } else {
-              _colour.push([topColor.r, topColor.g, topColor.b]);
-              _colour.push([topColor.r, topColor.g, topColor.b]);
-              _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-            }
-
-            _faces.push(face);
-            _colours.push(_colour);
-          });
+        if (polygons.allFlat && !polygonAttributes.flat) {
+          polygons.allFlat = false;
         }
 
-        // Skip bottom as there's no point rendering it
-        // allFaces.push(extruded.faces);
-
-        polygons.faces.push(_faces);
-        polygons.colours.push(_colours);
-
-        polygons.facesCount += _faces.length;
+        polygons.facesCount += polygonAttributes.faces.length;
       }
     });
 
@@ -547,44 +418,7 @@ class GeoJSONTile extends Tile {
 
     // Output lines
     if (lines.vertices.length > 0) {
-      var geometry = new THREE.BufferGeometry();
-
-      var vertices = new Float32Array(lines.verticesCount * 3);
-      var colours = new Float32Array(lines.verticesCount * 3);
-
-      var _vertices;
-      var _colour;
-
-      var lastIndex = 0;
-
-      for (var i = 0; i < lines.vertices.length; i++) {
-        _vertices = lines.vertices[i];
-        _colour = lines.colours[i];
-
-        for (var j = 0; j < _vertices.length; j++) {
-          var ax = _vertices[j][0] + offset.x;
-          var ay = _vertices[j][1];
-          var az = _vertices[j][2] + offset.y;
-
-          var c1 = _colour[j];
-
-          vertices[lastIndex * 3 + 0] = ax;
-          vertices[lastIndex * 3 + 1] = ay;
-          vertices[lastIndex * 3 + 2] = az;
-
-          colours[lastIndex * 3 + 0] = c1[0];
-          colours[lastIndex * 3 + 1] = c1[1];
-          colours[lastIndex * 3 + 2] = c1[2];
-
-          lastIndex++;
-        }
-      }
-
-      // itemSize = 3 because there are 3 values (components) per vertex
-      geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
-      geometry.addAttribute('color', new THREE.BufferAttribute(colours, 3));
-
-      geometry.computeBoundingBox();
+      var geometry = Buffer.createLineGeometry(lines, offset);
 
       var material = new THREE.LineBasicMaterial({
         vertexColors: THREE.VertexColors,
@@ -608,118 +442,7 @@ class GeoJSONTile extends Tile {
 
     // Output polygons
     if (polygons.facesCount > 0) {
-      var geometry = new THREE.BufferGeometry();
-
-      // Three components per vertex per face (3 x 3 = 9)
-      var vertices = new Float32Array(polygons.facesCount * 9);
-      var normals = new Float32Array(polygons.facesCount * 9);
-      var colours = new Float32Array(polygons.facesCount * 9);
-
-      var pA = new THREE.Vector3();
-      var pB = new THREE.Vector3();
-      var pC = new THREE.Vector3();
-
-      var cb = new THREE.Vector3();
-      var ab = new THREE.Vector3();
-
-      var index;
-      var _faces;
-      var _vertices;
-      var _colour;
-      var lastIndex = 0;
-      for (var i = 0; i < polygons.faces.length; i++) {
-        _faces = polygons.faces[i];
-        _vertices = polygons.vertices[i];
-        _colour = polygons.colours[i];
-
-        for (var j = 0; j < _faces.length; j++) {
-          // Array of vertex indexes for the face
-          index = _faces[j][0];
-
-          var ax = _vertices[index][0] + offset.x;
-          var ay = _vertices[index][1];
-          var az = _vertices[index][2] + offset.y;
-
-          var c1 = _colour[j][0];
-
-          index = _faces[j][1];
-
-          var bx = _vertices[index][0] + offset.x;
-          var by = _vertices[index][1];
-          var bz = _vertices[index][2] + offset.y;
-
-          var c2 = _colour[j][1];
-
-          index = _faces[j][2];
-
-          var cx = _vertices[index][0] + offset.x;
-          var cy = _vertices[index][1];
-          var cz = _vertices[index][2] + offset.y;
-
-          var c3 = _colour[j][2];
-
-          // Flat face normals
-          // From: http://threejs.org/examples/webgl_buffergeometry.html
-          pA.set(ax, ay, az);
-          pB.set(bx, by, bz);
-          pC.set(cx, cy, cz);
-
-          cb.subVectors(pC, pB);
-          ab.subVectors(pA, pB);
-          cb.cross(ab);
-
-          cb.normalize();
-
-          var nx = cb.x;
-          var ny = cb.y;
-          var nz = cb.z;
-
-          vertices[lastIndex * 9 + 0] = ax;
-          vertices[lastIndex * 9 + 1] = ay;
-          vertices[lastIndex * 9 + 2] = az;
-
-          normals[lastIndex * 9 + 0] = nx;
-          normals[lastIndex * 9 + 1] = ny;
-          normals[lastIndex * 9 + 2] = nz;
-
-          colours[lastIndex * 9 + 0] = c1[0];
-          colours[lastIndex * 9 + 1] = c1[1];
-          colours[lastIndex * 9 + 2] = c1[2];
-
-          vertices[lastIndex * 9 + 3] = bx;
-          vertices[lastIndex * 9 + 4] = by;
-          vertices[lastIndex * 9 + 5] = bz;
-
-          normals[lastIndex * 9 + 3] = nx;
-          normals[lastIndex * 9 + 4] = ny;
-          normals[lastIndex * 9 + 5] = nz;
-
-          colours[lastIndex * 9 + 3] = c2[0];
-          colours[lastIndex * 9 + 4] = c2[1];
-          colours[lastIndex * 9 + 5] = c2[2];
-
-          vertices[lastIndex * 9 + 6] = cx;
-          vertices[lastIndex * 9 + 7] = cy;
-          vertices[lastIndex * 9 + 8] = cz;
-
-          normals[lastIndex * 9 + 6] = nx;
-          normals[lastIndex * 9 + 7] = ny;
-          normals[lastIndex * 9 + 8] = nz;
-
-          colours[lastIndex * 9 + 6] = c3[0];
-          colours[lastIndex * 9 + 7] = c3[1];
-          colours[lastIndex * 9 + 8] = c3[2];
-
-          lastIndex++;
-        }
-      }
-
-      // itemSize = 3 because there are 3 values (components) per vertex
-      geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
-      geometry.addAttribute('normal', new THREE.BufferAttribute(normals, 3));
-      geometry.addAttribute('color', new THREE.BufferAttribute(colours, 3));
-
-      geometry.computeBoundingBox();
+      var geometry = Buffer.createGeometry(polygons, offset);
 
       var material;
       if (!this._world._environment._skybox) {
@@ -754,41 +477,6 @@ class GeoJSONTile extends Tile {
     this._ready = true;
     console.timeEnd(this._tile);
     console.log(`${this._tile}: ${features.length} features`);
-  }
-
-  _toEarcut(data) {
-    var dim = data[0][0].length;
-    var result = {vertices: [], holes: [], dimensions: dim};
-    var holeIndex = 0;
-
-    for (var i = 0; i < data.length; i++) {
-      for (var j = 0; j < data[i].length; j++) {
-        for (var d = 0; d < dim; d++) {
-          result.vertices.push(data[i][j][d]);
-        }
-      }
-      if (i > 0) {
-        holeIndex += data[i - 1].length;
-        result.holes.push(holeIndex);
-      }
-    }
-
-    return result;
-  }
-
-  _triangulate(contour, holes, dim) {
-    // console.time('earcut');
-
-    var faces = earcut(contour, holes, dim);
-    var result = [];
-
-    for (i = 0, il = faces.length; i < il; i += 3) {
-      result.push(faces.slice(i, i + 3));
-    }
-
-    // console.timeEnd('earcut');
-
-    return result;
   }
 
   _abortRequest() {

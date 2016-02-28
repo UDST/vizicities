@@ -80,7 +80,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _layerTileGeoJSONTileLayer2 = _interopRequireDefault(_layerTileGeoJSONTileLayer);
 	
-	var _layerTileTopoJSONTileLayer = __webpack_require__(70);
+	var _layerTileTopoJSONTileLayer = __webpack_require__(64);
 	
 	var _layerTileTopoJSONTileLayer2 = _interopRequireDefault(_layerTileTopoJSONTileLayer);
 	
@@ -11396,10 +11396,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _reqwest2 = _interopRequireDefault(_reqwest);
 	
-	var _topojson = __webpack_require__(57);
-	
-	var _topojson2 = _interopRequireDefault(_topojson);
-	
 	var _geoPoint = __webpack_require__(11);
 	
 	var _geoPoint2 = _interopRequireDefault(_geoPoint);
@@ -11408,25 +11404,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _geoLatLon2 = _interopRequireDefault(_geoLatLon);
 	
-	var _earcut = __webpack_require__(58);
-	
-	var _earcut2 = _interopRequireDefault(_earcut);
-	
 	var _lodashAssign = __webpack_require__(3);
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _utilExtrudePolygon = __webpack_require__(59);
+	// import Offset from 'polygon-offset';
 	
-	var _utilExtrudePolygon2 = _interopRequireDefault(_utilExtrudePolygon);
+	var _utilGeoJSON = __webpack_require__(57);
 	
-	var _polygonOffset = __webpack_require__(60);
+	var _utilGeoJSON2 = _interopRequireDefault(_utilGeoJSON);
 	
-	var _polygonOffset2 = _interopRequireDefault(_polygonOffset);
+	var _utilBuffer = __webpack_require__(63);
 	
-	var _geojsonMerge = __webpack_require__(68);
-	
-	var _geojsonMerge2 = _interopRequireDefault(_geojsonMerge);
+	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
 	// TODO: Perform tile request and processing in a Web Worker
 	//
@@ -11594,58 +11584,56 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      return canvas;
 	    }
-	  }, {
-	    key: '_addShadow',
-	    value: function _addShadow(coordinates) {
-	      var _this2 = this;
 	
-	      var ctx = this._shadowCanvas.getContext('2d');
-	      var width = this._shadowCanvas.width;
-	      var height = this._shadowCanvas.height;
+	    // _addShadow(coordinates) {
+	    //   var ctx = this._shadowCanvas.getContext('2d');
+	    //   var width = this._shadowCanvas.width;
+	    //   var height = this._shadowCanvas.height;
+	    //
+	    //   var _coords;
+	    //   var _offset;
+	    //   var offset = new Offset();
+	    //
+	    //   // Transform coordinates to shadowCanvas space and draw on canvas
+	    //   coordinates.forEach((ring, index) => {
+	    //     ctx.beginPath();
+	    //
+	    //     _coords = ring.map(coord => {
+	    //       var xFrac = (coord[0] - this._boundsWorld[0]) / this._side;
+	    //       var yFrac = (coord[1] - this._boundsWorld[3]) / this._side;
+	    //       return [xFrac * width, yFrac * height];
+	    //     });
+	    //
+	    //     if (index > 0) {
+	    //       _offset = _coords;
+	    //     } else {
+	    //       _offset = offset.data(_coords).padding(1.3);
+	    //     }
+	    //
+	    //     // TODO: This is super flaky and crashes the browser if run on anything
+	    //     // put the outer ring (potentially due to winding)
+	    //     _offset.forEach((coord, index) => {
+	    //       // var xFrac = (coord[0] - this._boundsWorld[0]) / this._side;
+	    //       // var yFrac = (coord[1] - this._boundsWorld[3]) / this._side;
+	    //
+	    //       if (index === 0) {
+	    //         ctx.moveTo(coord[0], coord[1]);
+	    //       } else {
+	    //         ctx.lineTo(coord[0], coord[1]);
+	    //       }
+	    //     });
+	    //
+	    //     ctx.closePath();
+	    //   });
+	    //
+	    //   ctx.fillStyle = 'rgba(80, 80, 80, 0.7)';
+	    //   ctx.fill();
+	    // }
 	
-	      var _coords;
-	      var _offset;
-	      var offset = new _polygonOffset2['default']();
-	
-	      // Transform coordinates to shadowCanvas space and draw on canvas
-	      coordinates.forEach(function (ring, index) {
-	        ctx.beginPath();
-	
-	        _coords = ring.map(function (coord) {
-	          var xFrac = (coord[0] - _this2._boundsWorld[0]) / _this2._side;
-	          var yFrac = (coord[1] - _this2._boundsWorld[3]) / _this2._side;
-	          return [xFrac * width, yFrac * height];
-	        });
-	
-	        if (index > 0) {
-	          _offset = _coords;
-	        } else {
-	          _offset = offset.data(_coords).padding(1.3);
-	        }
-	
-	        // TODO: This is super flaky and crashes the browser if run on anything
-	        // put the outer ring (potentially due to winding)
-	        _offset.forEach(function (coord, index) {
-	          // var xFrac = (coord[0] - this._boundsWorld[0]) / this._side;
-	          // var yFrac = (coord[1] - this._boundsWorld[3]) / this._side;
-	
-	          if (index === 0) {
-	            ctx.moveTo(coord[0], coord[1]);
-	          } else {
-	            ctx.lineTo(coord[0], coord[1]);
-	          }
-	        });
-	
-	        ctx.closePath();
-	      });
-	
-	      ctx.fillStyle = 'rgba(80, 80, 80, 0.7)';
-	      ctx.fill();
-	    }
 	  }, {
 	    key: '_requestTile',
 	    value: function _requestTile() {
-	      var _this3 = this;
+	      var _this2 = this;
 	
 	      var urlParams = {
 	        x: this._tile[0],
@@ -11661,121 +11649,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	        crossOrigin: true
 	      }).then(function (res) {
 	        // Clear request reference
-	        _this3._request = null;
-	        _this3._processTileData(res);
+	        _this2._request = null;
+	        _this2._processTileData(res);
 	      })['catch'](function (err) {
 	        console.error(err);
 	
 	        // Clear request reference
-	        _this3._request = null;
+	        _this2._request = null;
 	      });
-	    }
-	  }, {
-	    key: '_processLineString',
-	    value: function _processLineString(coordinates, colour) {
-	      var _this4 = this;
-	
-	      coordinates = coordinates.map(function (coordinate) {
-	        var latlon = (0, _geoLatLon2['default'])(coordinate[1], coordinate[0]);
-	        var point = _this4._layer._world.latLonToPoint(latlon);
-	        return [point.x, point.y];
-	      });
-	
-	      var _coords = [];
-	      var _colours = [];
-	
-	      var nextCoord;
-	
-	      // Connect coordinate with the next to make a pair
-	      //
-	      // LineSegments requires pairs of vertices so repeat the last point if
-	      // there's an odd number of vertices
-	      coordinates.forEach(function (coordinate, index) {
-	        // TODO: Don't hardcode y-value
-	        _colours.push([colour.r, colour.g, colour.b]);
-	        _coords.push([coordinate[0], 0, coordinate[1]]);
-	
-	        nextCoord = coordinates[index + 1] ? coordinates[index + 1] : coordinate;
-	
-	        _colours.push([colour.r, colour.g, colour.b]);
-	        _coords.push([nextCoord[0], 0, nextCoord[1]]);
-	      });
-	
-	      return [_coords, _colours];
-	    }
-	  }, {
-	    key: '_processMultiLineString',
-	    value: function _processMultiLineString(coordinates, colour) {
-	      var _this5 = this;
-	
-	      var _coords = [];
-	      var _colours = [];
-	
-	      var result;
-	      coordinates.forEach(function (coordinate) {
-	        result = _this5._processLineString(coordinate, colour);
-	
-	        result[0].forEach(function (coord) {
-	          _coords.push(coord);
-	        });
-	
-	        result[1].forEach(function (colour) {
-	          _colours.push(colour);
-	        });
-	      });
-	
-	      return [_coords, _colours];
 	    }
 	  }, {
 	    key: '_processTileData',
 	    value: function _processTileData(data) {
-	      var _this6 = this;
+	      var _this3 = this;
 	
 	      console.time(this._tile);
 	
-	      var geojson;
-	
-	      if (this._options.topojson) {
-	        // TODO: Allow TopoJSON objects to be overridden as an option
-	
-	        var collections = [];
-	
-	        // If not overridden, merge all features from all objects
-	        for (var key in data.objects) {
-	          collections.push(_topojson2['default'].feature(data, data.objects[key]));
-	        }
-	
-	        geojson = (0, _geojsonMerge2['default'])(collections);
-	      } else {
-	        // If root doesn't have a type then let's see if there are features in the
-	        // next step down
-	        if (!data.type) {
-	          // TODO: Allow GeoJSON objects to be overridden as an option
-	
-	          var collections = [];
-	
-	          // If not overridden, merge all features from all objects
-	          for (var key in data) {
-	            if (!data[key].type) {
-	              continue;
-	            }
-	
-	            collections.push(data[key]);
-	          }
-	
-	          geojson = (0, _geojsonMerge2['default'])(collections);
-	        } else {
-	          geojson = data;
-	        }
-	      }
+	      var geojson = _utilGeoJSON2['default'].mergeFeatures(data, this._options.topojson);
 	
 	      // TODO: Check that GeoJSON is valid / usable
-	
-	      var offset = (0, _geoPoint2['default'])(0, 0);
-	      offset.x = -1 * this._center[0];
-	      offset.y = -1 * this._center[1];
-	
-	      var coordinates;
 	
 	      var features = geojson.features;
 	
@@ -11785,6 +11677,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      var style = this._options.style;
+	
+	      var offset = (0, _geoPoint2['default'])(0, 0);
+	      offset.x = -1 * this._center[0];
+	      offset.y = -1 * this._center[1];
+	
+	      // TODO: Wrap into a helper method so this isn't duplicated in the non-tiled
+	      // GeoJSON output layer
+	      //
+	      // Need to be careful as to not make it impossible to fork this off into a
+	      // worker script at a later stage
+	      //
+	      // Also unsure as to whether it's wise to lump so much into a black box
+	      //
+	      // var meshes = GeoJSON.createMeshes(features, offset, style);
 	
 	      var polygons = {
 	        vertices: [],
@@ -11800,15 +11706,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        verticesCount: 0
 	      };
 	
-	      // Polygon variables
-	      var earcutData;
-	      var faces;
-	
 	      var colour = new _three2['default'].Color();
-	
-	      // Light and dark colours used for poor-mans AO gradient on object sides
-	      var light = new _three2['default'].Color(0xffffff);
-	      var shadow = new _three2['default'].Color(0x666666);
 	
 	      features.forEach(function (feature) {
 	        // feature.geometry, feature.properties
@@ -11822,8 +11720,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        // Get style object, if provided
-	        if (typeof _this6._options.style === 'function') {
-	          style = (0, _lodashAssign2['default'])(_this6._defaultStyle, _this6._options.style(feature));
+	        if (typeof _this3._options.style === 'function') {
+	          style = (0, _lodashAssign2['default'])(_this3._defaultStyle, _this3._options.style(feature));
 	        }
 	
 	        var coordinates = feature.geometry.coordinates;
@@ -11832,21 +11730,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (feature.geometry.type === 'LineString') {
 	          colour.set(style.lineColor);
 	
-	          var linestringResults = _this6._processLineString(coordinates, colour);
+	          coordinates = coordinates.map(function (coordinate) {
+	            var latlon = (0, _geoLatLon2['default'])(coordinate[1], coordinate[0]);
+	            var point = _this3._layer._world.latLonToPoint(latlon);
+	            return [point.x, point.y];
+	          });
 	
-	          lines.vertices.push(linestringResults[0]);
-	          lines.colours.push(linestringResults[1]);
-	          lines.verticesCount += linestringResults[0].length;
+	          var linestringAttributes = _utilGeoJSON2['default'].lineStringAttributes(coordinates, colour);
+	
+	          lines.vertices.push(linestringAttributes.vertices);
+	          lines.colours.push(linestringAttributes.colours);
+	          lines.verticesCount += linestringAttributes.vertices.length;
 	        }
 	
 	        if (feature.geometry.type === 'MultiLineString') {
 	          colour.set(style.lineColor);
 	
-	          var multiLinestringResults = _this6._processMultiLineString(coordinates, colour);
+	          coordinates = coordinates.map(function (_coordinates) {
+	            return _coordinates.map(function (coordinate) {
+	              var latlon = (0, _geoLatLon2['default'])(coordinate[1], coordinate[0]);
+	              var point = _this3._layer._world.latLonToPoint(latlon);
+	              return [point.x, point.y];
+	            });
+	          });
 	
-	          lines.vertices.push(multiLinestringResults[0]);
-	          lines.colours.push(multiLinestringResults[1]);
-	          lines.verticesCount += multiLinestringResults[0].length;
+	          var multiLinestringAttributes = _utilGeoJSON2['default'].multiLineStringAttributes(coordinates, colour);
+	
+	          lines.vertices.push(multiLinestringAttributes.vertices);
+	          lines.colours.push(multiLinestringAttributes.colours);
+	          lines.verticesCount += multiLinestringAttributes.vertices.length;
 	        }
 	
 	        if (feature.geometry.type === 'Polygon') {
@@ -11855,10 +11767,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	          coordinates = coordinates.map(function (ring) {
 	            return ring.map(function (coordinate) {
 	              var latlon = (0, _geoLatLon2['default'])(coordinate[1], coordinate[0]);
-	              var point = _this6._layer._world.latLonToPoint(latlon);
+	              var point = _this3._layer._world.latLonToPoint(latlon);
 	              return [point.x, point.y];
 	            });
 	          });
+	
+	          var height = 0;
+	
+	          if (style.height) {
+	            height = _this3._world.metresToWorld(style.height, _this3._pointScale);
+	          }
 	
 	          // Draw footprint on shadow canvas
 	          //
@@ -11866,80 +11784,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	          // a worker
 	          // this._addShadow(coordinates);
 	
-	          earcutData = _this6._toEarcut(coordinates);
+	          var polygonAttributes = _utilGeoJSON2['default'].polygonAttributes(coordinates, colour, height);
 	
-	          faces = _this6._triangulate(earcutData.vertices, earcutData.holes, earcutData.dimensions);
+	          polygons.vertices.push(polygonAttributes.vertices);
+	          polygons.faces.push(polygonAttributes.faces);
+	          polygons.colours.push(polygonAttributes.colours);
 	
-	          var groupedVertices = [];
-	          for (i = 0, il = earcutData.vertices.length; i < il; i += earcutData.dimensions) {
-	            groupedVertices.push(earcutData.vertices.slice(i, i + earcutData.dimensions));
+	          if (polygons.allFlat && !polygonAttributes.flat) {
+	            polygons.allFlat = false;
 	          }
 	
-	          var height = 0;
-	
-	          if (style.height) {
-	            height = _this6._world.metresToWorld(style.height, _this6._pointScale);
-	          }
-	
-	          var extruded = (0, _utilExtrudePolygon2['default'])(groupedVertices, faces, {
-	            bottom: 0,
-	            top: height
-	          });
-	
-	          var topColor = colour.clone().multiply(light);
-	          var bottomColor = colour.clone().multiply(shadow);
-	
-	          var _faces = [];
-	          var _colours = [];
-	
-	          polygons.vertices.push(extruded.positions);
-	
-	          var _colour;
-	          extruded.top.forEach(function (face, fi) {
-	            _colour = [];
-	
-	            _colour.push([colour.r, colour.g, colour.b]);
-	            _colour.push([colour.r, colour.g, colour.b]);
-	            _colour.push([colour.r, colour.g, colour.b]);
-	
-	            _faces.push(face);
-	            _colours.push(_colour);
-	          });
-	
-	          if (extruded.sides) {
-	            if (polygons.allFlat) {
-	              polygons.allFlat = false;
-	            }
-	
-	            // Set up colours for every vertex with poor-mans AO on the sides
-	            extruded.sides.forEach(function (face, fi) {
-	              _colour = [];
-	
-	              // First face is always bottom-bottom-top
-	              if (fi % 2 === 0) {
-	                _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-	                _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-	                _colour.push([topColor.r, topColor.g, topColor.b]);
-	                // Reverse winding for the second face
-	                // top-top-bottom
-	              } else {
-	                  _colour.push([topColor.r, topColor.g, topColor.b]);
-	                  _colour.push([topColor.r, topColor.g, topColor.b]);
-	                  _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-	                }
-	
-	              _faces.push(face);
-	              _colours.push(_colour);
-	            });
-	          }
-	
-	          // Skip bottom as there's no point rendering it
-	          // allFaces.push(extruded.faces);
-	
-	          polygons.faces.push(_faces);
-	          polygons.colours.push(_colours);
-	
-	          polygons.facesCount += _faces.length;
+	          polygons.facesCount += polygonAttributes.faces.length;
 	        }
 	      });
 	
@@ -11990,44 +11845,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // Output lines
 	      if (lines.vertices.length > 0) {
-	        var geometry = new _three2['default'].BufferGeometry();
-	
-	        var vertices = new Float32Array(lines.verticesCount * 3);
-	        var colours = new Float32Array(lines.verticesCount * 3);
-	
-	        var _vertices;
-	        var _colour;
-	
-	        var lastIndex = 0;
-	
-	        for (var i = 0; i < lines.vertices.length; i++) {
-	          _vertices = lines.vertices[i];
-	          _colour = lines.colours[i];
-	
-	          for (var j = 0; j < _vertices.length; j++) {
-	            var ax = _vertices[j][0] + offset.x;
-	            var ay = _vertices[j][1];
-	            var az = _vertices[j][2] + offset.y;
-	
-	            var c1 = _colour[j];
-	
-	            vertices[lastIndex * 3 + 0] = ax;
-	            vertices[lastIndex * 3 + 1] = ay;
-	            vertices[lastIndex * 3 + 2] = az;
-	
-	            colours[lastIndex * 3 + 0] = c1[0];
-	            colours[lastIndex * 3 + 1] = c1[1];
-	            colours[lastIndex * 3 + 2] = c1[2];
-	
-	            lastIndex++;
-	          }
-	        }
-	
-	        // itemSize = 3 because there are 3 values (components) per vertex
-	        geometry.addAttribute('position', new _three2['default'].BufferAttribute(vertices, 3));
-	        geometry.addAttribute('color', new _three2['default'].BufferAttribute(colours, 3));
-	
-	        geometry.computeBoundingBox();
+	        var geometry = _utilBuffer2['default'].createLineGeometry(lines, offset);
 	
 	        var material = new _three2['default'].LineBasicMaterial({
 	          vertexColors: _three2['default'].VertexColors,
@@ -12051,118 +11869,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // Output polygons
 	      if (polygons.facesCount > 0) {
-	        var geometry = new _three2['default'].BufferGeometry();
-	
-	        // Three components per vertex per face (3 x 3 = 9)
-	        var vertices = new Float32Array(polygons.facesCount * 9);
-	        var normals = new Float32Array(polygons.facesCount * 9);
-	        var colours = new Float32Array(polygons.facesCount * 9);
-	
-	        var pA = new _three2['default'].Vector3();
-	        var pB = new _three2['default'].Vector3();
-	        var pC = new _three2['default'].Vector3();
-	
-	        var cb = new _three2['default'].Vector3();
-	        var ab = new _three2['default'].Vector3();
-	
-	        var index;
-	        var _faces;
-	        var _vertices;
-	        var _colour;
-	        var lastIndex = 0;
-	        for (var i = 0; i < polygons.faces.length; i++) {
-	          _faces = polygons.faces[i];
-	          _vertices = polygons.vertices[i];
-	          _colour = polygons.colours[i];
-	
-	          for (var j = 0; j < _faces.length; j++) {
-	            // Array of vertex indexes for the face
-	            index = _faces[j][0];
-	
-	            var ax = _vertices[index][0] + offset.x;
-	            var ay = _vertices[index][1];
-	            var az = _vertices[index][2] + offset.y;
-	
-	            var c1 = _colour[j][0];
-	
-	            index = _faces[j][1];
-	
-	            var bx = _vertices[index][0] + offset.x;
-	            var by = _vertices[index][1];
-	            var bz = _vertices[index][2] + offset.y;
-	
-	            var c2 = _colour[j][1];
-	
-	            index = _faces[j][2];
-	
-	            var cx = _vertices[index][0] + offset.x;
-	            var cy = _vertices[index][1];
-	            var cz = _vertices[index][2] + offset.y;
-	
-	            var c3 = _colour[j][2];
-	
-	            // Flat face normals
-	            // From: http://threejs.org/examples/webgl_buffergeometry.html
-	            pA.set(ax, ay, az);
-	            pB.set(bx, by, bz);
-	            pC.set(cx, cy, cz);
-	
-	            cb.subVectors(pC, pB);
-	            ab.subVectors(pA, pB);
-	            cb.cross(ab);
-	
-	            cb.normalize();
-	
-	            var nx = cb.x;
-	            var ny = cb.y;
-	            var nz = cb.z;
-	
-	            vertices[lastIndex * 9 + 0] = ax;
-	            vertices[lastIndex * 9 + 1] = ay;
-	            vertices[lastIndex * 9 + 2] = az;
-	
-	            normals[lastIndex * 9 + 0] = nx;
-	            normals[lastIndex * 9 + 1] = ny;
-	            normals[lastIndex * 9 + 2] = nz;
-	
-	            colours[lastIndex * 9 + 0] = c1[0];
-	            colours[lastIndex * 9 + 1] = c1[1];
-	            colours[lastIndex * 9 + 2] = c1[2];
-	
-	            vertices[lastIndex * 9 + 3] = bx;
-	            vertices[lastIndex * 9 + 4] = by;
-	            vertices[lastIndex * 9 + 5] = bz;
-	
-	            normals[lastIndex * 9 + 3] = nx;
-	            normals[lastIndex * 9 + 4] = ny;
-	            normals[lastIndex * 9 + 5] = nz;
-	
-	            colours[lastIndex * 9 + 3] = c2[0];
-	            colours[lastIndex * 9 + 4] = c2[1];
-	            colours[lastIndex * 9 + 5] = c2[2];
-	
-	            vertices[lastIndex * 9 + 6] = cx;
-	            vertices[lastIndex * 9 + 7] = cy;
-	            vertices[lastIndex * 9 + 8] = cz;
-	
-	            normals[lastIndex * 9 + 6] = nx;
-	            normals[lastIndex * 9 + 7] = ny;
-	            normals[lastIndex * 9 + 8] = nz;
-	
-	            colours[lastIndex * 9 + 6] = c3[0];
-	            colours[lastIndex * 9 + 7] = c3[1];
-	            colours[lastIndex * 9 + 8] = c3[2];
-	
-	            lastIndex++;
-	          }
-	        }
-	
-	        // itemSize = 3 because there are 3 values (components) per vertex
-	        geometry.addAttribute('position', new _three2['default'].BufferAttribute(vertices, 3));
-	        geometry.addAttribute('normal', new _three2['default'].BufferAttribute(normals, 3));
-	        geometry.addAttribute('color', new _three2['default'].BufferAttribute(colours, 3));
-	
-	        geometry.computeBoundingBox();
+	        var geometry = _utilBuffer2['default'].createGeometry(polygons, offset);
 	
 	        var material;
 	        if (!this._world._environment._skybox) {
@@ -12197,43 +11904,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._ready = true;
 	      console.timeEnd(this._tile);
 	      console.log(this._tile + ': ' + features.length + ' features');
-	    }
-	  }, {
-	    key: '_toEarcut',
-	    value: function _toEarcut(data) {
-	      var dim = data[0][0].length;
-	      var result = { vertices: [], holes: [], dimensions: dim };
-	      var holeIndex = 0;
-	
-	      for (var i = 0; i < data.length; i++) {
-	        for (var j = 0; j < data[i].length; j++) {
-	          for (var d = 0; d < dim; d++) {
-	            result.vertices.push(data[i][j][d]);
-	          }
-	        }
-	        if (i > 0) {
-	          holeIndex += data[i - 1].length;
-	          result.holes.push(holeIndex);
-	        }
-	      }
-	
-	      return result;
-	    }
-	  }, {
-	    key: '_triangulate',
-	    value: function _triangulate(contour, holes, dim) {
-	      // console.time('earcut');
-	
-	      var faces = (0, _earcut2['default'])(contour, holes, dim);
-	      var result = [];
-	
-	      for (i = 0, il = faces.length; i < il; i += 3) {
-	        result.push(faces.slice(i, i + 3));
-	      }
-	
-	      // console.timeEnd('earcut');
-	
-	      return result;
 	    }
 	  }, {
 	    key: '_abortRequest',
@@ -12902,6 +12572,251 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	/*
+	 * GeoJSON helpers for handling data and generating objects
+	 */
+	
+	var _three = __webpack_require__(24);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var _topojson2 = __webpack_require__(58);
+	
+	var _topojson3 = _interopRequireDefault(_topojson2);
+	
+	var _geojsonMerge = __webpack_require__(59);
+	
+	var _geojsonMerge2 = _interopRequireDefault(_geojsonMerge);
+	
+	var _earcut = __webpack_require__(61);
+	
+	var _earcut2 = _interopRequireDefault(_earcut);
+	
+	var _extrudePolygon = __webpack_require__(62);
+	
+	var _extrudePolygon2 = _interopRequireDefault(_extrudePolygon);
+	
+	// Light and dark colours used for poor-mans AO gradient on object sides
+	var light = new _three2['default'].Color(0xffffff);
+	var shadow = new _three2['default'].Color(0x666666);
+	
+	var GeoJSON = (function () {
+	  // Attempts to merge together multiple GeoJSON Features or FeatureCollections
+	  // into a single FeatureCollection
+	  var mergeFeatures = function mergeFeatures(data, _topojson) {
+	    var collections = [];
+	
+	    if (_topojson) {
+	      // TODO: Allow TopoJSON objects to be overridden as an option
+	
+	      // If not overridden, merge all features from all objects
+	      for (var tk in data.objects) {
+	        collections.push(_topojson3['default'].feature(data, data.objects[tk]));
+	      }
+	
+	      return (0, _geojsonMerge2['default'])(collections);
+	    } else {
+	      // If root doesn't have a type then let's see if there are features in the
+	      // next step down
+	      if (!data.type) {
+	        // TODO: Allow GeoJSON objects to be overridden as an option
+	
+	        // If not overridden, merge all features from all objects
+	        for (var gk in data) {
+	          if (!data[gk].type) {
+	            continue;
+	          }
+	
+	          collections.push(data[gk]);
+	        }
+	
+	        return (0, _geojsonMerge2['default'])(collections);
+	      } else {
+	        return (0, _geojsonMerge2['default'])(data);
+	      }
+	    }
+	  };
+	
+	  var lineStringAttributes = function lineStringAttributes(coordinates, colour) {
+	    var _coords = [];
+	    var _colours = [];
+	
+	    var nextCoord;
+	
+	    // Connect coordinate with the next to make a pair
+	    //
+	    // LineSegments requires pairs of vertices so repeat the last point if
+	    // there's an odd number of vertices
+	    coordinates.forEach(function (coordinate, index) {
+	      // TODO: Don't hardcode y-value
+	      _colours.push([colour.r, colour.g, colour.b]);
+	      _coords.push([coordinate[0], 0, coordinate[1]]);
+	
+	      nextCoord = coordinates[index + 1] ? coordinates[index + 1] : coordinate;
+	
+	      _colours.push([colour.r, colour.g, colour.b]);
+	      _coords.push([nextCoord[0], 0, nextCoord[1]]);
+	    });
+	
+	    return {
+	      vertices: _coords,
+	      colours: _colours
+	    };
+	  };
+	
+	  var multiLineStringAttributes = function multiLineStringAttributes(coordinates, colour) {
+	    var _coords = [];
+	    var _colours = [];
+	
+	    var result;
+	    coordinates.forEach(function (coordinate) {
+	      result = lineStringAttributes(coordinate, colour);
+	
+	      result.vertices.forEach(function (coord) {
+	        _coords.push(coord);
+	      });
+	
+	      result.colours.forEach(function (colour) {
+	        _colours.push(colour);
+	      });
+	    });
+	
+	    return {
+	      vertices: _coords,
+	      colours: _colours
+	    };
+	  };
+	
+	  var polygonAttributes = function polygonAttributes(coordinates, colour, height) {
+	    var earcutData = _toEarcut(coordinates);
+	
+	    var faces = _triangulate(earcutData.vertices, earcutData.holes, earcutData.dimensions);
+	
+	    var groupedVertices = [];
+	    for (i = 0, il = earcutData.vertices.length; i < il; i += earcutData.dimensions) {
+	      groupedVertices.push(earcutData.vertices.slice(i, i + earcutData.dimensions));
+	    }
+	
+	    var extruded = (0, _extrudePolygon2['default'])(groupedVertices, faces, {
+	      bottom: 0,
+	      top: height
+	    });
+	
+	    var topColor = colour.clone().multiply(light);
+	    var bottomColor = colour.clone().multiply(shadow);
+	
+	    var _vertices = extruded.positions;
+	    var _faces = [];
+	    var _colours = [];
+	
+	    var _colour;
+	    extruded.top.forEach(function (face, fi) {
+	      _colour = [];
+	
+	      _colour.push([colour.r, colour.g, colour.b]);
+	      _colour.push([colour.r, colour.g, colour.b]);
+	      _colour.push([colour.r, colour.g, colour.b]);
+	
+	      _faces.push(face);
+	      _colours.push(_colour);
+	    });
+	
+	    var allFlat = true;
+	
+	    if (extruded.sides) {
+	      if (allFlat) {
+	        allFlat = false;
+	      }
+	
+	      // Set up colours for every vertex with poor-mans AO on the sides
+	      extruded.sides.forEach(function (face, fi) {
+	        _colour = [];
+	
+	        // First face is always bottom-bottom-top
+	        if (fi % 2 === 0) {
+	          _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+	          _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+	          _colour.push([topColor.r, topColor.g, topColor.b]);
+	          // Reverse winding for the second face
+	          // top-top-bottom
+	        } else {
+	            _colour.push([topColor.r, topColor.g, topColor.b]);
+	            _colour.push([topColor.r, topColor.g, topColor.b]);
+	            _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+	          }
+	
+	        _faces.push(face);
+	        _colours.push(_colour);
+	      });
+	    }
+	
+	    // Skip bottom as there's no point rendering it
+	    // allFaces.push(extruded.faces);
+	
+	    return {
+	      vertices: _vertices,
+	      faces: _faces,
+	      colours: _colours,
+	      flat: allFlat
+	    };
+	  };
+	
+	  var _toEarcut = function _toEarcut(data) {
+	    var dim = data[0][0].length;
+	    var result = { vertices: [], holes: [], dimensions: dim };
+	    var holeIndex = 0;
+	
+	    for (var i = 0; i < data.length; i++) {
+	      for (var j = 0; j < data[i].length; j++) {
+	        for (var d = 0; d < dim; d++) {
+	          result.vertices.push(data[i][j][d]);
+	        }
+	      }
+	      if (i > 0) {
+	        holeIndex += data[i - 1].length;
+	        result.holes.push(holeIndex);
+	      }
+	    }
+	
+	    return result;
+	  };
+	
+	  var _triangulate = function _triangulate(contour, holes, dim) {
+	    // console.time('earcut');
+	
+	    var faces = (0, _earcut2['default'])(contour, holes, dim);
+	    var result = [];
+	
+	    for (i = 0, il = faces.length; i < il; i += 3) {
+	      result.push(faces.slice(i, i + 3));
+	    }
+	
+	    // console.timeEnd('earcut');
+	
+	    return result;
+	  };
+	
+	  return {
+	    mergeFeatures: mergeFeatures,
+	    lineStringAttributes: lineStringAttributes,
+	    multiLineStringAttributes: multiLineStringAttributes,
+	    polygonAttributes: polygonAttributes
+	  };
+	})();
+	
+	exports['default'] = GeoJSON;
+	module.exports = exports['default'];
+
+/***/ },
+/* 58 */
+/***/ function(module, exports, __webpack_require__) {
+
 	(function (global, factory) {
 	   true ? factory(exports) :
 	  typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -13452,7 +13367,72 @@ return /******/ (function(modules) { // webpackBootstrap
 	}));
 
 /***/ },
-/* 58 */
+/* 59 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var normalize = __webpack_require__(60);
+	
+	module.exports = function(inputs) {
+	    return {
+	        type: 'FeatureCollection',
+	        features: inputs.reduce(function(memo, input) {
+	            return memo.concat(normalize(input).features);
+	        }, [])
+	    };
+	};
+
+
+/***/ },
+/* 60 */
+/***/ function(module, exports) {
+
+	module.exports = normalize;
+	
+	var types = {
+	    Point: 'geometry',
+	    MultiPoint: 'geometry',
+	    LineString: 'geometry',
+	    MultiLineString: 'geometry',
+	    Polygon: 'geometry',
+	    MultiPolygon: 'geometry',
+	    GeometryCollection: 'geometry',
+	    Feature: 'feature',
+	    FeatureCollection: 'featurecollection'
+	};
+	
+	/**
+	 * Normalize a GeoJSON feature into a FeatureCollection.
+	 *
+	 * @param {object} gj geojson data
+	 * @returns {object} normalized geojson data
+	 */
+	function normalize(gj) {
+	    if (!gj || !gj.type) return null;
+	    var type = types[gj.type];
+	    if (!type) return null;
+	
+	    if (type === 'geometry') {
+	        return {
+	            type: 'FeatureCollection',
+	            features: [{
+	                type: 'Feature',
+	                properties: {},
+	                geometry: gj
+	            }]
+	        };
+	    } else if (type === 'feature') {
+	        return {
+	            type: 'FeatureCollection',
+	            features: [gj]
+	        };
+	    } else if (type === 'featurecollection') {
+	        return gj;
+	    }
+	}
+
+
+/***/ },
+/* 61 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -14042,7 +14022,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 59 */
+/* 62 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -14141,1037 +14121,195 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 60 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var GreinerHormann = __webpack_require__(61);
-	var Edge = __webpack_require__(66);
-	var intersection = __webpack_require__(67);
-	
-	"use strict";
-	
-	var min = Math.min,
-	    max = Math.max,
-	    atan2 = Math.atan2;
-	
-	/**
-	 * Offset builder
-	 *
-	 * @param {Array.<Object>=} vertices
-	 * @param {Number=}        arcSegments
-	 * @constructor
-	 */
-	function Offset(vertices, arcSegments) {
-	
-	    /**
-	     * @type {Array.<Object>}
-	     */
-	    this.vertices = null;
-	
-	    /**
-	     * @type {Array.<Edge>}
-	     */
-	    this.edges = null;
-	
-	    /**
-	     * @type {Boolean}
-	     */
-	    this._closed = false;
-	
-	    if (vertices) {
-	        this.data(vertices);
-	    }
-	
-	    /**
-	     * Segments in edge bounding arches
-	     * @type {Number}
-	     */
-	    this._arcSegments = arcSegments || 5;
-	};
-	
-	/**
-	 * Change data set
-	 * @param  {Array.<Array>} vertices
-	 * @return {Offset}
-	 */
-	Offset.prototype.data = function(vertices) {
-	    vertices = this.validate(vertices);
-	
-	    var edges = [];
-	    for (var i = 0, len = vertices.length; i < len; i++) {
-	        edges.push(new Edge(vertices[i], vertices[(i + 1) % len]));
-	    }
-	
-	    this.vertices = vertices;
-	    this.edges = edges;
-	    return this;
-	};
-	
-	/**
-	 * @param  {Number} arcSegments
-	 * @return {Offset}
-	 */
-	Offset.prototype.arcSegments = function(arcSegments) {
-	    this._arcSegments = arcSegments;
-	    return this;
-	};
-	
-	/**
-	 * Validates if the first and last points repeat
-	 * TODO: check CCW
-	 *
-	 * @param  {Array.<Object>} vertices
-	 */
-	Offset.prototype.validate = function(vertices) {
-	    var len = vertices.length;
-	    if (vertices[0][0] === vertices[len - 1][0] &&
-	        vertices[0][1] === vertices[len - 1][1]) {
-	        vertices = vertices.slice(0, len - 1);
-	        this._closed = true;
-	    }
-	    return vertices;
-	};
-	
-	/**
-	 * Creates arch between two edges
-	 *
-	 * @param  {Array.<Object>} vertices
-	 * @param  {Object}         center
-	 * @param  {Number}         radius
-	 * @param  {Object}         startVertex
-	 * @param  {Object}         endVertex
-	 * @param  {Number}         segments
-	 * @param  {Boolean}        outwards
-	 */
-	Offset.prototype.createArc = function(vertices, center, radius, startVertex,
-	    endVertex, segments, outwards) {
-	
-	    var PI2 = Math.PI * 2,
-	        startAngle = atan2(startVertex[1] - center[1], startVertex[0] - center[0]),
-	        endAngle = atan2(endVertex[1] - center[1], endVertex[0] - center[0]);
-	
-	    // odd number please
-	    if (segments % 2 === 0) {
-	        segments -= 1;
-	    }
-	
-	    if (startAngle < 0) {
-	        startAngle += PI2;
-	    }
-	
-	    if (endAngle < 0) {
-	        endAngle += PI2;
-	    }
-	
-	    var angle = ((startAngle > endAngle) ?
-	            (startAngle - endAngle) :
-	            (startAngle + PI2 - endAngle)),
-	        segmentAngle = ((outwards) ? -angle : PI2 - angle) / segments;
-	
-	    vertices.push(startVertex);
-	    for (var i = 1; i < segments; ++i) {
-	        angle = startAngle + segmentAngle * i;
-	        vertices.push([
-	            center[0] + Math.cos(angle) * radius,
-	            center[1] + Math.sin(angle) * radius
-	        ]);
-	    }
-	    vertices.push(endVertex);
-	};
-	
-	/**
-	 * Create padding polygon
-	 *
-	 * @param  {Number} distance
-	 * @return {Array.<Number>}
-	 */
-	Offset.prototype.padding = function(dist) {
-	    var offsetEdges = [],
-	        vertices = [],
-	        i, len, union;
-	
-	    for (i = 0, len = this.edges.length; i < len; i++) {
-	        var edge = this.edges[i],
-	            dx = edge._outNormal[0] * dist,
-	            dy = edge._outNormal[1] * dist;
-	        offsetEdges.push(edge.offset(dx, dy));
-	    }
-	
-	    for (i = 0, len = offsetEdges.length; i < len; i++) {
-	        var thisEdge = offsetEdges[i],
-	            prevEdge = offsetEdges[(i + len - 1) % len],
-	            vertex = intersection(
-	                prevEdge.current,
-	                prevEdge.next,
-	                thisEdge.current,
-	                thisEdge.next);
-	
-	        if (vertex)
-	            vertices.push(vertex);
-	        else {
-	            this.createArc(
-	                vertices,
-	                this.edges[i].current,
-	                dist,
-	                prevEdge.next,
-	                thisEdge.current,
-	                this._arcSegments,
-	                false);
-	        }
-	    }
-	    union = GreinerHormann.union(vertices, vertices);
-	    vertices = union ? union[0] : vertices;
-	
-	    vertices = this.ensureLastPoint(vertices);
-	    return vertices;
-	};
-	
-	/**
-	 * Creates margin polygon
-	 * @param  {Number} dist
-	 * @return {Array.<Object>}
-	 */
-	Offset.prototype.margin = function(dist) {
-	    var offsetEdges = [],
-	        vertices = [],
-	        i, len, union;
-	    for (i = 0, len = this.edges.length; i < len; i++) {
-	        var edge = this.edges[i],
-	            dx = edge._inNormal[0] * dist,
-	            dy = edge._inNormal[1] * dist;
-	
-	        offsetEdges.push(edge.offset(dx, dy));
-	    }
-	
-	    for (i = 0, len = offsetEdges.length; i < len; i++) {
-	        var thisEdge = offsetEdges[i],
-	            prevEdge = offsetEdges[(i + len - 1) % len],
-	            vertex = intersection(
-	                prevEdge.current,
-	                prevEdge.next,
-	                thisEdge.current,
-	                thisEdge.next
-	            );
-	
-	        if (vertex) {
-	            vertices.push(vertex);
-	        } else {
-	            this.createArc(
-	                vertices,
-	                this.edges[i].current,
-	                dist,
-	                prevEdge.next,
-	                thisEdge.current,
-	                this._arcSegments,
-	                true
-	            );
-	        }
-	    }
-	
-	    union = GreinerHormann.union(vertices, vertices);
-	    if (union) {
-	        union = union[0];
-	        // that's the toll
-	        vertices = union.slice(0, union.length / 2);
-	    }
-	
-	    vertices = this.ensureLastPoint(vertices);
-	    return vertices;
-	};
-	
-	/**
-	 * @param  {Array.<Object>} vertices
-	 * @return {Array.<Object>}
-	 */
-	Offset.prototype.ensureLastPoint = function(vertices) {
-	    if (this._closed) {
-	        vertices.push([
-	            vertices[0][0],
-	            vertices[0][1]
-	        ]);
-	    }
-	    return vertices;
-	};
-	
-	/**
-	 * Decides by the sign if it's a padding or a margin
-	 *
-	 * @param  {Number} dist
-	 * @return {Array.<Object>}
-	 */
-	Offset.prototype.offset = function(dist) {
-	    return dist === 0 ?
-	        this.vertices :
-	        (dist > 0 ? this.margin(dist) : this.padding(-dist));
-	};
-	
-	module.exports = Offset;
-
-
-/***/ },
-/* 61 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var clip = __webpack_require__(62);
-	
-	module.exports = {
-	    /**
-	     * @api
-	     * @param  {Array.<Array.<Number>|Array.<Object>} polygonA
-	     * @param  {Array.<Array.<Number>|Array.<Object>} polygonB
-	     * @return {Array.<Array.<Number>>|Array.<Array.<Object>|Null}
-	     */
-	    union: function(polygonA, polygonB) {
-	        return clip(polygonA, polygonB, false, false);
-	    },
-	
-	    /**
-	     * @api
-	     * @param  {Array.<Array.<Number>|Array.<Object>} polygonA
-	     * @param  {Array.<Array.<Number>|Array.<Object>} polygonB
-	     * @return {Array.<Array.<Number>>|Array.<Array.<Object>>|Null}
-	     */
-	    intersection: function(polygonA, polygonB) {
-	        return clip(polygonA, polygonB, true, true);
-	    },
-	
-	    /**
-	     * @api
-	     * @param  {Array.<Array.<Number>|Array.<Object>} polygonA
-	     * @param  {Array.<Array.<Number>|Array.<Object>} polygonB
-	     * @return {Array.<Array.<Number>>|Array.<Array.<Object>>|Null}
-	     */
-	    diff: function(polygonA, polygonB) {
-	        return clip(polygonA, polygonB, false, true);
-	    },
-	
-	    clip: clip
-	};
-
-
-/***/ },
-/* 62 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Polygon = __webpack_require__(63);
-	
-	/**
-	 * Clip driver
-	 * @api
-	 * @param  {Array.<Array.<Number>>} polygonA
-	 * @param  {Array.<Array.<Number>>} polygonB
-	 * @param  {Boolean}                sourceForwards
-	 * @param  {Boolean}                clipForwards
-	 * @return {Array.<Array.<Number>>}
-	 */
-	module.exports = function(polygonA, polygonB, eA, eB) {
-	    var result, source = new Polygon(polygonA),
-	        clip = new Polygon(polygonB),
-	        result = source.clip(clip, eA, eB);
-	
-	    return result;
-	};
-
-
-/***/ },
 /* 63 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Vertex = __webpack_require__(64);
-	var Intersection = __webpack_require__(65);
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
 	
-	/**
-	 * Polygon representation
-	 * @param {Array.<Array.<Number>>} p
-	 * @param {Boolean=}               arrayVertices
-	 *
-	 * @constructor
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	/*
+	 * BufferGeometry helpers
 	 */
-	var Polygon = function(p, arrayVertices) {
 	
-	    /**
-	     * @type {Vertex}
-	     */
-	    this.first = null;
+	var _three = __webpack_require__(24);
 	
-	    /**
-	     * @type {Number}
-	     */
-	    this.vertices = 0;
+	var _three2 = _interopRequireDefault(_three);
 	
-	    /**
-	     * @type {Vertex}
-	     */
-	    this._lastUnprocessed = null;
+	var Buffer = (function () {
+	  var createLineGeometry = function createLineGeometry(lines, offset) {
+	    var geometry = new _three2['default'].BufferGeometry();
 	
-	    /**
-	     * Whether to handle input and output as [x,y] or {x:x,y:y}
-	     * @type {Boolean}
-	     */
-	    this._arrayVertices = (typeof arrayVertices === "undefined") ?
-	        Array.isArray(p[0]) :
-	        arrayVertices;
+	    var vertices = new Float32Array(lines.verticesCount * 3);
+	    var colours = new Float32Array(lines.verticesCount * 3);
 	
-	    for (var i = 0, len = p.length; i < len; i++) {
-	        this.addVertex(new Vertex(p[i]));
-	    }
-	};
+	    var _vertices;
+	    var _colour;
 	
-	/**
-	 * Add a vertex object to the polygon
-	 * (vertex is added at the 'end' of the list')
-	 *
-	 * @param vertex
-	 */
-	Polygon.prototype.addVertex = function(vertex) {
-	    if (this.first == null) {
-	        this.first = vertex;
-	        this.first.next = vertex;
-	        this.first.prev = vertex;
-	    } else {
-	        var next = this.first,
-	            prev = next.prev;
+	    var lastIndex = 0;
 	
-	        next.prev = vertex;
-	        vertex.next = next;
-	        vertex.prev = prev;
-	        prev.next = vertex;
-	    }
-	    this.vertices++;
-	};
+	    for (var i = 0; i < lines.vertices.length; i++) {
+	      _vertices = lines.vertices[i];
+	      _colour = lines.colours[i];
 	
-	/**
-	 * Inserts a vertex inbetween start and end
-	 *
-	 * @param {Vertex} vertex
-	 * @param {Vertex} start
-	 * @param {Vertex} end
-	 */
-	Polygon.prototype.insertVertex = function(vertex, start, end) {
-	    var prev, curr = start;
+	      for (var j = 0; j < _vertices.length; j++) {
+	        var ax = _vertices[j][0] + offset.x;
+	        var ay = _vertices[j][1];
+	        var az = _vertices[j][2] + offset.y;
 	
-	    while (!curr.equals(end) && curr._distance < vertex._distance) {
-	        curr = curr.next;
+	        var c1 = _colour[j];
+	
+	        vertices[lastIndex * 3 + 0] = ax;
+	        vertices[lastIndex * 3 + 1] = ay;
+	        vertices[lastIndex * 3 + 2] = az;
+	
+	        colours[lastIndex * 3 + 0] = c1[0];
+	        colours[lastIndex * 3 + 1] = c1[1];
+	        colours[lastIndex * 3 + 2] = c1[2];
+	
+	        lastIndex++;
+	      }
 	    }
 	
-	    vertex.next = curr;
-	    prev = curr.prev;
+	    // itemSize = 3 because there are 3 values (components) per vertex
+	    geometry.addAttribute('position', new _three2['default'].BufferAttribute(vertices, 3));
+	    geometry.addAttribute('color', new _three2['default'].BufferAttribute(colours, 3));
 	
-	    vertex.prev = prev;
-	    prev.next = vertex;
-	    curr.prev = vertex;
+	    geometry.computeBoundingBox();
 	
-	    this.vertices++;
-	};
+	    return geometry;
+	  };
 	
-	/**
-	 * Get next non-intersection point
-	 * @param  {Vertex} v
-	 * @return {Vertex}
-	 */
-	Polygon.prototype.getNext = function(v) {
-	    var c = v;
-	    while (c._isIntersection) {
-	        c = c.next;
-	    }
-	    return c;
-	};
+	  var createGeometry = function createGeometry(attributes, offset) {
+	    var geometry = new _three2['default'].BufferGeometry();
 	
-	/**
-	 * Unvisited intersection
-	 * @return {Vertex}
-	 */
-	Polygon.prototype.getFirstIntersect = function() {
-	    var v = this._firstIntersect || this.first;
+	    // Three components per vertex per face (3 x 3 = 9)
+	    var vertices = new Float32Array(attributes.facesCount * 9);
+	    var normals = new Float32Array(attributes.facesCount * 9);
+	    var colours = new Float32Array(attributes.facesCount * 9);
 	
-	    do {
-	        if (v._isIntersection && !v._visited) {
-	            break;
-	        }
+	    var pA = new _three2['default'].Vector3();
+	    var pB = new _three2['default'].Vector3();
+	    var pC = new _three2['default'].Vector3();
 	
-	        v = v.next;
-	    } while (!v.equals(this.first));
+	    var cb = new _three2['default'].Vector3();
+	    var ab = new _three2['default'].Vector3();
 	
-	    this._firstIntersect = v;
-	    return v;
-	};
+	    var index;
+	    var _faces;
+	    var _vertices;
+	    var _colour;
+	    var lastIndex = 0;
+	    for (var i = 0; i < attributes.faces.length; i++) {
+	      _faces = attributes.faces[i];
+	      _vertices = attributes.vertices[i];
+	      _colour = attributes.colours[i];
 	
-	/**
-	 * Does the polygon have unvisited vertices
-	 * @return {Boolean} [description]
-	 */
-	Polygon.prototype.hasUnprocessed = function() {
-	    var v = this._lastUnprocessed || this.first;
-	    do {
-	        if (v._isIntersection && !v._visited) {
-	            this._lastUnprocessed = v;
-	            return true;
-	        }
+	      for (var j = 0; j < _faces.length; j++) {
+	        // Array of vertex indexes for the face
+	        index = _faces[j][0];
 	
-	        v = v.next;
-	    } while (!v.equals(this.first));
+	        var ax = _vertices[index][0] + offset.x;
+	        var ay = _vertices[index][1];
+	        var az = _vertices[index][2] + offset.y;
 	
-	    this._lastUnprocessed = null;
-	    return false;
-	};
+	        var c1 = _colour[j][0];
 	
-	/**
-	 * The output depends on what you put in, arrays or objects
-	 * @return {Array.<Array<Number>|Array.<Object>}
-	 */
-	Polygon.prototype.getPoints = function() {
-	    var points = [],
-	        v = this.first;
+	        index = _faces[j][1];
 	
-	    if (this._arrayVertices) {
-	        do {
-	            points.push([v.x, v.y]);
-	            v = v.next;
-	        } while (v !== this.first);
-	    } else {
-	        do {
-	            points.push({
-	                x: v.x,
-	                y: v.y
-	            });
-	            v = v.next;
-	        } while (v !== this.first);
-	    }
+	        var bx = _vertices[index][0] + offset.x;
+	        var by = _vertices[index][1];
+	        var bz = _vertices[index][2] + offset.y;
 	
-	    return points;
-	};
+	        var c2 = _colour[j][1];
 	
-	/**
-	 * Clip polygon against another one.
-	 * Result depends on algorithm direction:
-	 *
-	 * Intersection: forwards forwards
-	 * Union:        backwars backwards
-	 * Diff:         backwards forwards
-	 *
-	 * @param {Polygon} clip
-	 * @param {Boolean} sourceForwards
-	 * @param {Boolean} clipForwards
-	 */
-	Polygon.prototype.clip = function(clip, sourceForwards, clipForwards) {
-	    var sourceVertex = this.first,
-	        clipVertex = clip.first,
-	        sourceInClip, clipInSource;
+	        index = _faces[j][2];
 	
-	    // calculate and mark intersections
-	    do {
-	        if (!sourceVertex._isIntersection) {
-	            do {
-	                if (!clipVertex._isIntersection) {
-	                    var i = new Intersection(
-	                        sourceVertex,
-	                        this.getNext(sourceVertex.next),
-	                        clipVertex, clip.getNext(clipVertex.next));
+	        var cx = _vertices[index][0] + offset.x;
+	        var cy = _vertices[index][1];
+	        var cz = _vertices[index][2] + offset.y;
 	
-	                    if (i.valid()) {
-	                        var sourceIntersection =
-	                            Vertex.createIntersection(i.x, i.y, i.toSource),
-	                            clipIntersection =
-	                            Vertex.createIntersection(i.x, i.y, i.toClip);
+	        var c3 = _colour[j][2];
 	
-	                        sourceIntersection._corresponding = clipIntersection;
-	                        clipIntersection._corresponding = sourceIntersection;
+	        // Flat face normals
+	        // From: http://threejs.org/examples/webgl_buffergeometry.html
+	        pA.set(ax, ay, az);
+	        pB.set(bx, by, bz);
+	        pC.set(cx, cy, cz);
 	
-	                        this.insertVertex(
-	                            sourceIntersection,
-	                            sourceVertex,
-	                            this.getNext(sourceVertex.next));
-	                        clip.insertVertex(
-	                            clipIntersection,
-	                            clipVertex,
-	                            clip.getNext(clipVertex.next));
-	                    }
-	                }
-	                clipVertex = clipVertex.next;
-	            } while (!clipVertex.equals(clip.first));
-	        }
+	        cb.subVectors(pC, pB);
+	        ab.subVectors(pA, pB);
+	        cb.cross(ab);
 	
-	        sourceVertex = sourceVertex.next;
-	    } while (!sourceVertex.equals(this.first));
+	        cb.normalize();
 	
-	    // phase two - identify entry/exit points
-	    sourceVertex = this.first;
-	    clipVertex = clip.first;
+	        var nx = cb.x;
+	        var ny = cb.y;
+	        var nz = cb.z;
 	
-	    sourceInClip = sourceVertex.isInside(clip);
-	    clipInSource = clipVertex.isInside(this);
+	        vertices[lastIndex * 9 + 0] = ax;
+	        vertices[lastIndex * 9 + 1] = ay;
+	        vertices[lastIndex * 9 + 2] = az;
 	
-	    sourceForwards ^= sourceInClip;
-	    clipForwards ^= clipInSource;
+	        normals[lastIndex * 9 + 0] = nx;
+	        normals[lastIndex * 9 + 1] = ny;
+	        normals[lastIndex * 9 + 2] = nz;
 	
-	    do {
-	        if (sourceVertex._isIntersection) {
-	            sourceVertex._isEntry = sourceForwards;
-	            sourceForwards = !sourceForwards;
-	        }
-	        sourceVertex = sourceVertex.next;
-	    } while (!sourceVertex.equals(this.first));
+	        colours[lastIndex * 9 + 0] = c1[0];
+	        colours[lastIndex * 9 + 1] = c1[1];
+	        colours[lastIndex * 9 + 2] = c1[2];
 	
-	    do {
-	        if (clipVertex._isIntersection) {
-	            clipVertex._isEntry = clipForwards;
-	            clipForwards = !clipForwards;
-	        }
-	        clipVertex = clipVertex.next;
-	    } while (!clipVertex.equals(clip.first));
+	        vertices[lastIndex * 9 + 3] = bx;
+	        vertices[lastIndex * 9 + 4] = by;
+	        vertices[lastIndex * 9 + 5] = bz;
 	
-	    // phase three - construct a list of clipped polygons
-	    var list = [];
+	        normals[lastIndex * 9 + 3] = nx;
+	        normals[lastIndex * 9 + 4] = ny;
+	        normals[lastIndex * 9 + 5] = nz;
 	
-	    while (this.hasUnprocessed()) {
-	        var current = this.getFirstIntersect(),
-	            // keep format
-	            clipped = new Polygon([], this._arrayVertices);
+	        colours[lastIndex * 9 + 3] = c2[0];
+	        colours[lastIndex * 9 + 4] = c2[1];
+	        colours[lastIndex * 9 + 5] = c2[2];
 	
-	        clipped.addVertex(new Vertex(current.x, current.y));
-	        do {
-	            current.visit();
-	            if (current._isEntry) {
-	                do {
-	                    current = current.next;
-	                    clipped.addVertex(new Vertex(current.x, current.y));
-	                } while (!current._isIntersection);
+	        vertices[lastIndex * 9 + 6] = cx;
+	        vertices[lastIndex * 9 + 7] = cy;
+	        vertices[lastIndex * 9 + 8] = cz;
 	
-	            } else {
-	                do {
-	                    current = current.prev;
-	                    clipped.addVertex(new Vertex(current.x, current.y));
-	                } while (!current._isIntersection);
-	            }
-	            current = current._corresponding;
-	        } while (!current._visited);
+	        normals[lastIndex * 9 + 6] = nx;
+	        normals[lastIndex * 9 + 7] = ny;
+	        normals[lastIndex * 9 + 8] = nz;
 	
-	        list.push(clipped.getPoints());
+	        colours[lastIndex * 9 + 6] = c3[0];
+	        colours[lastIndex * 9 + 7] = c3[1];
+	        colours[lastIndex * 9 + 8] = c3[2];
+	
+	        lastIndex++;
+	      }
 	    }
 	
-	    if (list.length === 0) {
-	        if (sourceInClip) {
-	            list.push(this.getPoints());
-	        }
-	        if (clipInSource) {
-	            list.push(clip.getPoints());
-	        }
-	        if (list.length === 0) {
-	            list = null;
-	        }
-	    }
+	    // itemSize = 3 because there are 3 values (components) per vertex
+	    geometry.addAttribute('position', new _three2['default'].BufferAttribute(vertices, 3));
+	    geometry.addAttribute('normal', new _three2['default'].BufferAttribute(normals, 3));
+	    geometry.addAttribute('color', new _three2['default'].BufferAttribute(colours, 3));
 	
-	    return list;
-	};
+	    geometry.computeBoundingBox();
 	
-	module.exports = Polygon;
-
+	    return geometry;
+	  };
+	
+	  return {
+	    createLineGeometry: createLineGeometry,
+	    createGeometry: createGeometry
+	  };
+	})();
+	
+	exports['default'] = Buffer;
+	module.exports = exports['default'];
 
 /***/ },
 /* 64 */
-/***/ function(module, exports) {
-
-	/**
-	 * Vertex representation
-	 *
-	 * @param {Number|Array.<Number>} x
-	 * @param {Number=}               y
-	 *
-	 * @constructor
-	 */
-	var Vertex = function(x, y) {
-	
-	    if (arguments.length === 1) {
-	        // Coords
-	        if (Array.isArray(x)) {
-	            y = x[1];
-	            x = x[0];
-	        } else {
-	            y = x.y;
-	            x = x.x;
-	        }
-	    }
-	
-	    /**
-	     * X coordinate
-	     * @type {Number}
-	     */
-	    this.x = x;
-	
-	    /**
-	     * Y coordinate
-	     * @type {Number}
-	     */
-	    this.y = y;
-	
-	    /**
-	     * Next node
-	     * @type {Vertex}
-	     */
-	    this.next = null;
-	
-	    /**
-	     * Previous vertex
-	     * @type {Vertex}
-	     */
-	    this.prev = null;
-	
-	    /**
-	     * Corresponding intersection in other polygon
-	     */
-	    this._corresponding = null;
-	
-	    /**
-	     * Distance from previous
-	     */
-	    this._distance = 0.0;
-	
-	    /**
-	     * Entry/exit point in another polygon
-	     * @type {Boolean}
-	     */
-	    this._isEntry = true;
-	
-	    /**
-	     * Intersection vertex flag
-	     * @type {Boolean}
-	     */
-	    this._isIntersection = false;
-	
-	    /**
-	     * Loop check
-	     * @type {Boolean}
-	     */
-	    this._visited = false;
-	};
-	
-	/**
-	 * Creates intersection vertex
-	 * @param  {Number} x
-	 * @param  {Number} y
-	 * @param  {Number} distance
-	 * @return {Vertex}
-	 */
-	Vertex.createIntersection = function(x, y, distance) {
-	    var vertex = new Vertex(x, y);
-	    vertex._distance = distance;
-	    vertex._isIntersection = true;
-	    vertex._isEntry = false;
-	    return vertex;
-	};
-	
-	/**
-	 * Mark as visited
-	 */
-	Vertex.prototype.visit = function() {
-	    this._visited = true;
-	    if (this._corresponding !== null && !this._corresponding._visited) {
-	        this._corresponding.visit();
-	    }
-	};
-	
-	/**
-	 * Convenience
-	 * @param  {Vertex}  v
-	 * @return {Boolean}
-	 */
-	Vertex.prototype.equals = function(v) {
-	    return this.x === v.x && this.y === v.y;
-	};
-	
-	/**
-	 * Check if vertex is inside a polygon by odd-even rule:
-	 * If the number of intersections of a ray out of the point and polygon
-	 * segments is odd - the point is inside.
-	 * @param {Polygon} poly
-	 * @return {Boolean}
-	 */
-	Vertex.prototype.isInside = function(poly) {
-	    var oddNodes = false,
-	        vertex = poly.first,
-	        next = vertex.next,
-	        x = this.x,
-	        y = this.y;
-	
-	    do {
-	        if ((vertex.y < y && next.y >= y ||
-	                next.y < y && vertex.y >= y) &&
-	            (vertex.x <= x || next.x <= x)) {
-	
-	            oddNodes ^= (vertex.x + (y - vertex.y) /
-	                (next.y - vertex.y) * (next.x - vertex.x) < x);
-	        }
-	
-	        vertex = vertex.next;
-	        next = vertex.next || poly.first;
-	    } while (!vertex.equals(poly.first));
-	
-	    return oddNodes;
-	};
-	
-	module.exports = Vertex;
-
-
-/***/ },
-/* 65 */
-/***/ function(module, exports) {
-
-	/**
-	 * Intersection
-	 * @param {Vertex} s1
-	 * @param {Vertex} s2
-	 * @param {Vertex} c1
-	 * @param {Vertex} c2
-	 * @constructor
-	 */
-	var Intersection = function(s1, s2, c1, c2) {
-	
-	    /**
-	     * @type {Number}
-	     */
-	    this.x = 0.0;
-	
-	    /**
-	     * @type {Number}
-	     */
-	    this.y = 0.0;
-	
-	    /**
-	     * @type {Number}
-	     */
-	    this.toSource = 0.0;
-	
-	    /**
-	     * @type {Number}
-	     */
-	    this.toClip = 0.0;
-	
-	    var d = (c2.y - c1.y) * (s2.x - s1.x) - (c2.x - c1.x) * (s2.y - s1.y);
-	
-	    if (d === 0) {
-	        return;
-	    }
-	
-	    /**
-	     * @type {Number}
-	     */
-	    this.toSource = ((c2.x - c1.x) * (s1.y - c1.y) - (c2.y - c1.y) * (s1.x - c1.x)) / d;
-	
-	    /**
-	     * @type {Number}
-	     */
-	    this.toClip = ((s2.x - s1.x) * (s1.y - c1.y) - (s2.y - s1.y) * (s1.x - c1.x)) / d;
-	
-	    if (this.valid()) {
-	        this.x = s1.x + this.toSource * (s2.x - s1.x);
-	        this.y = s1.y + this.toSource * (s2.y - s1.y);
-	    }
-	};
-	
-	/**
-	 * @return {Boolean}
-	 */
-	Intersection.prototype.valid = function() {
-	    return (0 < this.toSource && this.toSource < 1) && (0 < this.toClip && this.toClip < 1);
-	};
-	
-	module.exports = Intersection;
-
-
-/***/ },
-/* 66 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	/**
-	 * Offset edge of the polygon
-	 *
-	 * @param  {Object} current
-	 * @param  {Object} next
-	 * @cosntructor
-	 */
-	function Edge(current, next) {
-	
-	    /**
-	     * @type {Object}
-	     */
-	    this.current = current;
-	
-	    /**
-	     * @type {Object}
-	     */
-	    this.next = next;
-	
-	    /**
-	     * @type {Object}
-	     */
-	    this._inNormal = this.inwardsNormal();
-	
-	    /**
-	     * @type {Object}
-	     */
-	    this._outNormal = this.outwardsNormal();
-	};
-	
-	/**
-	 * Creates outwards normal
-	 * @return {Object}
-	 */
-	Edge.prototype.outwardsNormal = function() {
-	    var inwards = this.inwardsNormal();
-	    return [
-	        -inwards[0],
-	        -inwards[1]
-	    ];
-	};
-	
-	/**
-	 * Creates inwards normal
-	 * @return {Object}
-	 */
-	Edge.prototype.inwardsNormal = function() {
-	    var dx = this.next[0] - this.current[0],
-	        dy = this.next[1] - this.current[1],
-	        edgeLength = Math.sqrt(dx * dx + dy * dy);
-	
-	    return [
-	        -dy / edgeLength,
-	        dx / edgeLength
-	    ];
-	};
-	
-	/**
-	 * Offsets the edge by dx, dy
-	 * @param  {Number} dx
-	 * @param  {Number} dy
-	 * @return {Edge}
-	 */
-	Edge.prototype.offset = function(dx, dy) {
-	    var current = this.current,
-	        next = this.next;
-	
-	    return new Edge([
-	        current[0] + dx,
-	        current[1] + dy
-	    ], [
-	        next[0] + dx,
-	        next[1] + dy
-	    ]);
-	};
-	
-	module.exports = Edge;
-
-
-/***/ },
-/* 67 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	/**
-	 * Vector intersection, if present
-	 *
-	 * @param  {Object} A0
-	 * @param  {Object} A1
-	 * @param  {Object} B0
-	 * @param  {Object} B1
-	 *
-	 * @return {Object|null}
-	 */
-	module.exports = function intersection(A0, A1, B0, B1) {
-	    var den = (B1[1] - B0[1]) * (A1[0] - A0[0]) -
-	        (B1[0] - B0[0]) * (A1[1] - A0[1]);
-	
-	    // lines are parallel or conincident
-	    if (den == 0) {
-	        return null;
-	    }
-	
-	    var ua = ((B1[0] - B0[0]) * (A0[1] - B0[1]) -
-	        (B1[1] - B0[1]) * (A0[0] - B0[0])) / den;
-	
-	    var ub = ((A1[0] - A0[0]) * (A0[1] - B0[1]) -
-	        (A1[1] - A0[1]) * (A0[0] - B0[0])) / den;
-	
-	    if (ua < 0 || ub < 0 || ua > 1 || ub > 1) {
-	        return null;
-	    }
-	
-	    return [
-	        A0[0] + ua * (A1[0] - A0[0]),
-	        A0[1] + ua * (A1[1] - A0[1])
-	    ];
-	};
-
-
-/***/ },
-/* 68 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var normalize = __webpack_require__(69);
-	
-	module.exports = function(inputs) {
-	    return {
-	        type: 'FeatureCollection',
-	        features: inputs.reduce(function(memo, input) {
-	            return memo.concat(normalize(input).features);
-	        }, [])
-	    };
-	};
-
-
-/***/ },
-/* 69 */
-/***/ function(module, exports) {
-
-	module.exports = normalize;
-	
-	var types = {
-	    Point: 'geometry',
-	    MultiPoint: 'geometry',
-	    LineString: 'geometry',
-	    MultiLineString: 'geometry',
-	    Polygon: 'geometry',
-	    MultiPolygon: 'geometry',
-	    GeometryCollection: 'geometry',
-	    Feature: 'feature',
-	    FeatureCollection: 'featurecollection'
-	};
-	
-	/**
-	 * Normalize a GeoJSON feature into a FeatureCollection.
-	 *
-	 * @param {object} gj geojson data
-	 * @returns {object} normalized geojson data
-	 */
-	function normalize(gj) {
-	    if (!gj || !gj.type) return null;
-	    var type = types[gj.type];
-	    if (!type) return null;
-	
-	    if (type === 'geometry') {
-	        return {
-	            type: 'FeatureCollection',
-	            features: [{
-	                type: 'Feature',
-	                properties: {},
-	                geometry: gj
-	            }]
-	        };
-	    } else if (type === 'feature') {
-	        return {
-	            type: 'FeatureCollection',
-	            features: [gj]
-	        };
-	    } else if (type === 'featurecollection') {
-	        return gj;
-	    }
-	}
-
-
-/***/ },
-/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
