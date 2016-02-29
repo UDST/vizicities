@@ -3,6 +3,12 @@ import extend from 'lodash.assign';
 import TileCache from './TileCache';
 import THREE from 'three';
 
+// TODO: Consider removing picking from TileLayer instances as there aren't
+// (m)any situations where it would be practical
+//
+// For example, how would you even know what picking IDs to listen to and what
+// to do with them?
+
 // TODO: Make sure nothing is left behind in the heap after calling destroy()
 
 // TODO: Consider keeping a single TileLayer / LOD instance running by default
@@ -50,6 +56,7 @@ class TileLayer extends Layer {
     super(options);
 
     var defaults = {
+      picking: false,
       maxCache: 1000,
       maxLOD: 18
     };

@@ -10,6 +10,9 @@ import GeoJSON from '../../util/GeoJSON';
 import Buffer from '../../util/Buffer';
 import PickingMaterial from '../../engine/PickingMaterial';
 
+// TODO: Map picking IDs to some reference within the tile data / geometry so
+// that something useful can be done when an object is picked / clicked on
+
 // TODO: Make sure nothing is left behind in the heap after calling destroy()
 
 // TODO: Perform tile request and processing in a Web Worker
@@ -47,6 +50,7 @@ class GeoJSONTile extends Tile {
     this._defaultStyle = GeoJSON.defaultStyle;
 
     var defaults = {
+      picking: false,
       topojson: false,
       filter: null,
       style: this._defaultStyle
@@ -67,8 +71,13 @@ class GeoJSONTile extends Tile {
     setTimeout(() => {
       if (!this._mesh) {
         this._mesh = this._createMesh();
-        this._pickingMesh = this._createPickingMesh();
+
+        if (this._options.picking) {
+          this._pickingMesh = this._createPickingMesh();
+        }
+
         // this._shadowCanvas = this._createShadowCanvas();
+
         this._requestTile();
       }
     }, 0);
@@ -280,10 +289,13 @@ class GeoJSONTile extends Tile {
       vertices: [],
       faces: [],
       colours: [],
-      pickingIds: [],
       facesCount: 0,
       allFlat: true
     };
+
+    if (this._options.picking) {
+      polygons.pickingIds = [];
+    }
 
     var lines = {
       vertices: [],
@@ -391,13 +403,17 @@ class GeoJSONTile extends Tile {
         polygons.faces.push(polygonAttributes.faces);
         polygons.colours.push(polygonAttributes.colours);
 
-        // TODO: Make this optional
-        var pickingId = this._layer.getPickingId();
+        if (this._options.picking) {
+          var pickingId = this._layer.getPickingId();
 
-        // Inject picking ID
-        //
-        // TODO: Perhaps handle this within the GeoJSON helper
-        polygons.pickingIds.push(pickingId);
+          // Inject picking ID
+          //
+          // TODO: Perhaps handle this within the GeoJSON helper
+          polygons.pickingIds.push(pickingId);
+
+          // TODO: This is probably a good point to listen for picking events
+          // relating to this feature and do something with them
+        }
 
         if (polygons.allFlat && !polygonAttributes.flat) {
           polygons.allFlat = false;
@@ -513,11 +529,13 @@ class GeoJSONTile extends Tile {
 
       this._mesh.add(mesh);
 
-      material = new PickingMaterial();
-      material.side = THREE.BackSide;
+      if (this._options.picking) {
+        material = new PickingMaterial();
+        material.side = THREE.BackSide;
 
-      var pickingMesh = new THREE.Mesh(geometry, material);
-      this._pickingMesh.add(pickingMesh);
+        var pickingMesh = new THREE.Mesh(geometry, material);
+        this._pickingMesh.add(pickingMesh);
+      }
     }
 
     this._ready = true;

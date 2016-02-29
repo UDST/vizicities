@@ -107,6 +107,10 @@ class GeoJSONTileLayer extends TileLayer {
       options.topojson = true;
     }
 
+    if (this._options.picking) {
+      options.picking = true;
+    }
+
     return GeoJSONTile(quadcode, this._path, layer, options);
   }
 

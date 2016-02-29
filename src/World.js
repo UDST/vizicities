@@ -283,6 +283,7 @@ class World extends EventEmitter {
     // Environment layer is removed with the other layers
     this._environment = null;
 
+    this._engine.destroy();
     this._engine = null;
 
     // TODO: Probably should clean the container too / remove the canvas

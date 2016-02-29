@@ -488,6 +488,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Environment layer is removed with the other layers
 	      this._environment = null;
 	
+	      this._engine.destroy();
 	      this._engine = null;
 	
 	      // TODO: Probably should clean the container too / remove the canvas
@@ -3144,6 +3145,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._renderer = (0, _Renderer2['default'])(container);
 	    this._camera = (0, _Camera2['default'])(container);
 	
+	    // TODO: Make this optional
 	    this._picking = (0, _Picking2['default'])(this._world, this._renderer, this._camera);
 	
 	    this.clock = new _three2['default'].Clock();
@@ -3158,10 +3160,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function update(delta) {
 	      this.emit('preRender');
 	
-	      // this._renderer.render(this._scene, this._camera);
+	      this._renderer.render(this._scene, this._camera);
 	
 	      // Render picking scene
-	      this._renderer.render(this._picking._pickingScene, this._camera);
+	      // this._renderer.render(this._picking._pickingScene, this._camera);
 	
 	      this.emit('postRender');
 	    }
@@ -3195,6 +3197,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	          child.material = null;
 	        }
 	      };
+	
+	      this._picking.destroy();
+	      this._picking = null;
 	
 	      this._world = null;
 	      this._scene = null;
@@ -3370,6 +3375,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	// TODO: Look into a way of setting this up without passing in a renderer and
 	// camera from the engine
 	
+	// TODO: Add a basic indicator on or around the mouse pointer when it is over
+	// something pickable / clickable
+	//
+	// A simple transparent disc or ring at the mouse point should work to start
+	
 	var nextId = 1;
 	
 	var Picking = (function () {
@@ -3428,6 +3438,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._pixelBuffer = new Uint8Array(4 * size.width * size.height);
 	      this._needUpdate = true;
 	    }
+	
+	    // TODO: Make this only re-draw the scene if both an update is needed and the
+	    // camera has moved since the last update
+	    //
+	    // Otherwise it re-draws the scene on every click due to the way LOD updates
+	    // work in TileLayer – spamming this.add() and this.remove()
 	  }, {
 	    key: '_update',
 	    value: function _update() {
@@ -3440,8 +3456,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._renderer.readRenderTargetPixels(texture, 0, 0, texture.width, texture.height, this._pixelBuffer);
 	
 	        this._needUpdate = false;
-	
-	        console.log('Picker updated');
 	      }
 	    }
 	  }, {
@@ -3454,20 +3468,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Interpret the pixel as an ID
 	      var id = this._pixelBuffer[index * 4 + 2] * 255 * 255 + this._pixelBuffer[index * 4 + 1] * 255 + this._pixelBuffer[index * 4 + 0];
 	
+	      // Skip if ID is 16646655 (white) as the background returns this
+	      if (id === 16646655) {
+	        return;
+	      }
+	
+	      this._world.emit('pick', id);
+	      this._world.emit('pick-' + id);
+	
 	      console.log('Pick id:', id);
 	    }
 	
-	    // Add object to picking scene
+	    // Add mesh to picking scene
 	    //
-	    // Picking ID should already be added as an attribute for now
+	    // Picking ID should already be added as an attribute
 	  }, {
 	    key: 'add',
 	    value: function add(mesh) {
-	      // console.log('Add to picking:', mesh);
-	
 	      this._pickingScene.add(mesh);
 	      this._needUpdate = true;
 	    }
+	
+	    // Remove mesh from picking scene
 	  }, {
 	    key: 'remove',
 	    value: function remove(mesh) {
@@ -3483,7 +3505,53 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }, {
 	    key: 'destroy',
-	    value: function destroy() {}
+	    value: function destroy() {
+	      // TODO: Find a way to properly remove these listeners as they stay
+	      // active at the moment
+	      window.removeEventListener('resize', this._resizeTexture, false);
+	      this._renderer.domElement.removeEventListener('mouseup', this._onMouseUp, false);
+	      this._world.off('move', this._onWorldMove);
+	
+	      if (this._pickingScene.children) {
+	        // Remove everything else in the layer
+	        var child;
+	        for (var i = this._pickingScene.children.length - 1; i >= 0; i--) {
+	          child = this._pickingScene.children[i];
+	
+	          if (!child) {
+	            continue;
+	          }
+	
+	          this._pickingScene.remove(child);
+	
+	          // Probably not a good idea to dispose of geometry due to it being
+	          // shared with the non-picking scene
+	          // if (child.geometry) {
+	          //   // Dispose of mesh and materials
+	          //   child.geometry.dispose();
+	          //   child.geometry = null;
+	          // }
+	
+	          if (child.material) {
+	            if (child.material.map) {
+	              child.material.map.dispose();
+	              child.material.map = null;
+	            }
+	
+	            child.material.dispose();
+	            child.material = null;
+	          }
+	        }
+	      }
+	
+	      this._pickingScene = null;
+	      this._pickingTexture = null;
+	      this._pixelBuffer = null;
+	
+	      this._world = null;
+	      this._renderer = null;
+	      this._camera = null;
+	    }
 	  }]);
 	
 	  return Picking;
@@ -7712,18 +7780,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'getPickingId',
 	    value: function getPickingId() {
-	      return this._world._engine._picking.getNextId();
+	      if (this._world._engine._picking) {
+	        return this._world._engine._picking.getNextId();
+	      }
+	
+	      return false;
 	    }
 	
 	    // TODO: Tidy this up and don't access so many private properties to work
 	  }, {
 	    key: 'addToPicking',
 	    value: function addToPicking(mesh) {
+	      if (!this._world._engine._picking) {
+	        return;
+	      }
+	
 	      this._world._engine._picking.add(mesh);
 	    }
 	  }, {
 	    key: 'removeFromPicking',
 	    value: function removeFromPicking(mesh) {
+	      if (!this._world._engine._picking) {
+	        return;
+	      }
+	
 	      this._world._engine._picking.remove(mesh);
 	    }
 	
@@ -8763,6 +8843,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
+	// TODO: Consider removing picking from TileLayer instances as there aren't
+	// (m)any situations where it would be practical
+	//
+	// For example, how would you even know what picking IDs to listen to and what
+	// to do with them?
+	
 	// TODO: Make sure nothing is left behind in the heap after calling destroy()
 	
 	// TODO: Consider keeping a single TileLayer / LOD instance running by default
@@ -8816,6 +8902,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _get(Object.getPrototypeOf(TileLayer.prototype), 'constructor', this).call(this, options);
 	
 	    var defaults = {
+	      picking: false,
 	      maxCache: 1000,
 	      maxLOD: 18
 	    };
@@ -11733,6 +11820,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        options.topojson = true;
 	      }
 	
+	      if (this._options.picking) {
+	        options.picking = true;
+	      }
+	
 	      return (0, _GeoJSONTile2['default'])(quadcode, this._path, layer, options);
 	    }
 	
@@ -11820,6 +11911,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
+	// TODO: Map picking IDs to some reference within the tile data / geometry so
+	// that something useful can be done when an object is picked / clicked on
+	
 	// TODO: Make sure nothing is left behind in the heap after calling destroy()
 	
 	// TODO: Perform tile request and processing in a Web Worker
@@ -11861,6 +11955,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._defaultStyle = _utilGeoJSON2['default'].defaultStyle;
 	
 	    var defaults = {
+	      picking: false,
 	      topojson: false,
 	      filter: null,
 	      style: this._defaultStyle
@@ -11888,8 +11983,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      setTimeout(function () {
 	        if (!_this._mesh) {
 	          _this._mesh = _this._createMesh();
-	          _this._pickingMesh = _this._createPickingMesh();
+	
+	          if (_this._options.picking) {
+	            _this._pickingMesh = _this._createPickingMesh();
+	          }
+	
 	          // this._shadowCanvas = this._createShadowCanvas();
+	
 	          _this._requestTile();
 	        }
 	      }, 0);
@@ -11902,9 +12002,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // Clear request reference
 	      this._request = null;
-	
-	      this._pickingMaterial.dispose();
-	      this._pickingMaterial = null;
 	
 	      _get(Object.getPrototypeOf(GeoJSONTile.prototype), 'destroy', this).call(this);
 	    }
@@ -12116,10 +12213,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        vertices: [],
 	        faces: [],
 	        colours: [],
-	        pickingIds: [],
 	        facesCount: 0,
 	        allFlat: true
 	      };
+	
+	      if (this._options.picking) {
+	        polygons.pickingIds = [];
+	      }
 	
 	      var lines = {
 	        vertices: [],
@@ -12223,13 +12323,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	          polygons.faces.push(polygonAttributes.faces);
 	          polygons.colours.push(polygonAttributes.colours);
 	
-	          // TODO: Make this optional
-	          var pickingId = _this3._layer.getPickingId();
+	          if (_this3._options.picking) {
+	            var pickingId = _this3._layer.getPickingId();
 	
-	          // Inject picking ID
-	          //
-	          // TODO: Perhaps handle this within the GeoJSON helper
-	          polygons.pickingIds.push(pickingId);
+	            // Inject picking ID
+	            //
+	            // TODO: Perhaps handle this within the GeoJSON helper
+	            polygons.pickingIds.push(pickingId);
+	
+	            // TODO: This is probably a good point to listen for picking events
+	            // relating to this feature and do something with them
+	          }
 	
 	          if (polygons.allFlat && !polygonAttributes.flat) {
 	            polygons.allFlat = false;
@@ -12345,11 +12449,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        this._mesh.add(mesh);
 	
-	        material = new _enginePickingMaterial2['default']();
-	        material.side = _three2['default'].BackSide;
+	        if (this._options.picking) {
+	          material = new _enginePickingMaterial2['default']();
+	          material.side = _three2['default'].BackSide;
 	
-	        var pickingMesh = new _three2['default'].Mesh(geometry, material);
-	        this._pickingMesh.add(pickingMesh);
+	          var pickingMesh = new _three2['default'].Mesh(geometry, material);
+	          this._pickingMesh.add(pickingMesh);
+	        }
 	      }
 	
 	      this._ready = true;
@@ -14662,8 +14768,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var normals = new Float32Array(attributes.facesCount * 9);
 	    var colours = new Float32Array(attributes.facesCount * 9);
 	
-	    // One component per vertex per face (1 x 3 = 3)
-	    var pickingIds = new Float32Array(attributes.facesCount * 3);
+	    var pickingIds;
+	    if (attributes.pickingIds) {
+	      // One component per vertex per face (1 x 3 = 3)
+	      pickingIds = new Float32Array(attributes.facesCount * 3);
+	    }
 	
 	    var pA = new _three2['default'].Vector3();
 	    var pB = new _three2['default'].Vector3();
@@ -14682,7 +14791,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      _faces = attributes.faces[i];
 	      _vertices = attributes.vertices[i];
 	      _colour = attributes.colours[i];
-	      _pickingId = attributes.pickingIds[i];
+	
+	      if (pickingIds) {
+	        _pickingId = attributes.pickingIds[i];
+	      }
 	
 	      for (var j = 0; j < _faces.length; j++) {
 	        // Array of vertex indexes for the face
@@ -14750,10 +14862,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        colours[lastIndex * 9 + 4] = c2[1];
 	        colours[lastIndex * 9 + 5] = c2[2];
 	
-	        pickingIds[lastIndex * 9 + 3] = _pickingId;
-	        pickingIds[lastIndex * 9 + 4] = _pickingId;
-	        pickingIds[lastIndex * 9 + 5] = _pickingId;
-	
 	        vertices[lastIndex * 9 + 6] = cx;
 	        vertices[lastIndex * 9 + 7] = cy;
 	        vertices[lastIndex * 9 + 8] = cz;
@@ -14766,9 +14874,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        colours[lastIndex * 9 + 7] = c3[1];
 	        colours[lastIndex * 9 + 8] = c3[2];
 	
-	        pickingIds[lastIndex * 3 + 0] = _pickingId;
-	        pickingIds[lastIndex * 3 + 1] = _pickingId;
-	        pickingIds[lastIndex * 3 + 2] = _pickingId;
+	        if (pickingIds) {
+	          pickingIds[lastIndex * 3 + 0] = _pickingId;
+	          pickingIds[lastIndex * 3 + 1] = _pickingId;
+	          pickingIds[lastIndex * 3 + 2] = _pickingId;
+	        }
 	
 	        lastIndex++;
 	      }
@@ -14778,7 +14888,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    geometry.addAttribute('position', new _three2['default'].BufferAttribute(vertices, 3));
 	    geometry.addAttribute('normal', new _three2['default'].BufferAttribute(normals, 3));
 	    geometry.addAttribute('color', new _three2['default'].BufferAttribute(colours, 3));
-	    geometry.addAttribute('pickingId', new _three2['default'].BufferAttribute(pickingIds, 1));
+	
+	    if (pickingIds) {
+	      geometry.addAttribute('pickingId', new _three2['default'].BufferAttribute(pickingIds, 1));
+	    }
 	
 	    geometry.computeBoundingBox();
 	

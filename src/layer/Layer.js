@@ -35,15 +35,27 @@ class Layer extends EventEmitter {
   }
 
   getPickingId() {
-    return this._world._engine._picking.getNextId();
+    if (this._world._engine._picking) {
+      return this._world._engine._picking.getNextId();
+    }
+
+    return false;
   }
 
   // TODO: Tidy this up and don't access so many private properties to work
   addToPicking(mesh) {
+    if (!this._world._engine._picking) {
+      return;
+    }
+
     this._world._engine._picking.add(mesh);
   }
 
   removeFromPicking(mesh) {
+    if (!this._world._engine._picking) {
+      return;
+    }
+
     this._world._engine._picking.remove(mesh);
   }
 

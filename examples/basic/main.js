@@ -13,6 +13,7 @@ var imageTileLayer = VIZI.ImageTileLayer('http://{s}.basemaps.cartocdn.com/light
 
 // Building and roads from Mapzen (polygons and linestrings)
 var topoJSONTileLayer = VIZI.TopoJSONTileLayer('https://vector.mapzen.com/osm/buildings,roads/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
+  picking: true,
   style: function(feature) {
     var height;
 

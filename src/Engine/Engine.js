@@ -16,6 +16,7 @@ class Engine extends EventEmitter {
     this._renderer = Renderer(container);
     this._camera = Camera(container);
 
+    // TODO: Make this optional
     this._picking = Picking(this._world, this._renderer, this._camera);
 
     this.clock = new THREE.Clock();
@@ -26,10 +27,10 @@ class Engine extends EventEmitter {
   update(delta) {
     this.emit('preRender');
 
-    // this._renderer.render(this._scene, this._camera);
+    this._renderer.render(this._scene, this._camera);
 
     // Render picking scene
-    this._renderer.render(this._picking._pickingScene, this._camera);
+    // this._renderer.render(this._picking._pickingScene, this._camera);
 
     this.emit('postRender');
   }
@@ -62,6 +63,9 @@ class Engine extends EventEmitter {
         child.material = null;
       }
     };
+
+    this._picking.destroy();
+    this._picking = null;
 
     this._world = null;
     this._scene = null;

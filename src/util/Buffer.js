@@ -57,8 +57,11 @@ var Buffer = (function() {
     var normals = new Float32Array(attributes.facesCount * 9);
     var colours = new Float32Array(attributes.facesCount * 9);
 
-    // One component per vertex per face (1 x 3 = 3)
-    var pickingIds = new Float32Array(attributes.facesCount * 3);
+    var pickingIds;
+    if (attributes.pickingIds) {
+      // One component per vertex per face (1 x 3 = 3)
+      pickingIds = new Float32Array(attributes.facesCount * 3);
+    }
 
     var pA = new THREE.Vector3();
     var pB = new THREE.Vector3();
@@ -77,7 +80,10 @@ var Buffer = (function() {
       _faces = attributes.faces[i];
       _vertices = attributes.vertices[i];
       _colour = attributes.colours[i];
-      _pickingId = attributes.pickingIds[i];
+
+      if (pickingIds) {
+        _pickingId = attributes.pickingIds[i];
+      }
 
       for (var j = 0; j < _faces.length; j++) {
         // Array of vertex indexes for the face
@@ -145,10 +151,6 @@ var Buffer = (function() {
         colours[lastIndex * 9 + 4] = c2[1];
         colours[lastIndex * 9 + 5] = c2[2];
 
-        pickingIds[lastIndex * 9 + 3] = _pickingId;
-        pickingIds[lastIndex * 9 + 4] = _pickingId;
-        pickingIds[lastIndex * 9 + 5] = _pickingId;
-
         vertices[lastIndex * 9 + 6] = cx;
         vertices[lastIndex * 9 + 7] = cy;
         vertices[lastIndex * 9 + 8] = cz;
@@ -161,9 +163,11 @@ var Buffer = (function() {
         colours[lastIndex * 9 + 7] = c3[1];
         colours[lastIndex * 9 + 8] = c3[2];
 
-        pickingIds[lastIndex * 3 + 0] = _pickingId;
-        pickingIds[lastIndex * 3 + 1] = _pickingId;
-        pickingIds[lastIndex * 3 + 2] = _pickingId;
+        if (pickingIds) {
+          pickingIds[lastIndex * 3 + 0] = _pickingId;
+          pickingIds[lastIndex * 3 + 1] = _pickingId;
+          pickingIds[lastIndex * 3 + 2] = _pickingId;
+        }
 
         lastIndex++;
       }
@@ -173,7 +177,10 @@ var Buffer = (function() {
     geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
     geometry.addAttribute('normal', new THREE.BufferAttribute(normals, 3));
     geometry.addAttribute('color', new THREE.BufferAttribute(colours, 3));
-    geometry.addAttribute('pickingId', new THREE.BufferAttribute(pickingIds, 1));
+
+    if (pickingIds) {
+      geometry.addAttribute('pickingId', new THREE.BufferAttribute(pickingIds, 1));
+    }
 
     geometry.computeBoundingBox();
 
