@@ -10,6 +10,11 @@ import extrudePolygon from './extrudePolygon';
 
 // TODO: Make it so height can be per-coordinate / point but connected together
 // as a linestring (eg. GPS points with an elevation at each point)
+//
+// This isn't really valid GeoJSON so perhaps something best left to an external
+// component for now, until a better approach can be considered
+//
+// See: http://lists.geojson.org/pipermail/geojson-geojson.org/2009-June/000489.html
 
 // Light and dark colours used for poor-mans AO gradient on object sides
 var light = new THREE.Color(0xffffff);
