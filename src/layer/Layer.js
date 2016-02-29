@@ -34,6 +34,19 @@ class Layer extends EventEmitter {
     this.emit('added');
   }
 
+  getPickingId() {
+    return this._world._engine._picking.getNextId();
+  }
+
+  // TODO: Tidy this up and don't access so many private properties to work
+  addToPicking(mesh) {
+    this._world._engine._picking.add(mesh);
+  }
+
+  removeFromPicking(mesh) {
+    this._world._engine._picking.remove(mesh);
+  }
+
   // Destroys the layer and removes it from the scene and memory
   destroy() {
     if (this._layer.children) {

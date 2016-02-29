@@ -69,6 +69,10 @@ class Tile {
     return this._mesh;
   }
 
+  getPickingMesh() {
+    return this._pickingMesh;
+  }
+
   // Destroys the tile and removes it from the layer and memory
   //
   // Ensure that this leaves no trace of the tile – no textures, no meshes,

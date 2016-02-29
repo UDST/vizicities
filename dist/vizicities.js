@@ -64,31 +64,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _World2 = _interopRequireDefault(_World);
 	
-	var _controlsIndex = __webpack_require__(28);
+	var _controlsIndex = __webpack_require__(30);
 	
 	var _controlsIndex2 = _interopRequireDefault(_controlsIndex);
 	
-	var _layerEnvironmentEnvironmentLayer = __webpack_require__(32);
+	var _layerEnvironmentEnvironmentLayer = __webpack_require__(34);
 	
 	var _layerEnvironmentEnvironmentLayer2 = _interopRequireDefault(_layerEnvironmentEnvironmentLayer);
 	
-	var _layerTileImageTileLayer = __webpack_require__(38);
+	var _layerTileImageTileLayer = __webpack_require__(40);
 	
 	var _layerTileImageTileLayer2 = _interopRequireDefault(_layerTileImageTileLayer);
 	
-	var _layerTileGeoJSONTileLayer = __webpack_require__(53);
+	var _layerTileGeoJSONTileLayer = __webpack_require__(55);
 	
 	var _layerTileGeoJSONTileLayer2 = _interopRequireDefault(_layerTileGeoJSONTileLayer);
 	
-	var _layerTileTopoJSONTileLayer = __webpack_require__(64);
+	var _layerTileTopoJSONTileLayer = __webpack_require__(68);
 	
 	var _layerTileTopoJSONTileLayer2 = _interopRequireDefault(_layerTileTopoJSONTileLayer);
 	
-	var _layerGeoJSONLayer = __webpack_require__(65);
+	var _layerGeoJSONLayer = __webpack_require__(69);
 	
 	var _layerGeoJSONLayer2 = _interopRequireDefault(_layerGeoJSONLayer);
 	
-	var _layerTopoJSONLayer = __webpack_require__(66);
+	var _layerTopoJSONLayer = __webpack_require__(70);
 	
 	var _layerTopoJSONLayer2 = _interopRequireDefault(_layerTopoJSONLayer);
 	
@@ -205,7 +205,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_initEngine',
 	    value: function _initEngine() {
-	      this._engine = (0, _engineEngine2['default'])(this._container);
+	      this._engine = (0, _engineEngine2['default'])(this._container, this);
 	
 	      // Engine events
 	      //
@@ -457,6 +457,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    // Destroys the world(!) and removes it from the scene and memory
+	    //
+	    // TODO: World out why so much three.js stuff is left in the heap after this
 	  }, {
 	    key: 'destroy',
 	    value: function destroy() {
@@ -3123,19 +3125,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Camera2 = _interopRequireDefault(_Camera);
 	
+	var _Picking = __webpack_require__(28);
+	
+	var _Picking2 = _interopRequireDefault(_Picking);
+	
 	var Engine = (function (_EventEmitter) {
 	  _inherits(Engine, _EventEmitter);
 	
-	  function Engine(container) {
+	  function Engine(container, world) {
 	    _classCallCheck(this, Engine);
 	
 	    console.log('Init Engine');
 	
 	    _get(Object.getPrototypeOf(Engine.prototype), 'constructor', this).call(this);
 	
+	    this._world = world;
 	    this._scene = _Scene2['default'];
 	    this._renderer = (0, _Renderer2['default'])(container);
 	    this._camera = (0, _Camera2['default'])(container);
+	
+	    this._picking = (0, _Picking2['default'])(this._world, this._renderer, this._camera);
+	
 	    this.clock = new _three2['default'].Clock();
 	
 	    this._frustum = new _three2['default'].Frustum();
@@ -3147,7 +3157,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'update',
 	    value: function update(delta) {
 	      this.emit('preRender');
-	      this._renderer.render(this._scene, this._camera);
+	
+	      // this._renderer.render(this._scene, this._camera);
+	
+	      // Render picking scene
+	      this._renderer.render(this._picking._pickingScene, this._camera);
+	
 	      this.emit('postRender');
 	    }
 	  }, {
@@ -3181,6 +3196,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      };
 	
+	      this._world = null;
 	      this._scene = null;
 	      this._renderer = null;
 	      this._camera = null;
@@ -3192,8 +3208,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return Engine;
 	})(_eventemitter32['default']);
 	
-	exports['default'] = function (container) {
-	  return new Engine(container);
+	exports['default'] = function (container, world) {
+	  return new Engine(container, world);
 	};
 	
 	;
@@ -3333,9 +3349,188 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _ControlsOrbit = __webpack_require__(29);
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	var _three = __webpack_require__(24);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var _geoPoint = __webpack_require__(11);
+	
+	var _geoPoint2 = _interopRequireDefault(_geoPoint);
+	
+	var _PickingScene = __webpack_require__(29);
+	
+	var _PickingScene2 = _interopRequireDefault(_PickingScene);
+	
+	// TODO: Look into a way of setting this up without passing in a renderer and
+	// camera from the engine
+	
+	var nextId = 1;
+	
+	var Picking = (function () {
+	  function Picking(world, renderer, camera) {
+	    _classCallCheck(this, Picking);
+	
+	    this._world = world;
+	    this._renderer = renderer;
+	    this._camera = camera;
+	
+	    this._pickingScene = _PickingScene2['default'];
+	    this._pickingTexture = new _three2['default'].WebGLRenderTarget();
+	    this._pickingTexture.texture.minFilter = _three2['default'].LinearFilter;
+	    this._pickingTexture.texture.generateMipmaps = false;
+	
+	    this._nextId = 1;
+	
+	    this._resizeTexture();
+	    this._initEvents();
+	  }
+	
+	  // Initialise without requiring new keyword
+	
+	  _createClass(Picking, [{
+	    key: '_initEvents',
+	    value: function _initEvents() {
+	      window.addEventListener('resize', this._resizeTexture.bind(this), false);
+	
+	      // this._renderer.domElement.addEventListener('mousemove', this._onMouseMove.bind(this), false);
+	      this._renderer.domElement.addEventListener('mouseup', this._onMouseUp.bind(this), false);
+	
+	      this._world.on('move', this._onWorldMove, this);
+	    }
+	  }, {
+	    key: '_onMouseUp',
+	    value: function _onMouseUp(event) {
+	      // Only react to main button click
+	      if (event.button !== 0) {
+	        return;
+	      }
+	
+	      this._pick(VIZI.Point(event.clientX, event.clientY));
+	    }
+	  }, {
+	    key: '_onWorldMove',
+	    value: function _onWorldMove() {
+	      this._needUpdate = true;
+	    }
+	
+	    // TODO: Ensure this doesn't get out of sync issue with the renderer resize
+	  }, {
+	    key: '_resizeTexture',
+	    value: function _resizeTexture() {
+	      var size = this._renderer.getSize();
+	      this._pickingTexture.setSize(size.width, size.height);
+	      this._pixelBuffer = new Uint8Array(4 * size.width * size.height);
+	      this._needUpdate = true;
+	    }
+	  }, {
+	    key: '_update',
+	    value: function _update() {
+	      if (this._needUpdate) {
+	        var texture = this._pickingTexture;
+	
+	        this._renderer.render(this._pickingScene, this._camera, this._pickingTexture);
+	
+	        // Read the rendering texture
+	        this._renderer.readRenderTargetPixels(texture, 0, 0, texture.width, texture.height, this._pixelBuffer);
+	
+	        this._needUpdate = false;
+	
+	        console.log('Picker updated');
+	      }
+	    }
+	  }, {
+	    key: '_pick',
+	    value: function _pick(point) {
+	      this._update();
+	
+	      var index = point.x + (this._pickingTexture.height - point.y) * this._pickingTexture.width;
+	
+	      // Interpret the pixel as an ID
+	      var id = this._pixelBuffer[index * 4 + 2] * 255 * 255 + this._pixelBuffer[index * 4 + 1] * 255 + this._pixelBuffer[index * 4 + 0];
+	
+	      console.log('Pick id:', id);
+	    }
+	
+	    // Add object to picking scene
+	    //
+	    // Picking ID should already be added as an attribute for now
+	  }, {
+	    key: 'add',
+	    value: function add(mesh) {
+	      // console.log('Add to picking:', mesh);
+	
+	      this._pickingScene.add(mesh);
+	      this._needUpdate = true;
+	    }
+	  }, {
+	    key: 'remove',
+	    value: function remove(mesh) {
+	      this._pickingScene.remove(mesh);
+	      this._needUpdate = true;
+	    }
+	
+	    // Returns next ID to use for picking
+	  }, {
+	    key: 'getNextId',
+	    value: function getNextId() {
+	      return nextId++;
+	    }
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {}
+	  }]);
+	
+	  return Picking;
+	})();
+	
+	exports['default'] = function (world, renderer, camera) {
+	  return new Picking(world, renderer, camera);
+	};
+	
+	;
+	module.exports = exports['default'];
+
+/***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _three = __webpack_require__(24);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	// This can be imported from anywhere and will still reference the same scene,
+	// though there is a helper reference in Engine.pickingScene
+	
+	exports['default'] = (function () {
+	  var scene = new _three2['default'].Scene();
+	  return scene;
+	})();
+	
+	module.exports = exports['default'];
+
+/***/ },
+/* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _ControlsOrbit = __webpack_require__(31);
 	
 	var _ControlsOrbit2 = _interopRequireDefault(_ControlsOrbit);
 	
@@ -3347,7 +3542,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 29 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -3372,7 +3567,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _vendorOrbitControls = __webpack_require__(30);
+	var _vendorOrbitControls = __webpack_require__(32);
 	
 	var _vendorOrbitControls2 = _interopRequireDefault(_vendorOrbitControls);
 	
@@ -3524,7 +3719,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 30 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -3540,7 +3735,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _hammerjs = __webpack_require__(31);
+	var _hammerjs = __webpack_require__(33);
 	
 	var _hammerjs2 = _interopRequireDefault(_hammerjs);
 	
@@ -4702,7 +4897,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 31 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*! Hammer.JS - v2.0.6 - 2015-12-23
@@ -7276,7 +7471,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 32 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -7293,7 +7488,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Layer2 = __webpack_require__(33);
+	var _Layer2 = __webpack_require__(35);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -7305,7 +7500,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _Skybox = __webpack_require__(34);
+	var _Skybox = __webpack_require__(36);
 	
 	var _Skybox2 = _interopRequireDefault(_Skybox);
 	
@@ -7441,7 +7636,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 33 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -7514,6 +7709,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._onAdd(world);
 	      this.emit('added');
 	    }
+	  }, {
+	    key: 'getPickingId',
+	    value: function getPickingId() {
+	      return this._world._engine._picking.getNextId();
+	    }
+	
+	    // TODO: Tidy this up and don't access so many private properties to work
+	  }, {
+	    key: 'addToPicking',
+	    value: function addToPicking(mesh) {
+	      this._world._engine._picking.add(mesh);
+	    }
+	  }, {
+	    key: 'removeFromPicking',
+	    value: function removeFromPicking(mesh) {
+	      this._world._engine._picking.remove(mesh);
+	    }
 	
 	    // Destroys the layer and removes it from the scene and memory
 	  }, {
@@ -7561,7 +7773,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 34 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -7578,11 +7790,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _Sky = __webpack_require__(35);
+	var _Sky = __webpack_require__(37);
 	
 	var _Sky2 = _interopRequireDefault(_Sky);
 	
-	var _lodashThrottle = __webpack_require__(36);
+	var _lodashThrottle = __webpack_require__(38);
 	
 	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
 	
@@ -7786,7 +7998,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 35 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -7869,7 +8081,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 36 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -7880,7 +8092,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2016 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <https://lodash.com/license>
 	 */
-	var debounce = __webpack_require__(37);
+	var debounce = __webpack_require__(39);
 	
 	/** Used as the `TypeError` message for "Functions" methods. */
 	var FUNC_ERROR_TEXT = 'Expected a function';
@@ -7973,7 +8185,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 37 */
+/* 39 */
 /***/ function(module, exports) {
 
 	/**
@@ -8297,7 +8509,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 38 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -8314,19 +8526,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _TileLayer2 = __webpack_require__(39);
+	var _TileLayer2 = __webpack_require__(41);
 	
 	var _TileLayer3 = _interopRequireDefault(_TileLayer2);
 	
-	var _ImageTile = __webpack_require__(49);
+	var _ImageTile = __webpack_require__(51);
 	
 	var _ImageTile2 = _interopRequireDefault(_ImageTile);
 	
-	var _ImageTileLayerBaseMaterial = __webpack_require__(52);
+	var _ImageTileLayerBaseMaterial = __webpack_require__(54);
 	
 	var _ImageTileLayerBaseMaterial2 = _interopRequireDefault(_ImageTileLayerBaseMaterial);
 	
-	var _lodashThrottle = __webpack_require__(36);
+	var _lodashThrottle = __webpack_require__(38);
 	
 	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
 	
@@ -8518,7 +8730,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 39 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -8535,7 +8747,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Layer2 = __webpack_require__(33);
+	var _Layer2 = __webpack_require__(35);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -8543,7 +8755,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _TileCache = __webpack_require__(40);
+	var _TileCache = __webpack_require__(42);
 	
 	var _TileCache2 = _interopRequireDefault(_TileCache);
 	
@@ -8623,11 +8835,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    this._frustum = new _three2['default'].Frustum();
 	    this._tiles = new _three2['default'].Object3D();
+	    this._tilesPicking = new _three2['default'].Object3D();
 	  }
 	
 	  _createClass(TileLayer, [{
 	    key: '_onAdd',
 	    value: function _onAdd(world) {
+	      this.addToPicking(this._tilesPicking);
 	      this.add(this._tiles);
 	    }
 	  }, {
@@ -8672,6 +8886,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // Add tile to layer (and to scene) if not already there
 	        _this2._tiles.add(tile.getMesh());
+	
+	        if (tile.getPickingMesh()) {
+	          _this2._tilesPicking.add(tile.getPickingMesh());
+	        }
 	      });
 	    }
 	
@@ -8843,6 +9061,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      for (var i = this._tiles.children.length - 1; i >= 0; i--) {
 	        this._tiles.remove(this._tiles.children[i]);
 	      }
+	
+	      if (!this._tilesPicking || !this._tilesPicking.children) {
+	        return;
+	      }
+	
+	      for (var i = this._tilesPicking.children.length - 1; i >= 0; i--) {
+	        this._tilesPicking.remove(this._tilesPicking.children[i]);
+	      }
 	    }
 	
 	    // Return a new tile instance
@@ -8890,10 +9116,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      }
 	
+	      // Remove tile from picking scene
+	      this.removeFromPicking(this._tilesPicking);
+	
+	      if (this._tilesPicking.children) {
+	        // Remove all tiles
+	        for (var i = this._tilesPicking.children.length - 1; i >= 0; i--) {
+	          this._tilesPicking.remove(this._tilesPicking.children[i]);
+	        }
+	      }
+	
 	      this._tileCache.destroy();
 	      this._tileCache = null;
 	
 	      this._tiles = null;
+	      this._tilesPicking = null;
 	      this._frustum = null;
 	
 	      _get(Object.getPrototypeOf(TileLayer.prototype), 'destroy', this).call(this);
@@ -8907,7 +9144,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 40 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -8920,7 +9157,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var _lruCache = __webpack_require__(41);
+	var _lruCache = __webpack_require__(43);
 	
 	var _lruCache2 = _interopRequireDefault(_lruCache);
 	
@@ -8988,18 +9225,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 41 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = LRUCache
 	
 	// This will be a proper iterable 'Map' in engines that support it,
 	// or a fakey-fake PseudoMap in older versions.
-	var Map = __webpack_require__(42)
-	var util = __webpack_require__(45)
+	var Map = __webpack_require__(44)
+	var util = __webpack_require__(47)
 	
 	// A linked list to keep track of recently-used-ness
-	var Yallist = __webpack_require__(48)
+	var Yallist = __webpack_require__(50)
 	
 	// use symbols if possible, otherwise just _props
 	var symbols = {}
@@ -9462,7 +9699,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 42 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {if (process.env.npm_package_name === 'pseudomap' &&
@@ -9472,13 +9709,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	if (typeof Map === 'function' && !process.env.TEST_PSEUDOMAP) {
 	  module.exports = Map
 	} else {
-	  module.exports = __webpack_require__(44)
+	  module.exports = __webpack_require__(46)
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(43)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(45)))
 
 /***/ },
-/* 43 */
+/* 45 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -9575,7 +9812,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 44 */
+/* 46 */
 /***/ function(module, exports) {
 
 	var hasOwnProperty = Object.prototype.hasOwnProperty
@@ -9694,7 +9931,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 45 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -10222,7 +10459,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.isPrimitive = isPrimitive;
 	
-	exports.isBuffer = __webpack_require__(46);
+	exports.isBuffer = __webpack_require__(48);
 	
 	function objectToString(o) {
 	  return Object.prototype.toString.call(o);
@@ -10266,7 +10503,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *     prototype.
 	 * @param {function} superCtor Constructor function to inherit prototype from.
 	 */
-	exports.inherits = __webpack_require__(47);
+	exports.inherits = __webpack_require__(49);
 	
 	exports._extend = function(origin, add) {
 	  // Don't do anything if add isn't an object
@@ -10284,10 +10521,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return Object.prototype.hasOwnProperty.call(obj, prop);
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(43)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(45)))
 
 /***/ },
-/* 46 */
+/* 48 */
 /***/ function(module, exports) {
 
 	module.exports = function isBuffer(arg) {
@@ -10298,7 +10535,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 47 */
+/* 49 */
 /***/ function(module, exports) {
 
 	if (typeof Object.create === 'function') {
@@ -10327,7 +10564,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 48 */
+/* 50 */
 /***/ function(module, exports) {
 
 	module.exports = Yallist
@@ -10693,7 +10930,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 49 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -10710,11 +10947,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Tile2 = __webpack_require__(50);
+	var _Tile2 = __webpack_require__(52);
 	
 	var _Tile3 = _interopRequireDefault(_Tile2);
 	
-	var _vendorBoxHelper = __webpack_require__(51);
+	var _vendorBoxHelper = __webpack_require__(53);
 	
 	var _vendorBoxHelper2 = _interopRequireDefault(_vendorBoxHelper);
 	
@@ -10929,7 +11166,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 50 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -11031,6 +11268,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'getMesh',
 	    value: function getMesh() {
 	      return this._mesh;
+	    }
+	  }, {
+	    key: 'getPickingMesh',
+	    value: function getPickingMesh() {
+	      return this._pickingMesh;
 	    }
 	
 	    // Destroys the tile and removes it from the layer and memory
@@ -11181,7 +11423,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 51 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -11271,7 +11513,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 52 */
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -11333,7 +11575,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 53 */
+/* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -11350,7 +11592,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _TileLayer2 = __webpack_require__(39);
+	var _TileLayer2 = __webpack_require__(41);
 	
 	var _TileLayer3 = _interopRequireDefault(_TileLayer2);
 	
@@ -11358,17 +11600,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _GeoJSONTile = __webpack_require__(54);
+	var _GeoJSONTile = __webpack_require__(56);
 	
 	var _GeoJSONTile2 = _interopRequireDefault(_GeoJSONTile);
 	
-	var _lodashThrottle = __webpack_require__(36);
+	var _lodashThrottle = __webpack_require__(38);
 	
 	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
 	
 	var _three = __webpack_require__(24);
 	
 	var _three2 = _interopRequireDefault(_three);
+	
+	// TODO: Offer on-the-fly slicing of static, non-tile-based GeoJSON files into a
+	// tile grid using geojson-vt
+	//
+	// See: https://github.com/mapbox/geojson-vt
 	
 	// TODO: Make sure nothing is left behind in the heap after calling destroy()
 	
@@ -11514,7 +11761,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 54 */
+/* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -11531,11 +11778,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Tile2 = __webpack_require__(50);
+	var _Tile2 = __webpack_require__(52);
 	
 	var _Tile3 = _interopRequireDefault(_Tile2);
 	
-	var _vendorBoxHelper = __webpack_require__(51);
+	var _vendorBoxHelper = __webpack_require__(53);
 	
 	var _vendorBoxHelper2 = _interopRequireDefault(_vendorBoxHelper);
 	
@@ -11543,7 +11790,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _reqwest = __webpack_require__(55);
+	var _reqwest = __webpack_require__(57);
 	
 	var _reqwest2 = _interopRequireDefault(_reqwest);
 	
@@ -11561,13 +11808,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// import Offset from 'polygon-offset';
 	
-	var _utilGeoJSON = __webpack_require__(57);
+	var _utilGeoJSON = __webpack_require__(59);
 	
 	var _utilGeoJSON2 = _interopRequireDefault(_utilGeoJSON);
 	
-	var _utilBuffer = __webpack_require__(63);
+	var _utilBuffer = __webpack_require__(65);
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
+	
+	var _enginePickingMaterial = __webpack_require__(66);
+	
+	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
 	// TODO: Make sure nothing is left behind in the heap after calling destroy()
 	
@@ -11637,6 +11888,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      setTimeout(function () {
 	        if (!_this._mesh) {
 	          _this._mesh = _this._createMesh();
+	          _this._pickingMesh = _this._createPickingMesh();
 	          // this._shadowCanvas = this._createShadowCanvas();
 	          _this._requestTile();
 	        }
@@ -11650,6 +11902,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // Clear request reference
 	      this._request = null;
+	
+	      this._pickingMaterial.dispose();
+	      this._pickingMaterial = null;
 	
 	      _get(Object.getPrototypeOf(GeoJSONTile.prototype), 'destroy', this).call(this);
 	    }
@@ -11683,6 +11938,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // mesh.add(box);
 	      //
 	      // mesh.add(this._createDebugMesh());
+	
+	      return mesh;
+	    }
+	  }, {
+	    key: '_createPickingMesh',
+	    value: function _createPickingMesh() {
+	      if (!this._center) {
+	        return;
+	      }
+	
+	      var mesh = new _three2['default'].Object3D();
+	
+	      mesh.position.x = this._center[0];
+	      mesh.position.z = this._center[1];
 	
 	      return mesh;
 	    }
@@ -11847,6 +12116,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        vertices: [],
 	        faces: [],
 	        colours: [],
+	        pickingIds: [],
 	        facesCount: 0,
 	        allFlat: true
 	      };
@@ -11952,6 +12222,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	          polygons.vertices.push(polygonAttributes.vertices);
 	          polygons.faces.push(polygonAttributes.faces);
 	          polygons.colours.push(polygonAttributes.colours);
+	
+	          // TODO: Make this optional
+	          var pickingId = _this3._layer.getPickingId();
+	
+	          // Inject picking ID
+	          //
+	          // TODO: Perhaps handle this within the GeoJSON helper
+	          polygons.pickingIds.push(pickingId);
 	
 	          if (polygons.allFlat && !polygonAttributes.flat) {
 	            polygons.allFlat = false;
@@ -12066,6 +12344,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        this._mesh.add(mesh);
+	
+	        material = new _enginePickingMaterial2['default']();
+	        material.side = _three2['default'].BackSide;
+	
+	        var pickingMesh = new _three2['default'].Mesh(geometry, material);
+	        this._pickingMesh.add(pickingMesh);
 	      }
 	
 	      this._ready = true;
@@ -12094,7 +12378,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 55 */
+/* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -12118,7 +12402,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  } else {
 	    var XHR2
 	    try {
-	      XHR2 = __webpack_require__(56)
+	      XHR2 = __webpack_require__(58)
 	    } catch (ex) {
 	      throw new Error('Peer dependency `xhr2` required! Please npm install xhr2')
 	    }
@@ -12730,13 +13014,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 56 */
+/* 58 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 57 */
+/* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -12753,24 +13037,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _topojson2 = __webpack_require__(58);
+	var _topojson2 = __webpack_require__(60);
 	
 	var _topojson3 = _interopRequireDefault(_topojson2);
 	
-	var _geojsonMerge = __webpack_require__(59);
+	var _geojsonMerge = __webpack_require__(61);
 	
 	var _geojsonMerge2 = _interopRequireDefault(_geojsonMerge);
 	
-	var _earcut = __webpack_require__(61);
+	var _earcut = __webpack_require__(63);
 	
 	var _earcut2 = _interopRequireDefault(_earcut);
 	
-	var _extrudePolygon = __webpack_require__(62);
+	var _extrudePolygon = __webpack_require__(64);
 	
 	var _extrudePolygon2 = _interopRequireDefault(_extrudePolygon);
 	
-	// TODO: Make it so height can be per-coordinate for linestrings so you can do
-	// things like offsetting GPS points based on elevation at each point
+	// TODO: Make it so height can be per-coordinate / point but connected together
+	// as a linestring (eg. GPS points with an elevation at each point)
+	//
+	// This isn't really valid GeoJSON so perhaps something best left to an external
+	// component for now, until a better approach can be considered
+	//
+	// See: http://lists.geojson.org/pipermail/geojson-geojson.org/2009-June/000489.html
 	
 	// Light and dark colours used for poor-mans AO gradient on object sides
 	var light = new _three2['default'].Color(0xffffff);
@@ -12836,7 +13125,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // LineSegments requires pairs of vertices so repeat the last point if
 	    // there's an odd number of vertices
 	    coordinates.forEach(function (coordinate, index) {
-	      // TODO: Don't hardcode y-value
 	      _colours.push([colour.r, colour.g, colour.b]);
 	      _coords.push([coordinate[0], height, coordinate[1]]);
 	
@@ -12997,7 +13285,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 58 */
+/* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(function (global, factory) {
@@ -13550,10 +13838,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}));
 
 /***/ },
-/* 59 */
+/* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var normalize = __webpack_require__(60);
+	var normalize = __webpack_require__(62);
 	
 	module.exports = function(inputs) {
 	    return {
@@ -13566,7 +13854,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 60 */
+/* 62 */
 /***/ function(module, exports) {
 
 	module.exports = normalize;
@@ -13615,7 +13903,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 61 */
+/* 63 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -14205,7 +14493,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 62 */
+/* 64 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -14304,7 +14592,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 63 */
+/* 65 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -14365,6 +14653,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return geometry;
 	  };
 	
+	  // TODO: Make picking IDs optional
 	  var createGeometry = function createGeometry(attributes, offset) {
 	    var geometry = new _three2['default'].BufferGeometry();
 	
@@ -14372,6 +14661,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var vertices = new Float32Array(attributes.facesCount * 9);
 	    var normals = new Float32Array(attributes.facesCount * 9);
 	    var colours = new Float32Array(attributes.facesCount * 9);
+	
+	    // One component per vertex per face (1 x 3 = 3)
+	    var pickingIds = new Float32Array(attributes.facesCount * 3);
 	
 	    var pA = new _three2['default'].Vector3();
 	    var pB = new _three2['default'].Vector3();
@@ -14384,11 +14676,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var _faces;
 	    var _vertices;
 	    var _colour;
+	    var _pickingId;
 	    var lastIndex = 0;
 	    for (var i = 0; i < attributes.faces.length; i++) {
 	      _faces = attributes.faces[i];
 	      _vertices = attributes.vertices[i];
 	      _colour = attributes.colours[i];
+	      _pickingId = attributes.pickingIds[i];
 	
 	      for (var j = 0; j < _faces.length; j++) {
 	        // Array of vertex indexes for the face
@@ -14456,6 +14750,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        colours[lastIndex * 9 + 4] = c2[1];
 	        colours[lastIndex * 9 + 5] = c2[2];
 	
+	        pickingIds[lastIndex * 9 + 3] = _pickingId;
+	        pickingIds[lastIndex * 9 + 4] = _pickingId;
+	        pickingIds[lastIndex * 9 + 5] = _pickingId;
+	
 	        vertices[lastIndex * 9 + 6] = cx;
 	        vertices[lastIndex * 9 + 7] = cy;
 	        vertices[lastIndex * 9 + 8] = cz;
@@ -14468,6 +14766,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        colours[lastIndex * 9 + 7] = c3[1];
 	        colours[lastIndex * 9 + 8] = c3[2];
 	
+	        pickingIds[lastIndex * 3 + 0] = _pickingId;
+	        pickingIds[lastIndex * 3 + 1] = _pickingId;
+	        pickingIds[lastIndex * 3 + 2] = _pickingId;
+	
 	        lastIndex++;
 	      }
 	    }
@@ -14476,6 +14778,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    geometry.addAttribute('position', new _three2['default'].BufferAttribute(vertices, 3));
 	    geometry.addAttribute('normal', new _three2['default'].BufferAttribute(normals, 3));
 	    geometry.addAttribute('color', new _three2['default'].BufferAttribute(colours, 3));
+	    geometry.addAttribute('pickingId', new _three2['default'].BufferAttribute(pickingIds, 1));
 	
 	    geometry.computeBoundingBox();
 	
@@ -14492,7 +14795,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 64 */
+/* 66 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -14501,7 +14804,84 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _GeoJSONTileLayer = __webpack_require__(53);
+	var _three = __webpack_require__(24);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var _PickingShader = __webpack_require__(67);
+	
+	var _PickingShader2 = _interopRequireDefault(_PickingShader);
+	
+	// FROM: https://github.com/brianxu/GPUPicker/blob/master/GPUPicker.js
+	
+	var PickingMaterial = function PickingMaterial() {
+	  _three2['default'].ShaderMaterial.call(this, {
+	    // uniforms: {
+	    //   size: {
+	    //     type: 'f',
+	    //     value: 0.01,
+	    //   },
+	    //   scale: {
+	    //     type: 'f',
+	    //     value: 400,
+	    //   }
+	    // },
+	    // attributes: ['position', 'id'],
+	    vertexShader: _PickingShader2['default'].vertexShader,
+	    fragmentShader: _PickingShader2['default'].fragmentShader
+	  });
+	};
+	
+	PickingMaterial.prototype = Object.create(_three2['default'].ShaderMaterial.prototype);
+	
+	PickingMaterial.prototype.constructor = PickingMaterial;
+	
+	// PickingMaterial.prototype.setPointSize = function(size) {
+	//   this.uniforms.size.value = size;
+	// };
+	//
+	// PickingMaterial.prototype.setPointScale = function(scale) {
+	//   this.uniforms.scale.value = scale;
+	// };
+	
+	exports['default'] = PickingMaterial;
+	module.exports = exports['default'];
+
+/***/ },
+/* 67 */
+/***/ function(module, exports) {
+
+	Object.defineProperty(exports, '__esModule', {
+		value: true
+	});
+	// FROM: https://github.com/brianxu/GPUPicker/blob/master/GPUPicker.js
+	
+	var PickingShader = {
+		vertexShader: ['attribute float pickingId;',
+		// '',
+		// 'uniform float size;',
+		// 'uniform float scale;',
+		'', 'varying vec4 worldId;', '', 'void main() {', '  vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );',
+		// '  gl_PointSize = size * ( scale / length( mvPosition.xyz ) );',
+		'  vec3 a = fract(vec3(1.0/255.0, 1.0/(255.0*255.0), 1.0/(255.0*255.0*255.0)) * pickingId);', '  a -= a.xxy * vec3(0.0, 1.0/255.0, 1.0/255.0);', '  worldId = vec4(a,1);', '  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );', '}'].join('\n'),
+	
+		fragmentShader: ['#ifdef GL_ES\n', 'precision highp float;\n', '#endif\n', '', 'varying vec4 worldId;', '', 'void main() {', '  gl_FragColor = worldId;', '}'].join('\n')
+	};
+	
+	exports['default'] = PickingShader;
+	module.exports = exports['default'];
+
+/***/ },
+/* 68 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _GeoJSONTileLayer = __webpack_require__(55);
 	
 	var _GeoJSONTileLayer2 = _interopRequireDefault(_GeoJSONTileLayer);
 	
@@ -14525,7 +14905,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 65 */
+/* 69 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -14542,7 +14922,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Layer2 = __webpack_require__(33);
+	var _Layer2 = __webpack_require__(35);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -14550,7 +14930,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _reqwest = __webpack_require__(55);
+	var _reqwest = __webpack_require__(57);
 	
 	var _reqwest2 = _interopRequireDefault(_reqwest);
 	
@@ -14566,11 +14946,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _geoLatLon2 = _interopRequireDefault(_geoLatLon);
 	
-	var _utilGeoJSON = __webpack_require__(57);
+	var _utilGeoJSON = __webpack_require__(59);
 	
 	var _utilGeoJSON2 = _interopRequireDefault(_utilGeoJSON);
 	
-	var _utilBuffer = __webpack_require__(63);
+	var _utilBuffer = __webpack_require__(65);
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
@@ -14910,7 +15290,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 66 */
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -14919,7 +15299,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _GeoJSONLayer = __webpack_require__(65);
+	var _GeoJSONLayer = __webpack_require__(69);
 	
 	var _GeoJSONLayer2 = _interopRequireDefault(_GeoJSONLayer);
 	

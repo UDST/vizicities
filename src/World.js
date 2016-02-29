@@ -40,7 +40,7 @@ class World extends EventEmitter {
   }
 
   _initEngine() {
-    this._engine = Engine(this._container);
+    this._engine = Engine(this._container, this);
 
     // Engine events
     //

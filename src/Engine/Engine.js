@@ -3,16 +3,21 @@ import THREE from 'three';
 import Scene from './Scene';
 import Renderer from './Renderer';
 import Camera from './Camera';
+import Picking from './Picking';
 
 class Engine extends EventEmitter {
-  constructor(container) {
+  constructor(container, world) {
     console.log('Init Engine');
 
     super();
 
+    this._world = world;
     this._scene = Scene;
     this._renderer = Renderer(container);
     this._camera = Camera(container);
+
+    this._picking = Picking(this._world, this._renderer, this._camera);
+
     this.clock = new THREE.Clock();
 
     this._frustum = new THREE.Frustum();
@@ -20,7 +25,12 @@ class Engine extends EventEmitter {
 
   update(delta) {
     this.emit('preRender');
-    this._renderer.render(this._scene, this._camera);
+
+    // this._renderer.render(this._scene, this._camera);
+
+    // Render picking scene
+    this._renderer.render(this._picking._pickingScene, this._camera);
+
     this.emit('postRender');
   }
 
@@ -53,6 +63,7 @@ class Engine extends EventEmitter {
       }
     };
 
+    this._world = null;
     this._scene = null;
     this._renderer = null;
     this._camera = null;
@@ -62,6 +73,6 @@ class Engine extends EventEmitter {
 }
 
 // Initialise without requiring new keyword
-export default function(container) {
-  return new Engine(container);
+export default function(container, world) {
+  return new Engine(container, world);
 };

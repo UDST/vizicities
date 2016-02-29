@@ -8,6 +8,7 @@ import extend from 'lodash.assign';
 // import Offset from 'polygon-offset';
 import GeoJSON from '../../util/GeoJSON';
 import Buffer from '../../util/Buffer';
+import PickingMaterial from '../../engine/PickingMaterial';
 
 // TODO: Make sure nothing is left behind in the heap after calling destroy()
 
@@ -66,6 +67,7 @@ class GeoJSONTile extends Tile {
     setTimeout(() => {
       if (!this._mesh) {
         this._mesh = this._createMesh();
+        this._pickingMesh = this._createPickingMesh();
         // this._shadowCanvas = this._createShadowCanvas();
         this._requestTile();
       }
@@ -110,6 +112,19 @@ class GeoJSONTile extends Tile {
     // mesh.add(box);
     //
     // mesh.add(this._createDebugMesh());
+
+    return mesh;
+  }
+
+  _createPickingMesh() {
+    if (!this._center) {
+      return;
+    }
+
+    var mesh = new THREE.Object3D();
+
+    mesh.position.x = this._center[0];
+    mesh.position.z = this._center[1];
 
     return mesh;
   }
@@ -265,6 +280,7 @@ class GeoJSONTile extends Tile {
       vertices: [],
       faces: [],
       colours: [],
+      pickingIds: [],
       facesCount: 0,
       allFlat: true
     };
@@ -374,6 +390,14 @@ class GeoJSONTile extends Tile {
         polygons.vertices.push(polygonAttributes.vertices);
         polygons.faces.push(polygonAttributes.faces);
         polygons.colours.push(polygonAttributes.colours);
+
+        // TODO: Make this optional
+        var pickingId = this._layer.getPickingId();
+
+        // Inject picking ID
+        //
+        // TODO: Perhaps handle this within the GeoJSON helper
+        polygons.pickingIds.push(pickingId);
 
         if (polygons.allFlat && !polygonAttributes.flat) {
           polygons.allFlat = false;
@@ -488,6 +512,12 @@ class GeoJSONTile extends Tile {
       }
 
       this._mesh.add(mesh);
+
+      material = new PickingMaterial();
+      material.side = THREE.BackSide;
+
+      var pickingMesh = new THREE.Mesh(geometry, material);
+      this._pickingMesh.add(pickingMesh);
     }
 
     this._ready = true;

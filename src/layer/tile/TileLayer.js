@@ -69,9 +69,11 @@ class TileLayer extends Layer {
 
     this._frustum = new THREE.Frustum();
     this._tiles = new THREE.Object3D();
+    this._tilesPicking = new THREE.Object3D();
   }
 
   _onAdd(world) {
+    this.addToPicking(this._tilesPicking);
     this.add(this._tiles);
   }
 
@@ -110,6 +112,10 @@ class TileLayer extends Layer {
 
       // Add tile to layer (and to scene) if not already there
       this._tiles.add(tile.getMesh());
+
+      if (tile.getPickingMesh()) {
+        this._tilesPicking.add(tile.getPickingMesh());
+      }
     });
   }
 
@@ -274,6 +280,14 @@ class TileLayer extends Layer {
     for (var i = this._tiles.children.length - 1; i >= 0; i--) {
       this._tiles.remove(this._tiles.children[i]);
     }
+
+    if (!this._tilesPicking || !this._tilesPicking.children) {
+      return;
+    }
+
+    for (var i = this._tilesPicking.children.length - 1; i >= 0; i--) {
+      this._tilesPicking.remove(this._tilesPicking.children[i]);
+    }
   }
 
   // Return a new tile instance
@@ -314,10 +328,21 @@ class TileLayer extends Layer {
       }
     }
 
+    // Remove tile from picking scene
+    this.removeFromPicking(this._tilesPicking);
+
+    if (this._tilesPicking.children) {
+      // Remove all tiles
+      for (var i = this._tilesPicking.children.length - 1; i >= 0; i--) {
+        this._tilesPicking.remove(this._tilesPicking.children[i]);
+      }
+    }
+
     this._tileCache.destroy();
     this._tileCache = null;
 
     this._tiles = null;
+    this._tilesPicking = null;
     this._frustum = null;
 
     super.destroy();
