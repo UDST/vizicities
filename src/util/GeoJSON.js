@@ -8,8 +8,8 @@ import geojsonMerge from 'geojson-merge';
 import earcut from 'earcut';
 import extrudePolygon from './extrudePolygon';
 
-// TODO: Make it so height can be per-coordinate for linestrings so you can do
-// things like offsetting GPS points based on elevation at each point
+// TODO: Make it so height can be per-coordinate / point but connected together
+// as a linestring (eg. GPS points with an elevation at each point)
 
 // Light and dark colours used for poor-mans AO gradient on object sides
 var light = new THREE.Color(0xffffff);
@@ -75,7 +75,6 @@ var GeoJSON = (function() {
     // LineSegments requires pairs of vertices so repeat the last point if
     // there's an odd number of vertices
     coordinates.forEach((coordinate, index) => {
-      // TODO: Don't hardcode y-value
       _colours.push([colour.r, colour.g, colour.b]);
       _coords.push([coordinate[0], height, coordinate[1]]);
 
