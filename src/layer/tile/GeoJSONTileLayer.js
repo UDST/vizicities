@@ -4,6 +4,11 @@ import GeoJSONTile from './GeoJSONTile';
 import throttle from 'lodash.throttle';
 import THREE from 'three';
 
+// TODO: Offer on-the-fly slicing of static, non-tile-based GeoJSON files into a
+// tile grid using geojson-vt
+//
+// See: https://github.com/mapbox/geojson-vt
+
 // TODO: Make sure nothing is left behind in the heap after calling destroy()
 
 // TODO: Consider pausing per-frame output during movement so there's little to
