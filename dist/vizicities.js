@@ -189,6 +189,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._initEnvironment();
 	    this._initEvents();
 	
+	    this._pause = false;
+	
 	    // Kick off the update and render loop
 	    this._update();
 	  }
@@ -265,6 +267,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_update',
 	    value: function _update() {
+	      if (this._pause) {
+	        return;
+	      }
+	
 	      var delta = this._engine.clock.getDelta();
 	
 	      // Once _update is called it will run forever, for now
@@ -398,7 +404,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return this;
 	    }
 	
-	    // Remove layer and perform clean up operations
+	    // Remove layer from world and scene but don't destroy it entirely
 	  }, {
 	    key: 'removeLayer',
 	    value: function removeLayer(layer) {
@@ -410,8 +416,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      };
 	
 	      this._engine._scene.remove(layer._layer);
-	
-	      layer.destroy();
 	
 	      this.emit('layerRemoved');
 	      return this;
@@ -426,9 +430,67 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.emit('controlsAdded', controls);
 	      return this;
 	    }
+	
+	    // Remove controls from world but don't destroy them entirely
 	  }, {
 	    key: 'removeControls',
-	    value: function removeControls(controls) {}
+	    value: function removeControls(controls) {
+	      var controlsIndex = this._controls.indexOf(controlsIndex);
+	
+	      if (controlsIndex > -1) {
+	        this._controls.splice(controlsIndex, 1);
+	      };
+	
+	      this.emit('controlsRemoved', controls);
+	      return this;
+	    }
+	  }, {
+	    key: 'stop',
+	    value: function stop() {
+	      this._pause = true;
+	    }
+	  }, {
+	    key: 'start',
+	    value: function start() {
+	      this._pause = false;
+	      this._update();
+	    }
+	
+	    // Destroys the world(!) and removes it from the scene and memory
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {
+	      this.stop();
+	
+	      // Remove listeners
+	      this.off('controlsMoveEnd', this._onControlsMoveEnd);
+	
+	      var i;
+	
+	      // Remove all controls
+	      var controls;
+	      for (i = this._controls.length - 1; i >= 0; i--) {
+	        controls = this._controls[0];
+	        this.removeControls(controls);
+	        controls.destroy();
+	      };
+	
+	      // Remove all layers
+	      var layer;
+	      for (i = this._layers.length - 1; i >= 0; i--) {
+	        layer = this._layers[0];
+	        this.removeLayer(layer);
+	        layer.destroy();
+	      };
+	
+	      // Environment layer is removed with the other layers
+	      this._environment = null;
+	
+	      this._engine = null;
+	
+	      // TODO: Probably should clean the container too / remove the canvas
+	      this._container = null;
+	    }
 	  }]);
 	
 	  return World;
@@ -3088,6 +3150,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._renderer.render(this._scene, this._camera);
 	      this.emit('postRender');
 	    }
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {
+	      // Remove any remaining objects from scene
+	      var child;
+	      for (i = this._scene.children.length - 1; i >= 0; i--) {
+	        child = this._scene.children[i];
+	
+	        if (!child) {
+	          continue;
+	        }
+	
+	        this._scene.remove(child);
+	
+	        if (child.geometry) {
+	          // Dispose of mesh and materials
+	          child.geometry.dispose();
+	          child.geometry = null;
+	        }
+	
+	        if (child.material) {
+	          if (child.material.map) {
+	            child.material.map.dispose();
+	            child.material.map = null;
+	          }
+	
+	          child.material.dispose();
+	          child.material = null;
+	        }
+	      };
+	
+	      this._scene = null;
+	      this._renderer = null;
+	      this._camera = null;
+	      this._clock = null;
+	      this._frustum = null;
+	    }
 	  }]);
 	
 	  return Engine;
@@ -3399,6 +3498,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._initEvents();
 	
 	      this.emit('added');
+	    }
+	
+	    // Destroys the controls and removes them from memory
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {
+	      // TODO: Remove event listeners
+	
+	      this._controls.dispose();
+	
+	      this._world = null;
+	      this._controls = null;
 	    }
 	  }]);
 	
@@ -7408,31 +7519,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'destroy',
 	    value: function destroy() {
-	      // Remove everything else in the layer
-	      var child;
-	      for (i = this._layer.children.length - 1; i >= 0; i--) {
-	        child = this._layer.children[i];
+	      if (this._layer.children) {
+	        // Remove everything else in the layer
+	        var child;
+	        for (var i = this._layer.children.length - 1; i >= 0; i--) {
+	          child = this._layer.children[i];
 	
-	        if (!child) {
-	          continue;
-	        }
-	
-	        this.remove(child);
-	
-	        if (child.geometry) {
-	          // Dispose of mesh and materials
-	          child.geometry.dispose();
-	          child.geometry = null;
-	        }
-	
-	        if (child.material) {
-	          if (child.material.map) {
-	            child.material.map.dispose();
-	            child.material.map = null;
+	          if (!child) {
+	            continue;
 	          }
 	
-	          child.material.dispose();
-	          child.material = null;
+	          this.remove(child);
+	
+	          if (child.geometry) {
+	            // Dispose of mesh and materials
+	            child.geometry.dispose();
+	            child.geometry = null;
+	          }
+	
+	          if (child.material) {
+	            if (child.material.map) {
+	              child.material.map.dispose();
+	              child.material.map = null;
+	            }
+	
+	            child.material.dispose();
+	            child.material = null;
+	          }
 	        }
 	      }
 	
@@ -8540,6 +8653,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _outputTiles() {
 	      var _this2 = this;
 	
+	      if (!this._tiles) {
+	        return;
+	      }
+	
 	      // Remove all tiles from layer
 	      this._removeTiles();
 	
@@ -8719,6 +8836,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_removeTiles',
 	    value: function _removeTiles() {
+	      if (!this._tiles || !this._tiles.children) {
+	        return;
+	      }
+	
 	      for (var i = this._tiles.children.length - 1; i >= 0; i--) {
 	        this._tiles.remove(this._tiles.children[i]);
 	      }
@@ -8762,11 +8883,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'destroy',
 	    value: function destroy() {
-	      var i;
-	
-	      // Remove all tiles
-	      for (i = this._tiles.children.length - 1; i >= 0; i--) {
-	        this._tiles.remove(this._tiles.children[i]);
+	      if (this._tiles.children) {
+	        // Remove all tiles
+	        for (var i = this._tiles.children.length - 1; i >= 0; i--) {
+	          this._tiles.remove(this._tiles.children[i]);
+	        }
 	      }
 	
 	      this._tileCache.destroy();

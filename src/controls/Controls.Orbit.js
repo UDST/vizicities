@@ -86,6 +86,16 @@ class Orbit extends EventEmitter {
 
     this.emit('added');
   }
+
+  // Destroys the controls and removes them from memory
+  destroy() {
+    // TODO: Remove event listeners
+
+    this._controls.dispose();
+
+    this._world = null;
+    this._controls = null;
+  }
 }
 
 // Initialise without requiring new keyword

@@ -29,6 +29,8 @@ class World extends EventEmitter {
     this._initEnvironment();
     this._initEvents();
 
+    this._pause = false;
+
     // Kick off the update and render loop
     this._update();
   }
@@ -90,6 +92,10 @@ class World extends EventEmitter {
   }
 
   _update() {
+    if (this._pause) {
+      return;
+    }
+
     var delta = this._engine.clock.getDelta();
 
     // Once _update is called it will run forever, for now
@@ -202,7 +208,7 @@ class World extends EventEmitter {
     return this;
   }
 
-  // Remove layer and perform clean up operations
+  // Remove layer from world and scene but don't destroy it entirely
   removeLayer(layer) {
     var layerIndex = this._layers.indexOf(layer);
 
@@ -212,8 +218,6 @@ class World extends EventEmitter {
     };
 
     this._engine._scene.remove(layer._layer);
-
-    layer.destroy();
 
     this.emit('layerRemoved');
     return this;
@@ -228,7 +232,62 @@ class World extends EventEmitter {
     return this;
   }
 
-  removeControls(controls) {}
+  // Remove controls from world but don't destroy them entirely
+  removeControls(controls) {
+    var controlsIndex = this._controls.indexOf(controlsIndex);
+
+    if (controlsIndex > -1) {
+      this._controls.splice(controlsIndex, 1);
+    };
+
+    this.emit('controlsRemoved', controls);
+    return this;
+  }
+
+  stop() {
+    this._pause = true;
+  }
+
+  start() {
+    this._pause = false;
+    this._update();
+  }
+
+  // Destroys the world(!) and removes it from the scene and memory
+  //
+  // TODO: World out why so much three.js stuff is left in the heap after this
+  destroy() {
+    this.stop();
+
+    // Remove listeners
+    this.off('controlsMoveEnd', this._onControlsMoveEnd);
+
+    var i;
+
+    // Remove all controls
+    var controls;
+    for (i = this._controls.length - 1; i >= 0; i--) {
+      controls = this._controls[0];
+      this.removeControls(controls);
+      controls.destroy();
+    };
+
+    // Remove all layers
+    var layer;
+    for (i = this._layers.length - 1; i >= 0; i--) {
+      layer = this._layers[0];
+      this.removeLayer(layer);
+      layer.destroy();
+    };
+
+    // Environment layer is removed with the other layers
+    this._environment = null;
+
+    this._engine = null;
+
+    // TODO: Probably should clean the container too / remove the canvas
+    this._container = null;
+  }
 }
 
 // Initialise without requiring new keyword

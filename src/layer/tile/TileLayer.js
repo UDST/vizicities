@@ -91,6 +91,10 @@ class TileLayer extends Layer {
 
   // Update and output tiles from the previous LOD checklist
   _outputTiles() {
+    if (!this._tiles) {
+      return;
+    }
+
     // Remove all tiles from layer
     this._removeTiles();
 
@@ -263,6 +267,10 @@ class TileLayer extends Layer {
   }
 
   _removeTiles() {
+    if (!this._tiles || !this._tiles.children) {
+      return;
+    }
+
     for (var i = this._tiles.children.length - 1; i >= 0; i--) {
       this._tiles.remove(this._tiles.children[i]);
     }
@@ -299,11 +307,11 @@ class TileLayer extends Layer {
 
   // Destroys the layer and removes it from the scene and memory
   destroy() {
-    var i;
-
-    // Remove all tiles
-    for (i = this._tiles.children.length - 1; i >= 0; i--) {
-      this._tiles.remove(this._tiles.children[i]);
+    if (this._tiles.children) {
+      // Remove all tiles
+      for (var i = this._tiles.children.length - 1; i >= 0; i--) {
+        this._tiles.remove(this._tiles.children[i]);
+      }
     }
 
     this._tileCache.destroy();
