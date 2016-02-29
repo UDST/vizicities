@@ -11824,6 +11824,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        options.picking = true;
 	      }
 	
+	      if (this._options.onClick) {
+	        options.onClick = this._options.onClick;
+	      }
+	
 	      return (0, _GeoJSONTile2['default'])(quadcode, this._path, layer, options);
 	    }
 	
@@ -11958,6 +11962,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      picking: false,
 	      topojson: false,
 	      filter: null,
+	      onClick: null,
 	      style: this._defaultStyle
 	    };
 	
@@ -12002,6 +12007,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // Clear request reference
 	      this._request = null;
+	
+	      // TODO: Properly dispose of picking mesh
+	      this._pickingMesh = null;
 	
 	      _get(Object.getPrototypeOf(GeoJSONTile.prototype), 'destroy', this).call(this);
 	    }
@@ -12217,15 +12225,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        allFlat: true
 	      };
 	
-	      if (this._options.picking) {
-	        polygons.pickingIds = [];
-	      }
-	
 	      var lines = {
 	        vertices: [],
 	        colours: [],
 	        verticesCount: 0
 	      };
+	
+	      if (this._options.picking) {
+	        polygons.pickingIds = [];
+	        lines.pickingIds = [];
+	      }
 	
 	      var colour = new _three2['default'].Color();
 	
@@ -12267,6 +12276,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	          lines.vertices.push(linestringAttributes.vertices);
 	          lines.colours.push(linestringAttributes.colours);
+	
+	          if (_this3._options.picking) {
+	            var pickingId = _this3._layer.getPickingId();
+	
+	            // Inject picking ID
+	            //
+	            // TODO: Perhaps handle this within the GeoJSON helper
+	            lines.pickingIds.push(pickingId);
+	
+	            if (_this3._options.onClick) {
+	              // TODO: Find a way to properly remove this listener on destroy
+	              _this3._world.on('pick-' + pickingId, function () {
+	                _this3._options.onClick(feature);
+	              });
+	            }
+	          }
+	
 	          lines.verticesCount += linestringAttributes.vertices.length;
 	        }
 	
@@ -12291,6 +12317,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	          lines.vertices.push(multiLinestringAttributes.vertices);
 	          lines.colours.push(multiLinestringAttributes.colours);
+	
+	          if (_this3._options.picking) {
+	            var pickingId = _this3._layer.getPickingId();
+	
+	            // Inject picking ID
+	            //
+	            // TODO: Perhaps handle this within the GeoJSON helper
+	            lines.pickingIds.push(pickingId);
+	
+	            if (_this3._options.onClick) {
+	              // TODO: Find a way to properly remove this listener on destroy
+	              _this3._world.on('pick-' + pickingId, function () {
+	                _this3._options.onClick(feature);
+	              });
+	            }
+	          }
+	
 	          lines.verticesCount += multiLinestringAttributes.vertices.length;
 	        }
 	
@@ -12331,8 +12374,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // TODO: Perhaps handle this within the GeoJSON helper
 	            polygons.pickingIds.push(pickingId);
 	
-	            // TODO: This is probably a good point to listen for picking events
-	            // relating to this feature and do something with them
+	            if (_this3._options.onClick) {
+	              // TODO: Find a way to properly remove this listener on destroy
+	              _this3._world.on('pick-' + pickingId, function () {
+	                _this3._options.onClick(feature);
+	              });
+	            }
 	          }
 	
 	          if (polygons.allFlat && !polygonAttributes.flat) {
@@ -12415,6 +12462,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // mesh.castShadow = true;
 	
 	        this._mesh.add(mesh);
+	
+	        if (this._options.picking) {
+	          material = new _enginePickingMaterial2['default']();
+	          material.side = _three2['default'].BackSide;
+	
+	          // Make the line wider / easier to pick
+	          material.linewidth = style.lineWidth + material.linePadding;
+	
+	          var pickingMesh = new _three2['default'].LineSegments(geometry, material);
+	          this._pickingMesh.add(pickingMesh);
+	        }
 	      }
 	
 	      // Output polygons
@@ -14722,14 +14780,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var vertices = new Float32Array(lines.verticesCount * 3);
 	    var colours = new Float32Array(lines.verticesCount * 3);
 	
+	    var pickingIds;
+	    if (lines.pickingIds) {
+	      // One component per vertex (1)
+	      pickingIds = new Float32Array(lines.verticesCount);
+	    }
+	
 	    var _vertices;
 	    var _colour;
+	    var _pickingId;
 	
 	    var lastIndex = 0;
 	
 	    for (var i = 0; i < lines.vertices.length; i++) {
 	      _vertices = lines.vertices[i];
 	      _colour = lines.colours[i];
+	
+	      if (pickingIds) {
+	        _pickingId = lines.pickingIds[i];
+	      }
 	
 	      for (var j = 0; j < _vertices.length; j++) {
 	        var ax = _vertices[j][0] + offset.x;
@@ -14746,6 +14815,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        colours[lastIndex * 3 + 1] = c1[1];
 	        colours[lastIndex * 3 + 2] = c1[2];
 	
+	        if (pickingIds) {
+	          pickingIds[lastIndex] = _pickingId;
+	        }
+	
 	        lastIndex++;
 	      }
 	    }
@@ -14753,6 +14826,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // itemSize = 3 because there are 3 values (components) per vertex
 	    geometry.addAttribute('position', new _three2['default'].BufferAttribute(vertices, 3));
 	    geometry.addAttribute('color', new _three2['default'].BufferAttribute(colours, 3));
+	
+	    if (pickingIds) {
+	      geometry.addAttribute('pickingId', new _three2['default'].BufferAttribute(pickingIds, 1));
+	    }
 	
 	    geometry.computeBoundingBox();
 	
@@ -14929,33 +15006,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var PickingMaterial = function PickingMaterial() {
 	  _three2['default'].ShaderMaterial.call(this, {
-	    // uniforms: {
-	    //   size: {
-	    //     type: 'f',
-	    //     value: 0.01,
-	    //   },
-	    //   scale: {
-	    //     type: 'f',
-	    //     value: 400,
-	    //   }
-	    // },
+	    uniforms: {
+	      size: {
+	        type: 'f',
+	        value: 0.01
+	      },
+	      scale: {
+	        type: 'f',
+	        value: 400
+	      }
+	    },
 	    // attributes: ['position', 'id'],
 	    vertexShader: _PickingShader2['default'].vertexShader,
 	    fragmentShader: _PickingShader2['default'].fragmentShader
 	  });
+	
+	  this.linePadding = 2;
 	};
 	
 	PickingMaterial.prototype = Object.create(_three2['default'].ShaderMaterial.prototype);
 	
 	PickingMaterial.prototype.constructor = PickingMaterial;
 	
-	// PickingMaterial.prototype.setPointSize = function(size) {
-	//   this.uniforms.size.value = size;
-	// };
-	//
-	// PickingMaterial.prototype.setPointScale = function(scale) {
-	//   this.uniforms.scale.value = scale;
-	// };
+	PickingMaterial.prototype.setPointSize = function (size) {
+	  this.uniforms.size.value = size;
+	};
+	
+	PickingMaterial.prototype.setPointScale = function (scale) {
+	  this.uniforms.scale.value = scale;
+	};
 	
 	exports['default'] = PickingMaterial;
 	module.exports = exports['default'];
@@ -15067,6 +15146,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
+	var _enginePickingMaterial = __webpack_require__(66);
+	
+	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
+	
 	var GeoJSONLayer = (function (_Layer) {
 	  _inherits(GeoJSONLayer, _Layer);
 	
@@ -15080,8 +15163,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._defaultStyle = _utilGeoJSON2['default'].defaultStyle;
 	
 	    var defaults = {
+	      picking: false,
 	      topojson: false,
 	      filter: null,
+	      onClick: null,
 	      style: this._defaultStyle
 	    };
 	
@@ -15092,6 +15177,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    } else {
 	      this._options.style = (0, _lodashAssign2['default'])({}, defaults.style, options.style);
 	    }
+	
+	    this._pickingMesh = new _three2['default'].Object3D();
 	  }
 	
 	  // Initialise without requiring new keyword
@@ -15099,6 +15186,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(GeoJSONLayer, [{
 	    key: '_onAdd',
 	    value: function _onAdd(world) {
+	      this.addToPicking(this._pickingMesh);
+	
 	      // Request data from URL if needed
 	      if (typeof this._geojson === 'string') {
 	        this._requestData(this._geojson);
@@ -15173,6 +15262,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        verticesCount: 0
 	      };
 	
+	      if (this._options.picking) {
+	        polygons.pickingIds = [];
+	        lines.pickingIds = [];
+	      }
+	
 	      var colour = new _three2['default'].Color();
 	
 	      features.forEach(function (feature) {
@@ -15222,6 +15316,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	          lines.vertices.push(linestringAttributes.vertices);
 	          lines.colours.push(linestringAttributes.colours);
+	
+	          if (_this2._options.picking) {
+	            var pickingId = _this2.getPickingId();
+	
+	            // Inject picking ID
+	            //
+	            // TODO: Perhaps handle this within the GeoJSON helper
+	            lines.pickingIds.push(pickingId);
+	
+	            if (_this2._options.onClick) {
+	              // TODO: Find a way to properly remove this listener on destroy
+	              _this2._world.on('pick-' + pickingId, function () {
+	                _this2._options.onClick(feature);
+	              });
+	            }
+	          }
+	
 	          lines.verticesCount += linestringAttributes.vertices.length;
 	        }
 	
@@ -15255,6 +15366,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	          lines.vertices.push(multiLinestringAttributes.vertices);
 	          lines.colours.push(multiLinestringAttributes.colours);
+	
+	          if (_this2._options.picking) {
+	            var pickingId = _this2.getPickingId();
+	
+	            // Inject picking ID
+	            //
+	            // TODO: Perhaps handle this within the GeoJSON helper
+	            lines.pickingIds.push(pickingId);
+	
+	            if (_this2._options.onClick) {
+	              // TODO: Find a way to properly remove this listener on destroy
+	              _this2._world.on('pick-' + pickingId, function () {
+	                _this2._options.onClick(feature);
+	              });
+	            }
+	          }
+	
 	          lines.verticesCount += multiLinestringAttributes.vertices.length;
 	        }
 	
@@ -15290,6 +15418,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	          polygons.faces.push(polygonAttributes.faces);
 	          polygons.colours.push(polygonAttributes.colours);
 	
+	          if (_this2._options.picking) {
+	            var pickingId = _this2.getPickingId();
+	
+	            // Inject picking ID
+	            //
+	            // TODO: Perhaps handle this within the GeoJSON helper
+	            polygons.pickingIds.push(pickingId);
+	
+	            if (_this2._options.onClick) {
+	              // TODO: Find a way to properly remove this listener on destroy
+	              _this2._world.on('pick-' + pickingId, function () {
+	                _this2._options.onClick(feature);
+	              });
+	            }
+	          }
+	
 	          if (polygons.allFlat && !polygonAttributes.flat) {
 	            polygons.allFlat = false;
 	          }
@@ -15301,6 +15445,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var geometry;
 	      var material;
 	      var mesh;
+	
+	      if (this._options.picking) {
+	        // Move picking mesh to origin Point
+	        this._pickingMesh.position.x = -offset.x;
+	        this._pickingMesh.position.z = -offset.y;
+	      }
 	
 	      // Output lines
 	      if (lines.vertices.length > 0) {
@@ -15325,6 +15475,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // mesh.castShadow = true;
 	
 	        this.add(mesh);
+	
+	        if (this._options.picking) {
+	          material = new _enginePickingMaterial2['default']();
+	          material.side = _three2['default'].BackSide;
+	
+	          // Make the line wider / easier to pick
+	          material.linewidth = style.lineWidth + material.linePadding;
+	
+	          var pickingMesh = new _three2['default'].LineSegments(geometry, material);
+	          this._pickingMesh.add(pickingMesh);
+	        }
 	      }
 	
 	      // Output polygons
@@ -15358,6 +15519,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        this.add(mesh);
+	
+	        if (this._options.picking) {
+	          material = new _enginePickingMaterial2['default']();
+	          material.side = _three2['default'].BackSide;
+	
+	          var pickingMesh = new _three2['default'].Mesh(geometry, material);
+	          this._pickingMesh.add(pickingMesh);
+	        }
 	      }
 	
 	      // Move layer to origin Point
@@ -15386,6 +15555,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // Clear request reference
 	      this._request = null;
+	
+	      // TODO: Properly dispose of picking mesh
+	      this._pickingMesh = null;
 	
 	      // Run common destruction logic from parent
 	      _get(Object.getPrototypeOf(GeoJSONLayer.prototype), 'destroy', this).call(this);

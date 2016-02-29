@@ -53,6 +53,7 @@ class GeoJSONTile extends Tile {
       picking: false,
       topojson: false,
       filter: null,
+      onClick: null,
       style: this._defaultStyle
     };
 
@@ -89,6 +90,9 @@ class GeoJSONTile extends Tile {
 
     // Clear request reference
     this._request = null;
+
+    // TODO: Properly dispose of picking mesh
+    this._pickingMesh = null;
 
     super.destroy();
   }
@@ -293,15 +297,16 @@ class GeoJSONTile extends Tile {
       allFlat: true
     };
 
-    if (this._options.picking) {
-      polygons.pickingIds = [];
-    }
-
     var lines = {
       vertices: [],
       colours: [],
       verticesCount: 0
     };
+
+    if (this._options.picking) {
+      polygons.pickingIds = [];
+      lines.pickingIds = [];
+    }
 
     var colour = new THREE.Color();
 
@@ -347,6 +352,23 @@ class GeoJSONTile extends Tile {
 
         lines.vertices.push(linestringAttributes.vertices);
         lines.colours.push(linestringAttributes.colours);
+
+        if (this._options.picking) {
+          var pickingId = this._layer.getPickingId();
+
+          // Inject picking ID
+          //
+          // TODO: Perhaps handle this within the GeoJSON helper
+          lines.pickingIds.push(pickingId);
+
+          if (this._options.onClick) {
+            // TODO: Find a way to properly remove this listener on destroy
+            this._world.on('pick-' + pickingId, () => {
+              this._options.onClick(feature);
+            });
+          }
+        }
+
         lines.verticesCount += linestringAttributes.vertices.length;
       }
 
@@ -371,6 +393,23 @@ class GeoJSONTile extends Tile {
 
         lines.vertices.push(multiLinestringAttributes.vertices);
         lines.colours.push(multiLinestringAttributes.colours);
+
+        if (this._options.picking) {
+          var pickingId = this._layer.getPickingId();
+
+          // Inject picking ID
+          //
+          // TODO: Perhaps handle this within the GeoJSON helper
+          lines.pickingIds.push(pickingId);
+
+          if (this._options.onClick) {
+            // TODO: Find a way to properly remove this listener on destroy
+            this._world.on('pick-' + pickingId, () => {
+              this._options.onClick(feature);
+            });
+          }
+        }
+
         lines.verticesCount += multiLinestringAttributes.vertices.length;
       }
 
@@ -411,8 +450,12 @@ class GeoJSONTile extends Tile {
           // TODO: Perhaps handle this within the GeoJSON helper
           polygons.pickingIds.push(pickingId);
 
-          // TODO: This is probably a good point to listen for picking events
-          // relating to this feature and do something with them
+          if (this._options.onClick) {
+            // TODO: Find a way to properly remove this listener on destroy
+            this._world.on('pick-' + pickingId, () => {
+              this._options.onClick(feature);
+            });
+          }
         }
 
         if (polygons.allFlat && !polygonAttributes.flat) {
@@ -495,6 +538,17 @@ class GeoJSONTile extends Tile {
       // mesh.castShadow = true;
 
       this._mesh.add(mesh);
+
+      if (this._options.picking) {
+        material = new PickingMaterial();
+        material.side = THREE.BackSide;
+
+        // Make the line wider / easier to pick
+        material.linewidth = style.lineWidth + material.linePadding;
+
+        var pickingMesh = new THREE.LineSegments(geometry, material);
+        this._pickingMesh.add(pickingMesh);
+      }
     }
 
     // Output polygons

@@ -6,6 +6,7 @@ import Point from '../geo/Point';
 import LatLon from '../geo/LatLon';
 import GeoJSON from '../util/GeoJSON';
 import Buffer from '../util/Buffer';
+import PickingMaterial from '../engine/PickingMaterial';
 
 class GeoJSONLayer extends Layer {
   constructor(geojson, options) {
@@ -16,8 +17,10 @@ class GeoJSONLayer extends Layer {
     this._defaultStyle = GeoJSON.defaultStyle;
 
     var defaults = {
+      picking: false,
       topojson: false,
       filter: null,
+      onClick: null,
       style: this._defaultStyle
     };
 
@@ -28,9 +31,13 @@ class GeoJSONLayer extends Layer {
     } else {
       this._options.style = extend({}, defaults.style, options.style);
     }
+
+    this._pickingMesh = new THREE.Object3D();
   }
 
   _onAdd(world) {
+    this.addToPicking(this._pickingMesh);
+
     // Request data from URL if needed
     if (typeof this._geojson === 'string') {
       this._requestData(this._geojson);
@@ -99,6 +106,11 @@ class GeoJSONLayer extends Layer {
       verticesCount: 0
     };
 
+    if (this._options.picking) {
+      polygons.pickingIds = [];
+      lines.pickingIds = [];
+    }
+
     var colour = new THREE.Color();
 
     features.forEach(feature => {
@@ -152,6 +164,23 @@ class GeoJSONLayer extends Layer {
 
         lines.vertices.push(linestringAttributes.vertices);
         lines.colours.push(linestringAttributes.colours);
+
+        if (this._options.picking) {
+          var pickingId = this.getPickingId();
+
+          // Inject picking ID
+          //
+          // TODO: Perhaps handle this within the GeoJSON helper
+          lines.pickingIds.push(pickingId);
+
+          if (this._options.onClick) {
+            // TODO: Find a way to properly remove this listener on destroy
+            this._world.on('pick-' + pickingId, () => {
+              this._options.onClick(feature);
+            });
+          }
+        }
+
         lines.verticesCount += linestringAttributes.vertices.length;
       }
 
@@ -185,6 +214,23 @@ class GeoJSONLayer extends Layer {
 
         lines.vertices.push(multiLinestringAttributes.vertices);
         lines.colours.push(multiLinestringAttributes.colours);
+
+        if (this._options.picking) {
+          var pickingId = this.getPickingId();
+
+          // Inject picking ID
+          //
+          // TODO: Perhaps handle this within the GeoJSON helper
+          lines.pickingIds.push(pickingId);
+
+          if (this._options.onClick) {
+            // TODO: Find a way to properly remove this listener on destroy
+            this._world.on('pick-' + pickingId, () => {
+              this._options.onClick(feature);
+            });
+          }
+        }
+
         lines.verticesCount += multiLinestringAttributes.vertices.length;
       }
 
@@ -220,6 +266,22 @@ class GeoJSONLayer extends Layer {
         polygons.faces.push(polygonAttributes.faces);
         polygons.colours.push(polygonAttributes.colours);
 
+        if (this._options.picking) {
+          var pickingId = this.getPickingId();
+
+          // Inject picking ID
+          //
+          // TODO: Perhaps handle this within the GeoJSON helper
+          polygons.pickingIds.push(pickingId);
+
+          if (this._options.onClick) {
+            // TODO: Find a way to properly remove this listener on destroy
+            this._world.on('pick-' + pickingId, () => {
+              this._options.onClick(feature);
+            });
+          }
+        }
+
         if (polygons.allFlat && !polygonAttributes.flat) {
           polygons.allFlat = false;
         }
@@ -231,6 +293,12 @@ class GeoJSONLayer extends Layer {
     var geometry;
     var material;
     var mesh;
+
+    if (this._options.picking) {
+      // Move picking mesh to origin Point
+      this._pickingMesh.position.x = -offset.x;
+      this._pickingMesh.position.z = -offset.y;
+    }
 
     // Output lines
     if (lines.vertices.length > 0) {
@@ -255,6 +323,17 @@ class GeoJSONLayer extends Layer {
       // mesh.castShadow = true;
 
       this.add(mesh);
+
+      if (this._options.picking) {
+        material = new PickingMaterial();
+        material.side = THREE.BackSide;
+
+        // Make the line wider / easier to pick
+        material.linewidth = style.lineWidth + material.linePadding;
+
+        var pickingMesh = new THREE.LineSegments(geometry, material);
+        this._pickingMesh.add(pickingMesh);
+      }
     }
 
     // Output polygons
@@ -288,6 +367,14 @@ class GeoJSONLayer extends Layer {
       }
 
       this.add(mesh);
+
+      if (this._options.picking) {
+        material = new PickingMaterial();
+        material.side = THREE.BackSide;
+
+        var pickingMesh = new THREE.Mesh(geometry, material);
+        this._pickingMesh.add(pickingMesh);
+      }
     }
 
     // Move layer to origin Point
@@ -314,6 +401,9 @@ class GeoJSONLayer extends Layer {
 
     // Clear request reference
     this._request = null;
+
+    // TODO: Properly dispose of picking mesh
+    this._pickingMesh = null;
 
     // Run common destruction logic from parent
     super.destroy();

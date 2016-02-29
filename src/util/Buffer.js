@@ -11,14 +11,25 @@ var Buffer = (function() {
     var vertices = new Float32Array(lines.verticesCount * 3);
     var colours = new Float32Array(lines.verticesCount * 3);
 
+    var pickingIds;
+    if (lines.pickingIds) {
+      // One component per vertex (1)
+      pickingIds = new Float32Array(lines.verticesCount);
+    }
+
     var _vertices;
     var _colour;
+    var _pickingId;
 
     var lastIndex = 0;
 
     for (var i = 0; i < lines.vertices.length; i++) {
       _vertices = lines.vertices[i];
       _colour = lines.colours[i];
+
+      if (pickingIds) {
+        _pickingId = lines.pickingIds[i];
+      }
 
       for (var j = 0; j < _vertices.length; j++) {
         var ax = _vertices[j][0] + offset.x;
@@ -35,6 +46,10 @@ var Buffer = (function() {
         colours[lastIndex * 3 + 1] = c1[1];
         colours[lastIndex * 3 + 2] = c1[2];
 
+        if (pickingIds) {
+          pickingIds[lastIndex] = _pickingId;
+        }
+
         lastIndex++;
       }
     }
@@ -42,6 +57,10 @@ var Buffer = (function() {
     // itemSize = 3 because there are 3 values (components) per vertex
     geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
     geometry.addAttribute('color', new THREE.BufferAttribute(colours, 3));
+
+    if (pickingIds) {
+      geometry.addAttribute('pickingId', new THREE.BufferAttribute(pickingIds, 1));
+    }
 
     geometry.computeBoundingBox();
 
