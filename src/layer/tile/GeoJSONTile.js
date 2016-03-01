@@ -363,8 +363,8 @@ class GeoJSONTile extends Tile {
 
           if (this._options.onClick) {
             // TODO: Find a way to properly remove this listener on destroy
-            this._world.on('pick-' + pickingId, () => {
-              this._options.onClick(feature);
+            this._world.on('pick-' + pickingId, (point2d, point3d, intersects) => {
+              this._options.onClick(feature, point2d, point3d, intersects);
             });
           }
         }
@@ -404,8 +404,8 @@ class GeoJSONTile extends Tile {
 
           if (this._options.onClick) {
             // TODO: Find a way to properly remove this listener on destroy
-            this._world.on('pick-' + pickingId, () => {
-              this._options.onClick(feature);
+            this._world.on('pick-' + pickingId, (point2d, point3d, intersects) => {
+              this._options.onClick(feature, point2d, point3d, intersects);
             });
           }
         }
@@ -452,8 +452,8 @@ class GeoJSONTile extends Tile {
 
           if (this._options.onClick) {
             // TODO: Find a way to properly remove this listener on destroy
-            this._world.on('pick-' + pickingId, () => {
-              this._options.onClick(feature);
+            this._world.on('pick-' + pickingId, (point2d, point3d, intersects) => {
+              this._options.onClick(feature, point2d, point3d, intersects);
             });
           }
         }

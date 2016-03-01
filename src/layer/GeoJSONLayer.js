@@ -175,8 +175,8 @@ class GeoJSONLayer extends Layer {
 
           if (this._options.onClick) {
             // TODO: Find a way to properly remove this listener on destroy
-            this._world.on('pick-' + pickingId, () => {
-              this._options.onClick(feature);
+            this._world.on('pick-' + pickingId, (point2d, point3d, intersects) => {
+              this._options.onClick(feature, point2d, point3d, intersects);
             });
           }
         }
@@ -225,8 +225,8 @@ class GeoJSONLayer extends Layer {
 
           if (this._options.onClick) {
             // TODO: Find a way to properly remove this listener on destroy
-            this._world.on('pick-' + pickingId, () => {
-              this._options.onClick(feature);
+            this._world.on('pick-' + pickingId, (point2d, point3d, intersects) => {
+              this._options.onClick(feature, point2d, point3d, intersects);
             });
           }
         }
@@ -276,8 +276,8 @@ class GeoJSONLayer extends Layer {
 
           if (this._options.onClick) {
             // TODO: Find a way to properly remove this listener on destroy
-            this._world.on('pick-' + pickingId, () => {
-              this._options.onClick(feature);
+            this._world.on('pick-' + pickingId, (point2d, point3d, intersects) => {
+              this._options.onClick(feature, point2d, point3d, intersects);
             });
           }
         }

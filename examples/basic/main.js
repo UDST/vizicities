@@ -33,8 +33,8 @@ var topoJSONTileLayer = VIZI.TopoJSONTileLayer('https://vector.mapzen.com/osm/bu
       lineRenderOrder: 2
     };
   },
-  // onClick: function(feature) {
-  //   console.log('Clicked:', feature);
+  // onClick: function(feature, point2d, point3d, intersects) {
+  //   console.log('Clicked:', feature, point2d, point3d, intersects);
   // },
   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://whosonfirst.mapzen.com#License">Who\'s On First</a>.'
 }).addTo(world);
@@ -64,7 +64,7 @@ var topoJSONTileLayer = VIZI.TopoJSONTileLayer('https://vector.mapzen.com/osm/bu
 //   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://whosonfirst.mapzen.com#License">Who\'s On First</a>.'
 // }).addTo(world);
 
-// // London Underground lines
+// London Underground lines
 // var geoJSONLayer = VIZI.GeoJSONLayer('https://rawgit.com/robhawkes/4acb9d6a6a5f00a377e2/raw/30ae704a44e10f2e13fb7e956e80c3b22e8e7e81/tfl_lines.json', {
 //   picking: true,
 //   style: function(feature) {
@@ -80,8 +80,8 @@ var topoJSONTileLayer = VIZI.TopoJSONTileLayer('https://vector.mapzen.com/osm/bu
 //       lineRenderOrder: 2
 //     };
 //   },
-//   onClick: function(feature) {
-//     console.log('Clicked:', feature);
+//   onClick: function(feature, point2d, point3d, intersects) {
+//     console.log('Clicked:', feature, point2d, point3d, intersects);
 //   },
 //   attribution: '&copy; Transport for London.'
 // }).addTo(world);

@@ -8,7 +8,14 @@ import PickingScene from './PickingScene';
 // TODO: Add a basic indicator on or around the mouse pointer when it is over
 // something pickable / clickable
 //
-// A simple transparent disc or ring at the mouse point should work to start
+// A simple transparent disc or ring at the mouse point should work to start, or
+// even just changing the cursor to the CSS 'pointer' style
+//
+// Probably want this on mousemove with a throttled update as not to spam the
+// picking method
+//
+// Relies upon the picking method not redrawing the scene every call due to
+// the way TileLayer invalidates the picking scene
 
 var nextId = 1;
 
@@ -17,6 +24,11 @@ class Picking {
     this._world = world;
     this._renderer = renderer;
     this._camera = camera;
+
+    this._raycaster = new THREE.Raycaster();
+
+    // TODO: Match this with the line width used in the picking layers
+    this._raycaster.linePrecision = 3;
 
     this._pickingScene = PickingScene;
     this._pickingTexture = new THREE.WebGLRenderTarget();
@@ -44,7 +56,13 @@ class Picking {
       return;
     }
 
-    this._pick(VIZI.Point(event.clientX, event.clientY));
+    var point = VIZI.Point(event.clientX, event.clientY);
+
+    var normalisedPoint = VIZI.Point(0, 0);
+    normalisedPoint.x = (point.x / this._width) * 2 - 1;
+    normalisedPoint.y = -(point.y / this._height) * 2 + 1;
+
+    this._pick(point, normalisedPoint);
   }
 
   _onWorldMove() {
@@ -54,8 +72,13 @@ class Picking {
   // TODO: Ensure this doesn't get out of sync issue with the renderer resize
   _resizeTexture() {
     var size = this._renderer.getSize();
-    this._pickingTexture.setSize(size.width, size.height);
-    this._pixelBuffer = new Uint8Array(4 * size.width * size.height);
+
+    this._width = size.width;
+    this._height = size.height;
+
+    this._pickingTexture.setSize(this._width, this._height);
+    this._pixelBuffer = new Uint8Array(4 * this._width * this._height);
+
     this._needUpdate = true;
   }
 
@@ -64,6 +87,9 @@ class Picking {
   //
   // Otherwise it re-draws the scene on every click due to the way LOD updates
   // work in TileLayer – spamming this.add() and this.remove()
+  //
+  // TODO: Pause updates during map move / orbit / zoom as this is unlikely to
+  // be a point in time where the user cares for picking functionality
   _update() {
     if (this._needUpdate) {
       var texture = this._pickingTexture;
@@ -77,7 +103,7 @@ class Picking {
     }
   }
 
-  _pick(point) {
+  _pick(point, normalisedPoint) {
     this._update();
 
     var index = point.x + (this._pickingTexture.height - point.y) * this._pickingTexture.width;
@@ -90,10 +116,26 @@ class Picking {
       return;
     }
 
-    this._world.emit('pick', id);
-    this._world.emit('pick-' + id);
+    this._raycaster.setFromCamera(normalisedPoint, this._camera);
 
-    console.log('Pick id:', id);
+    // Perform ray intersection on picking scene
+    //
+    // TODO: Only perform intersection test on the relevant picking mesh
+    var intersects = this._raycaster.intersectObjects(this._pickingScene.children, true);
+
+    var _point2d = point.clone();
+
+    var _point3d;
+    if (intersects.length > 0) {
+      _point3d = intersects[0].point.clone();
+    }
+
+    // Pass along as much data as possible for now until we know more about how
+    // people use the picking API and what the returned data should be
+    //
+    // TODO: Look into the leak potential for passing so much by reference here
+    this._world.emit('pick', id, _point2d, _point3d, intersects);
+    this._world.emit('pick-' + id, _point2d, _point3d, intersects);
   }
 
   // Add mesh to picking scene
