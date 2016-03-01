@@ -7,8 +7,8 @@
  * https://github.com/Leaflet/Leaflet/blob/master/src/geo/projection/Projection.Mercator.js
  */
 
-import LatLon from '../LatLon';
-import Point from '../Point';
+import {latLon as LatLon} from '../LatLon';
+import {point as Point} from '../Point';
 
 const Mercator = {
   // Radius / WGS84 semi-major axis

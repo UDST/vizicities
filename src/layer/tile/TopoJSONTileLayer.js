@@ -1,13 +1,22 @@
 import GeoJSONTileLayer from './GeoJSONTileLayer';
 import extend from 'lodash.assign';
 
-// Initialise without requiring new keyword
-export default function(path, options) {
-  var defaults = {
-    topojson: true
-  };
+class TopoJSONTileLayer extends GeoJSONTileLayer {
+  constructor(path, options) {
+    var defaults = {
+      topojson: true
+    };
 
-  options = extend({}, defaults, options);
+    options = extend({}, defaults, options);
 
-  return GeoJSONTileLayer(path, options);
+    super(path, options);
+  }
+}
+
+export default TopoJSONTileLayer;
+
+var noNew = function(path, options) {
+  return new TopoJSONTileLayer(path, options);
 };
+
+export {noNew as topoJSONTileLayer};

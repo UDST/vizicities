@@ -76,7 +76,9 @@ class Engine extends EventEmitter {
   }
 }
 
-// Initialise without requiring new keyword
-export default function(container, world) {
-  return new Engine(container, world);
-};
+export default Engine;
+
+// // Initialise without requiring new keyword
+// export default function(container, world) {
+//   return new Engine(container, world);
+// };

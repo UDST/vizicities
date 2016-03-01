@@ -1,9 +1,10 @@
 import EventEmitter from 'eventemitter3';
 import extend from 'lodash.assign';
 import CRS from './geo/crs/index';
-import Point from './geo/Point';
-import LatLon from './geo/LatLon';
+import {point as Point} from './geo/Point';
+import {latLon as LatLon} from './geo/LatLon';
 import Engine from './engine/Engine';
+import EnvironmentLayer from './layer/environment/EnvironmentLayer';
 
 // TODO: Make sure nothing is left behind in the heap after calling destroy()
 
@@ -40,7 +41,7 @@ class World extends EventEmitter {
   }
 
   _initEngine() {
-    this._engine = Engine(this._container, this);
+    this._engine = new Engine(this._container, this);
 
     // Engine events
     //
@@ -54,7 +55,7 @@ class World extends EventEmitter {
     //
     // Makes sense to allow others to customise their environment so perhaps
     // add some method of disable / overriding the environment settings
-    this._environment = VIZI.EnvironmentLayer({
+    this._environment = new EnvironmentLayer({
       skybox: this.options.skybox
     }).addTo(this);
   }
@@ -291,7 +292,11 @@ class World extends EventEmitter {
   }
 }
 
-// Initialise without requiring new keyword
-export default function(domId, options) {
+export default World;
+
+var noNew = function(domId, options) {
   return new World(domId, options);
 };
+
+// Initialise without requiring new keyword
+export {noNew as world};

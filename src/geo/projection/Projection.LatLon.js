@@ -6,8 +6,8 @@
  * https://github.com/Leaflet/Leaflet/blob/master/src/geo/projection/Projection.LonLat.js
  */
 
-import LatLon from '../LatLon';
-import Point from '../Point';
+import {latLon as LatLon} from '../LatLon';
+import {point as Point} from '../Point';
 
 const ProjectionLatLon = {
   project: function(latlon) {

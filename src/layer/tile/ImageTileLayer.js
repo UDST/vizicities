@@ -157,7 +157,11 @@ class ImageTileLayer extends TileLayer {
   }
 }
 
-// Initialise without requiring new keyword
-export default function(path, options) {
+export default ImageTileLayer;
+
+var noNew = function(path, options) {
   return new ImageTileLayer(path, options);
 };
+
+// Initialise without requiring new keyword
+export {noNew as imageTileLayer};

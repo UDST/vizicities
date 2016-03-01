@@ -1,7 +1,8 @@
-import Orbit from './Controls.Orbit';
+import Orbit, {orbit} from './Controls.Orbit';
 
 const Controls = {
-  Orbit: Orbit
+  Orbit: Orbit,
+  orbit, orbit
 };
 
 export default Controls;

@@ -1,5 +1,5 @@
-import Point from '../../geo/Point';
-import LatLon from '../../geo/LatLon';
+import {point as Point} from '../../geo/Point';
+import {latLon as LatLon} from '../../geo/LatLon';
 import THREE from 'three';
 
 // TODO: Make sure nothing is left behind in the heap after calling destroy()
@@ -31,7 +31,7 @@ class Tile {
     this._center = this._boundsToCenter(this._boundsWorld);
 
     // Tile center in projected coordinates
-    this._centerLatlon = this._world.pointToLatLon(VIZI.Point(this._center[0], this._center[1]));
+    this._centerLatlon = this._world.pointToLatLon(Point(this._center[0], this._center[1]));
 
     // Length of a tile side in world coorindates
     this._side = this._getSide(this._boundsWorld);

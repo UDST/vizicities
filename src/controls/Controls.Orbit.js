@@ -98,7 +98,11 @@ class Orbit extends EventEmitter {
   }
 }
 
-// Initialise without requiring new keyword
-export default function() {
+export default Orbit;
+
+var noNew = function() {
   return new Orbit();
 };
+
+// Initialise without requiring new keyword
+export {noNew as orbit};

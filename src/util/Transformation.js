@@ -6,7 +6,7 @@
  * https://github.com/Leaflet/Leaflet/blob/master/src/geometry/Transformation.js
  */
 
-import Point from '../geo/Point';
+import {point as Point} from '../geo/Point';
 
 class Transformation {
   constructor(a, b, c, d) {

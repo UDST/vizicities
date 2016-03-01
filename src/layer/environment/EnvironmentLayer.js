@@ -84,7 +84,7 @@ class EnvironmentLayer extends Layer {
   }
 
   _initSkybox() {
-    this._skybox = Skybox(this._world, this._skyboxLight);
+    this._skybox = new Skybox(this._world, this._skyboxLight);
     this.add(this._skybox._mesh);
   }
 
@@ -109,7 +109,11 @@ class EnvironmentLayer extends Layer {
   }
 }
 
-// Initialise without requiring new keyword
-export default function(options) {
+export default EnvironmentLayer;
+
+var noNew = function(options) {
   return new EnvironmentLayer(options);
 };
+
+// Initialise without requiring new keyword
+export {noNew as environmentLayer};

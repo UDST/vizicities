@@ -202,7 +202,11 @@ class Skybox {
   }
 }
 
-// Initialise without requiring new keyword
-export default function(world, light) {
+export default Skybox;
+
+var noNew = function(world, light) {
   return new Skybox(world, light);
 };
+
+// Initialise without requiring new keyword
+export {noNew as skybox};

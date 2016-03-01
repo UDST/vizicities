@@ -1,6 +1,6 @@
 import Projection from '../../src/geo/projection/index';
-import LatLon from '../../src/geo/LatLon';
-import Point from '../../src/geo/Point';
+import {latLon as LatLon} from '../../src/geo/LatLon';
+import {point as Point} from '../../src/geo/Point';
 
 describe('Projection.SphericalMercator', () => {
   var projection = Projection.SphericalMercator;

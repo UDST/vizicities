@@ -3,8 +3,8 @@
  */
 
 import proj4 from 'proj4';
-import LatLon from '../LatLon';
-import Point from '../Point';
+import {latLon as LatLon} from '../LatLon';
+import {point as Point} from '../Point';
 
 const Proj4 = function(def, bounds) {
   var proj = proj4(def);

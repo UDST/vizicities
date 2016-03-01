@@ -1,7 +1,7 @@
 import extend from 'lodash.assign';
 import CRS from '../../src/geo/crs/index';
-import LatLon from '../../src/geo/LatLon';
-import Point from '../../src/geo/Point';
+import {latLon as LatLon} from '../../src/geo/LatLon';
+import {point as Point} from '../../src/geo/Point';
 
 describe('CRS.EPSG3857', () => {
   var crs = CRS.EPSG3857;

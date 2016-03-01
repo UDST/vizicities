@@ -24,11 +24,11 @@ class LatLon {
   }
 }
 
-// Initialise without requiring new keyword
-//
+export default LatLon;
+
 // Accepts (LatLon), ([lat, lon, alt]), ([lat, lon]) and (lat, lon, alt)
 // Also converts between lng and lon
-export default function(a, b, c) {
+var noNew = function(a, b, c) {
   if (a instanceof LatLon) {
     return a;
   }
@@ -52,3 +52,6 @@ export default function(a, b, c) {
   }
   return new LatLon(a, b, c);
 };
+
+// Initialise without requiring new keyword
+export {noNew as latLon};

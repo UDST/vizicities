@@ -130,7 +130,11 @@ class GeoJSONTileLayer extends TileLayer {
   }
 }
 
-// Initialise without requiring new keyword
-export default function(path, options) {
+export default GeoJSONTileLayer;
+
+var noNew = function(path, options) {
   return new GeoJSONTileLayer(path, options);
 };
+
+// Initialise without requiring new keyword
+export {noNew as geoJSONTileLayer};

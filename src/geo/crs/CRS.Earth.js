@@ -7,7 +7,7 @@
 
 import extend from 'lodash.assign';
 import CRS from './CRS';
-import LatLon from '../LatLon';
+import {latLon as LatLon} from '../LatLon';
 
 const Earth = {
   wrapLon: [-180, 180],

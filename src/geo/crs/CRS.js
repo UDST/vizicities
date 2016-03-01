@@ -5,8 +5,8 @@
  * https://github.com/Leaflet/Leaflet/blob/master/src/geo/crs/CRS.js
  */
 
-import LatLon from '../LatLon';
-import Point from '../Point';
+import {latLon as LatLon} from '../LatLon';
+import {point as Point} from '../Point';
 import wrapNum from '../../util/wrapNum';
 
 const CRS = {

@@ -97,3 +97,9 @@ class Layer extends EventEmitter {
 }
 
 export default Layer;
+
+var noNew = function() {
+  return new Layer();
+};
+
+export {noNew as layer};

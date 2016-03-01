@@ -1,5 +1,5 @@
 import THREE from 'three';
-import Point from '../geo/Point';
+import {point as Point} from '../geo/Point';
 import PickingScene from './PickingScene';
 
 // TODO: Look into a way of setting this up without passing in a renderer and
@@ -56,9 +56,9 @@ class Picking {
       return;
     }
 
-    var point = VIZI.Point(event.clientX, event.clientY);
+    var point = Point(event.clientX, event.clientY);
 
-    var normalisedPoint = VIZI.Point(0, 0);
+    var normalisedPoint = Point(0, 0);
     normalisedPoint.x = (point.x / this._width) * 2 - 1;
     normalisedPoint.y = -(point.y / this._height) * 2 + 1;
 

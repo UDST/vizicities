@@ -40,6 +40,8 @@ class Point {
   }
 }
 
+export default Point;
+
 // Accepts (point), ([x, y]) and (x, y, round)
 var _point = function(x, y, round) {
   if (x instanceof Point) {
@@ -55,4 +57,4 @@ var _point = function(x, y, round) {
 };
 
 // Initialise without requiring new keyword
-export default _point;
+export {_point as point};

@@ -1,5 +1,5 @@
 import Transformation from '../../src/util/Transformation';
-import Point from '../../src/geo/Point';
+import {point as Point} from '../../src/geo/Point';
 
 describe('Transformation', () => {
   var transformation;

@@ -2,8 +2,8 @@ import Layer from './Layer';
 import THREE from 'three';
 import reqwest from 'reqwest';
 import extend from 'lodash.assign';
-import Point from '../geo/Point';
-import LatLon from '../geo/LatLon';
+import {point as Point} from '../geo/Point';
+import {latLon as LatLon} from '../geo/LatLon';
 import GeoJSON from '../util/GeoJSON';
 import Buffer from '../util/Buffer';
 import PickingMaterial from '../engine/PickingMaterial';
@@ -410,7 +410,11 @@ class GeoJSONLayer extends Layer {
   }
 }
 
-// Initialise without requiring new keyword
-export default function(geojson, options) {
+export default GeoJSONLayer;
+
+var noNew = function(geojson, options) {
   return new GeoJSONLayer(geojson, options);
 };
+
+// Initialise without requiring new keyword
+export {noNew as geoJSONLayer};
