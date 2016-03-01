@@ -63,7 +63,7 @@ class TileLayer extends Layer {
 
     this._options = extend({}, defaults, options);
 
-    this._tileCache = TileCache(this._options.maxCache, tile => {
+    this._tileCache = new TileCache(this._options.maxCache, tile => {
       this._destroyTile(tile);
     });
 

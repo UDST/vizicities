@@ -606,7 +606,11 @@ class GeoJSONTile extends Tile {
   }
 }
 
-// Initialise without requiring new keyword
-export default function(quadcode, path, layer, options) {
+export default GeoJSONTile;
+
+var noNew = function(quadcode, path, layer, options) {
   return new GeoJSONTile(quadcode, path, layer, options);
 };
+
+// Initialise without requiring new keyword
+export {noNew as geoJSONTile};

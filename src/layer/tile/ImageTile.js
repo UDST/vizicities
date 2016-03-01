@@ -180,7 +180,11 @@ class ImageTile extends Tile {
   }
 }
 
-// Initialise without requiring new keyword
-export default function(quadcode, path, layer) {
+export default ImageTile;
+
+var noNew = function(quadcode, path, layer) {
   return new ImageTile(quadcode, path, layer);
 };
+
+// Initialise without requiring new keyword
+export {noNew as imageTile};

@@ -8798,7 +8798,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_createTile',
 	    value: function _createTile(quadcode, layer) {
-	      return (0, _ImageTile2['default'])(quadcode, this._path, layer);
+	      return new _ImageTile2['default'](quadcode, this._path, layer);
 	    }
 	
 	    // Destroys the layer and removes it from the scene and memory
@@ -8941,7 +8941,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    this._options = (0, _lodashAssign2['default'])({}, defaults, options);
 	
-	    this._tileCache = (0, _TileCache2['default'])(this._options.maxCache, function (tile) {
+	    this._tileCache = new _TileCache2['default'](this._options.maxCache, function (tile) {
 	      _this._destroyTile(tile);
 	    });
 	
@@ -9297,8 +9297,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	  }
 	
-	  // Initialise without requiring new keyword
-	
 	  // Returns true if all specified tile providers are ready to be used
 	  // Otherwise, returns false
 	
@@ -9336,12 +9334,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return TileCache;
 	})();
 	
-	exports['default'] = function (cacheLimit, onDestroyTile) {
+	exports['default'] = TileCache;
+	
+	var noNew = function noNew(cacheLimit, onDestroyTile) {
 	  return new TileCache(cacheLimit, onDestroyTile);
 	};
 	
-	;
-	module.exports = exports['default'];
+	// Initialise without requiring new keyword
+	exports.tileCache = noNew;
 
 /***/ },
 /* 43 */
@@ -11089,8 +11089,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _get(Object.getPrototypeOf(ImageTile.prototype), 'constructor', this).call(this, quadcode, path, layer);
 	  }
 	
-	  // Initialise without requiring new keyword
-	
 	  // Request data for the tile
 	
 	  _createClass(ImageTile, [{
@@ -11277,12 +11275,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return ImageTile;
 	})(_Tile3['default']);
 	
-	exports['default'] = function (quadcode, path, layer) {
+	exports['default'] = ImageTile;
+	
+	var noNew = function noNew(quadcode, path, layer) {
 	  return new ImageTile(quadcode, path, layer);
 	};
 	
-	;
-	module.exports = exports['default'];
+	// Initialise without requiring new keyword
+	exports.imageTile = noNew;
 
 /***/ },
 /* 52 */
@@ -11854,7 +11854,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        options.onClick = this._options.onClick;
 	      }
 	
-	      return (0, _GeoJSONTile2['default'])(quadcode, this._path, layer, options);
+	      return new _GeoJSONTile2['default'](quadcode, this._path, layer, options);
 	    }
 	
 	    // Destroys the layer and removes it from the scene and memory
@@ -11998,8 +11998,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._options.style = (0, _lodashAssign2['default'])({}, defaults.style, options.style);
 	    }
 	  }
-	
-	  // Initialise without requiring new keyword
 	
 	  // Request data for the tile
 	
@@ -12558,12 +12556,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return GeoJSONTile;
 	})(_Tile3['default']);
 	
-	exports['default'] = function (quadcode, path, layer, options) {
+	exports['default'] = GeoJSONTile;
+	
+	var noNew = function noNew(quadcode, path, layer, options) {
 	  return new GeoJSONTile(quadcode, path, layer, options);
 	};
 	
-	;
-	module.exports = exports['default'];
+	// Initialise without requiring new keyword
+	exports.geoJSONTile = noNew;
 
 /***/ },
 /* 57 */

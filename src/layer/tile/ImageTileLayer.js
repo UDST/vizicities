@@ -128,7 +128,7 @@ class ImageTileLayer extends TileLayer {
   }
 
   _createTile(quadcode, layer) {
-    return ImageTile(quadcode, this._path, layer);
+    return new ImageTile(quadcode, this._path, layer);
   }
 
   // Destroys the layer and removes it from the scene and memory
