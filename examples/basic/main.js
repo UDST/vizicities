@@ -64,17 +64,21 @@ var topoJSONTileLayer = VIZI.TopoJSONTileLayer('https://vector.mapzen.com/osm/bu
 //   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://whosonfirst.mapzen.com#License">Who\'s On First</a>.'
 // }).addTo(world);
 
-// London Underground lines
+// // London Underground lines
 // var geoJSONLayer = VIZI.GeoJSONLayer('https://rawgit.com/robhawkes/4acb9d6a6a5f00a377e2/raw/30ae704a44e10f2e13fb7e956e80c3b22e8e7e81/tfl_lines.json', {
 //   picking: true,
-//   style: {
-//     lineColor: '#f7c616',
-//     // lineHeight: 20,
-//     lineWidth: 1,
-//     lineTransparent: true,
-//     lineOpacity: 0.5,
-//     lineBlending: THREE.AdditiveBlending,
-//     lineRenderOrder: 2
+//   style: function(feature) {
+//     var colour = feature.properties.lines[0].colour || '#ffffff';
+//
+//     return {
+//       lineColor: colour,
+//       // lineHeight: 20,
+//       lineWidth: 3,
+//       // lineTransparent: true,
+//       // lineOpacity: 0.5,
+//       // lineBlending: THREE.AdditiveBlending,
+//       lineRenderOrder: 2
+//     };
 //   },
 //   onClick: function(feature) {
 //     console.log('Clicked:', feature);
