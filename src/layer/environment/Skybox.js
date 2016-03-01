@@ -88,6 +88,8 @@ class Skybox {
     });
 
     this._mesh = new THREE.Mesh(new THREE.BoxGeometry(190000, 190000, 190000), skyboxMat);
+
+    this._updateSkybox = true;
   }
 
   _updateUniforms() {
@@ -113,8 +115,8 @@ class Skybox {
   }
 
   _update(delta) {
-    if (!this._done) {
-      this._done = true;
+    if (this._updateSkybox) {
+      this._updateSkybox = false;
     } else {
       return;
     }
@@ -141,6 +143,11 @@ class Skybox {
 
   getRenderTarget() {
     return this._cubeCamera.renderTarget;
+  }
+
+  setInclination(inclination) {
+    this._settings.inclination = inclination;
+    this._updateSkybox = true;
   }
 
   // Destroy the skybox and remove it from memory

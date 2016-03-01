@@ -7997,6 +7997,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	
 	      this._mesh = new _three2['default'].Mesh(new _three2['default'].BoxGeometry(190000, 190000, 190000), skyboxMat);
+	
+	      this._updateSkybox = true;
 	    }
 	  }, {
 	    key: '_updateUniforms',
@@ -8024,8 +8026,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_update',
 	    value: function _update(delta) {
-	      if (!this._done) {
-	        this._done = true;
+	      if (this._updateSkybox) {
+	        this._updateSkybox = false;
 	      } else {
 	        return;
 	      }
@@ -8053,6 +8055,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'getRenderTarget',
 	    value: function getRenderTarget() {
 	      return this._cubeCamera.renderTarget;
+	    }
+	  }, {
+	    key: 'setInclination',
+	    value: function setInclination(inclination) {
+	      this._settings.inclination = inclination;
+	      this._updateSkybox = true;
 	    }
 	
 	    // Destroy the skybox and remove it from memory
