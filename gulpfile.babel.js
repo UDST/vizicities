@@ -86,7 +86,6 @@ function build() {
       },
       devtool: 'source-map'
     }))
-    // .pipe($.stripComments())
     .pipe(gulp.dest(destinationFolder))
     .pipe($.filter(['*', '!**/*.js.map']))
     .pipe($.rename(exportFileName + '.min.js'))
