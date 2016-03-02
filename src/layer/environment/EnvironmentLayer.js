@@ -47,14 +47,14 @@ class EnvironmentLayer extends Layer {
       directionalLight2.position.y = 100;
       directionalLight2.position.z = -100;
 
-      var helper = new THREE.DirectionalLightHelper(directionalLight, 10);
-      var helper2 = new THREE.DirectionalLightHelper(directionalLight2, 10);
+      // var helper = new THREE.DirectionalLightHelper(directionalLight, 10);
+      // var helper2 = new THREE.DirectionalLightHelper(directionalLight2, 10);
 
       this.add(directionalLight);
       this.add(directionalLight2);
 
-      this.add(helper);
-      this.add(helper2);
+      // this.add(helper);
+      // this.add(helper2);
     } else {
       // Directional light that will be projected from the sun
       this._skyboxLight = new THREE.DirectionalLight(0xffffff, 1);

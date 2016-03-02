@@ -3692,40 +3692,40 @@ return /******/ (function(modules) { // webpackBootstrap
 	        directionalLight2.position.y = 100;
 	        directionalLight2.position.z = -100;
 	
-	        var helper = new _three2['default'].DirectionalLightHelper(directionalLight, 10);
-	        var helper2 = new _three2['default'].DirectionalLightHelper(directionalLight2, 10);
+	        // var helper = new THREE.DirectionalLightHelper(directionalLight, 10);
+	        // var helper2 = new THREE.DirectionalLightHelper(directionalLight2, 10);
 	
 	        this.add(directionalLight);
 	        this.add(directionalLight2);
 	
-	        this.add(helper);
-	        this.add(helper2);
+	        // this.add(helper);
+	        // this.add(helper2);
 	      } else {
-	        // Directional light that will be projected from the sun
-	        this._skyboxLight = new _three2['default'].DirectionalLight(0xffffff, 1);
+	          // Directional light that will be projected from the sun
+	          this._skyboxLight = new _three2['default'].DirectionalLight(0xffffff, 1);
 	
-	        this._skyboxLight.castShadow = true;
+	          this._skyboxLight.castShadow = true;
 	
-	        var d = 1000;
-	        this._skyboxLight.shadow.camera.left = -d;
-	        this._skyboxLight.shadow.camera.right = d;
-	        this._skyboxLight.shadow.camera.top = d;
-	        this._skyboxLight.shadow.camera.bottom = -d;
+	          var d = 1000;
+	          this._skyboxLight.shadow.camera.left = -d;
+	          this._skyboxLight.shadow.camera.right = d;
+	          this._skyboxLight.shadow.camera.top = d;
+	          this._skyboxLight.shadow.camera.bottom = -d;
 	
-	        this._skyboxLight.shadow.camera.near = 10000;
-	        this._skyboxLight.shadow.camera.far = 70000;
+	          this._skyboxLight.shadow.camera.near = 10000;
+	          this._skyboxLight.shadow.camera.far = 70000;
 	
-	        // TODO: Need to dial in on a good shadowmap size
-	        this._skyboxLight.shadow.mapSize.width = 2048;
-	        this._skyboxLight.shadow.mapSize.height = 2048;
+	          // TODO: Need to dial in on a good shadowmap size
+	          this._skyboxLight.shadow.mapSize.width = 2048;
+	          this._skyboxLight.shadow.mapSize.height = 2048;
 	
-	        // this._skyboxLight.shadowBias = -0.0010;
-	        // this._skyboxLight.shadow.darkness = 0.15;
+	          // this._skyboxLight.shadowBias = -0.0010;
+	          // this._skyboxLight.shadow.darkness = 0.15;
 	
-	        // this._layer.add(new THREE.CameraHelper(this._skyboxLight.shadow.camera));
+	          // this._layer.add(new THREE.CameraHelper(this._skyboxLight.shadow.camera));
 	
-	        this.add(this._skyboxLight);
-	      }
+	          this.add(this._skyboxLight);
+	        }
 	    }
 	  }, {
 	    key: '_initSkybox',
