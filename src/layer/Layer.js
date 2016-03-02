@@ -34,6 +34,8 @@ class Layer extends EventEmitter {
     this.emit('added');
   }
 
+  _onAdd(world) {}
+
   getPickingId() {
     if (this._world._engine._picking) {
       return this._world._engine._picking.getNextId();

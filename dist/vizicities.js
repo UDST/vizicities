@@ -3844,6 +3844,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.emit('added');
 	    }
 	  }, {
+	    key: '_onAdd',
+	    value: function _onAdd(world) {}
+	  }, {
 	    key: 'getPickingId',
 	    value: function getPickingId() {
 	      if (this._world._engine._picking) {
