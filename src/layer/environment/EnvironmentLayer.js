@@ -35,17 +35,15 @@ class EnvironmentLayer extends Layer {
     // used here so the helpers look more natural.
 
     if (!this._options.skybox) {
-      var directionalLight = new THREE.DirectionalLight(0x999999);
-      directionalLight.intesity = 0.1;
-      directionalLight.position.x = 100;
-      directionalLight.position.y = 100;
-      directionalLight.position.z = 100;
+      var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+      directionalLight.position.x = 1000;
+      directionalLight.position.y = 1000;
+      directionalLight.position.z = 1000;
 
-      var directionalLight2 = new THREE.DirectionalLight(0x999999);
-      directionalLight2.intesity = 0.1;
-      directionalLight2.position.x = -100;
-      directionalLight2.position.y = 100;
-      directionalLight2.position.z = -100;
+      var directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
+      directionalLight2.position.x = -1000;
+      directionalLight2.position.y = 1000;
+      directionalLight2.position.z = -1000;
 
       // var helper = new THREE.DirectionalLightHelper(directionalLight, 10);
       // var helper2 = new THREE.DirectionalLightHelper(directionalLight2, 10);
