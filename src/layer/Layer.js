@@ -1,14 +1,25 @@
 import EventEmitter from 'eventemitter3';
 import THREE from 'three';
 import Scene from '../engine/Scene';
+import {CSS3DObject} from '../vendor/CSS3DRenderer';
+import {CSS2DObject} from '../vendor/CSS2DRenderer';
 
 // TODO: Make sure nothing is left behind in the heap after calling destroy()
+
+// TODO: Need a single move method that handles moving all the various object
+// layers so that the DOM layers stay in sync with the 3D layer
 
 class Layer extends EventEmitter {
   constructor() {
     super();
 
     this._layer = new THREE.Object3D();
+
+    this._dom3D = document.createElement('div');
+    this._domLayer3D = new CSS3DObject(this._dom3D);
+
+    this._dom2D = document.createElement('div');
+    this._domLayer2D = new CSS2DObject(this._dom2D);
   }
 
   // Add THREE object directly to layer
@@ -19,6 +30,22 @@ class Layer extends EventEmitter {
   // Remove THREE object from to layer
   remove(object) {
     this._layer.remove(object);
+  }
+
+  addDOM3D(object) {
+    this._domLayer3D.add(object);
+  }
+
+  removeDOM3D(object) {
+    this._domLayer3D.remove(object);
+  }
+
+  addDOM2D(object) {
+    this._domLayer2D.add(object);
+  }
+
+  removeDOM2D(object) {
+    this._domLayer2D.remove(object);
   }
 
   // Add layer to world instance and store world reference
@@ -92,6 +119,37 @@ class Layer extends EventEmitter {
         }
       }
     }
+
+    if (this._domLayer3D.children) {
+      // Remove everything else in the layer
+      var child;
+      for (var i = this._domLayer3D.children.length - 1; i >= 0; i--) {
+        child = this._domLayer3D.children[i];
+
+        if (!child) {
+          continue;
+        }
+
+        this.removeDOM3D(child);
+      }
+    }
+
+    if (this._domLayer2D.children) {
+      // Remove everything else in the layer
+      var child;
+      for (var i = this._domLayer2D.children.length - 1; i >= 0; i--) {
+        child = this._domLayer2D.children[i];
+
+        if (!child) {
+          continue;
+        }
+
+        this.removeDOM2D(child);
+      }
+    }
+
+    this._domLayer3D = null;
+    this._domLayer2D = null;
 
     this._world = null;
     this._layer = null;

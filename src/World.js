@@ -204,6 +204,8 @@ class World extends EventEmitter {
 
     // Could move this into Layer but it'll do here for now
     this._engine._scene.add(layer._layer);
+    this._engine._domScene3D.add(layer._domLayer3D);
+    this._engine._domScene2D.add(layer._domLayer2D);
 
     this.emit('layerAdded', layer);
     return this;
@@ -219,6 +221,8 @@ class World extends EventEmitter {
     };
 
     this._engine._scene.remove(layer._layer);
+    this._engine._domScene3D.remove(layer._domLayer3D);
+    this._engine._domScene2D.remove(layer._domLayer2D);
 
     this.emit('layerRemoved');
     return this;
