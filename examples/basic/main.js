@@ -85,3 +85,14 @@ var topoJSONTileLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/bu
 //   },
 //   attribution: '&copy; Transport for London.'
 // }).addTo(world);
+
+// Set up render debug stats
+var rendererStats = new THREEx.RendererStats();
+rendererStats.domElement.style.position = 'absolute';
+rendererStats.domElement.style.left = '0px';
+rendererStats.domElement.style.bottom = '0px';
+document.body.appendChild(rendererStats.domElement);
+
+world.on('postUpdate', function() {
+  rendererStats.update(world._engine._renderer);
+});

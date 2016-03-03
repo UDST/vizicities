@@ -9,6 +9,14 @@ import {CSS2DObject} from '../vendor/CSS2DRenderer';
 // TODO: Need a single move method that handles moving all the various object
 // layers so that the DOM layers stay in sync with the 3D layer
 
+// TODO: Double check that objects within the _layer Object3D parent are frustum
+// culled even if the layer position stays at the default (0,0,0) and the child
+// objects are positioned much further away
+//
+// Or does the layer being at (0,0,0) prevent the child objects from being
+// culled because the layer parent is effectively always in view even if the
+// child is actually out of camera
+
 class Layer extends EventEmitter {
   constructor() {
     super();
