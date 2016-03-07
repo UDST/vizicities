@@ -10,27 +10,27 @@ import PickingMaterial from '../engine/PickingMaterial';
 
 class GeoJSONLayer extends Layer {
   constructor(geojson, options) {
-    super(options);
-
-    this._geojson = geojson;
-
-    this._defaultStyle = GeoJSON.defaultStyle;
-
     var defaults = {
       picking: false,
       topojson: false,
       filter: null,
       onClick: null,
-      style: this._defaultStyle
+      style: GeoJSON.defaultStyle
     };
 
-    this._options = extend({}, defaults, options);
+    var _options = extend({}, defaults, options);
+
+    super(_options);
 
     if (typeof options.style === 'function') {
       this._options.style = options.style;
     } else {
       this._options.style = extend({}, defaults.style, options.style);
     }
+
+    this._defaultStyle = GeoJSON.defaultStyle;
+
+    this._geojson = geojson;
 
     this._pickingMesh = new THREE.Object3D();
   }
@@ -67,7 +67,7 @@ class GeoJSONLayer extends Layer {
   _processData(data) {
     console.time('GeoJSON');
 
-    var geojson = GeoJSON.mergeFeatures(data, this._options.topojson);
+    var geojson = GeoJSON.collectFeatures(data, this._options.topojson);
 
     // TODO: Check that GeoJSON is valid / usable
 
@@ -381,8 +381,8 @@ class GeoJSONLayer extends Layer {
     //
     // TODO: Is there a better way to ensure everything is aligned right and
     // able to be frustum-culled?
-    this._layer.position.x = -offset.x;
-    this._layer.position.z = -offset.y;
+    this._object3D.position.x = -offset.x;
+    this._object3D.position.z = -offset.y;
 
     console.timeEnd('GeoJSON');
   }

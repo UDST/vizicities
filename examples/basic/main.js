@@ -1,5 +1,5 @@
 var world = VIZI.world('world', {
-  skybox: true
+  // skybox: true
 }).setView([51.505, -0.09]);
 
 // Add controls
@@ -7,37 +7,52 @@ VIZI.Controls.orbit().addTo(world);
 
 // // http://{s}.tile.osm.org/{z}/{x}/{y}.png
 // // http://{s}.tiles.wmflabs.org/osm-no-labels/{z}/{x}/{y}.png
-var imageTileLayer = VIZI.imageTileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
-  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
+// var imageTileLayer = VIZI.imageTileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
+//   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
+// }).addTo(world);
+
+// var coordinates = [[[-0.34535,51.54392],[-0.34436,51.54604],[-0.34324,51.54584],[-0.34423,51.54372],[-0.34535,51.54392]]];
+//
+// VIZI.polygonLayer(coordinates, {
+//   interactive: true,
+//   style: {
+//     color: '#ff0000',
+//     height: 0
+//   }
+// }).addTo(world);
+
+var layer = VIZI.geoJSONLayer2('http://vector.mapzen.com/osm/buildings/13/4088/2722.json', {
+  output: false,
+  interactive: true
 }).addTo(world);
 
-// Building and roads from Mapzen (polygons and linestrings)
-var topoJSONTileLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/buildings,roads/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
-  // picking: true,
-  style: function(feature) {
-    var height;
-
-    if (feature.properties.height) {
-      height = feature.properties.height;
-    } else {
-      height = 10 + Math.random() * 10;
-    }
-
-    return {
-      height: height,
-      lineColor: '#f7c616',
-      lineWidth: 1,
-      lineTransparent: true,
-      lineOpacity: 0.2,
-      lineBlending: THREE.AdditiveBlending,
-      lineRenderOrder: 2
-    };
-  },
-  // onClick: function(feature, point2d, point3d, intersects) {
-  //   console.log('Clicked:', feature, point2d, point3d, intersects);
-  // },
-  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://whosonfirst.mapzen.com#License">Who\'s On First</a>.'
-}).addTo(world);
+// // Building and roads from Mapzen (polygons and linestrings)
+// var topoJSONTileLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/buildings,roads/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
+//   // picking: true,
+//   style: function(feature) {
+//     var height;
+//
+//     if (feature.properties.height) {
+//       height = feature.properties.height;
+//     } else {
+//       height = 10 + Math.random() * 10;
+//     }
+//
+//     return {
+//       height: height,
+//       lineColor: '#f7c616',
+//       lineWidth: 1,
+//       lineTransparent: true,
+//       lineOpacity: 0.2,
+//       lineBlending: THREE.AdditiveBlending,
+//       lineRenderOrder: 2
+//     };
+//   },
+//   // onClick: function(feature, point2d, point3d, intersects) {
+//   //   console.log('Clicked:', feature, point2d, point3d, intersects);
+//   // },
+//   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://whosonfirst.mapzen.com#License">Who\'s On First</a>.'
+// }).addTo(world);
 
 // Just buildings from Mapzen (polygons)
 // var topoJSONTileLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {

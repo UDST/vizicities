@@ -53,15 +53,15 @@ import THREE from 'three';
 
 class TileLayer extends Layer {
   constructor(options) {
-    super(options);
-
     var defaults = {
       picking: false,
       maxCache: 1000,
       maxLOD: 18
     };
 
-    this._options = extend({}, defaults, options);
+    var _options = extend({}, defaults, options);
+
+    super(_options);
 
     this._tileCache = new TileCache(this._options.maxCache, tile => {
       this._destroyTile(tile);

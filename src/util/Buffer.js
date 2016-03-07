@@ -5,6 +5,47 @@
 import THREE from 'three';
 
 var Buffer = (function() {
+  // Merge multiple attribute objects into a single attribute object
+  //
+  // Attribute objects must all use the same attribute keys
+  var mergeAttributes = function(attributes) {
+    var lengths = {};
+
+    // Find array lengths
+    attributes.forEach(_attributes => {
+      for (var k in _attributes) {
+        if (!lengths[k]) {
+          lengths[k] = 0;
+        }
+
+        lengths[k] += _attributes[k].length;
+      }
+    });
+
+    var mergedAttributes = {};
+
+    // Set up arrays to merge into
+    for (var k in lengths) {
+      mergedAttributes[k] = new Float32Array(lengths[k]);
+    }
+
+    var lastLengths = {};
+
+    attributes.forEach(_attributes => {
+      for (var k in _attributes) {
+        if (!lastLengths[k]) {
+          lastLengths[k] = 0;
+        }
+
+        mergedAttributes[k].set(_attributes[k], lastLengths[k]);
+
+        lastLengths[k] += _attributes[k].length;
+      }
+    });
+
+    return mergedAttributes;
+  };
+
   var createLineGeometry = function(lines, offset) {
     var geometry = new THREE.BufferGeometry();
 
@@ -207,6 +248,7 @@ var Buffer = (function() {
   };
 
   return {
+    mergeAttributes: mergeAttributes,
     createLineGeometry: createLineGeometry,
     createGeometry: createGeometry
   };

@@ -7,13 +7,13 @@ import Skybox from './Skybox';
 
 class EnvironmentLayer extends Layer {
   constructor(options) {
-    super();
-
     var defaults = {
       skybox: false
     };
 
-    this._options = extend(defaults, options);
+    var _options = extend({}, defaults, options);
+
+    super(_options);
   }
 
   _onAdd() {
@@ -75,7 +75,7 @@ class EnvironmentLayer extends Layer {
       // this._skyboxLight.shadowBias = -0.0010;
       // this._skyboxLight.shadow.darkness = 0.15;
 
-      // this._layer.add(new THREE.CameraHelper(this._skyboxLight.shadow.camera));
+      // this._object3D.add(new THREE.CameraHelper(this._skyboxLight.shadow.camera));
 
       this.add(this._skyboxLight);
     }

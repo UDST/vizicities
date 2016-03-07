@@ -202,10 +202,12 @@ class World extends EventEmitter {
 
     this._layers.push(layer);
 
-    // Could move this into Layer but it'll do here for now
-    this._engine._scene.add(layer._layer);
-    this._engine._domScene3D.add(layer._domLayer3D);
-    this._engine._domScene2D.add(layer._domLayer2D);
+    if (layer.isOutput()) {
+      // Could move this into Layer but it'll do here for now
+      this._engine._scene.add(layer._object3D);
+      this._engine._domScene3D.add(layer._domObject3D);
+      this._engine._domScene2D.add(layer._domObject2D);
+    }
 
     this.emit('layerAdded', layer);
     return this;
@@ -220,9 +222,11 @@ class World extends EventEmitter {
       this._layers.splice(layerIndex, 1);
     };
 
-    this._engine._scene.remove(layer._layer);
-    this._engine._domScene3D.remove(layer._domLayer3D);
-    this._engine._domScene2D.remove(layer._domLayer2D);
+    if (layer.isOutput()) {
+      this._engine._scene.remove(layer._object3D);
+      this._engine._domScene3D.remove(layer._domObject3D);
+      this._engine._domScene2D.remove(layer._domObject2D);
+    }
 
     this.emit('layerRemoved');
     return this;

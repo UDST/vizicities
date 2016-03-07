@@ -33,7 +33,7 @@ var GeoJSON = (function() {
 
   // Attempts to merge together multiple GeoJSON Features or FeatureCollections
   // into a single FeatureCollection
-  var mergeFeatures = function(data, _topojson) {
+  var collectFeatures = function(data, _topojson) {
     var collections = [];
 
     if (_topojson) {
@@ -229,7 +229,7 @@ var GeoJSON = (function() {
 
   return {
     defaultStyle: defaultStyle,
-    mergeFeatures: mergeFeatures,
+    collectFeatures: collectFeatures,
     lineStringAttributes: lineStringAttributes,
     multiLineStringAttributes: multiLineStringAttributes,
     polygonAttributes: polygonAttributes
