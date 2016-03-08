@@ -10,6 +10,9 @@ import GeoJSON from '../../util/GeoJSON';
 import Buffer from '../../util/Buffer';
 import PickingMaterial from '../../engine/PickingMaterial';
 
+// TODO: Look into using a GeoJSONLayer to represent and output the tile data
+// instead of duplicating a lot of effort within this class
+
 // TODO: Map picking IDs to some reference within the tile data / geometry so
 // that something useful can be done when an object is picked / clicked on
 

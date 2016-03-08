@@ -12583,6 +12583,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
+	// TODO: Look into using a GeoJSONLayer to represent and output the tile data
+	// instead of duplicating a lot of effort within this class
+	
 	// TODO: Map picking IDs to some reference within the tile data / geometry so
 	// that something useful can be done when an object is picked / clicked on
 	
@@ -16783,6 +16786,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// TODO: Move duplicated logic between geometry layrs into GeometryLayer
 	
+	// TODO: Look at ways to drop unneeded references to array buffers, etc to
+	// reduce memory footprint
+	
 	var _Layer2 = __webpack_require__(37);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
@@ -17378,6 +17384,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	// TODO: Move duplicated logic between geometry layrs into GeometryLayer
+	
+	// TODO: Look at ways to drop unneeded references to array buffers, etc to
+	// reduce memory footprint
 	
 	var _Layer2 = __webpack_require__(37);
 	
