@@ -11,10 +11,19 @@ class GeoJSONLayer2 extends LayerGroup {
     var defaults = {
       output: false,
       interactive: false,
-      topojson: false
+      topojson: false,
+      filter: null,
+      onEachFeature: null,
+      style: GeoJSON.defaultStyle
     };
 
     var _options = extend({}, defaults, options);
+
+    if (typeof options.style === 'function') {
+      _options.style = options.style;
+    } else {
+      _options.style = extend({}, defaults.style, options.style);
+    }
 
     super(_options);
 
@@ -70,17 +79,21 @@ class GeoJSONLayer2 extends LayerGroup {
     }
 
     var defaults = {};
+    var style = this._options.style;
 
     var options;
     features.forEach(feature => {
+      // Get style object, if provided
+      if (typeof this._options.style === 'function') {
+        style = extend(GeoJSON.defaultStyle, this._options.style(feature));
+      }
+
       options = extend({}, defaults, {
         // If merging feature layers, stop them outputting themselves
         // If not, let feature layers output themselves to the world
         output: !this.isOutput(),
         interactive: this._options.interactive,
-        style: {
-          color: '#ff0000'
-        }
+        style: style
       });
 
       var layer = this._featureToLayer(feature, options);
@@ -91,13 +104,23 @@ class GeoJSONLayer2 extends LayerGroup {
 
       layer.feature = feature;
 
+      // If defined, call a function for each feature
+      //
+      // This is commonly used for adding event listeners from the user script
+      if (this._options.onEachFeature) {
+        this._options.onEachFeature(feature, layer);
+      }
+
       this.addLayer(layer);
     });
 
-    // If merging layers do that now, otherwise skip
+    // If merging layers do that now, otherwise skip as the geometry layers
+    // should have already outputted themselves
     if (!this.isOutput()) {
       return;
     }
+
+    // From here on we can assume that we want to merge the layers
 
     var attributes = [];
     var flat = true;
@@ -109,8 +132,6 @@ class GeoJSONLayer2 extends LayerGroup {
         flat = false;
       }
     });
-
-    // From here on we can assume that we want to merge the layers
 
     var mergedAttributes = Buffer.mergeAttributes(attributes);
 
@@ -174,6 +195,7 @@ class GeoJSONLayer2 extends LayerGroup {
     this._mesh = mesh;
   }
 
+  // TODO: Support all GeoJSON geometry types
   _featureToLayer(feature, options) {
     var geometry = feature.geometry;
     var coordinates = (geometry.coordinates) ? geometry.coordinates : null;
@@ -187,8 +209,28 @@ class GeoJSONLayer2 extends LayerGroup {
     }
   }
 
+  _abortRequest() {
+    if (!this._request) {
+      return;
+    }
+
+    this._request.abort();
+  }
+
   // Destroy the layers and remove them from the scene and memory
   destroy() {
+    // Cancel any pending requests
+    this._abortRequest();
+
+    // Clear request reference
+    this._request = null;
+
+    if (this._pickingMesh) {
+      // TODO: Properly dispose of picking mesh
+      this._pickingMesh = null;
+    }
+
+    // Run common destruction logic from parent
     super.destroy();
   }
 }

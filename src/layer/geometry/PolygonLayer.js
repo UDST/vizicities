@@ -58,19 +58,26 @@ class PolygonLayer extends Layer {
   }
 
   // Return center of polygon as a LatLon
+  //
+  // TODO: Implement getCenter()
   getCenter() {}
 
   // Return polygon bounds in geographic coordinates
+  //
+  // TODO: Implement getBounds()
   getBounds() {}
 
+  // Get ID for picking interaction
   _setPickingId() {
     this._pickingId = this.getPickingId();
   }
 
+  // Set up and re-emit interaction events
   _addPickingEvents() {
     // TODO: Find a way to properly remove this listener on destroy
     this._world.on('pick-' + this._pickingId, (point2d, point3d, intersects) => {
-      console.log(this, point2d, point3d, intersects);
+      // Re-emit click event from the layer
+      this.emit('click', this, point2d, point3d, intersects);
     });
   }
 
@@ -78,6 +85,7 @@ class PolygonLayer extends Layer {
   _setBufferAttributes() {
     var height = 0;
 
+    // Convert height into world units
     if (this._options.style.height && this._options.style.height !== 0) {
       height = this._world.metresToWorld(this._options.style.height, this._pointScale);
     }
@@ -229,6 +237,8 @@ class PolygonLayer extends Layer {
   }
 
   // Convert and project coordinates
+  //
+  // TODO: Calculate bounds
   _setCoordinates() {
     this._bounds = [];
     this._coordinates = this._convertCoordinates(this._coordinates);
@@ -240,6 +250,8 @@ class PolygonLayer extends Layer {
   // Recursively convert input coordinates into LatLon objects
   //
   // Calculate geographic bounds at the same time
+  //
+  // TODO: Calculate geographic bounds
   _convertCoordinates(coordinates) {
     return coordinates.map(ring => {
       return ring.map(coordinate => {
@@ -251,6 +263,8 @@ class PolygonLayer extends Layer {
   // Recursively project coordinates into world positions
   //
   // Calculate world bounds, offset and pointScale at the same time
+  //
+  // TODO: Calculate world bounds
   _projectCoordinates() {
     var point;
     return this._coordinates.map(ring => {
@@ -293,6 +307,7 @@ class PolygonLayer extends Layer {
     return result;
   }
 
+  // Triangulate earcut-based input using earcut
   _triangulate(contour, holes, dim) {
     // console.time('earcut');
 
@@ -308,6 +323,8 @@ class PolygonLayer extends Layer {
     return result;
   }
 
+  // Transform polygon representation into attribute arrays that can be used by
+  // THREE.BufferGeometry
   _toAttributes(polygon) {
     // Three components per vertex per face (3 x 3 = 9)
     var vertices = new Float32Array(polygon.facesCount * 9);
@@ -440,6 +457,7 @@ class PolygonLayer extends Layer {
     return attributes;
   }
 
+  // Returns true if the polygon is flat (has no height)
   isFlat() {
     return this._flat;
   }

@@ -22,8 +22,16 @@ VIZI.Controls.orbit().addTo(world);
 // }).addTo(world);
 
 var layer = VIZI.geoJSONLayer2('http://vector.mapzen.com/osm/buildings/13/4088/2722.json', {
-  output: false,
-  interactive: true
+  output: true,
+  interactive: true,
+  style: {
+    color: '#ff0000'
+  },
+  onEachFeature: function(feature, layer) {
+    layer.on('click', function(layer, point2d, point3d, intersects) {
+      console.log(layer, point2d, point3d, intersects);
+    });
+  }
 }).addTo(world);
 
 // // Building and roads from Mapzen (polygons and linestrings)

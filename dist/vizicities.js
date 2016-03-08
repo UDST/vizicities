@@ -16344,10 +16344,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var defaults = {
 	      output: false,
 	      interactive: false,
-	      topojson: false
+	      topojson: false,
+	      filter: null,
+	      onEachFeature: null,
+	      style: _utilGeoJSON2['default'].defaultStyle
 	    };
 	
 	    var _options = (0, _lodashAssign2['default'])({}, defaults, options);
+	
+	    if (typeof options.style === 'function') {
+	      _options.style = options.style;
+	    } else {
+	      _options.style = (0, _lodashAssign2['default'])({}, defaults.style, options.style);
+	    }
 	
 	    _get(Object.getPrototypeOf(GeoJSONLayer2.prototype), 'constructor', this).call(this, _options);
 	
@@ -16411,17 +16420,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      var defaults = {};
+	      var style = this._options.style;
 	
 	      var options;
 	      features.forEach(function (feature) {
+	        // Get style object, if provided
+	        if (typeof _this2._options.style === 'function') {
+	          style = (0, _lodashAssign2['default'])(_utilGeoJSON2['default'].defaultStyle, _this2._options.style(feature));
+	        }
+	
 	        options = (0, _lodashAssign2['default'])({}, defaults, {
 	          // If merging feature layers, stop them outputting themselves
 	          // If not, let feature layers output themselves to the world
 	          output: !_this2.isOutput(),
 	          interactive: _this2._options.interactive,
-	          style: {
-	            color: '#ff0000'
-	          }
+	          style: style
 	        });
 	
 	        var layer = _this2._featureToLayer(feature, options);
@@ -16432,13 +16445,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        layer.feature = feature;
 	
+	        // If defined, call a function for each feature
+	        //
+	        // This is commonly used for adding event listeners from the user script
+	        if (_this2._options.onEachFeature) {
+	          _this2._options.onEachFeature(feature, layer);
+	        }
+	
 	        _this2.addLayer(layer);
 	      });
 	
-	      // If merging layers do that now, otherwise skip
+	      // If merging layers do that now, otherwise skip as the geometry layers
+	      // should have already outputted themselves
 	      if (!this.isOutput()) {
 	        return;
 	      }
+	
+	      // From here on we can assume that we want to merge the layers
 	
 	      var attributes = [];
 	      var flat = true;
@@ -16450,8 +16473,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	          flat = false;
 	        }
 	      });
-	
-	      // From here on we can assume that we want to merge the layers
 	
 	      var mergedAttributes = _utilBuffer2['default'].mergeAttributes(attributes);
 	
@@ -16516,6 +16537,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      this._mesh = mesh;
 	    }
+	
+	    // TODO: Support all GeoJSON geometry types
 	  }, {
 	    key: '_featureToLayer',
 	    value: function _featureToLayer(feature, options) {
@@ -16530,11 +16553,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return (0, _geometryPolygonLayer.polygonLayer)(coordinates, options);
 	      }
 	    }
+	  }, {
+	    key: '_abortRequest',
+	    value: function _abortRequest() {
+	      if (!this._request) {
+	        return;
+	      }
+	
+	      this._request.abort();
+	    }
 	
 	    // Destroy the layers and remove them from the scene and memory
 	  }, {
 	    key: 'destroy',
 	    value: function destroy() {
+	      // Cancel any pending requests
+	      this._abortRequest();
+	
+	      // Clear request reference
+	      this._request = null;
+	
+	      if (this._pickingMesh) {
+	        // TODO: Properly dispose of picking mesh
+	        this._pickingMesh = null;
+	      }
+	
+	      // Run common destruction logic from parent
 	      _get(Object.getPrototypeOf(GeoJSONLayer2.prototype), 'destroy', this).call(this);
 	    }
 	  }]);
@@ -16743,19 +16787,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    // Return center of polygon as a LatLon
+	    //
+	    // TODO: Implement getCenter()
 	  }, {
 	    key: 'getCenter',
 	    value: function getCenter() {}
 	
 	    // Return polygon bounds in geographic coordinates
+	    //
+	    // TODO: Implement getBounds()
 	  }, {
 	    key: 'getBounds',
 	    value: function getBounds() {}
+	
+	    // Get ID for picking interaction
 	  }, {
 	    key: '_setPickingId',
 	    value: function _setPickingId() {
 	      this._pickingId = this.getPickingId();
 	    }
+	
+	    // Set up and re-emit interaction events
 	  }, {
 	    key: '_addPickingEvents',
 	    value: function _addPickingEvents() {
@@ -16763,7 +16815,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // TODO: Find a way to properly remove this listener on destroy
 	      this._world.on('pick-' + this._pickingId, function (point2d, point3d, intersects) {
-	        console.log(_this, point2d, point3d, intersects);
+	        // Re-emit click event from the layer
+	        _this.emit('click', _this, point2d, point3d, intersects);
 	      });
 	    }
 	
@@ -16773,6 +16826,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _setBufferAttributes() {
 	      var height = 0;
 	
+	      // Convert height into world units
 	      if (this._options.style.height && this._options.style.height !== 0) {
 	        height = this._world.metresToWorld(this._options.style.height, this._pointScale);
 	      }
@@ -16927,6 +16981,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    // Convert and project coordinates
+	    //
+	    // TODO: Calculate bounds
 	  }, {
 	    key: '_setCoordinates',
 	    value: function _setCoordinates() {
@@ -16940,6 +16996,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Recursively convert input coordinates into LatLon objects
 	    //
 	    // Calculate geographic bounds at the same time
+	    //
+	    // TODO: Calculate geographic bounds
 	  }, {
 	    key: '_convertCoordinates',
 	    value: function _convertCoordinates(coordinates) {
@@ -16953,6 +17011,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Recursively project coordinates into world positions
 	    //
 	    // Calculate world bounds, offset and pointScale at the same time
+	    //
+	    // TODO: Calculate world bounds
 	  }, {
 	    key: '_projectCoordinates',
 	    value: function _projectCoordinates() {
@@ -17000,6 +17060,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      return result;
 	    }
+	
+	    // Triangulate earcut-based input using earcut
 	  }, {
 	    key: '_triangulate',
 	    value: function _triangulate(contour, holes, dim) {
@@ -17016,6 +17078,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      return result;
 	    }
+	
+	    // Transform polygon representation into attribute arrays that can be used by
+	    // THREE.BufferGeometry
 	  }, {
 	    key: '_toAttributes',
 	    value: function _toAttributes(polygon) {
@@ -17149,6 +17214,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      return attributes;
 	    }
+	
+	    // Returns true if the polygon is flat (has no height)
 	  }, {
 	    key: 'isFlat',
 	    value: function isFlat() {
