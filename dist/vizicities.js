@@ -16335,6 +16335,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _geometryPolygonLayer = __webpack_require__(78);
 	
+	var _geometryPolygonLayer2 = _interopRequireDefault(_geometryPolygonLayer);
+	
 	var GeoJSONLayer2 = (function (_LayerGroup) {
 	  _inherits(GeoJSONLayer2, _LayerGroup);
 	
@@ -16408,6 +16410,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _processData(data) {
 	      var _this2 = this;
 	
+	      // Collects features into a single FeatureCollection
+	      //
+	      // Also converts TopoJSON to GeoJSON if instructed
 	      var geojson = _utilGeoJSON2['default'].collectFeatures(data, this._options.topojson);
 	
 	      // TODO: Check that GeoJSON is valid / usable
@@ -16420,11 +16425,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      var defaults = {};
+	
+	      // Assume that a style won't be set per feature
 	      var style = this._options.style;
 	
 	      var options;
 	      features.forEach(function (feature) {
-	        // Get style object, if provided
+	        // Get per-feature style object, if provided
 	        if (typeof _this2._options.style === 'function') {
 	          style = (0, _lodashAssign2['default'])(_utilGeoJSON2['default'].defaultStyle, _this2._options.style(feature));
 	        }
@@ -16463,20 +16470,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // From here on we can assume that we want to merge the layers
 	
-	      var attributes = [];
-	      var flat = true;
+	      var polygonAttributes = [];
+	      var polygonFlat = true;
 	
 	      this._layers.forEach(function (layer) {
-	        attributes.push(layer.getBufferAttributes());
+	        if (layer instanceof _geometryPolygonLayer2['default']) {
+	          polygonAttributes.push(layer.getBufferAttributes());
 	
-	        if (flat && !layer.isFlat()) {
-	          flat = false;
+	          if (polygonFlat && !layer.isFlat()) {
+	            polygonFlat = false;
+	          }
 	        }
 	      });
 	
-	      var mergedAttributes = _utilBuffer2['default'].mergeAttributes(attributes);
+	      var mergedPolygonAttributes = _utilBuffer2['default'].mergeAttributes(polygonAttributes);
 	
-	      this._setMesh(mergedAttributes, flat);
+	      this._setPolygonMesh(mergedPolygonAttributes, polygonFlat);
 	      this.add(this._mesh);
 	    }
 	
@@ -16485,8 +16494,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // TODO: De-dupe this from the individual mesh creation logic within each
 	    // geometry layer (materials, settings, etc)
 	  }, {
-	    key: '_setMesh',
-	    value: function _setMesh(attributes, flat) {
+	    key: '_setPolygonMesh',
+	    value: function _setPolygonMesh(attributes, flat) {
 	      var geometry = new THREE.BufferGeometry();
 	
 	      // itemSize = 3 because there are 3 values (components) per vertex
@@ -16550,7 +16559,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      if (geometry.type === 'Polygon') {
-	        return (0, _geometryPolygonLayer.polygonLayer)(coordinates, options);
+	        return new _geometryPolygonLayer2['default'](coordinates, options);
+	      }
+	
+	      if (geometry.type === 'LineString' || geometry.type === 'MultiLineString') {
+	        return new PolylineLayer(coordinates, options);
 	      }
 	    }
 	  }, {
@@ -16752,7 +16765,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    _get(Object.getPrototypeOf(PolygonLayer.prototype), 'constructor', this).call(this, _options);
 	
-	    this._coordinates = coordinates;
+	    // Return coordinates as arrays of polygons so it's easy to support
+	    // MultiPolygon features (a single polygon would be a MultiPolygon with a
+	    // single polygon in the array)
+	    this._coordinates = PolygonLayer.isSingle(coordinates) ? [coordinates] : coordinates;
 	  }
 	
 	  _createClass(PolygonLayer, [{
@@ -16788,10 +16804,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // Return center of polygon as a LatLon
 	    //
-	    // TODO: Implement getCenter()
+	    // This is used for things like placing popups / UI elements on the layer
+	    //
+	    // TODO: Find proper center position instead of returning first coordinate
+	    // SEE: https://github.com/Leaflet/Leaflet/blob/master/src/layer/vector/Polygon.js#L15
 	  }, {
 	    key: 'getCenter',
-	    value: function getCenter() {}
+	    value: function getCenter() {
+	      return this._coordinates[0][0];
+	    }
 	
 	    // Return polygon bounds in geographic coordinates
 	    //
@@ -16800,7 +16821,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'getBounds',
 	    value: function getBounds() {}
 	
-	    // Get ID for picking interaction
+	    // Get unique ID for picking interaction
 	  }, {
 	    key: '_setPickingId',
 	    value: function _setPickingId() {
@@ -16824,6 +16845,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_setBufferAttributes',
 	    value: function _setBufferAttributes() {
+	      var _this2 = this;
+	
 	      var height = 0;
 	
 	      // Convert height into world units
@@ -16838,86 +16861,90 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var light = new THREE.Color(0xffffff);
 	      var shadow = new THREE.Color(0x666666);
 	
-	      // Convert coordinates to earcut format
-	      var _earcut = this._toEarcut(this._projectedCoordinates);
+	      // For each polygon
+	      var attributes = this._projectedCoordinates.map(function (_projectedCoordinates) {
+	        // Convert coordinates to earcut format
+	        var _earcut = _this2._toEarcut(_projectedCoordinates);
 	
-	      // Triangulate faces using earcut
-	      var faces = this._triangulate(_earcut.vertices, _earcut.holes, _earcut.dimensions);
+	        // Triangulate faces using earcut
+	        var faces = _this2._triangulate(_earcut.vertices, _earcut.holes, _earcut.dimensions);
 	
-	      var groupedVertices = [];
-	      for (i = 0, il = _earcut.vertices.length; i < il; i += _earcut.dimensions) {
-	        groupedVertices.push(_earcut.vertices.slice(i, i + _earcut.dimensions));
-	      }
+	        var groupedVertices = [];
+	        for (i = 0, il = _earcut.vertices.length; i < il; i += _earcut.dimensions) {
+	          groupedVertices.push(_earcut.vertices.slice(i, i + _earcut.dimensions));
+	        }
 	
-	      var extruded = (0, _utilExtrudePolygon2['default'])(groupedVertices, faces, {
-	        bottom: 0,
-	        top: height
-	      });
+	        var extruded = (0, _utilExtrudePolygon2['default'])(groupedVertices, faces, {
+	          bottom: 0,
+	          top: height
+	        });
 	
-	      var topColor = colour.clone().multiply(light);
-	      var bottomColor = colour.clone().multiply(shadow);
+	        var topColor = colour.clone().multiply(light);
+	        var bottomColor = colour.clone().multiply(shadow);
 	
-	      var _vertices = extruded.positions;
-	      var _faces = [];
-	      var _colours = [];
+	        var _vertices = extruded.positions;
+	        var _faces = [];
+	        var _colours = [];
 	
-	      var _colour;
-	      extruded.top.forEach(function (face, fi) {
-	        _colour = [];
-	
-	        _colour.push([colour.r, colour.g, colour.b]);
-	        _colour.push([colour.r, colour.g, colour.b]);
-	        _colour.push([colour.r, colour.g, colour.b]);
-	
-	        _faces.push(face);
-	        _colours.push(_colour);
-	      });
-	
-	      this._flat = true;
-	
-	      if (extruded.sides) {
-	        this._flat = false;
-	
-	        // Set up colours for every vertex with poor-mans AO on the sides
-	        extruded.sides.forEach(function (face, fi) {
+	        var _colour;
+	        extruded.top.forEach(function (face, fi) {
 	          _colour = [];
 	
-	          // First face is always bottom-bottom-top
-	          if (fi % 2 === 0) {
-	            _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-	            _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-	            _colour.push([topColor.r, topColor.g, topColor.b]);
-	            // Reverse winding for the second face
-	            // top-top-bottom
-	          } else {
-	              _colour.push([topColor.r, topColor.g, topColor.b]);
-	              _colour.push([topColor.r, topColor.g, topColor.b]);
-	              _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-	            }
+	          _colour.push([colour.r, colour.g, colour.b]);
+	          _colour.push([colour.r, colour.g, colour.b]);
+	          _colour.push([colour.r, colour.g, colour.b]);
 	
 	          _faces.push(face);
 	          _colours.push(_colour);
 	        });
-	      }
 	
-	      // Skip bottom as there's no point rendering it
-	      // allFaces.push(extruded.faces);
+	        _this2._flat = true;
 	
-	      var polygon = {
-	        vertices: _vertices,
-	        faces: _faces,
-	        colours: _colours,
-	        facesCount: _faces.length
-	      };
+	        if (extruded.sides) {
+	          _this2._flat = false;
 	
-	      if (this._options.interactive && this._pickingId) {
-	        // Inject picking ID
-	        polygon.pickingId = this._pickingId;
-	      }
+	          // Set up colours for every vertex with poor-mans AO on the sides
+	          extruded.sides.forEach(function (face, fi) {
+	            _colour = [];
 	
-	      var attributes = this._toAttributes(polygon);
+	            // First face is always bottom-bottom-top
+	            if (fi % 2 === 0) {
+	              _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+	              _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+	              _colour.push([topColor.r, topColor.g, topColor.b]);
+	              // Reverse winding for the second face
+	              // top-top-bottom
+	            } else {
+	                _colour.push([topColor.r, topColor.g, topColor.b]);
+	                _colour.push([topColor.r, topColor.g, topColor.b]);
+	                _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+	              }
 	
-	      this._bufferAttributes = attributes;
+	            _faces.push(face);
+	            _colours.push(_colour);
+	          });
+	        }
+	
+	        // Skip bottom as there's no point rendering it
+	        // allFaces.push(extruded.faces);
+	
+	        var polygon = {
+	          vertices: _vertices,
+	          faces: _faces,
+	          colours: _colours,
+	          facesCount: _faces.length
+	        };
+	
+	        if (_this2._options.interactive && _this2._pickingId) {
+	          // Inject picking ID
+	          polygon.pickingId = _this2._pickingId;
+	        }
+	
+	        // Convert polygon representation to proper attribute arrays
+	        return _this2._toAttributes(polygon);
+	      });
+	
+	      this._bufferAttributes = _utilBuffer2['default'].mergeAttributes(attributes);
 	    }
 	  }, {
 	    key: 'getBufferAttributes',
@@ -16926,6 +16953,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    // Create and store mesh from buffer attributes
+	    //
+	    // This is only called if the layer is controlling its own output
 	  }, {
 	    key: '_setMesh',
 	    value: function _setMesh(attributes) {
@@ -17001,9 +17030,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_convertCoordinates',
 	    value: function _convertCoordinates(coordinates) {
-	      return coordinates.map(function (ring) {
-	        return ring.map(function (coordinate) {
-	          return (0, _geoLatLon.latLon)(coordinate[1], coordinate[0]);
+	      return coordinates.map(function (_coordinates) {
+	        return _coordinates.map(function (ring) {
+	          return ring.map(function (coordinate) {
+	            return (0, _geoLatLon.latLon)(coordinate[1], coordinate[0]);
+	          });
 	        });
 	      });
 	    }
@@ -17016,23 +17047,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_projectCoordinates',
 	    value: function _projectCoordinates() {
-	      var _this2 = this;
+	      var _this3 = this;
 	
 	      var point;
-	      return this._coordinates.map(function (ring) {
-	        return ring.map(function (latlon) {
-	          point = _this2._world.latLonToPoint(latlon);
+	      return this._coordinates.map(function (_coordinates) {
+	        return _coordinates.map(function (ring) {
+	          return ring.map(function (latlon) {
+	            point = _this3._world.latLonToPoint(latlon);
 	
-	          // TODO: Is offset ever being used or needed?
-	          if (!_this2._offset) {
-	            _this2._offset = (0, _geoPoint.point)(0, 0);
-	            _this2._offset.x = -1 * point.x;
-	            _this2._offset.y = -1 * point.y;
+	            // TODO: Is offset ever being used or needed?
+	            if (!_this3._offset) {
+	              _this3._offset = (0, _geoPoint.point)(0, 0);
+	              _this3._offset.x = -1 * point.x;
+	              _this3._offset.y = -1 * point.y;
 	
-	            _this2._pointScale = _this2._world.pointScale(latlon);
-	          }
+	              _this3._pointScale = _this3._world.pointScale(latlon);
+	            }
 	
-	          return point;
+	            return point;
+	          });
 	        });
 	      });
 	    }
@@ -17081,6 +17114,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // Transform polygon representation into attribute arrays that can be used by
 	    // THREE.BufferGeometry
+	    //
+	    // TODO: Can this be simplified? It's messy and huge
 	  }, {
 	    key: '_toAttributes',
 	    value: function _toAttributes(polygon) {
@@ -17221,6 +17256,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function isFlat() {
 	      return this._flat;
 	    }
+	
+	    // Returns true if coordinates refer to a single geometry
+	    //
+	    // For example, coordinates for a MultiPolygon GeoJSON feature
 	  }, {
 	    key: 'destroy',
 	    value: function destroy() {
@@ -17231,6 +17270,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // Run common destruction logic from parent
 	      _get(Object.getPrototypeOf(PolygonLayer.prototype), 'destroy', this).call(this);
+	    }
+	  }], [{
+	    key: 'isSingle',
+	    value: function isSingle(coordinates) {
+	      return !Array.isArray(coordinates[0][0][0]);
 	    }
 	  }]);
 	

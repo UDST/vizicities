@@ -4,7 +4,7 @@ import reqwest from 'reqwest';
 import GeoJSON from '../util/GeoJSON';
 import Buffer from '../util/Buffer';
 import PickingMaterial from '../engine/PickingMaterial';
-import {polygonLayer as PolygonLayer} from './geometry/PolygonLayer';
+import PolygonLayer from './geometry/PolygonLayer';
 
 class GeoJSONLayer2 extends LayerGroup {
   constructor(geojson, options) {
@@ -127,20 +127,22 @@ class GeoJSONLayer2 extends LayerGroup {
 
     // From here on we can assume that we want to merge the layers
 
-    var attributes = [];
-    var flat = true;
+    var polygonAttributes = [];
+    var polygonFlat = true;
 
     this._layers.forEach(layer => {
-      attributes.push(layer.getBufferAttributes());
+      if (layer instanceof PolygonLayer) {
+        polygonAttributes.push(layer.getBufferAttributes());
 
-      if (flat && !layer.isFlat()) {
-        flat = false;
+        if (polygonFlat && !layer.isFlat()) {
+          polygonFlat = false;
+        }
       }
     });
 
-    var mergedAttributes = Buffer.mergeAttributes(attributes);
+    var mergedPolygonAttributes = Buffer.mergeAttributes(polygonAttributes);
 
-    this._setMesh(mergedAttributes, flat);
+    this._setPolygonMesh(mergedPolygonAttributes, polygonFlat);
     this.add(this._mesh);
   }
 
@@ -148,7 +150,7 @@ class GeoJSONLayer2 extends LayerGroup {
   //
   // TODO: De-dupe this from the individual mesh creation logic within each
   // geometry layer (materials, settings, etc)
-  _setMesh(attributes, flat) {
+  _setPolygonMesh(attributes, flat) {
     var geometry = new THREE.BufferGeometry();
 
     // itemSize = 3 because there are 3 values (components) per vertex
@@ -209,8 +211,12 @@ class GeoJSONLayer2 extends LayerGroup {
       return;
     }
 
-    if (geometry.type === 'Polygon') {
-      return PolygonLayer(coordinates, options);
+    if (geometry.type === 'Polygon' || geometry.type === 'MultiPolygon') {
+      return new PolygonLayer(coordinates, options);
+    }
+
+    if (geometry.type === 'LineString' || geometry.type === 'MultiLineString') {
+      return new PolylineLayer(coordinates, options);
     }
   }
 

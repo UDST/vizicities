@@ -25,7 +25,10 @@ class PolygonLayer extends Layer {
 
     super(_options);
 
-    this._coordinates = coordinates;
+    // Return coordinates as arrays of polygons so it's easy to support
+    // MultiPolygon features (a single polygon would be a MultiPolygon with a
+    // single polygon in the array)
+    this._coordinates = (PolygonLayer.isSingle(coordinates)) ? [coordinates] : coordinates;
   }
 
   _onAdd(world) {
@@ -102,87 +105,90 @@ class PolygonLayer extends Layer {
     var light = new THREE.Color(0xffffff);
     var shadow  = new THREE.Color(0x666666);
 
-    // Convert coordinates to earcut format
-    var _earcut = this._toEarcut(this._projectedCoordinates);
+    // For each polygon
+    var attributes = this._projectedCoordinates.map(_projectedCoordinates => {
+      // Convert coordinates to earcut format
+      var _earcut = this._toEarcut(_projectedCoordinates);
 
-    // Triangulate faces using earcut
-    var faces = this._triangulate(_earcut.vertices, _earcut.holes, _earcut.dimensions);
+      // Triangulate faces using earcut
+      var faces = this._triangulate(_earcut.vertices, _earcut.holes, _earcut.dimensions);
 
-    var groupedVertices = [];
-    for (i = 0, il = _earcut.vertices.length; i < il; i += _earcut.dimensions) {
-      groupedVertices.push(_earcut.vertices.slice(i, i + _earcut.dimensions));
-    }
+      var groupedVertices = [];
+      for (i = 0, il = _earcut.vertices.length; i < il; i += _earcut.dimensions) {
+        groupedVertices.push(_earcut.vertices.slice(i, i + _earcut.dimensions));
+      }
 
-    var extruded = extrudePolygon(groupedVertices, faces, {
-      bottom: 0,
-      top: height
-    });
+      var extruded = extrudePolygon(groupedVertices, faces, {
+        bottom: 0,
+        top: height
+      });
 
-    var topColor = colour.clone().multiply(light);
-    var bottomColor = colour.clone().multiply(shadow);
+      var topColor = colour.clone().multiply(light);
+      var bottomColor = colour.clone().multiply(shadow);
 
-    var _vertices = extruded.positions;
-    var _faces = [];
-    var _colours = [];
+      var _vertices = extruded.positions;
+      var _faces = [];
+      var _colours = [];
 
-    var _colour;
-    extruded.top.forEach((face, fi) => {
-      _colour = [];
-
-      _colour.push([colour.r, colour.g, colour.b]);
-      _colour.push([colour.r, colour.g, colour.b]);
-      _colour.push([colour.r, colour.g, colour.b]);
-
-      _faces.push(face);
-      _colours.push(_colour);
-    });
-
-    this._flat = true;
-
-    if (extruded.sides) {
-      this._flat = false;
-
-      // Set up colours for every vertex with poor-mans AO on the sides
-      extruded.sides.forEach((face, fi) => {
+      var _colour;
+      extruded.top.forEach((face, fi) => {
         _colour = [];
 
-        // First face is always bottom-bottom-top
-        if (fi % 2 === 0) {
-          _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-          _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-          _colour.push([topColor.r, topColor.g, topColor.b]);
-        // Reverse winding for the second face
-        // top-top-bottom
-        } else {
-          _colour.push([topColor.r, topColor.g, topColor.b]);
-          _colour.push([topColor.r, topColor.g, topColor.b]);
-          _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-        }
+        _colour.push([colour.r, colour.g, colour.b]);
+        _colour.push([colour.r, colour.g, colour.b]);
+        _colour.push([colour.r, colour.g, colour.b]);
 
         _faces.push(face);
         _colours.push(_colour);
       });
-    }
 
-    // Skip bottom as there's no point rendering it
-    // allFaces.push(extruded.faces);
+      this._flat = true;
 
-    var polygon = {
-      vertices: _vertices,
-      faces: _faces,
-      colours: _colours,
-      facesCount: _faces.length
-    };
+      if (extruded.sides) {
+        this._flat = false;
 
-    if (this._options.interactive && this._pickingId) {
-      // Inject picking ID
-      polygon.pickingId = this._pickingId;
-    }
+        // Set up colours for every vertex with poor-mans AO on the sides
+        extruded.sides.forEach((face, fi) => {
+          _colour = [];
 
-    // Convert polygon representation to proper attribute arrays
-    var attributes = this._toAttributes(polygon);
+          // First face is always bottom-bottom-top
+          if (fi % 2 === 0) {
+            _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+            _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+            _colour.push([topColor.r, topColor.g, topColor.b]);
+          // Reverse winding for the second face
+          // top-top-bottom
+          } else {
+            _colour.push([topColor.r, topColor.g, topColor.b]);
+            _colour.push([topColor.r, topColor.g, topColor.b]);
+            _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+          }
 
-    this._bufferAttributes = attributes;
+          _faces.push(face);
+          _colours.push(_colour);
+        });
+      }
+
+      // Skip bottom as there's no point rendering it
+      // allFaces.push(extruded.faces);
+
+      var polygon = {
+        vertices: _vertices,
+        faces: _faces,
+        colours: _colours,
+        facesCount: _faces.length
+      };
+
+      if (this._options.interactive && this._pickingId) {
+        // Inject picking ID
+        polygon.pickingId = this._pickingId;
+      }
+
+      // Convert polygon representation to proper attribute arrays
+      return this._toAttributes(polygon);
+    });
+
+    this._bufferAttributes = Buffer.mergeAttributes(attributes);
   }
 
   getBufferAttributes() {
@@ -261,9 +267,11 @@ class PolygonLayer extends Layer {
   //
   // TODO: Calculate geographic bounds
   _convertCoordinates(coordinates) {
-    return coordinates.map(ring => {
-      return ring.map(coordinate => {
-        return LatLon(coordinate[1], coordinate[0]);
+    return coordinates.map(_coordinates => {
+      return _coordinates.map(ring => {
+        return ring.map(coordinate => {
+          return LatLon(coordinate[1], coordinate[0]);
+        });
       });
     });
   }
@@ -275,20 +283,22 @@ class PolygonLayer extends Layer {
   // TODO: Calculate world bounds
   _projectCoordinates() {
     var point;
-    return this._coordinates.map(ring => {
-      return ring.map(latlon => {
-        point = this._world.latLonToPoint(latlon);
+    return this._coordinates.map(_coordinates => {
+      return _coordinates.map(ring => {
+        return ring.map(latlon => {
+          point = this._world.latLonToPoint(latlon);
 
-        // TODO: Is offset ever being used or needed?
-        if (!this._offset) {
-          this._offset = Point(0, 0);
-          this._offset.x = -1 * point.x;
-          this._offset.y = -1 * point.y;
+          // TODO: Is offset ever being used or needed?
+          if (!this._offset) {
+            this._offset = Point(0, 0);
+            this._offset.x = -1 * point.x;
+            this._offset.y = -1 * point.y;
 
-          this._pointScale = this._world.pointScale(latlon);
-        }
+            this._pointScale = this._world.pointScale(latlon);
+          }
 
-        return point;
+          return point;
+        });
       });
     });
   }
@@ -470,6 +480,13 @@ class PolygonLayer extends Layer {
   // Returns true if the polygon is flat (has no height)
   isFlat() {
     return this._flat;
+  }
+
+  // Returns true if coordinates refer to a single geometry
+  //
+  // For example, coordinates for a MultiPolygon GeoJSON feature
+  static isSingle(coordinates) {
+    return !Array.isArray(coordinates[0][0][0]);
   }
 
   destroy() {
