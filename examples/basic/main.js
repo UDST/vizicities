@@ -21,7 +21,7 @@ VIZI.Controls.orbit().addTo(world);
 //   }
 // }).addTo(world);
 
-var layer = VIZI.geoJSONLayer2('http://vector.mapzen.com/osm/buildings/13/4088/2722.json', {
+var layer = VIZI.geoJSONLayer2('http://vector.mapzen.com/osm/buildings,roads/13/4088/2722.json', {
   output: true,
   interactive: true,
   style: {

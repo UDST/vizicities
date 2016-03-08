@@ -5,6 +5,7 @@ import GeoJSON from '../util/GeoJSON';
 import Buffer from '../util/Buffer';
 import PickingMaterial from '../engine/PickingMaterial';
 import PolygonLayer from './geometry/PolygonLayer';
+import PolylineLayer from './geometry/PolylineLayer';
 
 class GeoJSONLayer2 extends LayerGroup {
   constructor(geojson, options) {
@@ -130,6 +131,8 @@ class GeoJSONLayer2 extends LayerGroup {
     var polygonAttributes = [];
     var polygonFlat = true;
 
+    var polylineAttributes = [];
+
     this._layers.forEach(layer => {
       if (layer instanceof PolygonLayer) {
         polygonAttributes.push(layer.getBufferAttributes());
@@ -137,13 +140,19 @@ class GeoJSONLayer2 extends LayerGroup {
         if (polygonFlat && !layer.isFlat()) {
           polygonFlat = false;
         }
+      } else if (layer instanceof PolylineLayer) {
+        polylineAttributes.push(layer.getBufferAttributes());
       }
     });
 
     var mergedPolygonAttributes = Buffer.mergeAttributes(polygonAttributes);
+    var mergedPolylineAttributes = Buffer.mergeAttributes(polylineAttributes);
 
     this._setPolygonMesh(mergedPolygonAttributes, polygonFlat);
-    this.add(this._mesh);
+    this.add(this._polygonMesh);
+
+    this._setPolylineMesh(mergedPolylineAttributes);
+    this.add(this._polylineMesh);
   }
 
   // Create and store mesh from buffer attributes
@@ -199,7 +208,54 @@ class GeoJSONLayer2 extends LayerGroup {
       this._pickingMesh.add(pickingMesh);
     }
 
-    this._mesh = mesh;
+    this._polygonMesh = mesh;
+  }
+
+  _setPolylineMesh(attributes) {
+    var geometry = new THREE.BufferGeometry();
+
+    // itemSize = 3 because there are 3 values (components) per vertex
+    geometry.addAttribute('position', new THREE.BufferAttribute(attributes.vertices, 3));
+    geometry.addAttribute('color', new THREE.BufferAttribute(attributes.colours, 3));
+
+    if (attributes.pickingIds) {
+      geometry.addAttribute('pickingId', new THREE.BufferAttribute(attributes.pickingIds, 1));
+    }
+
+    geometry.computeBoundingBox();
+
+    // TODO: Make this work when style is a function per feature
+    var style = this._options.style;
+    var material = new THREE.LineBasicMaterial({
+      vertexColors: THREE.VertexColors,
+      linewidth: style.lineWidth,
+      transparent: style.lineTransparent,
+      opacity: style.lineOpacity,
+      blending: style.lineBlending
+    });
+
+    var mesh = new THREE.LineSegments(geometry, material);
+
+    if (style.lineRenderOrder !== undefined) {
+      material.depthWrite = false;
+      mesh.renderOrder = style.lineRenderOrder;
+    }
+
+    // TODO: Can a line cast a shadow?
+    // mesh.castShadow = true;
+
+    if (this._options.interactive && this._pickingMesh) {
+      material = new PickingMaterial();
+      material.side = THREE.BackSide;
+
+      // Make the line wider / easier to pick
+      material.linewidth = style.lineWidth + material.linePadding;
+
+      var pickingMesh = new THREE.LineSegments(geometry, material);
+      this._pickingMesh.add(pickingMesh);
+    }
+
+    this._polylineMesh = mesh;
   }
 
   // TODO: Support all GeoJSON geometry types

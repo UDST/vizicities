@@ -1,7 +1,11 @@
-// TODO: Fire click event when this feature is picked
+// TODO: Move duplicated logic between geometry layrs into GeometryLayer
+
+// TODO: Look at ways to drop unneeded references to array buffers, etc to
+// reduce memory footprint
 
 import Layer from '../Layer';
 import extend from 'lodash.assign';
+import THREE from 'three';
 import {latLon as LatLon} from '../../geo/LatLon';
 import {point as Point} from '../../geo/Point';
 import earcut from 'earcut';
@@ -67,7 +71,7 @@ class PolygonLayer extends Layer {
   // TODO: Find proper center position instead of returning first coordinate
   // SEE: https://github.com/Leaflet/Leaflet/blob/master/src/layer/vector/Polygon.js#L15
   getCenter() {
-    return this._coordinates[0][0];
+    return this._coordinates[0][0][0];
   }
 
   // Return polygon bounds in geographic coordinates
@@ -229,7 +233,7 @@ class PolygonLayer extends Layer {
       material.envMap = this._world._environment._skybox.getRenderTarget();
     }
 
-    mesh = new THREE.Mesh(geometry, material);
+    var mesh = new THREE.Mesh(geometry, material);
 
     mesh.castShadow = true;
     mesh.receiveShadow = true;
