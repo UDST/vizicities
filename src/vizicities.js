@@ -7,7 +7,6 @@ import ImageTileLayer, {imageTileLayer} from './layer/tile/ImageTileLayer';
 import GeoJSONTileLayer, {geoJSONTileLayer} from './layer/tile/GeoJSONTileLayer';
 import TopoJSONTileLayer, {topoJSONTileLayer} from './layer/tile/TopoJSONTileLayer';
 import GeoJSONLayer, {geoJSONLayer} from './layer/GeoJSONLayer';
-import GeoJSONLayer2, {geoJSONLayer2} from './layer/GeoJSONLayer2';
 import TopoJSONLayer, {topoJSONLayer} from './layer/TopoJSONLayer';
 import PolygonLayer, {polygonLayer} from './layer/geometry/PolygonLayer';
 import PolylineLayer, {polylineLayer} from './layer/geometry/PolylineLayer';
@@ -34,8 +33,6 @@ const VIZI = {
   topoJSONTileLayer: topoJSONTileLayer,
   GeoJSONLayer: GeoJSONLayer,
   geoJSONLayer: geoJSONLayer,
-  GeoJSONLayer2: GeoJSONLayer2,
-  geoJSONLayer2: geoJSONLayer2,
   TopoJSONLayer: TopoJSONLayer,
   topoJSONLayer: topoJSONLayer,
   PolygonLayer: PolygonLayer,

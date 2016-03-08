@@ -92,19 +92,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _layerGeoJSONLayer2 = _interopRequireDefault(_layerGeoJSONLayer);
 	
-	var _layerGeoJSONLayer22 = __webpack_require__(76);
-	
-	var _layerGeoJSONLayer23 = _interopRequireDefault(_layerGeoJSONLayer22);
-	
-	var _layerTopoJSONLayer = __webpack_require__(80);
+	var _layerTopoJSONLayer = __webpack_require__(79);
 	
 	var _layerTopoJSONLayer2 = _interopRequireDefault(_layerTopoJSONLayer);
 	
-	var _layerGeometryPolygonLayer = __webpack_require__(78);
+	var _layerGeometryPolygonLayer = __webpack_require__(77);
 	
 	var _layerGeometryPolygonLayer2 = _interopRequireDefault(_layerGeometryPolygonLayer);
 	
-	var _layerGeometryPolylineLayer = __webpack_require__(79);
+	var _layerGeometryPolylineLayer = __webpack_require__(78);
 	
 	var _layerGeometryPolylineLayer2 = _interopRequireDefault(_layerGeometryPolylineLayer);
 	
@@ -135,8 +131,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  topoJSONTileLayer: _layerTileTopoJSONTileLayer.topoJSONTileLayer,
 	  GeoJSONLayer: _layerGeoJSONLayer2['default'],
 	  geoJSONLayer: _layerGeoJSONLayer.geoJSONLayer,
-	  GeoJSONLayer2: _layerGeoJSONLayer23['default'],
-	  geoJSONLayer2: _layerGeoJSONLayer22.geoJSONLayer2,
 	  TopoJSONLayer: _layerTopoJSONLayer2['default'],
 	  topoJSONLayer: _layerTopoJSONLayer.topoJSONLayer,
 	  PolygonLayer: _layerGeometryPolygonLayer2['default'],
@@ -15844,481 +15838,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Layer2 = __webpack_require__(37);
-	
-	var _Layer3 = _interopRequireDefault(_Layer2);
-	
-	var _three = __webpack_require__(24);
-	
-	var _three2 = _interopRequireDefault(_three);
-	
-	var _reqwest = __webpack_require__(63);
-	
-	var _reqwest2 = _interopRequireDefault(_reqwest);
-	
-	var _lodashAssign = __webpack_require__(3);
-	
-	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
-	
-	var _geoPoint = __webpack_require__(11);
-	
-	var _geoLatLon = __webpack_require__(10);
-	
-	var _utilGeoJSON = __webpack_require__(65);
-	
-	var _utilGeoJSON2 = _interopRequireDefault(_utilGeoJSON);
-	
-	var _utilBuffer = __webpack_require__(71);
-	
-	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
-	
-	var _enginePickingMaterial = __webpack_require__(72);
-	
-	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
-	
-	var GeoJSONLayer = (function (_Layer) {
-	  _inherits(GeoJSONLayer, _Layer);
-	
-	  function GeoJSONLayer(geojson, options) {
-	    _classCallCheck(this, GeoJSONLayer);
-	
-	    var defaults = {
-	      picking: false,
-	      topojson: false,
-	      filter: null,
-	      onClick: null,
-	      style: _utilGeoJSON2['default'].defaultStyle
-	    };
-	
-	    var _options = (0, _lodashAssign2['default'])({}, defaults, options);
-	
-	    _get(Object.getPrototypeOf(GeoJSONLayer.prototype), 'constructor', this).call(this, _options);
-	
-	    if (typeof options.style === 'function') {
-	      this._options.style = options.style;
-	    } else {
-	      this._options.style = (0, _lodashAssign2['default'])({}, defaults.style, options.style);
-	    }
-	
-	    this._defaultStyle = _utilGeoJSON2['default'].defaultStyle;
-	
-	    this._geojson = geojson;
-	
-	    this._pickingMesh = new _three2['default'].Object3D();
-	  }
-	
-	  _createClass(GeoJSONLayer, [{
-	    key: '_onAdd',
-	    value: function _onAdd(world) {
-	      this.addToPicking(this._pickingMesh);
-	
-	      // Request data from URL if needed
-	      if (typeof this._geojson === 'string') {
-	        this._requestData(this._geojson);
-	      } else {
-	        // Process and add GeoJSON to layer
-	        this._processData(this._geojson);
-	      }
-	    }
-	  }, {
-	    key: '_requestData',
-	    value: function _requestData(url) {
-	      var _this = this;
-	
-	      this._request = (0, _reqwest2['default'])({
-	        url: url,
-	        type: 'json',
-	        crossOrigin: true
-	      }).then(function (res) {
-	        // Clear request reference
-	        _this._request = null;
-	        _this._processData(res);
-	      })['catch'](function (err) {
-	        console.error(err);
-	
-	        // Clear request reference
-	        _this._request = null;
-	      });
-	    }
-	  }, {
-	    key: '_processData',
-	    value: function _processData(data) {
-	      var _this2 = this;
-	
-	      console.time('GeoJSON');
-	
-	      var geojson = _utilGeoJSON2['default'].collectFeatures(data, this._options.topojson);
-	
-	      // TODO: Check that GeoJSON is valid / usable
-	
-	      var features = geojson.features;
-	
-	      // Run filter, if provided
-	      if (this._options.filter) {
-	        features = geojson.features.filter(this._options.filter);
-	      }
-	
-	      var style = this._options.style;
-	
-	      var offset;
-	
-	      // TODO: Wrap into a helper method so this isn't duplicated in the tiled
-	      // GeoJSON output layer
-	      //
-	      // Need to be careful as to not make it impossible to fork this off into a
-	      // worker script at a later stage
-	      //
-	      // Also unsure as to whether it's wise to lump so much into a black box
-	      //
-	      // var meshes = GeoJSON.createMeshes(features, offset, style);
-	
-	      var polygons = {
-	        vertices: [],
-	        faces: [],
-	        colours: [],
-	        facesCount: 0,
-	        allFlat: true
-	      };
-	
-	      var lines = {
-	        vertices: [],
-	        colours: [],
-	        verticesCount: 0
-	      };
-	
-	      if (this._options.picking) {
-	        polygons.pickingIds = [];
-	        lines.pickingIds = [];
-	      }
-	
-	      var colour = new _three2['default'].Color();
-	
-	      features.forEach(function (feature) {
-	        // feature.geometry, feature.properties
-	
-	        // Skip features that aren't supported
-	        //
-	        // TODO: Add support for all GeoJSON geometry types, including Multi...
-	        // geometry types
-	        if (feature.geometry.type !== 'Polygon' && feature.geometry.type !== 'LineString' && feature.geometry.type !== 'MultiLineString') {
-	          return;
-	        }
-	
-	        // Get style object, if provided
-	        if (typeof _this2._options.style === 'function') {
-	          style = (0, _lodashAssign2['default'])(_this2._defaultStyle, _this2._options.style(feature));
-	        }
-	
-	        var coordinates = feature.geometry.coordinates;
-	
-	        // if (feature.geometry.type === 'LineString') {
-	        if (feature.geometry.type === 'LineString') {
-	          colour.set(style.lineColor);
-	
-	          coordinates = coordinates.map(function (coordinate) {
-	            var latlon = (0, _geoLatLon.latLon)(coordinate[1], coordinate[0]);
-	            var point = _this2._world.latLonToPoint(latlon);
-	
-	            if (!offset) {
-	              offset = (0, _geoPoint.point)(0, 0);
-	              offset.x = -1 * point.x;
-	              offset.y = -1 * point.y;
-	
-	              _this2._pointScale = _this2._world.pointScale(latlon);
-	            }
-	
-	            return [point.x, point.y];
-	          });
-	
-	          var height = 0;
-	
-	          if (style.lineHeight) {
-	            height = _this2._world.metresToWorld(style.lineHeight, _this2._pointScale);
-	          }
-	
-	          var linestringAttributes = _utilGeoJSON2['default'].lineStringAttributes(coordinates, colour, height);
-	
-	          lines.vertices.push(linestringAttributes.vertices);
-	          lines.colours.push(linestringAttributes.colours);
-	
-	          if (_this2._options.picking) {
-	            var pickingId = _this2.getPickingId();
-	
-	            // Inject picking ID
-	            //
-	            // TODO: Perhaps handle this within the GeoJSON helper
-	            lines.pickingIds.push(pickingId);
-	
-	            if (_this2._options.onClick) {
-	              // TODO: Find a way to properly remove this listener on destroy
-	              _this2._world.on('pick-' + pickingId, function (point2d, point3d, intersects) {
-	                _this2._options.onClick(feature, point2d, point3d, intersects);
-	              });
-	            }
-	          }
-	
-	          lines.verticesCount += linestringAttributes.vertices.length;
-	        }
-	
-	        if (feature.geometry.type === 'MultiLineString') {
-	          colour.set(style.lineColor);
-	
-	          coordinates = coordinates.map(function (_coordinates) {
-	            return _coordinates.map(function (coordinate) {
-	              var latlon = (0, _geoLatLon.latLon)(coordinate[1], coordinate[0]);
-	              var point = _this2._world.latLonToPoint(latlon);
-	
-	              if (!offset) {
-	                offset = (0, _geoPoint.point)(0, 0);
-	                offset.x = -1 * point.x;
-	                offset.y = -1 * point.y;
-	
-	                _this2._pointScale = _this2._world.pointScale(latlon);
-	              }
-	
-	              return [point.x, point.y];
-	            });
-	          });
-	
-	          var height = 0;
-	
-	          if (style.lineHeight) {
-	            height = _this2._world.metresToWorld(style.lineHeight, _this2._pointScale);
-	          }
-	
-	          var multiLinestringAttributes = _utilGeoJSON2['default'].multiLineStringAttributes(coordinates, colour, height);
-	
-	          lines.vertices.push(multiLinestringAttributes.vertices);
-	          lines.colours.push(multiLinestringAttributes.colours);
-	
-	          if (_this2._options.picking) {
-	            var pickingId = _this2.getPickingId();
-	
-	            // Inject picking ID
-	            //
-	            // TODO: Perhaps handle this within the GeoJSON helper
-	            lines.pickingIds.push(pickingId);
-	
-	            if (_this2._options.onClick) {
-	              // TODO: Find a way to properly remove this listener on destroy
-	              _this2._world.on('pick-' + pickingId, function (point2d, point3d, intersects) {
-	                _this2._options.onClick(feature, point2d, point3d, intersects);
-	              });
-	            }
-	          }
-	
-	          lines.verticesCount += multiLinestringAttributes.vertices.length;
-	        }
-	
-	        if (feature.geometry.type === 'Polygon') {
-	          colour.set(style.color);
-	
-	          coordinates = coordinates.map(function (ring) {
-	            return ring.map(function (coordinate) {
-	              var latlon = (0, _geoLatLon.latLon)(coordinate[1], coordinate[0]);
-	              var point = _this2._world.latLonToPoint(latlon);
-	
-	              if (!offset) {
-	                offset = (0, _geoPoint.point)(0, 0);
-	                offset.x = -1 * point.x;
-	                offset.y = -1 * point.y;
-	
-	                _this2._pointScale = _this2._world.pointScale(latlon);
-	              }
-	
-	              return [point.x, point.y];
-	            });
-	          });
-	
-	          var height = 0;
-	
-	          if (style.height) {
-	            height = _this2._world.metresToWorld(style.height, _this2._pointScale);
-	          }
-	
-	          var polygonAttributes = _utilGeoJSON2['default'].polygonAttributes(coordinates, colour, height);
-	
-	          polygons.vertices.push(polygonAttributes.vertices);
-	          polygons.faces.push(polygonAttributes.faces);
-	          polygons.colours.push(polygonAttributes.colours);
-	
-	          if (_this2._options.picking) {
-	            var pickingId = _this2.getPickingId();
-	
-	            // Inject picking ID
-	            //
-	            // TODO: Perhaps handle this within the GeoJSON helper
-	            polygons.pickingIds.push(pickingId);
-	
-	            if (_this2._options.onClick) {
-	              // TODO: Find a way to properly remove this listener on destroy
-	              _this2._world.on('pick-' + pickingId, function (point2d, point3d, intersects) {
-	                _this2._options.onClick(feature, point2d, point3d, intersects);
-	              });
-	            }
-	          }
-	
-	          if (polygons.allFlat && !polygonAttributes.flat) {
-	            polygons.allFlat = false;
-	          }
-	
-	          polygons.facesCount += polygonAttributes.faces.length;
-	        }
-	      });
-	
-	      var geometry;
-	      var material;
-	      var mesh;
-	
-	      if (this._options.picking) {
-	        // Move picking mesh to origin Point
-	        this._pickingMesh.position.x = -offset.x;
-	        this._pickingMesh.position.z = -offset.y;
-	      }
-	
-	      // Output lines
-	      if (lines.vertices.length > 0) {
-	        geometry = _utilBuffer2['default'].createLineGeometry(lines, offset);
-	
-	        material = new _three2['default'].LineBasicMaterial({
-	          vertexColors: _three2['default'].VertexColors,
-	          linewidth: style.lineWidth,
-	          transparent: style.lineTransparent,
-	          opacity: style.lineOpacity,
-	          blending: style.lineBlending
-	        });
-	
-	        mesh = new _three2['default'].LineSegments(geometry, material);
-	
-	        if (style.lineRenderOrder !== undefined) {
-	          material.depthWrite = false;
-	          mesh.renderOrder = style.lineRenderOrder;
-	        }
-	
-	        // TODO: Can a line cast a shadow?
-	        // mesh.castShadow = true;
-	
-	        this.add(mesh);
-	
-	        if (this._options.picking) {
-	          material = new _enginePickingMaterial2['default']();
-	          material.side = _three2['default'].BackSide;
-	
-	          // Make the line wider / easier to pick
-	          material.linewidth = style.lineWidth + material.linePadding;
-	
-	          var pickingMesh = new _three2['default'].LineSegments(geometry, material);
-	          this._pickingMesh.add(pickingMesh);
-	        }
-	      }
-	
-	      // Output polygons
-	      if (polygons.facesCount > 0) {
-	        geometry = _utilBuffer2['default'].createGeometry(polygons, offset);
-	
-	        if (!this._world._environment._skybox) {
-	          material = new _three2['default'].MeshPhongMaterial({
-	            vertexColors: _three2['default'].VertexColors,
-	            side: _three2['default'].BackSide
-	          });
-	        } else {
-	          material = new _three2['default'].MeshStandardMaterial({
-	            vertexColors: _three2['default'].VertexColors,
-	            side: _three2['default'].BackSide
-	          });
-	          material.roughness = 1;
-	          material.metalness = 0.1;
-	          material.envMapIntensity = 3;
-	          material.envMap = this._world._environment._skybox.getRenderTarget();
-	        }
-	
-	        mesh = new _three2['default'].Mesh(geometry, material);
-	
-	        mesh.castShadow = true;
-	        mesh.receiveShadow = true;
-	
-	        if (polygons.allFlat) {
-	          material.depthWrite = false;
-	          mesh.renderOrder = 1;
-	        }
-	
-	        this.add(mesh);
-	
-	        if (this._options.picking) {
-	          material = new _enginePickingMaterial2['default']();
-	          material.side = _three2['default'].BackSide;
-	
-	          var pickingMesh = new _three2['default'].Mesh(geometry, material);
-	          this._pickingMesh.add(pickingMesh);
-	        }
-	      }
-	
-	      // Move layer to origin Point
-	      //
-	      // TODO: Is there a better way to ensure everything is aligned right and
-	      // able to be frustum-culled?
-	      this._object3D.position.x = -offset.x;
-	      this._object3D.position.z = -offset.y;
-	
-	      console.timeEnd('GeoJSON');
-	    }
-	  }, {
-	    key: '_abortRequest',
-	    value: function _abortRequest() {
-	      if (!this._request) {
-	        return;
-	      }
-	
-	      this._request.abort();
-	    }
-	  }, {
-	    key: 'destroy',
-	    value: function destroy() {
-	      // Cancel any pending requests
-	      this._abortRequest();
-	
-	      // Clear request reference
-	      this._request = null;
-	
-	      // TODO: Properly dispose of picking mesh
-	      this._pickingMesh = null;
-	
-	      // Run common destruction logic from parent
-	      _get(Object.getPrototypeOf(GeoJSONLayer.prototype), 'destroy', this).call(this);
-	    }
-	  }]);
-	
-	  return GeoJSONLayer;
-	})(_Layer3['default']);
-	
-	exports['default'] = GeoJSONLayer;
-	
-	var noNew = function noNew(geojson, options) {
-	  return new GeoJSONLayer(geojson, options);
-	};
-	
-	// Initialise without requiring new keyword
-	exports.geoJSONLayer = noNew;
-
-/***/ },
-/* 76 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var _LayerGroup2 = __webpack_require__(77);
+	var _LayerGroup2 = __webpack_require__(76);
 	
 	var _LayerGroup3 = _interopRequireDefault(_LayerGroup2);
 	
@@ -16342,19 +15862,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
-	var _geometryPolygonLayer = __webpack_require__(78);
+	var _geometryPolygonLayer = __webpack_require__(77);
 	
 	var _geometryPolygonLayer2 = _interopRequireDefault(_geometryPolygonLayer);
 	
-	var _geometryPolylineLayer = __webpack_require__(79);
+	var _geometryPolylineLayer = __webpack_require__(78);
 	
 	var _geometryPolylineLayer2 = _interopRequireDefault(_geometryPolylineLayer);
 	
-	var GeoJSONLayer2 = (function (_LayerGroup) {
-	  _inherits(GeoJSONLayer2, _LayerGroup);
+	var GeoJSONLayer = (function (_LayerGroup) {
+	  _inherits(GeoJSONLayer, _LayerGroup);
 	
-	  function GeoJSONLayer2(geojson, options) {
-	    _classCallCheck(this, GeoJSONLayer2);
+	  function GeoJSONLayer(geojson, options) {
+	    _classCallCheck(this, GeoJSONLayer);
 	
 	    var defaults = {
 	      output: false,
@@ -16373,12 +15893,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      _options.style = (0, _lodashAssign2['default'])({}, defaults.style, options.style);
 	    }
 	
-	    _get(Object.getPrototypeOf(GeoJSONLayer2.prototype), 'constructor', this).call(this, _options);
+	    _get(Object.getPrototypeOf(GeoJSONLayer.prototype), 'constructor', this).call(this, _options);
 	
 	    this._geojson = geojson;
 	  }
 	
-	  _createClass(GeoJSONLayer2, [{
+	  _createClass(GeoJSONLayer, [{
 	    key: '_onAdd',
 	    value: function _onAdd(world) {
 	      // Only add to picking mesh if this layer is controlling output
@@ -16418,6 +15938,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _this._request = null;
 	      });
 	    }
+	
+	    // TODO: Wrap into a helper method so this isn't duplicated in the tiled
+	    // GeoJSON output layer
+	    //
+	    // Need to be careful as to not make it impossible to fork this off into a
+	    // worker script at a later stage
 	  }, {
 	    key: '_processData',
 	    value: function _processData(data) {
@@ -16661,23 +16187,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      // Run common destruction logic from parent
-	      _get(Object.getPrototypeOf(GeoJSONLayer2.prototype), 'destroy', this).call(this);
+	      _get(Object.getPrototypeOf(GeoJSONLayer.prototype), 'destroy', this).call(this);
 	    }
 	  }]);
 	
-	  return GeoJSONLayer2;
+	  return GeoJSONLayer;
 	})(_LayerGroup3['default']);
 	
-	exports['default'] = GeoJSONLayer2;
+	exports['default'] = GeoJSONLayer;
 	
 	var noNew = function noNew(geojson, options) {
-	  return new GeoJSONLayer2(geojson, options);
+	  return new GeoJSONLayer(geojson, options);
 	};
 	
-	exports.geoJSONLayer2 = noNew;
+	exports.geoJSONLayer = noNew;
 
 /***/ },
-/* 77 */
+/* 76 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -16767,7 +16293,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.layerGroup = noNew;
 
 /***/ },
-/* 78 */
+/* 77 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -17366,7 +16892,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.polygonLayer = noNew;
 
 /***/ },
-/* 79 */
+/* 78 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -17782,7 +17308,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.polylineLayer = noNew;
 
 /***/ },
-/* 80 */
+/* 79 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {

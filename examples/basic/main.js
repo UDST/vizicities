@@ -11,17 +11,7 @@ VIZI.Controls.orbit().addTo(world);
 //   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
 // }).addTo(world);
 
-// var coordinates = [[[-0.34535,51.54392],[-0.34436,51.54604],[-0.34324,51.54584],[-0.34423,51.54372],[-0.34535,51.54392]]];
-//
-// VIZI.polygonLayer(coordinates, {
-//   interactive: true,
-//   style: {
-//     color: '#ff0000',
-//     height: 0
-//   }
-// }).addTo(world);
-
-var layer = VIZI.geoJSONLayer2('http://vector.mapzen.com/osm/buildings,roads/13/4088/2722.json', {
+var layer = VIZI.geoJSONLayer('http://vector.mapzen.com/osm/buildings,roads/13/4088/2722.json', {
   output: true,
   interactive: true,
   style: {
@@ -36,7 +26,6 @@ var layer = VIZI.geoJSONLayer2('http://vector.mapzen.com/osm/buildings,roads/13/
 
 // // Building and roads from Mapzen (polygons and linestrings)
 // var topoJSONTileLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/buildings,roads/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
-//   // picking: true,
 //   style: function(feature) {
 //     var height;
 //
@@ -56,9 +45,6 @@ var layer = VIZI.geoJSONLayer2('http://vector.mapzen.com/osm/buildings,roads/13/
 //       lineRenderOrder: 2
 //     };
 //   },
-//   // onClick: function(feature, point2d, point3d, intersects) {
-//   //   console.log('Clicked:', feature, point2d, point3d, intersects);
-//   // },
 //   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://whosonfirst.mapzen.com#License">Who\'s On First</a>.'
 // }).addTo(world);
 
@@ -89,7 +75,7 @@ var layer = VIZI.geoJSONLayer2('http://vector.mapzen.com/osm/buildings,roads/13/
 
 // London Underground lines
 // var geoJSONLayer = VIZI.geoJSONLayer('https://rawgit.com/robhawkes/4acb9d6a6a5f00a377e2/raw/30ae704a44e10f2e13fb7e956e80c3b22e8e7e81/tfl_lines.json', {
-//   picking: true,
+//   interactive: true,
 //   style: function(feature) {
 //     var colour = feature.properties.lines[0].colour || '#ffffff';
 //
@@ -103,8 +89,10 @@ var layer = VIZI.geoJSONLayer2('http://vector.mapzen.com/osm/buildings,roads/13/
 //       lineRenderOrder: 2
 //     };
 //   },
-//   onClick: function(feature, point2d, point3d, intersects) {
-//     console.log('Clicked:', feature, point2d, point3d, intersects);
+//   onEachFeature: function(feature, layer) {
+//     layer.on('click', function(layer, point2d, point3d, intersects) {
+//       console.log(layer, point2d, point3d, intersects);
+//     });
 //   },
 //   attribution: '&copy; Transport for London.'
 // }).addTo(world);
