@@ -59,15 +59,20 @@ class PolygonLayer extends Layer {
 
   // Return center of polygon as a LatLon
   //
-  // TODO: Implement getCenter()
-  getCenter() {}
+  // This is used for things like placing popups / UI elements on the layer
+  //
+  // TODO: Find proper center position instead of returning first coordinate
+  // SEE: https://github.com/Leaflet/Leaflet/blob/master/src/layer/vector/Polygon.js#L15
+  getCenter() {
+    return this._coordinates[0][0];
+  }
 
   // Return polygon bounds in geographic coordinates
   //
   // TODO: Implement getBounds()
   getBounds() {}
 
-  // Get ID for picking interaction
+  // Get unique ID for picking interaction
   _setPickingId() {
     this._pickingId = this.getPickingId();
   }
@@ -174,6 +179,7 @@ class PolygonLayer extends Layer {
       polygon.pickingId = this._pickingId;
     }
 
+    // Convert polygon representation to proper attribute arrays
     var attributes = this._toAttributes(polygon);
 
     this._bufferAttributes = attributes;
@@ -184,6 +190,8 @@ class PolygonLayer extends Layer {
   }
 
   // Create and store mesh from buffer attributes
+  //
+  // This is only called if the layer is controlling its own output
   _setMesh(attributes) {
     var geometry = new THREE.BufferGeometry();
 
@@ -325,6 +333,8 @@ class PolygonLayer extends Layer {
 
   // Transform polygon representation into attribute arrays that can be used by
   // THREE.BufferGeometry
+  //
+  // TODO: Can this be simplified? It's messy and huge
   _toAttributes(polygon) {
     // Three components per vertex per face (3 x 3 = 9)
     var vertices = new Float32Array(polygon.facesCount * 9);

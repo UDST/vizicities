@@ -67,6 +67,9 @@ class GeoJSONLayer2 extends LayerGroup {
   }
 
   _processData(data) {
+    // Collects features into a single FeatureCollection
+    //
+    // Also converts TopoJSON to GeoJSON if instructed
     var geojson = GeoJSON.collectFeatures(data, this._options.topojson);
 
     // TODO: Check that GeoJSON is valid / usable
@@ -79,11 +82,13 @@ class GeoJSONLayer2 extends LayerGroup {
     }
 
     var defaults = {};
+
+    // Assume that a style won't be set per feature
     var style = this._options.style;
 
     var options;
     features.forEach(feature => {
-      // Get style object, if provided
+      // Get per-feature style object, if provided
       if (typeof this._options.style === 'function') {
         style = extend(GeoJSON.defaultStyle, this._options.style(feature));
       }
