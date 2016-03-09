@@ -107,7 +107,7 @@ class PolylineLayer extends Layer {
     }
 
     var colour = new THREE.Color();
-    colour.set(this._options.style.color);
+    colour.set(this._options.style.lineColor);
 
     // For each line
     var attributes = this._projectedCoordinates.map(_projectedCoordinates => {
@@ -183,8 +183,8 @@ class PolylineLayer extends Layer {
       mesh.renderOrder = style.lineRenderOrder;
     }
 
-    // TODO: Can a line cast a shadow?
-    // mesh.castShadow = true;
+    mesh.castShadow = true;
+    // mesh.receiveShadow = true;
 
     if (this._options.interactive && this._pickingMesh) {
       material = new PickingMaterial();

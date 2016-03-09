@@ -10,6 +10,10 @@
 // Can probably use fromGeometry() or setFromObject() from THREE.BufferGeometry
 // and pull out the attributes
 
+// TODO: Support sprite objects using textures
+
+// TODO: Provide option to billboard geometry so it always faces the camera
+
 import Layer from '../Layer';
 import extend from 'lodash.assign';
 import THREE from 'three';
@@ -23,10 +27,13 @@ class PointLayer extends Layer {
     var defaults = {
       output: true,
       interactive: false,
+      // THREE.Geometry or THREE.BufferGeometry to use for point output
+      //
+      // TODO: Make this customisable per point via a callback (like style)
+      geometry: null,
       // This default style is separate to Util.GeoJSON.defaultStyle
       style: {
-        pointColor: '#ff0000',
-        pointHeight: 0
+        pointColor: '#ff0000'
       }
     };
 
@@ -115,15 +122,26 @@ class PointLayer extends Layer {
     var colour = new THREE.Color();
     colour.set(this._options.style.pointColor);
 
-    // Debug geometry for points
-    //
-    // TODO: Allow point geometry to be customised / overridden
-    var debugGeomWidth = this._world.metresToWorld(5, this._pointScale);
-    var debugGeomHeight = this._world.metresToWorld(100, this._pointScale);
-    var debugGeom = new THREE.BoxGeometry(debugGeomWidth, debugGeomHeight, debugGeomWidth);
+    var geometry;
 
-    // Pull attributes out of debug geometry
-    var debugBufferGeom = new THREE.BufferGeometry().fromGeometry(debugGeom);
+    // Use default geometry if none has been provided or the provided geometry
+    // isn't valid
+    if (!this._options.geometry || (!this._options.geometry instanceof THREE.Geometry || !this._options.geometry instanceof THREE.BufferGeometry)) {
+      // Debug geometry for points is a thin bar
+      //
+      // TODO: Allow point geometry to be customised / overridden
+      var geometryWidth = this._world.metresToWorld(5, this._pointScale);
+      var geometryHeight = this._world.metresToWorld(200, this._pointScale);
+      var _geometry = new THREE.BoxGeometry(geometryWidth, geometryHeight, geometryWidth);
+
+      // Shift geometry up so it sits on the ground
+      _geometry.translate(0, geometryHeight * 0.5, 0);
+
+      // Pull attributes out of debug geometry
+      geometry = new THREE.BufferGeometry().fromGeometry(_geometry);
+    } else {
+      geometry = this._options.geometry;
+    }
 
     // For each point
     var attributes = this._projectedCoordinates.map(coordinate => {
@@ -131,13 +149,13 @@ class PointLayer extends Layer {
       var _normals = [];
       var _colours = [];
 
-      var _debugBufferGeom = debugBufferGeom.clone();
+      var _geometry = geometry.clone();
 
-      _debugBufferGeom.translate(coordinate.x, height, coordinate.y);
+      _geometry.translate(coordinate.x, height, coordinate.y);
 
-      var _vertices = _debugBufferGeom.attributes.position.clone().array;
-      var _normals = _debugBufferGeom.attributes.normal.clone().array;
-      var _colours = _debugBufferGeom.attributes.color.clone().array;
+      var _vertices = _geometry.attributes.position.clone().array;
+      var _normals = _geometry.attributes.normal.clone().array;
+      var _colours = _geometry.attributes.color.clone().array;
 
       for (var i = 0; i < _colours.length; i += 3) {
         _colours[i] = colour.r;
@@ -145,26 +163,10 @@ class PointLayer extends Layer {
         _colours[i + 2] = colour.b;
       }
 
-      // Connect coordinate with the next to make a pair
-      //
-      // LineSegments requires pairs of vertices so repeat the last point if
-      // there's an odd number of vertices
-      // var nextCoord;
-      // _projectedCoordinates.forEach((coordinate, index) => {
-      //   _colours.push([colour.r, colour.g, colour.b]);
-      //   _vertices.push([coordinate.x, height, coordinate.y]);
-      //
-      //   nextCoord = (_projectedCoordinates[index + 1]) ? _projectedCoordinates[index + 1] : coordinate;
-      //
-      //   _colours.push([colour.r, colour.g, colour.b]);
-      //   _vertices.push([nextCoord.x, height, nextCoord.y]);
-      // });
-
       var _point = {
         vertices: _vertices,
         normals: _normals,
         colours: _colours
-        // verticesCount: _vertices.length
       };
 
       if (this._options.interactive && this._pickingId) {
@@ -225,7 +227,7 @@ class PointLayer extends Layer {
     var mesh = new THREE.Mesh(geometry, material);
 
     mesh.castShadow = true;
-    mesh.receiveShadow = true;
+    // mesh.receiveShadow = true;
 
     if (this.isFlat()) {
       material.depthWrite = false;

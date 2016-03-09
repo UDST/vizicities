@@ -6,6 +6,7 @@ import Buffer from '../util/Buffer';
 import PickingMaterial from '../engine/PickingMaterial';
 import PolygonLayer from './geometry/PolygonLayer';
 import PolylineLayer from './geometry/PolylineLayer';
+import PointLayer from './geometry/PointLayer';
 
 class GeoJSONLayer extends LayerGroup {
   constructor(geojson, options) {
@@ -76,15 +77,15 @@ class GeoJSONLayer extends LayerGroup {
     // Collects features into a single FeatureCollection
     //
     // Also converts TopoJSON to GeoJSON if instructed
-    var geojson = GeoJSON.collectFeatures(data, this._options.topojson);
+    this._geojson = GeoJSON.collectFeatures(data, this._options.topojson);
 
     // TODO: Check that GeoJSON is valid / usable
 
-    var features = geojson.features;
+    var features = this._geojson.features;
 
     // Run filter, if provided
     if (this._options.filter) {
-      features = geojson.features.filter(this._options.filter);
+      features = this._geojson.features.filter(this._options.filter);
     }
 
     var defaults = {};
@@ -96,7 +97,7 @@ class GeoJSONLayer extends LayerGroup {
     features.forEach(feature => {
       // Get per-feature style object, if provided
       if (typeof this._options.style === 'function') {
-        style = extend(GeoJSON.defaultStyle, this._options.style(feature));
+        style = extend({}, GeoJSON.defaultStyle, this._options.style(feature));
       }
 
       options = extend({}, defaults, {
@@ -137,6 +138,7 @@ class GeoJSONLayer extends LayerGroup {
     var polygonFlat = true;
 
     var polylineAttributes = [];
+    var pointAttributes = [];
 
     this._layers.forEach(layer => {
       if (layer instanceof PolygonLayer) {
@@ -147,23 +149,36 @@ class GeoJSONLayer extends LayerGroup {
         }
       } else if (layer instanceof PolylineLayer) {
         polylineAttributes.push(layer.getBufferAttributes());
+      } else if (layer instanceof PointLayer) {
+        pointAttributes.push(layer.getBufferAttributes());
       }
     });
 
-    var mergedPolygonAttributes = Buffer.mergeAttributes(polygonAttributes);
-    var mergedPolylineAttributes = Buffer.mergeAttributes(polylineAttributes);
+    if (polygonAttributes.length > 0) {
+      var mergedPolygonAttributes = Buffer.mergeAttributes(polygonAttributes);
+      this._setPolygonMesh(mergedPolygonAttributes, polygonFlat);
+      this.add(this._polygonMesh);
+    }
 
-    this._setPolygonMesh(mergedPolygonAttributes, polygonFlat);
-    this.add(this._polygonMesh);
+    if (polylineAttributes.length > 0) {
+      var mergedPolylineAttributes = Buffer.mergeAttributes(polylineAttributes);
+      this._setPolylineMesh(mergedPolylineAttributes);
+      this.add(this._polylineMesh);
+    }
 
-    this._setPolylineMesh(mergedPolylineAttributes);
-    this.add(this._polylineMesh);
+    if (pointAttributes.length > 0) {
+      var mergedPointAttributes = Buffer.mergeAttributes(pointAttributes);
+      this._setPointMesh(mergedPointAttributes);
+      this.add(this._pointMesh);
+    }
   }
 
   // Create and store mesh from buffer attributes
   //
   // TODO: De-dupe this from the individual mesh creation logic within each
   // geometry layer (materials, settings, etc)
+  //
+  // Could make this an abstract method for each geometry layer
   _setPolygonMesh(attributes, flat) {
     var geometry = new THREE.BufferGeometry();
 
@@ -230,7 +245,9 @@ class GeoJSONLayer extends LayerGroup {
     geometry.computeBoundingBox();
 
     // TODO: Make this work when style is a function per feature
-    var style = this._options.style;
+    var style = (typeof this._options.style === 'function') ? this._options.style(this._geojson.features[0]) : this._options.style;
+    style = extend({}, GeoJSON.defaultStyle, style);
+
     var material = new THREE.LineBasicMaterial({
       vertexColors: THREE.VertexColors,
       linewidth: style.lineWidth,
@@ -246,12 +263,12 @@ class GeoJSONLayer extends LayerGroup {
       mesh.renderOrder = style.lineRenderOrder;
     }
 
-    // TODO: Can a line cast a shadow?
-    // mesh.castShadow = true;
+    mesh.castShadow = true;
+    // mesh.receiveShadow = true;
 
     if (this._options.interactive && this._pickingMesh) {
       material = new PickingMaterial();
-      material.side = THREE.BackSide;
+      // material.side = THREE.BackSide;
 
       // Make the line wider / easier to pick
       material.linewidth = style.lineWidth + material.linePadding;
@@ -261,6 +278,53 @@ class GeoJSONLayer extends LayerGroup {
     }
 
     this._polylineMesh = mesh;
+  }
+
+  _setPointMesh(attributes) {
+    var geometry = new THREE.BufferGeometry();
+
+    // itemSize = 3 because there are 3 values (components) per vertex
+    geometry.addAttribute('position', new THREE.BufferAttribute(attributes.vertices, 3));
+    geometry.addAttribute('normal', new THREE.BufferAttribute(attributes.normals, 3));
+    geometry.addAttribute('color', new THREE.BufferAttribute(attributes.colours, 3));
+
+    if (attributes.pickingIds) {
+      geometry.addAttribute('pickingId', new THREE.BufferAttribute(attributes.pickingIds, 1));
+    }
+
+    geometry.computeBoundingBox();
+
+    var material;
+    if (!this._world._environment._skybox) {
+      material = new THREE.MeshPhongMaterial({
+        vertexColors: THREE.VertexColors
+        // side: THREE.BackSide
+      });
+    } else {
+      material = new THREE.MeshStandardMaterial({
+        vertexColors: THREE.VertexColors
+        // side: THREE.BackSide
+      });
+      material.roughness = 1;
+      material.metalness = 0.1;
+      material.envMapIntensity = 3;
+      material.envMap = this._world._environment._skybox.getRenderTarget();
+    }
+
+    mesh = new THREE.Mesh(geometry, material);
+
+    mesh.castShadow = true;
+    // mesh.receiveShadow = true;
+
+    if (this._options.interactive && this._pickingMesh) {
+      material = new PickingMaterial();
+      // material.side = THREE.BackSide;
+
+      var pickingMesh = new THREE.Mesh(geometry, material);
+      this._pickingMesh.add(pickingMesh);
+    }
+
+    this._pointMesh = mesh;
   }
 
   // TODO: Support all GeoJSON geometry types
@@ -278,6 +342,10 @@ class GeoJSONLayer extends LayerGroup {
 
     if (geometry.type === 'LineString' || geometry.type === 'MultiLineString') {
       return new PolylineLayer(coordinates, options);
+    }
+
+    if (geometry.type === 'Point' || geometry.type === 'MultiPoint') {
+      return new PointLayer(coordinates, options);
     }
   }
 

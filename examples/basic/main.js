@@ -5,11 +5,11 @@ var world = VIZI.world('world', {
 // Add controls
 VIZI.Controls.orbit().addTo(world);
 
-// // http://{s}.tile.osm.org/{z}/{x}/{y}.png
-// // http://{s}.tiles.wmflabs.org/osm-no-labels/{z}/{x}/{y}.png
-// var imageTileLayer = VIZI.imageTileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
-//   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
-// }).addTo(world);
+// http://{s}.tile.osm.org/{z}/{x}/{y}.png
+// http://{s}.tiles.wmflabs.org/osm-no-labels/{z}/{x}/{y}.png
+var imageTileLayer = VIZI.imageTileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
+  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
+}).addTo(world);
 
 // var layer = VIZI.geoJSONLayer('http://vector.mapzen.com/osm/buildings,roads/13/4088/2722.json', {
 //   output: true,
@@ -24,13 +24,18 @@ VIZI.Controls.orbit().addTo(world);
 //   }
 // }).addTo(world);
 
-var layer = VIZI.pointLayer([-0.09, 51.505], {
-  interactive: true
+var layer = VIZI.geoJSONLayer('http://vector.mapzen.com/osm/pois/13/4088/2722.json', {
+  output: true,
+  interactive: true,
+  style: {
+    pointColor: '#ff0000'
+  },
+  onEachFeature: function(feature, layer) {
+    layer.on('click', function(layer, point2d, point3d, intersects) {
+      console.log(layer, point2d, point3d, intersects);
+    });
+  }
 }).addTo(world);
-
-layer.on('click', function(layer, point2d, point3d, intersects) {
-  console.log(layer, point2d, point3d, intersects);
-});
 
 // // Building and roads from Mapzen (polygons and linestrings)
 // var topoJSONTileLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/buildings,roads/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
@@ -82,28 +87,29 @@ layer.on('click', function(layer, point2d, point3d, intersects) {
 // }).addTo(world);
 
 // London Underground lines
-// var geoJSONLayer = VIZI.geoJSONLayer('https://rawgit.com/robhawkes/4acb9d6a6a5f00a377e2/raw/30ae704a44e10f2e13fb7e956e80c3b22e8e7e81/tfl_lines.json', {
-//   interactive: true,
-//   style: function(feature) {
-//     var colour = feature.properties.lines[0].colour || '#ffffff';
-//
-//     return {
-//       lineColor: colour,
-//       // lineHeight: 20,
-//       lineWidth: 3,
-//       // lineTransparent: true,
-//       // lineOpacity: 0.5,
-//       // lineBlending: THREE.AdditiveBlending,
-//       lineRenderOrder: 2
-//     };
-//   },
-//   onEachFeature: function(feature, layer) {
-//     layer.on('click', function(layer, point2d, point3d, intersects) {
-//       console.log(layer, point2d, point3d, intersects);
-//     });
-//   },
-//   attribution: '&copy; Transport for London.'
-// }).addTo(world);
+var geoJSONLayer = VIZI.geoJSONLayer('https://rawgit.com/robhawkes/4acb9d6a6a5f00a377e2/raw/30ae704a44e10f2e13fb7e956e80c3b22e8e7e81/tfl_lines.json', {
+  output: true,
+  interactive: true,
+  style: function(feature) {
+    var colour = feature.properties.lines[0].colour || '#ffffff';
+
+    return {
+      lineColor: colour,
+      // lineHeight: 20,
+      lineWidth: 3,
+      // lineTransparent: true,
+      // lineOpacity: 0.5,
+      // lineBlending: THREE.AdditiveBlending,
+      lineRenderOrder: 2
+    };
+  },
+  onEachFeature: function(feature, layer) {
+    layer.on('click', function(layer, point2d, point3d, intersects) {
+      console.log(layer, point2d, point3d, intersects);
+    });
+  },
+  attribution: '&copy; Transport for London.'
+}).addTo(world);
 
 // Set up render debug stats
 var rendererStats = new THREEx.RendererStats();
