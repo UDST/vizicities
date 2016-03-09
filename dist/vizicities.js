@@ -15034,6 +15034,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      topojson: false,
 	      filter: null,
 	      onEachFeature: null,
+	      pointGeometry: null,
 	      style: _utilGeoJSON2['default'].defaultStyle
 	    };
 	
@@ -15378,6 +15379,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      if (geometry.type === 'Point' || geometry.type === 'MultiPoint') {
+	        // Get geometry object to use for point, if provided
+	        if (typeof this._options.pointGeometry === 'function') {
+	          options.geometry = this._options.pointGeometry(feature);
+	        }
+	
 	        return new _geometryPointLayer2['default'](coordinates, options);
 	      }
 	    }
@@ -16823,6 +16829,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	// TODO: Look at ways to drop unneeded references to array buffers, etc to
 	// reduce memory footprint
 	
+	// TODO: Provide alternative output using tubes and splines / curves
+	
 	var _Layer2 = __webpack_require__(37);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
@@ -17402,7 +17410,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // Debug geometry for points is a thin bar
 	        //
 	        // TODO: Allow point geometry to be customised / overridden
-	        var geometryWidth = this._world.metresToWorld(5, this._pointScale);
+	        var geometryWidth = this._world.metresToWorld(25, this._pointScale);
 	        var geometryHeight = this._world.metresToWorld(200, this._pointScale);
 	        var _geometry = new _three2['default'].BoxGeometry(geometryWidth, geometryHeight, geometryWidth);
 	
@@ -17412,7 +17420,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // Pull attributes out of debug geometry
 	        geometry = new _three2['default'].BufferGeometry().fromGeometry(_geometry);
 	      } else {
-	        geometry = this._options.geometry;
+	        if (this._options.geometry instanceof _three2['default'].BufferGeometry) {
+	          geometry = this._options.geometry;
+	        } else {
+	          geometry = new _three2['default'].BufferGeometry().fromGeometry(this._options.geometry);
+	        }
 	      }
 	
 	      // For each point

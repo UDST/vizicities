@@ -130,7 +130,7 @@ class PointLayer extends Layer {
       // Debug geometry for points is a thin bar
       //
       // TODO: Allow point geometry to be customised / overridden
-      var geometryWidth = this._world.metresToWorld(5, this._pointScale);
+      var geometryWidth = this._world.metresToWorld(25, this._pointScale);
       var geometryHeight = this._world.metresToWorld(200, this._pointScale);
       var _geometry = new THREE.BoxGeometry(geometryWidth, geometryHeight, geometryWidth);
 
@@ -140,7 +140,11 @@ class PointLayer extends Layer {
       // Pull attributes out of debug geometry
       geometry = new THREE.BufferGeometry().fromGeometry(_geometry);
     } else {
-      geometry = this._options.geometry;
+      if (this._options.geometry instanceof THREE.BufferGeometry) {
+        geometry = this._options.geometry;
+      } else {
+        geometry = new THREE.BufferGeometry().fromGeometry(this._options.geometry);
+      }
     }
 
     // For each point

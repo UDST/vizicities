@@ -3,6 +3,8 @@
 // TODO: Look at ways to drop unneeded references to array buffers, etc to
 // reduce memory footprint
 
+// TODO: Provide alternative output using tubes and splines / curves
+
 import Layer from '../Layer';
 import extend from 'lodash.assign';
 import THREE from 'three';

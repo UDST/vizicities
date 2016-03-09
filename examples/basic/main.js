@@ -29,9 +29,13 @@ var layer = VIZI.geoJSONLayer('http://vector.mapzen.com/osm/roads,pois,buildings
   interactive: true,
   style: {
     color: '#ff0000',
-    lineColor: '#ff0000',
+    lineColor: '#0000ff',
     lineRenderOrder: 1,
-    pointColor: '#ff0000'
+    pointColor: '#00cc00'
+  },
+  pointGeometry: function(feature) {
+    var geometry = new THREE.SphereGeometry(2, 16, 16);
+    return geometry;
   },
   onEachFeature: function(feature, layer) {
     layer.on('click', function(layer, point2d, point3d, intersects) {

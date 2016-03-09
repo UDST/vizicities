@@ -16,6 +16,7 @@ class GeoJSONLayer extends LayerGroup {
       topojson: false,
       filter: null,
       onEachFeature: null,
+      pointGeometry: null,
       style: GeoJSON.defaultStyle
     };
 
@@ -345,6 +346,11 @@ class GeoJSONLayer extends LayerGroup {
     }
 
     if (geometry.type === 'Point' || geometry.type === 'MultiPoint') {
+      // Get geometry object to use for point, if provided
+      if (typeof this._options.pointGeometry === 'function') {
+        options.geometry = this._options.pointGeometry(feature);
+      }
+
       return new PointLayer(coordinates, options);
     }
   }
