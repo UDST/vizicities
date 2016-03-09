@@ -1,3 +1,6 @@
+// TODO: Consider adopting GeoJSON CSS
+// http://wiki.openstreetmap.org/wiki/Geojson_CSS
+
 import LayerGroup from './LayerGroup';
 import extend from 'lodash.assign';
 import reqwest from 'reqwest';
