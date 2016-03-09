@@ -24,10 +24,13 @@ var imageTileLayer = VIZI.imageTileLayer('http://{s}.basemaps.cartocdn.com/light
 //   }
 // }).addTo(world);
 
-var layer = VIZI.geoJSONLayer('http://vector.mapzen.com/osm/pois/13/4088/2722.json', {
+var layer = VIZI.geoJSONLayer('http://vector.mapzen.com/osm/roads,pois,buildings/13/4088/2722.json', {
   output: true,
   interactive: true,
   style: {
+    color: '#ff0000',
+    lineColor: '#ff0000',
+    lineRenderOrder: 1,
     pointColor: '#ff0000'
   },
   onEachFeature: function(feature, layer) {
