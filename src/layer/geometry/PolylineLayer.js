@@ -5,6 +5,14 @@
 
 // TODO: Provide alternative output using tubes and splines / curves
 
+// TODO: Support dynamic updating / hiding / animation of geometry
+//
+// This could be pretty hard as it's all packed away within BufferGeometry and
+// may even be merged by another layer (eg. GeoJSONLayer)
+//
+// How much control should this layer support? Perhaps a different or custom
+// layer would be better suited for animation, for example.
+
 import Layer from '../Layer';
 import extend from 'lodash.assign';
 import THREE from 'three';

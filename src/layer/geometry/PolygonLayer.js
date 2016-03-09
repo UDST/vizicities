@@ -3,6 +3,14 @@
 // TODO: Look at ways to drop unneeded references to array buffers, etc to
 // reduce memory footprint
 
+// TODO: Support dynamic updating / hiding / animation of geometry
+//
+// This could be pretty hard as it's all packed away within BufferGeometry and
+// may even be merged by another layer (eg. GeoJSONLayer)
+//
+// How much control should this layer support? Perhaps a different or custom
+// layer would be better suited for animation, for example.
+
 import Layer from '../Layer';
 import extend from 'lodash.assign';
 import THREE from 'three';
