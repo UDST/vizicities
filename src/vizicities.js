@@ -10,6 +10,7 @@ import GeoJSONLayer, {geoJSONLayer} from './layer/GeoJSONLayer';
 import TopoJSONLayer, {topoJSONLayer} from './layer/TopoJSONLayer';
 import PolygonLayer, {polygonLayer} from './layer/geometry/PolygonLayer';
 import PolylineLayer, {polylineLayer} from './layer/geometry/PolylineLayer';
+import PointLayer, {pointLayer} from './layer/geometry/PointLayer';
 
 import Point, {point} from './geo/Point';
 import LatLon, {latLon} from './geo/LatLon';
@@ -39,6 +40,8 @@ const VIZI = {
   polygonLayer: polygonLayer,
   PolylineLayer: PolylineLayer,
   polylineLayer: polylineLayer,
+  PointLayer: PointLayer,
+  pointLayer: pointLayer,
   Point: Point,
   point: point,
   LatLon: LatLon,

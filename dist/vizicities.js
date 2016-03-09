@@ -104,6 +104,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _layerGeometryPolylineLayer2 = _interopRequireDefault(_layerGeometryPolylineLayer);
 	
+	var _layerGeometryPointLayer = __webpack_require__(80);
+	
+	var _layerGeometryPointLayer2 = _interopRequireDefault(_layerGeometryPointLayer);
+	
 	var _geoPoint = __webpack_require__(11);
 	
 	var _geoPoint2 = _interopRequireDefault(_geoPoint);
@@ -137,6 +141,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  polygonLayer: _layerGeometryPolygonLayer.polygonLayer,
 	  PolylineLayer: _layerGeometryPolylineLayer2['default'],
 	  polylineLayer: _layerGeometryPolylineLayer.polylineLayer,
+	  PointLayer: _layerGeometryPointLayer2['default'],
+	  pointLayer: _layerGeometryPointLayer.pointLayer,
 	  Point: _geoPoint2['default'],
 	  point: _geoPoint.point,
 	  LatLon: _geoLatLon2['default'],
@@ -16367,7 +16373,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    _get(Object.getPrototypeOf(PolygonLayer.prototype), 'constructor', this).call(this, _options);
 	
-	    // Return coordinates as arrays of polygons so it's easy to support
+	    // Return coordinates as array of polygons so it's easy to support
 	    // MultiPolygon features (a single polygon would be a MultiPolygon with a
 	    // single polygon in the array)
 	    this._coordinates = PolygonLayer.isSingle(coordinates) ? [coordinates] : coordinates;
@@ -16861,7 +16867,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // Returns true if coordinates refer to a single geometry
 	    //
-	    // For example, coordinates for a MultiPolygon GeoJSON feature
+	    // For example, not coordinates for a MultiPolygon GeoJSON feature
 	  }, {
 	    key: 'destroy',
 	    value: function destroy() {
@@ -16961,7 +16967,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    _get(Object.getPrototypeOf(PolylineLayer.prototype), 'constructor', this).call(this, _options);
 	
-	    // Return coordinates as arrays of lines so it's easy to support
+	    // Return coordinates as array of lines so it's easy to support
 	    // MultiLineString features (a single line would be a MultiLineString with a
 	    // single line in the array)
 	    this._coordinates = PolylineLayer.isSingle(coordinates) ? [coordinates] : coordinates;
@@ -17277,7 +17283,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // Returns true if coordinates refer to a single geometry
 	    //
-	    // For example, coordinates for a MultiLineString GeoJSON feature
+	    // For example, not coordinates for a MultiLineString GeoJSON feature
 	  }, {
 	    key: 'destroy',
 	    value: function destroy() {
@@ -17357,6 +17363,461 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// Initialise without requiring new keyword
 	exports.topoJSONLayer = noNew;
+
+/***/ },
+/* 80 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	// TODO: Move duplicated logic between geometry layrs into GeometryLayer
+	
+	// TODO: Look at ways to drop unneeded references to array buffers, etc to
+	// reduce memory footprint
+	
+	// TODO: Point features may be using custom models / meshes and so an approach
+	// needs to be found to allow these to be brokwn down into buffer attributes for
+	// merging
+	//
+	// Can probably use fromGeometry() or setFromObject() from THREE.BufferGeometry
+	// and pull out the attributes
+	
+	var _Layer2 = __webpack_require__(37);
+	
+	var _Layer3 = _interopRequireDefault(_Layer2);
+	
+	var _lodashAssign = __webpack_require__(3);
+	
+	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
+	
+	var _three = __webpack_require__(24);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var _geoLatLon = __webpack_require__(10);
+	
+	var _geoPoint = __webpack_require__(11);
+	
+	var _enginePickingMaterial = __webpack_require__(72);
+	
+	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
+	
+	var _utilBuffer = __webpack_require__(71);
+	
+	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
+	
+	var PointLayer = (function (_Layer) {
+	  _inherits(PointLayer, _Layer);
+	
+	  function PointLayer(coordinates, options) {
+	    _classCallCheck(this, PointLayer);
+	
+	    var defaults = {
+	      output: true,
+	      interactive: false,
+	      // This default style is separate to Util.GeoJSON.defaultStyle
+	      style: {
+	        pointColor: '#ff0000',
+	        pointHeight: 0
+	      }
+	    };
+	
+	    var _options = (0, _lodashAssign2['default'])({}, defaults, options);
+	
+	    _get(Object.getPrototypeOf(PointLayer.prototype), 'constructor', this).call(this, _options);
+	
+	    // Return coordinates as array of points so it's easy to support
+	    // MultiPoint features (a single point would be a MultiPoint with a
+	    // single point in the array)
+	    this._coordinates = PointLayer.isSingle(coordinates) ? [coordinates] : coordinates;
+	
+	    // Point features are always flat (for now at least)
+	    //
+	    // This won't always be the case once custom point objects / meshes are
+	    // added
+	    this._flat = true;
+	  }
+	
+	  _createClass(PointLayer, [{
+	    key: '_onAdd',
+	    value: function _onAdd(world) {
+	      this._setCoordinates();
+	
+	      if (this._options.interactive) {
+	        // Only add to picking mesh if this layer is controlling output
+	        //
+	        // Otherwise, assume another component will eventually add a mesh to
+	        // the picking scene
+	        if (this.isOutput()) {
+	          this._pickingMesh = new _three2['default'].Object3D();
+	          this.addToPicking(this._pickingMesh);
+	        }
+	
+	        this._setPickingId();
+	        this._addPickingEvents();
+	      }
+	
+	      // Store geometry representation as instances of THREE.BufferAttribute
+	      this._setBufferAttributes();
+	
+	      if (this.isOutput()) {
+	        // Set mesh if not merging elsewhere
+	        this._setMesh(this._bufferAttributes);
+	
+	        // Output mesh
+	        this.add(this._mesh);
+	      }
+	    }
+	
+	    // Return center of point as a LatLon
+	    //
+	    // This is used for things like placing popups / UI elements on the layer
+	  }, {
+	    key: 'getCenter',
+	    value: function getCenter() {
+	      return this._coordinates;
+	    }
+	
+	    // Return point bounds in geographic coordinates
+	    //
+	    // While not useful for single points, it could be useful for MultiPoint
+	    //
+	    // TODO: Implement getBounds()
+	  }, {
+	    key: 'getBounds',
+	    value: function getBounds() {}
+	
+	    // Get unique ID for picking interaction
+	  }, {
+	    key: '_setPickingId',
+	    value: function _setPickingId() {
+	      this._pickingId = this.getPickingId();
+	    }
+	
+	    // Set up and re-emit interaction events
+	  }, {
+	    key: '_addPickingEvents',
+	    value: function _addPickingEvents() {
+	      var _this = this;
+	
+	      // TODO: Find a way to properly remove this listener on destroy
+	      this._world.on('pick-' + this._pickingId, function (point2d, point3d, intersects) {
+	        // Re-emit click event from the layer
+	        _this.emit('click', _this, point2d, point3d, intersects);
+	      });
+	    }
+	
+	    // Create and store reference to THREE.BufferAttribute data for this layer
+	  }, {
+	    key: '_setBufferAttributes',
+	    value: function _setBufferAttributes() {
+	      var _this2 = this;
+	
+	      var height = 0;
+	
+	      // Convert height into world units
+	      if (this._options.style.pointHeight) {
+	        height = this._world.metresToWorld(this._options.style.pointHeight, this._pointScale);
+	      }
+	
+	      var colour = new _three2['default'].Color();
+	      colour.set(this._options.style.pointColor);
+	
+	      // Debug geometry for points
+	      //
+	      // TODO: Allow point geometry to be customised / overridden
+	      var debugGeomWidth = this._world.metresToWorld(5, this._pointScale);
+	      var debugGeomHeight = this._world.metresToWorld(100, this._pointScale);
+	      var debugGeom = new _three2['default'].BoxGeometry(debugGeomWidth, debugGeomHeight, debugGeomWidth);
+	
+	      // Pull attributes out of debug geometry
+	      var debugBufferGeom = new _three2['default'].BufferGeometry().fromGeometry(debugGeom);
+	
+	      // For each point
+	      var attributes = this._projectedCoordinates.map(function (coordinate) {
+	        var _vertices = [];
+	        var _normals = [];
+	        var _colours = [];
+	
+	        var _debugBufferGeom = debugBufferGeom.clone();
+	
+	        _debugBufferGeom.translate(coordinate.x, height, coordinate.y);
+	
+	        var _vertices = _debugBufferGeom.attributes.position.clone().array;
+	        var _normals = _debugBufferGeom.attributes.normal.clone().array;
+	        var _colours = _debugBufferGeom.attributes.color.clone().array;
+	
+	        for (var i = 0; i < _colours.length; i += 3) {
+	          _colours[i] = colour.r;
+	          _colours[i + 1] = colour.g;
+	          _colours[i + 2] = colour.b;
+	        }
+	
+	        // Connect coordinate with the next to make a pair
+	        //
+	        // LineSegments requires pairs of vertices so repeat the last point if
+	        // there's an odd number of vertices
+	        // var nextCoord;
+	        // _projectedCoordinates.forEach((coordinate, index) => {
+	        //   _colours.push([colour.r, colour.g, colour.b]);
+	        //   _vertices.push([coordinate.x, height, coordinate.y]);
+	        //
+	        //   nextCoord = (_projectedCoordinates[index + 1]) ? _projectedCoordinates[index + 1] : coordinate;
+	        //
+	        //   _colours.push([colour.r, colour.g, colour.b]);
+	        //   _vertices.push([nextCoord.x, height, nextCoord.y]);
+	        // });
+	
+	        var _point = {
+	          vertices: _vertices,
+	          normals: _normals,
+	          colours: _colours
+	          // verticesCount: _vertices.length
+	        };
+	
+	        if (_this2._options.interactive && _this2._pickingId) {
+	          // Inject picking ID
+	          // point.pickingId = this._pickingId;
+	          _point.pickingIds = new Float32Array(_vertices.length / 3);
+	          for (var i = 0; i < _point.pickingIds.length; i++) {
+	            _point.pickingIds[i] = _this2._pickingId;
+	          }
+	        }
+	
+	        // Convert point representation to proper attribute arrays
+	        // return this._toAttributes(_point);
+	        return _point;
+	      });
+	
+	      this._bufferAttributes = _utilBuffer2['default'].mergeAttributes(attributes);
+	    }
+	  }, {
+	    key: 'getBufferAttributes',
+	    value: function getBufferAttributes() {
+	      return this._bufferAttributes;
+	    }
+	
+	    // Create and store mesh from buffer attributes
+	    //
+	    // This is only called if the layer is controlling its own output
+	  }, {
+	    key: '_setMesh',
+	    value: function _setMesh(attributes) {
+	      var geometry = new _three2['default'].BufferGeometry();
+	
+	      // itemSize = 3 because there are 3 values (components) per vertex
+	      geometry.addAttribute('position', new _three2['default'].BufferAttribute(attributes.vertices, 3));
+	      geometry.addAttribute('normal', new _three2['default'].BufferAttribute(attributes.normals, 3));
+	      geometry.addAttribute('color', new _three2['default'].BufferAttribute(attributes.colours, 3));
+	
+	      if (attributes.pickingIds) {
+	        geometry.addAttribute('pickingId', new _three2['default'].BufferAttribute(attributes.pickingIds, 1));
+	      }
+	
+	      geometry.computeBoundingBox();
+	
+	      var material;
+	      if (!this._world._environment._skybox) {
+	        material = new _three2['default'].MeshPhongMaterial({
+	          vertexColors: _three2['default'].VertexColors
+	          // side: THREE.BackSide
+	        });
+	      } else {
+	          material = new _three2['default'].MeshStandardMaterial({
+	            vertexColors: _three2['default'].VertexColors
+	            // side: THREE.BackSide
+	          });
+	          material.roughness = 1;
+	          material.metalness = 0.1;
+	          material.envMapIntensity = 3;
+	          material.envMap = this._world._environment._skybox.getRenderTarget();
+	        }
+	
+	      var mesh = new _three2['default'].Mesh(geometry, material);
+	
+	      mesh.castShadow = true;
+	      mesh.receiveShadow = true;
+	
+	      if (this.isFlat()) {
+	        material.depthWrite = false;
+	        mesh.renderOrder = 1;
+	      }
+	
+	      if (this._options.interactive && this._pickingMesh) {
+	        material = new _enginePickingMaterial2['default']();
+	        // material.side = THREE.BackSide;
+	
+	        var pickingMesh = new _three2['default'].Mesh(geometry, material);
+	        this._pickingMesh.add(pickingMesh);
+	      }
+	
+	      this._mesh = mesh;
+	    }
+	
+	    // Convert and project coordinates
+	    //
+	    // TODO: Calculate bounds
+	  }, {
+	    key: '_setCoordinates',
+	    value: function _setCoordinates() {
+	      this._bounds = [];
+	      this._coordinates = this._convertCoordinates(this._coordinates);
+	
+	      this._projectedBounds = [];
+	      this._projectedCoordinates = this._projectCoordinates();
+	    }
+	
+	    // Recursively convert input coordinates into LatLon objects
+	    //
+	    // Calculate geographic bounds at the same time
+	    //
+	    // TODO: Calculate geographic bounds
+	  }, {
+	    key: '_convertCoordinates',
+	    value: function _convertCoordinates(coordinates) {
+	      return coordinates.map(function (coordinate) {
+	        return (0, _geoLatLon.latLon)(coordinate[1], coordinate[0]);
+	      });
+	    }
+	
+	    // Recursively project coordinates into world positions
+	    //
+	    // Calculate world bounds, offset and pointScale at the same time
+	    //
+	    // TODO: Calculate world bounds
+	  }, {
+	    key: '_projectCoordinates',
+	    value: function _projectCoordinates() {
+	      var _this3 = this;
+	
+	      var _point;
+	      return this._coordinates.map(function (latlon) {
+	        _point = _this3._world.latLonToPoint(latlon);
+	
+	        // TODO: Is offset ever being used or needed?
+	        if (!_this3._offset) {
+	          _this3._offset = (0, _geoPoint.point)(0, 0);
+	          _this3._offset.x = -1 * _point.x;
+	          _this3._offset.y = -1 * _point.y;
+	
+	          _this3._pointScale = _this3._world.pointScale(latlon);
+	        }
+	
+	        return _point;
+	      });
+	    }
+	
+	    // Transform line representation into attribute arrays that can be used by
+	    // THREE.BufferGeometry
+	    //
+	    // TODO: Can this be simplified? It's messy and huge
+	  }, {
+	    key: '_toAttributes',
+	    value: function _toAttributes(line) {
+	      // Three components per vertex
+	      var vertices = new Float32Array(line.verticesCount * 3);
+	      var colours = new Float32Array(line.verticesCount * 3);
+	
+	      var pickingIds;
+	      if (line.pickingId) {
+	        // One component per vertex
+	        pickingIds = new Float32Array(line.verticesCount);
+	      }
+	
+	      var _vertices = line.vertices;
+	      var _colour = line.colours;
+	
+	      var _pickingId;
+	      if (pickingIds) {
+	        _pickingId = line.pickingId;
+	      }
+	
+	      var lastIndex = 0;
+	
+	      for (var i = 0; i < _vertices.length; i++) {
+	        var ax = _vertices[i][0];
+	        var ay = _vertices[i][1];
+	        var az = _vertices[i][2];
+	
+	        var c1 = _colour[i];
+	
+	        vertices[lastIndex * 3 + 0] = ax;
+	        vertices[lastIndex * 3 + 1] = ay;
+	        vertices[lastIndex * 3 + 2] = az;
+	
+	        colours[lastIndex * 3 + 0] = c1[0];
+	        colours[lastIndex * 3 + 1] = c1[1];
+	        colours[lastIndex * 3 + 2] = c1[2];
+	
+	        if (pickingIds) {
+	          pickingIds[lastIndex] = _pickingId;
+	        }
+	
+	        lastIndex++;
+	      }
+	
+	      var attributes = {
+	        vertices: vertices,
+	        colours: colours
+	      };
+	
+	      if (pickingIds) {
+	        attributes.pickingIds = pickingIds;
+	      }
+	
+	      return attributes;
+	    }
+	
+	    // Returns true if the line is flat (has no height)
+	  }, {
+	    key: 'isFlat',
+	    value: function isFlat() {
+	      return this._flat;
+	    }
+	
+	    // Returns true if coordinates refer to a single geometry
+	    //
+	    // For example, not coordinates for a MultiPoint GeoJSON feature
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {
+	      if (this._pickingMesh) {
+	        // TODO: Properly dispose of picking mesh
+	        this._pickingMesh = null;
+	      }
+	
+	      // Run common destruction logic from parent
+	      _get(Object.getPrototypeOf(PointLayer.prototype), 'destroy', this).call(this);
+	    }
+	  }], [{
+	    key: 'isSingle',
+	    value: function isSingle(coordinates) {
+	      return !Array.isArray(coordinates[0]);
+	    }
+	  }]);
+	
+	  return PointLayer;
+	})(_Layer3['default']);
+	
+	exports['default'] = PointLayer;
+	
+	var noNew = function noNew(coordinates, options) {
+	  return new PointLayer(coordinates, options);
+	};
+	
+	exports.pointLayer = noNew;
 
 /***/ }
 /******/ ])

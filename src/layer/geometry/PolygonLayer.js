@@ -29,7 +29,7 @@ class PolygonLayer extends Layer {
 
     super(_options);
 
-    // Return coordinates as arrays of polygons so it's easy to support
+    // Return coordinates as array of polygons so it's easy to support
     // MultiPolygon features (a single polygon would be a MultiPolygon with a
     // single polygon in the array)
     this._coordinates = (PolygonLayer.isSingle(coordinates)) ? [coordinates] : coordinates;
@@ -488,7 +488,7 @@ class PolygonLayer extends Layer {
 
   // Returns true if coordinates refer to a single geometry
   //
-  // For example, coordinates for a MultiPolygon GeoJSON feature
+  // For example, not coordinates for a MultiPolygon GeoJSON feature
   static isSingle(coordinates) {
     return !Array.isArray(coordinates[0][0][0]);
   }

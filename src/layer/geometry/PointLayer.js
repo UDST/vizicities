@@ -3,6 +3,13 @@
 // TODO: Look at ways to drop unneeded references to array buffers, etc to
 // reduce memory footprint
 
+// TODO: Point features may be using custom models / meshes and so an approach
+// needs to be found to allow these to be brokwn down into buffer attributes for
+// merging
+//
+// Can probably use fromGeometry() or setFromObject() from THREE.BufferGeometry
+// and pull out the attributes
+
 import Layer from '../Layer';
 import extend from 'lodash.assign';
 import THREE from 'three';
@@ -11,18 +18,15 @@ import {point as Point} from '../../geo/Point';
 import PickingMaterial from '../../engine/PickingMaterial';
 import Buffer from '../../util/Buffer';
 
-class PolylineLayer extends Layer {
+class PointLayer extends Layer {
   constructor(coordinates, options) {
     var defaults = {
       output: true,
       interactive: false,
       // This default style is separate to Util.GeoJSON.defaultStyle
       style: {
-        lineOpacity: 1,
-        lineTransparent: false,
-        lineColor: '#ffffff',
-        lineWidth: 1,
-        lineBlending: THREE.NormalBlending
+        pointColor: '#ff0000',
+        pointHeight: 0
       }
     };
 
@@ -30,12 +34,15 @@ class PolylineLayer extends Layer {
 
     super(_options);
 
-    // Return coordinates as array of lines so it's easy to support
-    // MultiLineString features (a single line would be a MultiLineString with a
-    // single line in the array)
-    this._coordinates = (PolylineLayer.isSingle(coordinates)) ? [coordinates] : coordinates;
+    // Return coordinates as array of points so it's easy to support
+    // MultiPoint features (a single point would be a MultiPoint with a
+    // single point in the array)
+    this._coordinates = (PointLayer.isSingle(coordinates)) ? [coordinates] : coordinates;
 
-    // Polyline features are always flat (for now at least)
+    // Point features are always flat (for now at least)
+    //
+    // This won't always be the case once custom point objects / meshes are
+    // added
     this._flat = true;
   }
 
@@ -68,17 +75,16 @@ class PolylineLayer extends Layer {
     }
   }
 
-  // Return center of polyline as a LatLon
+  // Return center of point as a LatLon
   //
   // This is used for things like placing popups / UI elements on the layer
-  //
-  // TODO: Find proper center position instead of returning first coordinate
-  // SEE: https://github.com/Leaflet/Leaflet/blob/master/src/layer/vector/Polyline.js#L59
   getCenter() {
-    return this._coordinates[0][0];
+    return this._coordinates;
   }
 
-  // Return line bounds in geographic coordinates
+  // Return point bounds in geographic coordinates
+  //
+  // While not useful for single points, it could be useful for MultiPoint
   //
   // TODO: Implement getBounds()
   getBounds() {}
@@ -102,46 +108,77 @@ class PolylineLayer extends Layer {
     var height = 0;
 
     // Convert height into world units
-    if (this._options.style.lineHeight) {
-      height = this._world.metresToWorld(this._options.style.lineHeight, this._pointScale);
+    if (this._options.style.pointHeight) {
+      height = this._world.metresToWorld(this._options.style.pointHeight, this._pointScale);
     }
 
     var colour = new THREE.Color();
-    colour.set(this._options.style.color);
+    colour.set(this._options.style.pointColor);
 
-    // For each line
-    var attributes = this._projectedCoordinates.map(_projectedCoordinates => {
+    // Debug geometry for points
+    //
+    // TODO: Allow point geometry to be customised / overridden
+    var debugGeomWidth = this._world.metresToWorld(5, this._pointScale);
+    var debugGeomHeight = this._world.metresToWorld(100, this._pointScale);
+    var debugGeom = new THREE.BoxGeometry(debugGeomWidth, debugGeomHeight, debugGeomWidth);
+
+    // Pull attributes out of debug geometry
+    var debugBufferGeom = new THREE.BufferGeometry().fromGeometry(debugGeom);
+
+    // For each point
+    var attributes = this._projectedCoordinates.map(coordinate => {
       var _vertices = [];
+      var _normals = [];
       var _colours = [];
+
+      var _debugBufferGeom = debugBufferGeom.clone();
+
+      _debugBufferGeom.translate(coordinate.x, height, coordinate.y);
+
+      var _vertices = _debugBufferGeom.attributes.position.clone().array;
+      var _normals = _debugBufferGeom.attributes.normal.clone().array;
+      var _colours = _debugBufferGeom.attributes.color.clone().array;
+
+      for (var i = 0; i < _colours.length; i += 3) {
+        _colours[i] = colour.r;
+        _colours[i + 1] = colour.g;
+        _colours[i + 2] = colour.b;
+      }
 
       // Connect coordinate with the next to make a pair
       //
       // LineSegments requires pairs of vertices so repeat the last point if
       // there's an odd number of vertices
-      var nextCoord;
-      _projectedCoordinates.forEach((coordinate, index) => {
-        _colours.push([colour.r, colour.g, colour.b]);
-        _vertices.push([coordinate.x, height, coordinate.y]);
+      // var nextCoord;
+      // _projectedCoordinates.forEach((coordinate, index) => {
+      //   _colours.push([colour.r, colour.g, colour.b]);
+      //   _vertices.push([coordinate.x, height, coordinate.y]);
+      //
+      //   nextCoord = (_projectedCoordinates[index + 1]) ? _projectedCoordinates[index + 1] : coordinate;
+      //
+      //   _colours.push([colour.r, colour.g, colour.b]);
+      //   _vertices.push([nextCoord.x, height, nextCoord.y]);
+      // });
 
-        nextCoord = (_projectedCoordinates[index + 1]) ? _projectedCoordinates[index + 1] : coordinate;
-
-        _colours.push([colour.r, colour.g, colour.b]);
-        _vertices.push([nextCoord.x, height, nextCoord.y]);
-      });
-
-      var line = {
+      var _point = {
         vertices: _vertices,
-        colours: _colours,
-        verticesCount: _vertices.length
+        normals: _normals,
+        colours: _colours
+        // verticesCount: _vertices.length
       };
 
       if (this._options.interactive && this._pickingId) {
         // Inject picking ID
-        line.pickingId = this._pickingId;
+        // point.pickingId = this._pickingId;
+        _point.pickingIds = new Float32Array(_vertices.length / 3);
+        for (var i = 0; i < _point.pickingIds.length; i++) {
+          _point.pickingIds[i] = this._pickingId;
+        }
       }
 
-      // Convert line representation to proper attribute arrays
-      return this._toAttributes(line);
+      // Convert point representation to proper attribute arrays
+      // return this._toAttributes(_point);
+      return _point;
     });
 
     this._bufferAttributes = Buffer.mergeAttributes(attributes);
@@ -159,6 +196,7 @@ class PolylineLayer extends Layer {
 
     // itemSize = 3 because there are 3 values (components) per vertex
     geometry.addAttribute('position', new THREE.BufferAttribute(attributes.vertices, 3));
+    geometry.addAttribute('normal', new THREE.BufferAttribute(attributes.normals, 3));
     geometry.addAttribute('color', new THREE.BufferAttribute(attributes.colours, 3));
 
     if (attributes.pickingIds) {
@@ -167,33 +205,38 @@ class PolylineLayer extends Layer {
 
     geometry.computeBoundingBox();
 
-    var style = this._options.style;
-    var material = new THREE.LineBasicMaterial({
-      vertexColors: THREE.VertexColors,
-      linewidth: style.lineWidth,
-      transparent: style.lineTransparent,
-      opacity: style.lineOpacity,
-      blending: style.lineBlending
-    });
-
-    var mesh = new THREE.LineSegments(geometry, material);
-
-    if (style.lineRenderOrder !== undefined) {
-      material.depthWrite = false;
-      mesh.renderOrder = style.lineRenderOrder;
+    var material;
+    if (!this._world._environment._skybox) {
+      material = new THREE.MeshPhongMaterial({
+        vertexColors: THREE.VertexColors
+        // side: THREE.BackSide
+      });
+    } else {
+      material = new THREE.MeshStandardMaterial({
+        vertexColors: THREE.VertexColors
+        // side: THREE.BackSide
+      });
+      material.roughness = 1;
+      material.metalness = 0.1;
+      material.envMapIntensity = 3;
+      material.envMap = this._world._environment._skybox.getRenderTarget();
     }
 
-    // TODO: Can a line cast a shadow?
-    // mesh.castShadow = true;
+    var mesh = new THREE.Mesh(geometry, material);
+
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+
+    if (this.isFlat()) {
+      material.depthWrite = false;
+      mesh.renderOrder = 1;
+    }
 
     if (this._options.interactive && this._pickingMesh) {
       material = new PickingMaterial();
       // material.side = THREE.BackSide;
 
-      // Make the line wider / easier to pick
-      material.linewidth = style.lineWidth + material.linePadding;
-
-      var pickingMesh = new THREE.LineSegments(geometry, material);
+      var pickingMesh = new THREE.Mesh(geometry, material);
       this._pickingMesh.add(pickingMesh);
     }
 
@@ -217,10 +260,8 @@ class PolylineLayer extends Layer {
   //
   // TODO: Calculate geographic bounds
   _convertCoordinates(coordinates) {
-    return coordinates.map(_coordinates => {
-      return _coordinates.map(coordinate => {
-        return LatLon(coordinate[1], coordinate[0]);
-      });
+    return coordinates.map(coordinate => {
+      return LatLon(coordinate[1], coordinate[0]);
     });
   }
 
@@ -230,22 +271,20 @@ class PolylineLayer extends Layer {
   //
   // TODO: Calculate world bounds
   _projectCoordinates() {
-    var point;
-    return this._coordinates.map(_coordinates => {
-      return _coordinates.map(latlon => {
-        point = this._world.latLonToPoint(latlon);
+    var _point;
+    return this._coordinates.map(latlon => {
+      _point = this._world.latLonToPoint(latlon);
 
-        // TODO: Is offset ever being used or needed?
-        if (!this._offset) {
-          this._offset = Point(0, 0);
-          this._offset.x = -1 * point.x;
-          this._offset.y = -1 * point.y;
+      // TODO: Is offset ever being used or needed?
+      if (!this._offset) {
+        this._offset = Point(0, 0);
+        this._offset.x = -1 * _point.x;
+        this._offset.y = -1 * _point.y;
 
-          this._pointScale = this._world.pointScale(latlon);
-        }
+        this._pointScale = this._world.pointScale(latlon);
+      }
 
-        return point;
-      });
+      return _point;
     });
   }
 
@@ -315,9 +354,9 @@ class PolylineLayer extends Layer {
 
   // Returns true if coordinates refer to a single geometry
   //
-  // For example, not coordinates for a MultiLineString GeoJSON feature
+  // For example, not coordinates for a MultiPoint GeoJSON feature
   static isSingle(coordinates) {
-    return !Array.isArray(coordinates[0][0]);
+    return !Array.isArray(coordinates[0]);
   }
 
   destroy() {
@@ -331,10 +370,10 @@ class PolylineLayer extends Layer {
   }
 }
 
-export default PolylineLayer;
+export default PointLayer;
 
 var noNew = function(coordinates, options) {
-  return new PolylineLayer(coordinates, options);
+  return new PointLayer(coordinates, options);
 };
 
-export {noNew as polylineLayer};
+export {noNew as pointLayer};
