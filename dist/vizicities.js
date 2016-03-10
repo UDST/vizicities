@@ -14986,6 +14986,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
+	// TODO: Consider adopting GeoJSON CSS
+	// http://wiki.openstreetmap.org/wiki/Geojson_CSS
+	
 	var _LayerGroup2 = __webpack_require__(74);
 	
 	var _LayerGroup3 = _interopRequireDefault(_LayerGroup2);
@@ -15540,6 +15543,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// TODO: Look at ways to drop unneeded references to array buffers, etc to
 	// reduce memory footprint
+	
+	// TODO: Support dynamic updating / hiding / animation of geometry
+	//
+	// This could be pretty hard as it's all packed away within BufferGeometry and
+	// may even be merged by another layer (eg. GeoJSONLayer)
+	//
+	// How much control should this layer support? Perhaps a different or custom
+	// layer would be better suited for animation, for example.
 	
 	var _Layer2 = __webpack_require__(37);
 	
@@ -16831,6 +16842,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// TODO: Provide alternative output using tubes and splines / curves
 	
+	// TODO: Support dynamic updating / hiding / animation of geometry
+	//
+	// This could be pretty hard as it's all packed away within BufferGeometry and
+	// may even be merged by another layer (eg. GeoJSONLayer)
+	//
+	// How much control should this layer support? Perhaps a different or custom
+	// layer would be better suited for animation, for example.
+	
 	var _Layer2 = __webpack_require__(37);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
@@ -17258,6 +17277,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// TODO: Provide option to billboard geometry so it always faces the camera
 	
+	// TODO: Support dynamic updating / hiding / animation of geometry
+	//
+	// This could be pretty hard as it's all packed away within BufferGeometry and
+	// may even be merged by another layer (eg. GeoJSONLayer)
+	//
+	// How much control should this layer support? Perhaps a different or custom
+	// layer would be better suited for animation, for example.
+	
 	var _Layer2 = __webpack_require__(37);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
@@ -17515,11 +17542,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      mesh.castShadow = true;
 	      // mesh.receiveShadow = true;
-	
-	      if (this.isFlat()) {
-	        material.depthWrite = false;
-	        mesh.renderOrder = 1;
-	      }
 	
 	      if (this._options.interactive && this._pickingMesh) {
 	        material = new _enginePickingMaterial2['default']();

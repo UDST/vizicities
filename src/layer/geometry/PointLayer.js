@@ -241,11 +241,6 @@ class PointLayer extends Layer {
     mesh.castShadow = true;
     // mesh.receiveShadow = true;
 
-    if (this.isFlat()) {
-      material.depthWrite = false;
-      mesh.renderOrder = 1;
-    }
-
     if (this._options.interactive && this._pickingMesh) {
       material = new PickingMaterial();
       // material.side = THREE.BackSide;
