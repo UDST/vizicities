@@ -11,19 +11,6 @@ var imageTileLayer = VIZI.imageTileLayer('http://{s}.basemaps.cartocdn.com/light
   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
 }).addTo(world);
 
-// var layer = VIZI.geoJSONLayer('http://vector.mapzen.com/osm/buildings,roads/13/4088/2722.json', {
-//   output: true,
-//   interactive: true,
-//   style: {
-//     color: '#ff0000'
-//   },
-//   onEachFeature: function(feature, layer) {
-//     layer.on('click', function(layer, point2d, point3d, intersects) {
-//       console.log(layer, point2d, point3d, intersects);
-//     });
-//   }
-// }).addTo(world);
-
 var layer = VIZI.geoJSONLayer('http://vector.mapzen.com/osm/roads,pois,buildings/13/4088/2722.json', {
   output: true,
   interactive: true,
