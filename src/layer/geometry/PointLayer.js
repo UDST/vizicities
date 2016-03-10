@@ -221,7 +221,7 @@ class PointLayer extends Layer {
 
     var material;
     if (!this._world._environment._skybox) {
-      material = new THREE.MeshPhongMaterial({
+      material = new THREE.MeshBasicMaterial({
         vertexColors: THREE.VertexColors
         // side: THREE.BackSide
       });

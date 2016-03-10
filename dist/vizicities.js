@@ -4239,6 +4239,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	        directionalLight.position.y = 1000;
 	        directionalLight.position.z = 1000;
 	
+	        // TODO: Get shadows working in non-PBR scenes
+	
+	        // directionalLight.castShadow = true;
+	        //
+	        // var d = 100;
+	        // directionalLight.shadow.camera.left = -d;
+	        // directionalLight.shadow.camera.right = d;
+	        // directionalLight.shadow.camera.top = d;
+	        // directionalLight.shadow.camera.bottom = -d;
+	        //
+	        // directionalLight.shadow.camera.near = 10;
+	        // directionalLight.shadow.camera.far = 100;
+	        //
+	        // // TODO: Need to dial in on a good shadowmap size
+	        // directionalLight.shadow.mapSize.width = 2048;
+	        // directionalLight.shadow.mapSize.height = 2048;
+	        //
+	        // // directionalLight.shadowBias = -0.0010;
+	        // // directionalLight.shadow.darkness = 0.15;
+	
 	        var directionalLight2 = new _three2['default'].DirectionalLight(0xffffff, 0.5);
 	        directionalLight2.position.x = -1000;
 	        directionalLight2.position.y = 1000;
@@ -17523,7 +17543,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      var material;
 	      if (!this._world._environment._skybox) {
-	        material = new _three2['default'].MeshPhongMaterial({
+	        material = new _three2['default'].MeshBasicMaterial({
 	          vertexColors: _three2['default'].VertexColors
 	          // side: THREE.BackSide
 	        });
