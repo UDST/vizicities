@@ -3203,7 +3203,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var renderPass = new _vendorRenderPass2['default'](this._scene, this._camera);
 	
 	      var bokehPass = new _vendorBokehPass2['default'](this._scene, this._camera, {
-	        focus: 1.02,
+	        focus: 1,
 	        aperture: 0.6,
 	        // maxblur: 1.0,
 	        width: this._renderer.getSize().width,
