@@ -46,6 +46,7 @@ class Engine extends EventEmitter {
 
   // TODO: Set up composer to automatically resize on viewport change
   // TODO: Update passes that rely on width / height on resize
+  // TODO: Merge default passes into a single shader / pass for performance
   _initPostProcessing() {
     var renderPass = new RenderPass(this._scene, this._camera);
 
