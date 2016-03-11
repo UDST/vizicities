@@ -19,7 +19,15 @@ class GeoJSONLayer extends LayerGroup {
       topojson: false,
       filter: null,
       onEachFeature: null,
+      polygonMaterial: null,
+      onPolygonMesh: null,
+      onPolygonBufferAttributes: null,
+      polylineMaterial: null,
+      onPolylineMesh: null,
+      onPolylineBufferAttributes: null,
       pointGeometry: null,
+      pointMaterial: null,
+      onPointMesh: null,
       style: GeoJSON.defaultStyle
     };
 
@@ -198,7 +206,9 @@ class GeoJSONLayer extends LayerGroup {
     geometry.computeBoundingBox();
 
     var material;
-    if (!this._world._environment._skybox) {
+    if (this._options.polygonMaterial && this._options.polygonMaterial instanceof THREE.Material) {
+      material = this._options.material;
+    } else if (!this._world._environment._skybox) {
       material = new THREE.MeshPhongMaterial({
         vertexColors: THREE.VertexColors,
         side: THREE.BackSide
@@ -232,6 +242,11 @@ class GeoJSONLayer extends LayerGroup {
       this._pickingMesh.add(pickingMesh);
     }
 
+    // Pass mesh through callback, if defined
+    if (typeof this._options.onPolygonMesh === 'function') {
+      this._options.onPolygonMesh(mesh);
+    }
+
     this._polygonMesh = mesh;
   }
 
@@ -252,13 +267,18 @@ class GeoJSONLayer extends LayerGroup {
     var style = (typeof this._options.style === 'function') ? this._options.style(this._geojson.features[0]) : this._options.style;
     style = extend({}, GeoJSON.defaultStyle, style);
 
-    var material = new THREE.LineBasicMaterial({
-      vertexColors: THREE.VertexColors,
-      linewidth: style.lineWidth,
-      transparent: style.lineTransparent,
-      opacity: style.lineOpacity,
-      blending: style.lineBlending
-    });
+    var material;
+    if (this._options.polylineMaterial && this._options.polylineMaterial instanceof THREE.Material) {
+      material = this._options.material;
+    } else {
+      material = new THREE.LineBasicMaterial({
+        vertexColors: THREE.VertexColors,
+        linewidth: style.lineWidth,
+        transparent: style.lineTransparent,
+        opacity: style.lineOpacity,
+        blending: style.lineBlending
+      });
+    }
 
     var mesh = new THREE.LineSegments(geometry, material);
 
@@ -281,6 +301,11 @@ class GeoJSONLayer extends LayerGroup {
       this._pickingMesh.add(pickingMesh);
     }
 
+    // Pass mesh through callback, if defined
+    if (typeof this._options.onPolylineMesh === 'function') {
+      this._options.onPolylineMesh(mesh);
+    }
+
     this._polylineMesh = mesh;
   }
 
@@ -299,7 +324,9 @@ class GeoJSONLayer extends LayerGroup {
     geometry.computeBoundingBox();
 
     var material;
-    if (!this._world._environment._skybox) {
+    if (this._options.pointMaterial && this._options.pointMaterial instanceof THREE.Material) {
+      material = this._options.material;
+    } else if (!this._world._environment._skybox) {
       material = new THREE.MeshPhongMaterial({
         vertexColors: THREE.VertexColors
         // side: THREE.BackSide
@@ -328,6 +355,11 @@ class GeoJSONLayer extends LayerGroup {
       this._pickingMesh.add(pickingMesh);
     }
 
+    // Pass mesh callback, if defined
+    if (typeof this._options.onPointMesh === 'function') {
+      this._options.onPointMesh(mesh);
+    }
+
     this._pointMesh = mesh;
   }
 
@@ -341,10 +373,38 @@ class GeoJSONLayer extends LayerGroup {
     }
 
     if (geometry.type === 'Polygon' || geometry.type === 'MultiPolygon') {
+      // Get material instance to use for polygon, if provided
+      if (typeof this._options.polygonMaterial === 'function') {
+        options.geometry = this._options.polygonMaterial(feature);
+      }
+
+      if (typeof this._options.onPolygonMesh === 'function') {
+        options.onMesh = this._options.onPolygonMesh;
+      }
+
+      // Pass onBufferAttributes callback, if defined
+      if (typeof this._options.onPolygonBufferAttributes === 'function') {
+        options.onBufferAttributes = this._options.onPolygonBufferAttributes;
+      }
+
       return new PolygonLayer(coordinates, options);
     }
 
     if (geometry.type === 'LineString' || geometry.type === 'MultiLineString') {
+      // Get material instance to use for line, if provided
+      if (typeof this._options.lineMaterial === 'function') {
+        options.geometry = this._options.lineMaterial(feature);
+      }
+
+      if (typeof this._options.onPolylineMesh === 'function') {
+        options.onMesh = this._options.onPolylineMesh;
+      }
+
+      // Pass onBufferAttributes callback, if defined
+      if (typeof this._options.onPolylineBufferAttributes === 'function') {
+        options.onBufferAttributes = this._options.onPolylineBufferAttributes;
+      }
+
       return new PolylineLayer(coordinates, options);
     }
 
@@ -352,6 +412,15 @@ class GeoJSONLayer extends LayerGroup {
       // Get geometry object to use for point, if provided
       if (typeof this._options.pointGeometry === 'function') {
         options.geometry = this._options.pointGeometry(feature);
+      }
+
+      // Get material instance to use for point, if provided
+      if (typeof this._options.pointMaterial === 'function') {
+        options.geometry = this._options.pointMaterial(feature);
+      }
+
+      if (typeof this._options.onPointMesh === 'function') {
+        options.onMesh = this._options.onPointMesh;
       }
 
       return new PointLayer(coordinates, options);

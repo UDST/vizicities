@@ -13,6 +13,9 @@
 // How much control should this layer support? Perhaps a different or custom
 // layer would be better suited for animation, for example.
 
+// TODO: Allow _setBufferAttributes to use a custom function passed in to
+// generate a custom mesh
+
 import Layer from '../Layer';
 import extend from 'lodash.assign';
 import THREE from 'three';
@@ -26,6 +29,12 @@ class PolylineLayer extends Layer {
     var defaults = {
       output: true,
       interactive: false,
+      // Custom material override
+      //
+      // TODO: Should this be in the style object?
+      material: null,
+      onMesh: null,
+      onBufferAttributes: null,
       // This default style is separate to Util.GeoJSON.defaultStyle
       style: {
         lineOpacity: 1,
@@ -109,50 +118,59 @@ class PolylineLayer extends Layer {
 
   // Create and store reference to THREE.BufferAttribute data for this layer
   _setBufferAttributes() {
-    var height = 0;
+    var attributes;
 
-    // Convert height into world units
-    if (this._options.style.lineHeight) {
-      height = this._world.metresToWorld(this._options.style.lineHeight, this._pointScale);
-    }
+    // Only use this if you know what you're doing
+    if (typeof this._options.onBufferAttributes === 'function') {
+      // TODO: Probably want to pass something less general as arguments,
+      // though passing the instance will do for now (it's everything)
+      attributes = this._options.onBufferAttributes(this);
+    } else {
+      var height = 0;
 
-    var colour = new THREE.Color();
-    colour.set(this._options.style.lineColor);
-
-    // For each line
-    var attributes = this._projectedCoordinates.map(_projectedCoordinates => {
-      var _vertices = [];
-      var _colours = [];
-
-      // Connect coordinate with the next to make a pair
-      //
-      // LineSegments requires pairs of vertices so repeat the last point if
-      // there's an odd number of vertices
-      var nextCoord;
-      _projectedCoordinates.forEach((coordinate, index) => {
-        _colours.push([colour.r, colour.g, colour.b]);
-        _vertices.push([coordinate.x, height, coordinate.y]);
-
-        nextCoord = (_projectedCoordinates[index + 1]) ? _projectedCoordinates[index + 1] : coordinate;
-
-        _colours.push([colour.r, colour.g, colour.b]);
-        _vertices.push([nextCoord.x, height, nextCoord.y]);
-      });
-
-      var line = {
-        vertices: _vertices,
-        colours: _colours,
-        verticesCount: _vertices.length
-      };
-
-      if (this._options.interactive && this._pickingId) {
-        // Inject picking ID
-        line.pickingId = this._pickingId;
+      // Convert height into world units
+      if (this._options.style.lineHeight) {
+        height = this._world.metresToWorld(this._options.style.lineHeight, this._pointScale);
       }
 
-      // Convert line representation to proper attribute arrays
-      return this._toAttributes(line);
-    });
+      var colour = new THREE.Color();
+      colour.set(this._options.style.lineColor);
+
+      // For each line
+      attributes = this._projectedCoordinates.map(_projectedCoordinates => {
+        var _vertices = [];
+        var _colours = [];
+
+        // Connect coordinate with the next to make a pair
+        //
+        // LineSegments requires pairs of vertices so repeat the last point if
+        // there's an odd number of vertices
+        var nextCoord;
+        _projectedCoordinates.forEach((coordinate, index) => {
+          _colours.push([colour.r, colour.g, colour.b]);
+          _vertices.push([coordinate.x, height, coordinate.y]);
+
+          nextCoord = (_projectedCoordinates[index + 1]) ? _projectedCoordinates[index + 1] : coordinate;
+
+          _colours.push([colour.r, colour.g, colour.b]);
+          _vertices.push([nextCoord.x, height, nextCoord.y]);
+        });
+
+        var line = {
+          vertices: _vertices,
+          colours: _colours,
+          verticesCount: _vertices.length
+        };
+
+        if (this._options.interactive && this._pickingId) {
+          // Inject picking ID
+          line.pickingId = this._pickingId;
+        }
+
+        // Convert line representation to proper attribute arrays
+        return this._toAttributes(line);
+      });
+    }
 
     this._bufferAttributes = Buffer.mergeAttributes(attributes);
   }
@@ -178,13 +196,19 @@ class PolylineLayer extends Layer {
     geometry.computeBoundingBox();
 
     var style = this._options.style;
-    var material = new THREE.LineBasicMaterial({
-      vertexColors: THREE.VertexColors,
-      linewidth: style.lineWidth,
-      transparent: style.lineTransparent,
-      opacity: style.lineOpacity,
-      blending: style.lineBlending
-    });
+    var material;
+
+    if (this._options.material && this._options.material instanceof THREE.Material) {
+      material = this._options.material;
+    } else {
+      material = new THREE.LineBasicMaterial({
+        vertexColors: THREE.VertexColors,
+        linewidth: style.lineWidth,
+        transparent: style.lineTransparent,
+        opacity: style.lineOpacity,
+        blending: style.lineBlending
+      });
+    }
 
     var mesh = new THREE.LineSegments(geometry, material);
 
@@ -205,6 +229,11 @@ class PolylineLayer extends Layer {
 
       var pickingMesh = new THREE.LineSegments(geometry, material);
       this._pickingMesh.add(pickingMesh);
+    }
+
+    // Pass mesh through callback, if defined
+    if (typeof this._options.onMesh === 'function') {
+      this._options.onMesh(mesh);
     }
 
     this._mesh = mesh;

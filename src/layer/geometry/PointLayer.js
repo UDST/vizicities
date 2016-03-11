@@ -36,9 +36,12 @@ class PointLayer extends Layer {
       output: true,
       interactive: false,
       // THREE.Geometry or THREE.BufferGeometry to use for point output
-      //
-      // TODO: Make this customisable per point via a callback (like style)
       geometry: null,
+      // Custom material override
+      //
+      // TODO: Should this be in the style object?
+      material: null,
+      onMesh: null,
       // This default style is separate to Util.GeoJSON.defaultStyle
       style: {
         pointColor: '#ff0000'
@@ -220,7 +223,10 @@ class PointLayer extends Layer {
     geometry.computeBoundingBox();
 
     var material;
-    if (!this._world._environment._skybox) {
+
+    if (this._options.material && this._options.material instanceof THREE.Material) {
+      material = this._options.material;
+    } else if (!this._world._environment._skybox) {
       material = new THREE.MeshBasicMaterial({
         vertexColors: THREE.VertexColors
         // side: THREE.BackSide
@@ -247,6 +253,11 @@ class PointLayer extends Layer {
 
       var pickingMesh = new THREE.Mesh(geometry, material);
       this._pickingMesh.add(pickingMesh);
+    }
+
+    // Pass mesh through callback, if defined
+    if (typeof this._options.onMesh === 'function') {
+      this._options.onMesh(mesh);
     }
 
     this._mesh = mesh;

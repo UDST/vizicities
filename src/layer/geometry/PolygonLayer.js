@@ -11,6 +11,9 @@
 // How much control should this layer support? Perhaps a different or custom
 // layer would be better suited for animation, for example.
 
+// TODO: Allow _setBufferAttributes to use a custom function passed in to
+// generate a custom mesh
+
 import Layer from '../Layer';
 import extend from 'lodash.assign';
 import THREE from 'three';
@@ -26,6 +29,12 @@ class PolygonLayer extends Layer {
     var defaults = {
       output: true,
       interactive: false,
+      // Custom material override
+      //
+      // TODO: Should this be in the style object?
+      material: null,
+      onMesh: null,
+      onBufferAttributes: null,
       // This default style is separate to Util.GeoJSON.defaultStyle
       style: {
         color: '#ffffff',
@@ -103,102 +112,111 @@ class PolygonLayer extends Layer {
 
   // Create and store reference to THREE.BufferAttribute data for this layer
   _setBufferAttributes() {
-    var height = 0;
+    var attributes;
 
-    // Convert height into world units
-    if (this._options.style.height && this._options.style.height !== 0) {
-      height = this._world.metresToWorld(this._options.style.height, this._pointScale);
-    }
+    // Only use this if you know what you're doing
+    if (typeof this._options.onBufferAttributes === 'function') {
+      // TODO: Probably want to pass something less general as arguments,
+      // though passing the instance will do for now (it's everything)
+      attributes = this._options.onBufferAttributes(this);
+    } else {
+      var height = 0;
 
-    var colour = new THREE.Color();
-    colour.set(this._options.style.color);
-
-    // Light and dark colours used for poor-mans AO gradient on object sides
-    var light = new THREE.Color(0xffffff);
-    var shadow  = new THREE.Color(0x666666);
-
-    // For each polygon
-    var attributes = this._projectedCoordinates.map(_projectedCoordinates => {
-      // Convert coordinates to earcut format
-      var _earcut = this._toEarcut(_projectedCoordinates);
-
-      // Triangulate faces using earcut
-      var faces = this._triangulate(_earcut.vertices, _earcut.holes, _earcut.dimensions);
-
-      var groupedVertices = [];
-      for (i = 0, il = _earcut.vertices.length; i < il; i += _earcut.dimensions) {
-        groupedVertices.push(_earcut.vertices.slice(i, i + _earcut.dimensions));
+      // Convert height into world units
+      if (this._options.style.height && this._options.style.height !== 0) {
+        height = this._world.metresToWorld(this._options.style.height, this._pointScale);
       }
 
-      var extruded = extrudePolygon(groupedVertices, faces, {
-        bottom: 0,
-        top: height
-      });
+      var colour = new THREE.Color();
+      colour.set(this._options.style.color);
 
-      var topColor = colour.clone().multiply(light);
-      var bottomColor = colour.clone().multiply(shadow);
+      // Light and dark colours used for poor-mans AO gradient on object sides
+      var light = new THREE.Color(0xffffff);
+      var shadow  = new THREE.Color(0x666666);
 
-      var _vertices = extruded.positions;
-      var _faces = [];
-      var _colours = [];
+      // For each polygon
+      attributes = this._projectedCoordinates.map(_projectedCoordinates => {
+        // Convert coordinates to earcut format
+        var _earcut = this._toEarcut(_projectedCoordinates);
 
-      var _colour;
-      extruded.top.forEach((face, fi) => {
-        _colour = [];
+        // Triangulate faces using earcut
+        var faces = this._triangulate(_earcut.vertices, _earcut.holes, _earcut.dimensions);
 
-        _colour.push([colour.r, colour.g, colour.b]);
-        _colour.push([colour.r, colour.g, colour.b]);
-        _colour.push([colour.r, colour.g, colour.b]);
+        var groupedVertices = [];
+        for (i = 0, il = _earcut.vertices.length; i < il; i += _earcut.dimensions) {
+          groupedVertices.push(_earcut.vertices.slice(i, i + _earcut.dimensions));
+        }
 
-        _faces.push(face);
-        _colours.push(_colour);
-      });
+        var extruded = extrudePolygon(groupedVertices, faces, {
+          bottom: 0,
+          top: height
+        });
 
-      this._flat = true;
+        var topColor = colour.clone().multiply(light);
+        var bottomColor = colour.clone().multiply(shadow);
 
-      if (extruded.sides) {
-        this._flat = false;
+        var _vertices = extruded.positions;
+        var _faces = [];
+        var _colours = [];
 
-        // Set up colours for every vertex with poor-mans AO on the sides
-        extruded.sides.forEach((face, fi) => {
+        var _colour;
+        extruded.top.forEach((face, fi) => {
           _colour = [];
 
-          // First face is always bottom-bottom-top
-          if (fi % 2 === 0) {
-            _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-            _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-            _colour.push([topColor.r, topColor.g, topColor.b]);
-          // Reverse winding for the second face
-          // top-top-bottom
-          } else {
-            _colour.push([topColor.r, topColor.g, topColor.b]);
-            _colour.push([topColor.r, topColor.g, topColor.b]);
-            _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-          }
+          _colour.push([colour.r, colour.g, colour.b]);
+          _colour.push([colour.r, colour.g, colour.b]);
+          _colour.push([colour.r, colour.g, colour.b]);
 
           _faces.push(face);
           _colours.push(_colour);
         });
-      }
 
-      // Skip bottom as there's no point rendering it
-      // allFaces.push(extruded.faces);
+        this._flat = true;
 
-      var polygon = {
-        vertices: _vertices,
-        faces: _faces,
-        colours: _colours,
-        facesCount: _faces.length
-      };
+        if (extruded.sides) {
+          this._flat = false;
 
-      if (this._options.interactive && this._pickingId) {
-        // Inject picking ID
-        polygon.pickingId = this._pickingId;
-      }
+          // Set up colours for every vertex with poor-mans AO on the sides
+          extruded.sides.forEach((face, fi) => {
+            _colour = [];
 
-      // Convert polygon representation to proper attribute arrays
-      return this._toAttributes(polygon);
-    });
+            // First face is always bottom-bottom-top
+            if (fi % 2 === 0) {
+              _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+              _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+              _colour.push([topColor.r, topColor.g, topColor.b]);
+            // Reverse winding for the second face
+            // top-top-bottom
+            } else {
+              _colour.push([topColor.r, topColor.g, topColor.b]);
+              _colour.push([topColor.r, topColor.g, topColor.b]);
+              _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+            }
+
+            _faces.push(face);
+            _colours.push(_colour);
+          });
+        }
+
+        // Skip bottom as there's no point rendering it
+        // allFaces.push(extruded.faces);
+
+        var polygon = {
+          vertices: _vertices,
+          faces: _faces,
+          colours: _colours,
+          facesCount: _faces.length
+        };
+
+        if (this._options.interactive && this._pickingId) {
+          // Inject picking ID
+          polygon.pickingId = this._pickingId;
+        }
+
+        // Convert polygon representation to proper attribute arrays
+        return this._toAttributes(polygon);
+      });
+    }
 
     this._bufferAttributes = Buffer.mergeAttributes(attributes);
   }
@@ -225,7 +243,9 @@ class PolygonLayer extends Layer {
     geometry.computeBoundingBox();
 
     var material;
-    if (!this._world._environment._skybox) {
+    if (this._options.material && this._options.material instanceof THREE.Material) {
+      material = this._options.material;
+    } else if (!this._world._environment._skybox) {
       material = new THREE.MeshPhongMaterial({
         vertexColors: THREE.VertexColors,
         side: THREE.BackSide
@@ -257,6 +277,11 @@ class PolygonLayer extends Layer {
 
       var pickingMesh = new THREE.Mesh(geometry, material);
       this._pickingMesh.add(pickingMesh);
+    }
+
+    // Pass mesh through callback, if defined
+    if (typeof this._options.onMesh === 'function') {
+      this._options.onMesh(mesh);
     }
 
     this._mesh = mesh;

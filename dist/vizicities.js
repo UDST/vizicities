@@ -15057,7 +15057,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	      topojson: false,
 	      filter: null,
 	      onEachFeature: null,
+	      polygonMaterial: null,
+	      onPolygonMesh: null,
+	      onPolygonBufferAttributes: null,
+	      polylineMaterial: null,
+	      onPolylineMesh: null,
+	      onPolylineBufferAttributes: null,
 	      pointGeometry: null,
+	      pointMaterial: null,
+	      onPointMesh: null,
 	      style: _utilGeoJSON2['default'].defaultStyle
 	    };
 	
@@ -15247,7 +15255,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      geometry.computeBoundingBox();
 	
 	      var material;
-	      if (!this._world._environment._skybox) {
+	      if (this._options.polygonMaterial && this._options.polygonMaterial instanceof THREE.Material) {
+	        material = this._options.material;
+	      } else if (!this._world._environment._skybox) {
 	        material = new THREE.MeshPhongMaterial({
 	          vertexColors: THREE.VertexColors,
 	          side: THREE.BackSide
@@ -15281,6 +15291,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._pickingMesh.add(pickingMesh);
 	      }
 	
+	      // Pass mesh through callback, if defined
+	      if (typeof this._options.onPolygonMesh === 'function') {
+	        this._options.onPolygonMesh(mesh);
+	      }
+	
 	      this._polygonMesh = mesh;
 	    }
 	  }, {
@@ -15302,13 +15317,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var style = typeof this._options.style === 'function' ? this._options.style(this._geojson.features[0]) : this._options.style;
 	      style = (0, _lodashAssign2['default'])({}, _utilGeoJSON2['default'].defaultStyle, style);
 	
-	      var material = new THREE.LineBasicMaterial({
-	        vertexColors: THREE.VertexColors,
-	        linewidth: style.lineWidth,
-	        transparent: style.lineTransparent,
-	        opacity: style.lineOpacity,
-	        blending: style.lineBlending
-	      });
+	      var material;
+	      if (this._options.polylineMaterial && this._options.polylineMaterial instanceof THREE.Material) {
+	        material = this._options.material;
+	      } else {
+	        material = new THREE.LineBasicMaterial({
+	          vertexColors: THREE.VertexColors,
+	          linewidth: style.lineWidth,
+	          transparent: style.lineTransparent,
+	          opacity: style.lineOpacity,
+	          blending: style.lineBlending
+	        });
+	      }
 	
 	      var mesh = new THREE.LineSegments(geometry, material);
 	
@@ -15331,6 +15351,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._pickingMesh.add(pickingMesh);
 	      }
 	
+	      // Pass mesh through callback, if defined
+	      if (typeof this._options.onPolylineMesh === 'function') {
+	        this._options.onPolylineMesh(mesh);
+	      }
+	
 	      this._polylineMesh = mesh;
 	    }
 	  }, {
@@ -15350,7 +15375,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      geometry.computeBoundingBox();
 	
 	      var material;
-	      if (!this._world._environment._skybox) {
+	      if (this._options.pointMaterial && this._options.pointMaterial instanceof THREE.Material) {
+	        material = this._options.material;
+	      } else if (!this._world._environment._skybox) {
 	        material = new THREE.MeshPhongMaterial({
 	          vertexColors: THREE.VertexColors
 	          // side: THREE.BackSide
@@ -15379,6 +15406,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._pickingMesh.add(pickingMesh);
 	      }
 	
+	      // Pass mesh callback, if defined
+	      if (typeof this._options.onPointMesh === 'function') {
+	        this._options.onPointMesh(mesh);
+	      }
+	
 	      this._pointMesh = mesh;
 	    }
 	
@@ -15394,10 +15426,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      if (geometry.type === 'Polygon' || geometry.type === 'MultiPolygon') {
+	        // Get material instance to use for polygon, if provided
+	        if (typeof this._options.polygonMaterial === 'function') {
+	          options.geometry = this._options.polygonMaterial(feature);
+	        }
+	
+	        if (typeof this._options.onPolygonMesh === 'function') {
+	          options.onMesh = this._options.onPolygonMesh;
+	        }
+	
+	        // Pass onBufferAttributes callback, if defined
+	        if (typeof this._options.onPolygonBufferAttributes === 'function') {
+	          options.onBufferAttributes = this._options.onPolygonBufferAttributes;
+	        }
+	
 	        return new _geometryPolygonLayer2['default'](coordinates, options);
 	      }
 	
 	      if (geometry.type === 'LineString' || geometry.type === 'MultiLineString') {
+	        // Get material instance to use for line, if provided
+	        if (typeof this._options.lineMaterial === 'function') {
+	          options.geometry = this._options.lineMaterial(feature);
+	        }
+	
+	        if (typeof this._options.onPolylineMesh === 'function') {
+	          options.onMesh = this._options.onPolylineMesh;
+	        }
+	
+	        // Pass onBufferAttributes callback, if defined
+	        if (typeof this._options.onPolylineBufferAttributes === 'function') {
+	          options.onBufferAttributes = this._options.onPolylineBufferAttributes;
+	        }
+	
 	        return new _geometryPolylineLayer2['default'](coordinates, options);
 	      }
 	
@@ -15405,6 +15465,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // Get geometry object to use for point, if provided
 	        if (typeof this._options.pointGeometry === 'function') {
 	          options.geometry = this._options.pointGeometry(feature);
+	        }
+	
+	        // Get material instance to use for point, if provided
+	        if (typeof this._options.pointMaterial === 'function') {
+	          options.geometry = this._options.pointMaterial(feature);
+	        }
+	
+	        if (typeof this._options.onPointMesh === 'function') {
+	          options.onMesh = this._options.onPointMesh;
 	        }
 	
 	        return new _geometryPointLayer2['default'](coordinates, options);
@@ -15572,6 +15641,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	// How much control should this layer support? Perhaps a different or custom
 	// layer would be better suited for animation, for example.
 	
+	// TODO: Allow _setBufferAttributes to use a custom function passed in to
+	// generate a custom mesh
+	
 	var _Layer2 = __webpack_require__(37);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
@@ -15613,6 +15685,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var defaults = {
 	      output: true,
 	      interactive: false,
+	      // Custom material override
+	      //
+	      // TODO: Should this be in the style object?
+	      material: null,
+	      onMesh: null,
+	      onBufferAttributes: null,
 	      // This default style is separate to Util.GeoJSON.defaultStyle
 	      style: {
 	        color: '#ffffff',
@@ -15706,102 +15784,111 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _setBufferAttributes() {
 	      var _this2 = this;
 	
-	      var height = 0;
+	      var attributes;
 	
-	      // Convert height into world units
-	      if (this._options.style.height && this._options.style.height !== 0) {
-	        height = this._world.metresToWorld(this._options.style.height, this._pointScale);
-	      }
+	      // Only use this if you know what you're doing
+	      if (typeof this._options.onBufferAttributes === 'function') {
+	        // TODO: Probably want to pass something less general as arguments,
+	        // though passing the instance will do for now (it's everything)
+	        attributes = this._options.onBufferAttributes(this);
+	      } else {
+	        var height = 0;
 	
-	      var colour = new _three2['default'].Color();
-	      colour.set(this._options.style.color);
-	
-	      // Light and dark colours used for poor-mans AO gradient on object sides
-	      var light = new _three2['default'].Color(0xffffff);
-	      var shadow = new _three2['default'].Color(0x666666);
-	
-	      // For each polygon
-	      var attributes = this._projectedCoordinates.map(function (_projectedCoordinates) {
-	        // Convert coordinates to earcut format
-	        var _earcut = _this2._toEarcut(_projectedCoordinates);
-	
-	        // Triangulate faces using earcut
-	        var faces = _this2._triangulate(_earcut.vertices, _earcut.holes, _earcut.dimensions);
-	
-	        var groupedVertices = [];
-	        for (i = 0, il = _earcut.vertices.length; i < il; i += _earcut.dimensions) {
-	          groupedVertices.push(_earcut.vertices.slice(i, i + _earcut.dimensions));
+	        // Convert height into world units
+	        if (this._options.style.height && this._options.style.height !== 0) {
+	          height = this._world.metresToWorld(this._options.style.height, this._pointScale);
 	        }
 	
-	        var extruded = (0, _utilExtrudePolygon2['default'])(groupedVertices, faces, {
-	          bottom: 0,
-	          top: height
-	        });
+	        var colour = new _three2['default'].Color();
+	        colour.set(this._options.style.color);
 	
-	        var topColor = colour.clone().multiply(light);
-	        var bottomColor = colour.clone().multiply(shadow);
+	        // Light and dark colours used for poor-mans AO gradient on object sides
+	        var light = new _three2['default'].Color(0xffffff);
+	        var shadow = new _three2['default'].Color(0x666666);
 	
-	        var _vertices = extruded.positions;
-	        var _faces = [];
-	        var _colours = [];
+	        // For each polygon
+	        attributes = this._projectedCoordinates.map(function (_projectedCoordinates) {
+	          // Convert coordinates to earcut format
+	          var _earcut = _this2._toEarcut(_projectedCoordinates);
 	
-	        var _colour;
-	        extruded.top.forEach(function (face, fi) {
-	          _colour = [];
+	          // Triangulate faces using earcut
+	          var faces = _this2._triangulate(_earcut.vertices, _earcut.holes, _earcut.dimensions);
 	
-	          _colour.push([colour.r, colour.g, colour.b]);
-	          _colour.push([colour.r, colour.g, colour.b]);
-	          _colour.push([colour.r, colour.g, colour.b]);
+	          var groupedVertices = [];
+	          for (i = 0, il = _earcut.vertices.length; i < il; i += _earcut.dimensions) {
+	            groupedVertices.push(_earcut.vertices.slice(i, i + _earcut.dimensions));
+	          }
 	
-	          _faces.push(face);
-	          _colours.push(_colour);
-	        });
+	          var extruded = (0, _utilExtrudePolygon2['default'])(groupedVertices, faces, {
+	            bottom: 0,
+	            top: height
+	          });
 	
-	        _this2._flat = true;
+	          var topColor = colour.clone().multiply(light);
+	          var bottomColor = colour.clone().multiply(shadow);
 	
-	        if (extruded.sides) {
-	          _this2._flat = false;
+	          var _vertices = extruded.positions;
+	          var _faces = [];
+	          var _colours = [];
 	
-	          // Set up colours for every vertex with poor-mans AO on the sides
-	          extruded.sides.forEach(function (face, fi) {
+	          var _colour;
+	          extruded.top.forEach(function (face, fi) {
 	            _colour = [];
 	
-	            // First face is always bottom-bottom-top
-	            if (fi % 2 === 0) {
-	              _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-	              _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-	              _colour.push([topColor.r, topColor.g, topColor.b]);
-	              // Reverse winding for the second face
-	              // top-top-bottom
-	            } else {
-	                _colour.push([topColor.r, topColor.g, topColor.b]);
-	                _colour.push([topColor.r, topColor.g, topColor.b]);
-	                _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-	              }
+	            _colour.push([colour.r, colour.g, colour.b]);
+	            _colour.push([colour.r, colour.g, colour.b]);
+	            _colour.push([colour.r, colour.g, colour.b]);
 	
 	            _faces.push(face);
 	            _colours.push(_colour);
 	          });
-	        }
 	
-	        // Skip bottom as there's no point rendering it
-	        // allFaces.push(extruded.faces);
+	          _this2._flat = true;
 	
-	        var polygon = {
-	          vertices: _vertices,
-	          faces: _faces,
-	          colours: _colours,
-	          facesCount: _faces.length
-	        };
+	          if (extruded.sides) {
+	            _this2._flat = false;
 	
-	        if (_this2._options.interactive && _this2._pickingId) {
-	          // Inject picking ID
-	          polygon.pickingId = _this2._pickingId;
-	        }
+	            // Set up colours for every vertex with poor-mans AO on the sides
+	            extruded.sides.forEach(function (face, fi) {
+	              _colour = [];
 	
-	        // Convert polygon representation to proper attribute arrays
-	        return _this2._toAttributes(polygon);
-	      });
+	              // First face is always bottom-bottom-top
+	              if (fi % 2 === 0) {
+	                _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+	                _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+	                _colour.push([topColor.r, topColor.g, topColor.b]);
+	                // Reverse winding for the second face
+	                // top-top-bottom
+	              } else {
+	                  _colour.push([topColor.r, topColor.g, topColor.b]);
+	                  _colour.push([topColor.r, topColor.g, topColor.b]);
+	                  _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+	                }
+	
+	              _faces.push(face);
+	              _colours.push(_colour);
+	            });
+	          }
+	
+	          // Skip bottom as there's no point rendering it
+	          // allFaces.push(extruded.faces);
+	
+	          var polygon = {
+	            vertices: _vertices,
+	            faces: _faces,
+	            colours: _colours,
+	            facesCount: _faces.length
+	          };
+	
+	          if (_this2._options.interactive && _this2._pickingId) {
+	            // Inject picking ID
+	            polygon.pickingId = _this2._pickingId;
+	          }
+	
+	          // Convert polygon representation to proper attribute arrays
+	          return _this2._toAttributes(polygon);
+	        });
+	      }
 	
 	      this._bufferAttributes = _utilBuffer2['default'].mergeAttributes(attributes);
 	    }
@@ -15831,7 +15918,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      geometry.computeBoundingBox();
 	
 	      var material;
-	      if (!this._world._environment._skybox) {
+	      if (this._options.material && this._options.material instanceof _three2['default'].Material) {
+	        material = this._options.material;
+	      } else if (!this._world._environment._skybox) {
 	        material = new _three2['default'].MeshPhongMaterial({
 	          vertexColors: _three2['default'].VertexColors,
 	          side: _three2['default'].BackSide
@@ -15863,6 +15952,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var pickingMesh = new _three2['default'].Mesh(geometry, material);
 	        this._pickingMesh.add(pickingMesh);
+	      }
+	
+	      // Pass mesh through callback, if defined
+	      if (typeof this._options.onMesh === 'function') {
+	        this._options.onMesh(mesh);
 	      }
 	
 	      this._mesh = mesh;
@@ -16870,6 +16964,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	// How much control should this layer support? Perhaps a different or custom
 	// layer would be better suited for animation, for example.
 	
+	// TODO: Allow _setBufferAttributes to use a custom function passed in to
+	// generate a custom mesh
+	
 	var _Layer2 = __webpack_require__(37);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
@@ -16903,6 +17000,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var defaults = {
 	      output: true,
 	      interactive: false,
+	      // Custom material override
+	      //
+	      // TODO: Should this be in the style object?
+	      material: null,
+	      onMesh: null,
+	      onBufferAttributes: null,
 	      // This default style is separate to Util.GeoJSON.defaultStyle
 	      style: {
 	        lineOpacity: 1,
@@ -17002,50 +17105,59 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _setBufferAttributes() {
 	      var _this2 = this;
 	
-	      var height = 0;
+	      var attributes;
 	
-	      // Convert height into world units
-	      if (this._options.style.lineHeight) {
-	        height = this._world.metresToWorld(this._options.style.lineHeight, this._pointScale);
-	      }
+	      // Only use this if you know what you're doing
+	      if (typeof this._options.onBufferAttributes === 'function') {
+	        // TODO: Probably want to pass something less general as arguments,
+	        // though passing the instance will do for now (it's everything)
+	        attributes = this._options.onBufferAttributes(this);
+	      } else {
+	        var height = 0;
 	
-	      var colour = new _three2['default'].Color();
-	      colour.set(this._options.style.lineColor);
-	
-	      // For each line
-	      var attributes = this._projectedCoordinates.map(function (_projectedCoordinates) {
-	        var _vertices = [];
-	        var _colours = [];
-	
-	        // Connect coordinate with the next to make a pair
-	        //
-	        // LineSegments requires pairs of vertices so repeat the last point if
-	        // there's an odd number of vertices
-	        var nextCoord;
-	        _projectedCoordinates.forEach(function (coordinate, index) {
-	          _colours.push([colour.r, colour.g, colour.b]);
-	          _vertices.push([coordinate.x, height, coordinate.y]);
-	
-	          nextCoord = _projectedCoordinates[index + 1] ? _projectedCoordinates[index + 1] : coordinate;
-	
-	          _colours.push([colour.r, colour.g, colour.b]);
-	          _vertices.push([nextCoord.x, height, nextCoord.y]);
-	        });
-	
-	        var line = {
-	          vertices: _vertices,
-	          colours: _colours,
-	          verticesCount: _vertices.length
-	        };
-	
-	        if (_this2._options.interactive && _this2._pickingId) {
-	          // Inject picking ID
-	          line.pickingId = _this2._pickingId;
+	        // Convert height into world units
+	        if (this._options.style.lineHeight) {
+	          height = this._world.metresToWorld(this._options.style.lineHeight, this._pointScale);
 	        }
 	
-	        // Convert line representation to proper attribute arrays
-	        return _this2._toAttributes(line);
-	      });
+	        var colour = new _three2['default'].Color();
+	        colour.set(this._options.style.lineColor);
+	
+	        // For each line
+	        attributes = this._projectedCoordinates.map(function (_projectedCoordinates) {
+	          var _vertices = [];
+	          var _colours = [];
+	
+	          // Connect coordinate with the next to make a pair
+	          //
+	          // LineSegments requires pairs of vertices so repeat the last point if
+	          // there's an odd number of vertices
+	          var nextCoord;
+	          _projectedCoordinates.forEach(function (coordinate, index) {
+	            _colours.push([colour.r, colour.g, colour.b]);
+	            _vertices.push([coordinate.x, height, coordinate.y]);
+	
+	            nextCoord = _projectedCoordinates[index + 1] ? _projectedCoordinates[index + 1] : coordinate;
+	
+	            _colours.push([colour.r, colour.g, colour.b]);
+	            _vertices.push([nextCoord.x, height, nextCoord.y]);
+	          });
+	
+	          var line = {
+	            vertices: _vertices,
+	            colours: _colours,
+	            verticesCount: _vertices.length
+	          };
+	
+	          if (_this2._options.interactive && _this2._pickingId) {
+	            // Inject picking ID
+	            line.pickingId = _this2._pickingId;
+	          }
+	
+	          // Convert line representation to proper attribute arrays
+	          return _this2._toAttributes(line);
+	        });
+	      }
 	
 	      this._bufferAttributes = _utilBuffer2['default'].mergeAttributes(attributes);
 	    }
@@ -17074,13 +17186,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	      geometry.computeBoundingBox();
 	
 	      var style = this._options.style;
-	      var material = new _three2['default'].LineBasicMaterial({
-	        vertexColors: _three2['default'].VertexColors,
-	        linewidth: style.lineWidth,
-	        transparent: style.lineTransparent,
-	        opacity: style.lineOpacity,
-	        blending: style.lineBlending
-	      });
+	      var material;
+	
+	      if (this._options.material && this._options.material instanceof _three2['default'].Material) {
+	        material = this._options.material;
+	      } else {
+	        material = new _three2['default'].LineBasicMaterial({
+	          vertexColors: _three2['default'].VertexColors,
+	          linewidth: style.lineWidth,
+	          transparent: style.lineTransparent,
+	          opacity: style.lineOpacity,
+	          blending: style.lineBlending
+	        });
+	      }
 	
 	      var mesh = new _three2['default'].LineSegments(geometry, material);
 	
@@ -17101,6 +17219,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var pickingMesh = new _three2['default'].LineSegments(geometry, material);
 	        this._pickingMesh.add(pickingMesh);
+	      }
+	
+	      // Pass mesh through callback, if defined
+	      if (typeof this._options.onMesh === 'function') {
+	        this._options.onMesh(mesh);
 	      }
 	
 	      this._mesh = mesh;
@@ -17339,9 +17462,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      output: true,
 	      interactive: false,
 	      // THREE.Geometry or THREE.BufferGeometry to use for point output
-	      //
-	      // TODO: Make this customisable per point via a callback (like style)
 	      geometry: null,
+	      // Custom material override
+	      //
+	      // TODO: Should this be in the style object?
+	      material: null,
+	      onMesh: null,
 	      // This default style is separate to Util.GeoJSON.defaultStyle
 	      style: {
 	        pointColor: '#ff0000'
@@ -17542,7 +17668,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      geometry.computeBoundingBox();
 	
 	      var material;
-	      if (!this._world._environment._skybox) {
+	
+	      if (this._options.material && this._options.material instanceof _three2['default'].Material) {
+	        material = this._options.material;
+	      } else if (!this._world._environment._skybox) {
 	        material = new _three2['default'].MeshBasicMaterial({
 	          vertexColors: _three2['default'].VertexColors
 	          // side: THREE.BackSide
@@ -17569,6 +17698,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var pickingMesh = new _three2['default'].Mesh(geometry, material);
 	        this._pickingMesh.add(pickingMesh);
+	      }
+	
+	      // Pass mesh through callback, if defined
+	      if (typeof this._options.onMesh === 'function') {
+	        this._options.onMesh(mesh);
 	      }
 	
 	      this._mesh = mesh;
