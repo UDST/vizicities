@@ -14569,9 +14569,135 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 	
+	  var lineStringAttributes = function lineStringAttributes(coordinates, colour, height) {
+	    var _coords = [];
+	    var _colours = [];
+	
+	    var nextCoord;
+	
+	    // Connect coordinate with the next to make a pair
+	    //
+	    // LineSegments requires pairs of vertices so repeat the last point if
+	    // there's an odd number of vertices
+	    coordinates.forEach(function (coordinate, index) {
+	      _colours.push([colour.r, colour.g, colour.b]);
+	      _coords.push([coordinate[0], height, coordinate[1]]);
+	
+	      nextCoord = coordinates[index + 1] ? coordinates[index + 1] : coordinate;
+	
+	      _colours.push([colour.r, colour.g, colour.b]);
+	      _coords.push([nextCoord[0], height, nextCoord[1]]);
+	    });
+	
+	    return {
+	      vertices: _coords,
+	      colours: _colours
+	    };
+	  };
+	
+	  var multiLineStringAttributes = function multiLineStringAttributes(coordinates, colour, height) {
+	    var _coords = [];
+	    var _colours = [];
+	
+	    var result;
+	    coordinates.forEach(function (coordinate) {
+	      result = lineStringAttributes(coordinate, colour, height);
+	
+	      result.vertices.forEach(function (coord) {
+	        _coords.push(coord);
+	      });
+	
+	      result.colours.forEach(function (colour) {
+	        _colours.push(colour);
+	      });
+	    });
+	
+	    return {
+	      vertices: _coords,
+	      colours: _colours
+	    };
+	  };
+	
+	  var polygonAttributes = function polygonAttributes(coordinates, colour, height) {
+	    var earcutData = _toEarcut(coordinates);
+	
+	    var faces = _triangulate(earcutData.vertices, earcutData.holes, earcutData.dimensions);
+	
+	    var groupedVertices = [];
+	    for (i = 0, il = earcutData.vertices.length; i < il; i += earcutData.dimensions) {
+	      groupedVertices.push(earcutData.vertices.slice(i, i + earcutData.dimensions));
+	    }
+	
+	    var extruded = extrudePolygon(groupedVertices, faces, {
+	      bottom: 0,
+	      top: height
+	    });
+	
+	    var topColor = colour.clone().multiply(light);
+	    var bottomColor = colour.clone().multiply(shadow);
+	
+	    var _vertices = extruded.positions;
+	    var _faces = [];
+	    var _colours = [];
+	
+	    var _colour;
+	    extruded.top.forEach(function (face, fi) {
+	      _colour = [];
+	
+	      _colour.push([colour.r, colour.g, colour.b]);
+	      _colour.push([colour.r, colour.g, colour.b]);
+	      _colour.push([colour.r, colour.g, colour.b]);
+	
+	      _faces.push(face);
+	      _colours.push(_colour);
+	    });
+	
+	    var allFlat = true;
+	
+	    if (extruded.sides) {
+	      if (allFlat) {
+	        allFlat = false;
+	      }
+	
+	      // Set up colours for every vertex with poor-mans AO on the sides
+	      extruded.sides.forEach(function (face, fi) {
+	        _colour = [];
+	
+	        // First face is always bottom-bottom-top
+	        if (fi % 2 === 0) {
+	          _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+	          _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+	          _colour.push([topColor.r, topColor.g, topColor.b]);
+	          // Reverse winding for the second face
+	          // top-top-bottom
+	        } else {
+	            _colour.push([topColor.r, topColor.g, topColor.b]);
+	            _colour.push([topColor.r, topColor.g, topColor.b]);
+	            _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+	          }
+	
+	        _faces.push(face);
+	        _colours.push(_colour);
+	      });
+	    }
+	
+	    // Skip bottom as there's no point rendering it
+	    // allFaces.push(extruded.faces);
+	
+	    return {
+	      vertices: _vertices,
+	      faces: _faces,
+	      colours: _colours,
+	      flat: allFlat
+	    };
+	  };
+	
 	  return {
 	    defaultStyle: defaultStyle,
-	    collectFeatures: collectFeatures
+	    collectFeatures: collectFeatures,
+	    lineStringAttributes: lineStringAttributes,
+	    multiLineStringAttributes: multiLineStringAttributes,
+	    polygonAttributes: polygonAttributes
 	  };
 	})();
 	

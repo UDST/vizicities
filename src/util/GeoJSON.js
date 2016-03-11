@@ -67,9 +67,141 @@ var GeoJSON = (function() {
     }
   };
 
+  // TODO: This is only used by GeoJSONTile so either roll it into that or
+  // update GeoJSONTile to use the new GeoJSONLayer or geometry layers
+  var lineStringAttributes = function(coordinates, colour, height) {
+    var _coords = [];
+    var _colours = [];
+
+    var nextCoord;
+
+    // Connect coordinate with the next to make a pair
+    //
+    // LineSegments requires pairs of vertices so repeat the last point if
+    // there's an odd number of vertices
+    coordinates.forEach((coordinate, index) => {
+      _colours.push([colour.r, colour.g, colour.b]);
+      _coords.push([coordinate[0], height, coordinate[1]]);
+
+      nextCoord = (coordinates[index + 1]) ? coordinates[index + 1] : coordinate;
+
+      _colours.push([colour.r, colour.g, colour.b]);
+      _coords.push([nextCoord[0], height, nextCoord[1]]);
+    });
+
+    return {
+      vertices: _coords,
+      colours: _colours
+    };
+  };
+
+  // TODO: This is only used by GeoJSONTile so either roll it into that or
+  // update GeoJSONTile to use the new GeoJSONLayer or geometry layers
+  var multiLineStringAttributes = function(coordinates, colour, height) {
+    var _coords = [];
+    var _colours = [];
+
+    var result;
+    coordinates.forEach(coordinate => {
+      result = lineStringAttributes(coordinate, colour, height);
+
+      result.vertices.forEach(coord => {
+        _coords.push(coord);
+      });
+
+      result.colours.forEach(colour => {
+        _colours.push(colour);
+      });
+    });
+
+    return {
+      vertices: _coords,
+      colours: _colours
+    };
+  };
+
+  // TODO: This is only used by GeoJSONTile so either roll it into that or
+  // update GeoJSONTile to use the new GeoJSONLayer or geometry layers
+  var polygonAttributes = function(coordinates, colour, height) {
+    var earcutData = _toEarcut(coordinates);
+
+    var faces = _triangulate(earcutData.vertices, earcutData.holes, earcutData.dimensions);
+
+    var groupedVertices = [];
+    for (i = 0, il = earcutData.vertices.length; i < il; i += earcutData.dimensions) {
+      groupedVertices.push(earcutData.vertices.slice(i, i + earcutData.dimensions));
+    }
+
+    var extruded = extrudePolygon(groupedVertices, faces, {
+      bottom: 0,
+      top: height
+    });
+
+    var topColor = colour.clone().multiply(light);
+    var bottomColor = colour.clone().multiply(shadow);
+
+    var _vertices = extruded.positions;
+    var _faces = [];
+    var _colours = [];
+
+    var _colour;
+    extruded.top.forEach((face, fi) => {
+      _colour = [];
+
+      _colour.push([colour.r, colour.g, colour.b]);
+      _colour.push([colour.r, colour.g, colour.b]);
+      _colour.push([colour.r, colour.g, colour.b]);
+
+      _faces.push(face);
+      _colours.push(_colour);
+    });
+
+    var allFlat = true;
+
+    if (extruded.sides) {
+      if (allFlat) {
+        allFlat = false;
+      }
+
+      // Set up colours for every vertex with poor-mans AO on the sides
+      extruded.sides.forEach((face, fi) => {
+        _colour = [];
+
+        // First face is always bottom-bottom-top
+        if (fi % 2 === 0) {
+          _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+          _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+          _colour.push([topColor.r, topColor.g, topColor.b]);
+        // Reverse winding for the second face
+        // top-top-bottom
+        } else {
+          _colour.push([topColor.r, topColor.g, topColor.b]);
+          _colour.push([topColor.r, topColor.g, topColor.b]);
+          _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+        }
+
+        _faces.push(face);
+        _colours.push(_colour);
+      });
+    }
+
+    // Skip bottom as there's no point rendering it
+    // allFaces.push(extruded.faces);
+
+    return {
+      vertices: _vertices,
+      faces: _faces,
+      colours: _colours,
+      flat: allFlat
+    };
+  };
+
   return {
     defaultStyle: defaultStyle,
-    collectFeatures: collectFeatures
+    collectFeatures: collectFeatures,
+    lineStringAttributes: lineStringAttributes,
+    multiLineStringAttributes: multiLineStringAttributes,
+    polygonAttributes: polygonAttributes
   };
 })();
 
