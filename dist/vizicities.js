@@ -3213,6 +3213,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  // TODO: Set up composer to automatically resize on viewport change
 	  // TODO: Update passes that rely on width / height on resize
+	  // TODO: Merge default passes into a single shader / pass for performance
 	
 	  _createClass(Engine, [{
 	    key: '_initPostProcessing',
