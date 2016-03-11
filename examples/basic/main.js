@@ -1,6 +1,12 @@
+// London
+// var coords = [51.505, -0.09];
+
+// Manhattan
+var coords = [40.739940, -73.988801];
+
 var world = VIZI.world('world', {
   skybox: true
-}).setView([51.505, -0.09]);
+}).setView(coords);
 
 world._environment._skybox.setInclination(0.4);
 
