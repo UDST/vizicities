@@ -261,10 +261,17 @@ class PolygonLayer extends Layer {
       material.envMap = this._world._environment._skybox.getRenderTarget();
     }
 
-    var mesh = new THREE.Mesh(geometry, material);
+    var mesh;
 
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
+    // Pass mesh through callback, if defined
+    if (typeof this._options.onMesh === 'function') {
+      mesh = this._options.onMesh(geometry, material);
+    } else {
+      mesh = new THREE.Mesh(geometry, material);
+
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+    }
 
     if (this.isFlat()) {
       material.depthWrite = false;
@@ -277,11 +284,6 @@ class PolygonLayer extends Layer {
 
       var pickingMesh = new THREE.Mesh(geometry, material);
       this._pickingMesh.add(pickingMesh);
-    }
-
-    // Pass mesh through callback, if defined
-    if (typeof this._options.onMesh === 'function') {
-      this._options.onMesh(mesh);
     }
 
     this._mesh = mesh;

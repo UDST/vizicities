@@ -16850,7 +16850,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      var material;
 	      if (this._options.polygonMaterial && this._options.polygonMaterial instanceof THREE.Material) {
-	        material = this._options.material;
+	        material = this._options.polygonMaterial;
 	      } else if (!this._world._environment._skybox) {
 	        material = new THREE.MeshPhongMaterial({
 	          vertexColors: THREE.VertexColors,
@@ -16867,10 +16867,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        material.envMap = this._world._environment._skybox.getRenderTarget();
 	      }
 	
-	      mesh = new THREE.Mesh(geometry, material);
+	      var mesh;
 	
-	      mesh.castShadow = true;
-	      mesh.receiveShadow = true;
+	      // Pass mesh through callback, if defined
+	      if (typeof this._options.onPolygonMesh === 'function') {
+	        mesh = this._options.onPolygonMesh(geometry, material);
+	      } else {
+	        mesh = new THREE.Mesh(geometry, material);
+	
+	        mesh.castShadow = true;
+	        mesh.receiveShadow = true;
+	      }
 	
 	      if (flat) {
 	        material.depthWrite = false;
@@ -16885,11 +16892,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._pickingMesh.add(pickingMesh);
 	      }
 	
-	      // Pass mesh through callback, if defined
-	      if (typeof this._options.onPolygonMesh === 'function') {
-	        this._options.onPolygonMesh(mesh);
-	      }
-	
 	      this._polygonMesh = mesh;
 	    }
 	  }, {
@@ -16899,6 +16901,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // itemSize = 3 because there are 3 values (components) per vertex
 	      geometry.addAttribute('position', new THREE.BufferAttribute(attributes.vertices, 3));
+	
+	      if (attributes.normals) {
+	        geometry.addAttribute('normal', new THREE.BufferAttribute(attributes.normals, 3));
+	      }
+	
 	      geometry.addAttribute('color', new THREE.BufferAttribute(attributes.colours, 3));
 	
 	      if (attributes.pickingIds) {
@@ -16913,7 +16920,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      var material;
 	      if (this._options.polylineMaterial && this._options.polylineMaterial instanceof THREE.Material) {
-	        material = this._options.material;
+	        material = this._options.polylineMaterial;
 	      } else {
 	        material = new THREE.LineBasicMaterial({
 	          vertexColors: THREE.VertexColors,
@@ -16924,16 +16931,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	      }
 	
-	      var mesh = new THREE.LineSegments(geometry, material);
+	      var mesh;
 	
-	      if (style.lineRenderOrder !== undefined) {
-	        material.depthWrite = false;
-	        mesh.renderOrder = style.lineRenderOrder;
+	      // Pass mesh through callback, if defined
+	      if (typeof this._options.onPolylineMesh === 'function') {
+	        mesh = this._options.onPolylineMesh(geometry, material);
+	      } else {
+	        mesh = new THREE.LineSegments(geometry, material);
+	
+	        if (style.lineRenderOrder !== undefined) {
+	          material.depthWrite = false;
+	          mesh.renderOrder = style.lineRenderOrder;
+	        }
+	
+	        mesh.castShadow = true;
+	        // mesh.receiveShadow = true;
 	      }
 	
-	      mesh.castShadow = true;
-	      // mesh.receiveShadow = true;
-	
+	      // TODO: Allow this to be overridden, or copy mesh instead of creating a new
+	      // one just for picking
 	      if (this._options.interactive && this._pickingMesh) {
 	        material = new _enginePickingMaterial2['default']();
 	        // material.side = THREE.BackSide;
@@ -16943,11 +16959,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var pickingMesh = new THREE.LineSegments(geometry, material);
 	        this._pickingMesh.add(pickingMesh);
-	      }
-	
-	      // Pass mesh through callback, if defined
-	      if (typeof this._options.onPolylineMesh === 'function') {
-	        this._options.onPolylineMesh(mesh);
 	      }
 	
 	      this._polylineMesh = mesh;
@@ -16970,7 +16981,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      var material;
 	      if (this._options.pointMaterial && this._options.pointMaterial instanceof THREE.Material) {
-	        material = this._options.material;
+	        material = this._options.pointMaterial;
 	      } else if (!this._world._environment._skybox) {
 	        material = new THREE.MeshPhongMaterial({
 	          vertexColors: THREE.VertexColors
@@ -16987,10 +16998,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	          material.envMap = this._world._environment._skybox.getRenderTarget();
 	        }
 	
-	      mesh = new THREE.Mesh(geometry, material);
+	      var mesh;
 	
-	      mesh.castShadow = true;
-	      // mesh.receiveShadow = true;
+	      // Pass mesh callback, if defined
+	      if (typeof this._options.onPointMesh === 'function') {
+	        mesh = this._options.onPointMesh(geometry, material);
+	      } else {
+	        mesh = new THREE.Mesh(geometry, material);
+	
+	        mesh.castShadow = true;
+	        // mesh.receiveShadow = true;
+	      }
 	
 	      if (this._options.interactive && this._pickingMesh) {
 	        material = new _enginePickingMaterial2['default']();
@@ -16998,11 +17016,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var pickingMesh = new THREE.Mesh(geometry, material);
 	        this._pickingMesh.add(pickingMesh);
-	      }
-	
-	      // Pass mesh callback, if defined
-	      if (typeof this._options.onPointMesh === 'function') {
-	        this._options.onPointMesh(mesh);
 	      }
 	
 	      this._pointMesh = mesh;
@@ -17530,10 +17543,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        material.envMap = this._world._environment._skybox.getRenderTarget();
 	      }
 	
-	      var mesh = new _three2['default'].Mesh(geometry, material);
+	      var mesh;
 	
-	      mesh.castShadow = true;
-	      mesh.receiveShadow = true;
+	      // Pass mesh through callback, if defined
+	      if (typeof this._options.onMesh === 'function') {
+	        mesh = this._options.onMesh(geometry, material);
+	      } else {
+	        mesh = new _three2['default'].Mesh(geometry, material);
+	
+	        mesh.castShadow = true;
+	        mesh.receiveShadow = true;
+	      }
 	
 	      if (this.isFlat()) {
 	        material.depthWrite = false;
@@ -17546,11 +17566,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var pickingMesh = new _three2['default'].Mesh(geometry, material);
 	        this._pickingMesh.add(pickingMesh);
-	      }
-	
-	      // Pass mesh through callback, if defined
-	      if (typeof this._options.onMesh === 'function') {
-	        this._options.onMesh(mesh);
 	      }
 	
 	      this._mesh = mesh;
@@ -18082,6 +18097,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // itemSize = 3 because there are 3 values (components) per vertex
 	      geometry.addAttribute('position', new _three2['default'].BufferAttribute(attributes.vertices, 3));
+	
+	      if (attributes.normals) {
+	        geometry.addAttribute('normal', new _three2['default'].BufferAttribute(attributes.normals, 3));
+	      }
+	
 	      geometry.addAttribute('color', new _three2['default'].BufferAttribute(attributes.colours, 3));
 	
 	      if (attributes.pickingIds) {
@@ -18105,16 +18125,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	      }
 	
-	      var mesh = new _three2['default'].LineSegments(geometry, material);
+	      var mesh;
 	
-	      if (style.lineRenderOrder !== undefined) {
-	        material.depthWrite = false;
-	        mesh.renderOrder = style.lineRenderOrder;
+	      // Pass mesh through callback, if defined
+	      if (typeof this._options.onMesh === 'function') {
+	        mesh = this._options.onMesh(geometry, material);
+	      } else {
+	        mesh = new _three2['default'].LineSegments(geometry, material);
+	
+	        if (style.lineRenderOrder !== undefined) {
+	          material.depthWrite = false;
+	          mesh.renderOrder = style.lineRenderOrder;
+	        }
+	
+	        mesh.castShadow = true;
+	        // mesh.receiveShadow = true;
 	      }
 	
-	      mesh.castShadow = true;
-	      // mesh.receiveShadow = true;
-	
+	      // TODO: Allow this to be overridden, or copy mesh instead of creating a new
+	      // one just for picking
 	      if (this._options.interactive && this._pickingMesh) {
 	        material = new _enginePickingMaterial2['default']();
 	        // material.side = THREE.BackSide;
@@ -18124,11 +18153,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var pickingMesh = new _three2['default'].LineSegments(geometry, material);
 	        this._pickingMesh.add(pickingMesh);
-	      }
-	
-	      // Pass mesh through callback, if defined
-	      if (typeof this._options.onMesh === 'function') {
-	        this._options.onMesh(mesh);
 	      }
 	
 	      this._mesh = mesh;
@@ -18211,6 +18235,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _vertices = line.vertices;
 	      var _colour = line.colours;
 	
+	      var normals;
+	      var _normals;
+	      if (line.normals) {
+	        normals = new Float32Array(line.verticesCount * 3);
+	        _normals = line.normals;
+	      }
+	
 	      var _pickingId;
 	      if (pickingIds) {
 	        _pickingId = line.pickingId;
@@ -18223,11 +18254,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var ay = _vertices[i][1];
 	        var az = _vertices[i][2];
 	
+	        var nx;
+	        var ny;
+	        var nz;
+	        if (_normals) {
+	          nx = _normals[i][0];
+	          ny = _normals[i][1];
+	          nz = _normals[i][2];
+	        }
+	
 	        var c1 = _colour[i];
 	
 	        vertices[lastIndex * 3 + 0] = ax;
 	        vertices[lastIndex * 3 + 1] = ay;
 	        vertices[lastIndex * 3 + 2] = az;
+	
+	        if (normals) {
+	          normals[lastIndex * 3 + 0] = nx;
+	          normals[lastIndex * 3 + 1] = ny;
+	          normals[lastIndex * 3 + 2] = nz;
+	        }
 	
 	        colours[lastIndex * 3 + 0] = c1[0];
 	        colours[lastIndex * 3 + 1] = c1[1];
@@ -18244,6 +18290,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        vertices: vertices,
 	        colours: colours
 	      };
+	
+	      if (normals) {
+	        attributes.normals = normals;
+	      }
 	
 	      if (pickingIds) {
 	        attributes.pickingIds = pickingIds;
@@ -18592,10 +18642,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	          material.envMap = this._world._environment._skybox.getRenderTarget();
 	        }
 	
-	      var mesh = new _three2['default'].Mesh(geometry, material);
+	      var mesh;
 	
-	      mesh.castShadow = true;
-	      // mesh.receiveShadow = true;
+	      // Pass mesh through callback, if defined
+	      if (typeof this._options.onMesh === 'function') {
+	        mesh = this._options.onMesh(geometry, material);
+	      } else {
+	        mesh = new _three2['default'].Mesh(geometry, material);
+	
+	        mesh.castShadow = true;
+	        // mesh.receiveShadow = true;
+	      }
 	
 	      if (this._options.interactive && this._pickingMesh) {
 	        material = new _enginePickingMaterial2['default']();
@@ -18603,11 +18660,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var pickingMesh = new _three2['default'].Mesh(geometry, material);
 	        this._pickingMesh.add(pickingMesh);
-	      }
-	
-	      // Pass mesh through callback, if defined
-	      if (typeof this._options.onMesh === 'function') {
-	        this._options.onMesh(mesh);
 	      }
 	
 	      this._mesh = mesh;

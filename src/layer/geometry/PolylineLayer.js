@@ -187,6 +187,11 @@ class PolylineLayer extends Layer {
 
     // itemSize = 3 because there are 3 values (components) per vertex
     geometry.addAttribute('position', new THREE.BufferAttribute(attributes.vertices, 3));
+
+    if (attributes.normals) {
+      geometry.addAttribute('normal', new THREE.BufferAttribute(attributes.normals, 3));
+    }
+
     geometry.addAttribute('color', new THREE.BufferAttribute(attributes.colours, 3));
 
     if (attributes.pickingIds) {
@@ -210,16 +215,25 @@ class PolylineLayer extends Layer {
       });
     }
 
-    var mesh = new THREE.LineSegments(geometry, material);
+    var mesh;
 
-    if (style.lineRenderOrder !== undefined) {
-      material.depthWrite = false;
-      mesh.renderOrder = style.lineRenderOrder;
+    // Pass mesh through callback, if defined
+    if (typeof this._options.onMesh === 'function') {
+      mesh = this._options.onMesh(geometry, material);
+    } else {
+      mesh = new THREE.LineSegments(geometry, material);
+
+      if (style.lineRenderOrder !== undefined) {
+        material.depthWrite = false;
+        mesh.renderOrder = style.lineRenderOrder;
+      }
+
+      mesh.castShadow = true;
+      // mesh.receiveShadow = true;
     }
 
-    mesh.castShadow = true;
-    // mesh.receiveShadow = true;
-
+    // TODO: Allow this to be overridden, or copy mesh instead of creating a new
+    // one just for picking
     if (this._options.interactive && this._pickingMesh) {
       material = new PickingMaterial();
       // material.side = THREE.BackSide;
@@ -229,11 +243,6 @@ class PolylineLayer extends Layer {
 
       var pickingMesh = new THREE.LineSegments(geometry, material);
       this._pickingMesh.add(pickingMesh);
-    }
-
-    // Pass mesh through callback, if defined
-    if (typeof this._options.onMesh === 'function') {
-      this._options.onMesh(mesh);
     }
 
     this._mesh = mesh;
@@ -306,6 +315,13 @@ class PolylineLayer extends Layer {
     var _vertices = line.vertices;
     var _colour = line.colours;
 
+    var normals;
+    var _normals;
+    if (line.normals) {
+      normals = new Float32Array(line.verticesCount * 3);
+      _normals = line.normals;
+    }
+
     var _pickingId;
     if (pickingIds) {
       _pickingId = line.pickingId;
@@ -318,11 +334,26 @@ class PolylineLayer extends Layer {
       var ay = _vertices[i][1];
       var az = _vertices[i][2];
 
+      var nx;
+      var ny;
+      var nz;
+      if (_normals) {
+        nx = _normals[i][0];
+        ny = _normals[i][1];
+        nz = _normals[i][2];
+      }
+
       var c1 = _colour[i];
 
       vertices[lastIndex * 3 + 0] = ax;
       vertices[lastIndex * 3 + 1] = ay;
       vertices[lastIndex * 3 + 2] = az;
+
+      if (normals) {
+        normals[lastIndex * 3 + 0] = nx;
+        normals[lastIndex * 3 + 1] = ny;
+        normals[lastIndex * 3 + 2] = nz;
+      }
 
       colours[lastIndex * 3 + 0] = c1[0];
       colours[lastIndex * 3 + 1] = c1[1];
@@ -339,6 +370,10 @@ class PolylineLayer extends Layer {
       vertices: vertices,
       colours: colours
     };
+
+    if (normals) {
+      attributes.normals = normals;
+    }
 
     if (pickingIds) {
       attributes.pickingIds = pickingIds;

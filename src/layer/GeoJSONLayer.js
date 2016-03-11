@@ -207,7 +207,7 @@ class GeoJSONLayer extends LayerGroup {
 
     var material;
     if (this._options.polygonMaterial && this._options.polygonMaterial instanceof THREE.Material) {
-      material = this._options.material;
+      material = this._options.polygonMaterial;
     } else if (!this._world._environment._skybox) {
       material = new THREE.MeshPhongMaterial({
         vertexColors: THREE.VertexColors,
@@ -224,10 +224,17 @@ class GeoJSONLayer extends LayerGroup {
       material.envMap = this._world._environment._skybox.getRenderTarget();
     }
 
-    mesh = new THREE.Mesh(geometry, material);
+    var mesh;
 
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
+    // Pass mesh through callback, if defined
+    if (typeof this._options.onPolygonMesh === 'function') {
+      mesh = this._options.onPolygonMesh(geometry, material);
+    } else {
+      mesh = new THREE.Mesh(geometry, material);
+
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+    }
 
     if (flat) {
       material.depthWrite = false;
@@ -242,11 +249,6 @@ class GeoJSONLayer extends LayerGroup {
       this._pickingMesh.add(pickingMesh);
     }
 
-    // Pass mesh through callback, if defined
-    if (typeof this._options.onPolygonMesh === 'function') {
-      this._options.onPolygonMesh(mesh);
-    }
-
     this._polygonMesh = mesh;
   }
 
@@ -255,6 +257,11 @@ class GeoJSONLayer extends LayerGroup {
 
     // itemSize = 3 because there are 3 values (components) per vertex
     geometry.addAttribute('position', new THREE.BufferAttribute(attributes.vertices, 3));
+
+    if (attributes.normals) {
+      geometry.addAttribute('normal', new THREE.BufferAttribute(attributes.normals, 3));
+    }
+
     geometry.addAttribute('color', new THREE.BufferAttribute(attributes.colours, 3));
 
     if (attributes.pickingIds) {
@@ -269,7 +276,7 @@ class GeoJSONLayer extends LayerGroup {
 
     var material;
     if (this._options.polylineMaterial && this._options.polylineMaterial instanceof THREE.Material) {
-      material = this._options.material;
+      material = this._options.polylineMaterial;
     } else {
       material = new THREE.LineBasicMaterial({
         vertexColors: THREE.VertexColors,
@@ -280,16 +287,25 @@ class GeoJSONLayer extends LayerGroup {
       });
     }
 
-    var mesh = new THREE.LineSegments(geometry, material);
+    var mesh;
 
-    if (style.lineRenderOrder !== undefined) {
-      material.depthWrite = false;
-      mesh.renderOrder = style.lineRenderOrder;
+    // Pass mesh through callback, if defined
+    if (typeof this._options.onPolylineMesh === 'function') {
+      mesh = this._options.onPolylineMesh(geometry, material);
+    } else {
+      mesh = new THREE.LineSegments(geometry, material);
+
+      if (style.lineRenderOrder !== undefined) {
+        material.depthWrite = false;
+        mesh.renderOrder = style.lineRenderOrder;
+      }
+
+      mesh.castShadow = true;
+      // mesh.receiveShadow = true;
     }
 
-    mesh.castShadow = true;
-    // mesh.receiveShadow = true;
-
+    // TODO: Allow this to be overridden, or copy mesh instead of creating a new
+    // one just for picking
     if (this._options.interactive && this._pickingMesh) {
       material = new PickingMaterial();
       // material.side = THREE.BackSide;
@@ -299,11 +315,6 @@ class GeoJSONLayer extends LayerGroup {
 
       var pickingMesh = new THREE.LineSegments(geometry, material);
       this._pickingMesh.add(pickingMesh);
-    }
-
-    // Pass mesh through callback, if defined
-    if (typeof this._options.onPolylineMesh === 'function') {
-      this._options.onPolylineMesh(mesh);
     }
 
     this._polylineMesh = mesh;
@@ -325,7 +336,7 @@ class GeoJSONLayer extends LayerGroup {
 
     var material;
     if (this._options.pointMaterial && this._options.pointMaterial instanceof THREE.Material) {
-      material = this._options.material;
+      material = this._options.pointMaterial;
     } else if (!this._world._environment._skybox) {
       material = new THREE.MeshPhongMaterial({
         vertexColors: THREE.VertexColors
@@ -342,10 +353,17 @@ class GeoJSONLayer extends LayerGroup {
       material.envMap = this._world._environment._skybox.getRenderTarget();
     }
 
-    mesh = new THREE.Mesh(geometry, material);
+    var mesh;
 
-    mesh.castShadow = true;
-    // mesh.receiveShadow = true;
+    // Pass mesh callback, if defined
+    if (typeof this._options.onPointMesh === 'function') {
+      mesh = this._options.onPointMesh(geometry, material);
+    } else {
+      mesh = new THREE.Mesh(geometry, material);
+
+      mesh.castShadow = true;
+      // mesh.receiveShadow = true;
+    }
 
     if (this._options.interactive && this._pickingMesh) {
       material = new PickingMaterial();
@@ -353,11 +371,6 @@ class GeoJSONLayer extends LayerGroup {
 
       var pickingMesh = new THREE.Mesh(geometry, material);
       this._pickingMesh.add(pickingMesh);
-    }
-
-    // Pass mesh callback, if defined
-    if (typeof this._options.onPointMesh === 'function') {
-      this._options.onPointMesh(mesh);
     }
 
     this._pointMesh = mesh;
