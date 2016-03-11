@@ -64,47 +64,47 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _World2 = _interopRequireDefault(_World);
 	
-	var _controlsIndex = __webpack_require__(50);
+	var _controlsIndex = __webpack_require__(51);
 	
 	var _controlsIndex2 = _interopRequireDefault(_controlsIndex);
 	
-	var _layerLayer = __webpack_require__(45);
+	var _layerLayer = __webpack_require__(46);
 	
 	var _layerLayer2 = _interopRequireDefault(_layerLayer);
 	
-	var _layerEnvironmentEnvironmentLayer = __webpack_require__(44);
+	var _layerEnvironmentEnvironmentLayer = __webpack_require__(45);
 	
 	var _layerEnvironmentEnvironmentLayer2 = _interopRequireDefault(_layerEnvironmentEnvironmentLayer);
 	
-	var _layerTileImageTileLayer = __webpack_require__(54);
+	var _layerTileImageTileLayer = __webpack_require__(55);
 	
 	var _layerTileImageTileLayer2 = _interopRequireDefault(_layerTileImageTileLayer);
 	
-	var _layerTileGeoJSONTileLayer = __webpack_require__(69);
+	var _layerTileGeoJSONTileLayer = __webpack_require__(70);
 	
 	var _layerTileGeoJSONTileLayer2 = _interopRequireDefault(_layerTileGeoJSONTileLayer);
 	
-	var _layerTileTopoJSONTileLayer = __webpack_require__(82);
+	var _layerTileTopoJSONTileLayer = __webpack_require__(83);
 	
 	var _layerTileTopoJSONTileLayer2 = _interopRequireDefault(_layerTileTopoJSONTileLayer);
 	
-	var _layerGeoJSONLayer = __webpack_require__(83);
+	var _layerGeoJSONLayer = __webpack_require__(84);
 	
 	var _layerGeoJSONLayer2 = _interopRequireDefault(_layerGeoJSONLayer);
 	
-	var _layerTopoJSONLayer = __webpack_require__(88);
+	var _layerTopoJSONLayer = __webpack_require__(89);
 	
 	var _layerTopoJSONLayer2 = _interopRequireDefault(_layerTopoJSONLayer);
 	
-	var _layerGeometryPolygonLayer = __webpack_require__(85);
+	var _layerGeometryPolygonLayer = __webpack_require__(86);
 	
 	var _layerGeometryPolygonLayer2 = _interopRequireDefault(_layerGeometryPolygonLayer);
 	
-	var _layerGeometryPolylineLayer = __webpack_require__(86);
+	var _layerGeometryPolylineLayer = __webpack_require__(87);
 	
 	var _layerGeometryPolylineLayer2 = _interopRequireDefault(_layerGeometryPolylineLayer);
 	
-	var _layerGeometryPointLayer = __webpack_require__(87);
+	var _layerGeometryPointLayer = __webpack_require__(88);
 	
 	var _layerGeometryPointLayer2 = _interopRequireDefault(_layerGeometryPointLayer);
 	
@@ -190,7 +190,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _engineEngine2 = _interopRequireDefault(_engineEngine);
 	
-	var _layerEnvironmentEnvironmentLayer = __webpack_require__(44);
+	var _layerEnvironmentEnvironmentLayer = __webpack_require__(45);
 	
 	var _layerEnvironmentEnvironmentLayer2 = _interopRequireDefault(_layerEnvironmentEnvironmentLayer);
 	
@@ -209,7 +209,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var defaults = {
 	      crs: _geoCrsIndex2['default'].EPSG3857,
-	      skybox: false
+	      skybox: false,
+	      postProcessing: false
 	    };
 	
 	    this.options = (0, _lodashAssign2['default'])({}, defaults, options);
@@ -3151,31 +3152,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Picking2 = _interopRequireDefault(_Picking);
 	
-	var _vendorEffectComposer = __webpack_require__(36);
+	var _EffectComposer = __webpack_require__(36);
 	
-	var _vendorEffectComposer2 = _interopRequireDefault(_vendorEffectComposer);
+	var _EffectComposer2 = _interopRequireDefault(_EffectComposer);
 	
-	var _vendorRenderPass = __webpack_require__(40);
+	var _vendorRenderPass = __webpack_require__(41);
 	
 	var _vendorRenderPass2 = _interopRequireDefault(_vendorRenderPass);
 	
-	var _vendorShaderPass = __webpack_require__(38);
+	var _vendorShaderPass = __webpack_require__(39);
 	
 	var _vendorShaderPass2 = _interopRequireDefault(_vendorShaderPass);
 	
-	var _vendorCopyShader = __webpack_require__(37);
+	var _vendorCopyShader = __webpack_require__(38);
 	
 	var _vendorCopyShader2 = _interopRequireDefault(_vendorCopyShader);
 	
-	var _vendorHorizontalTiltShiftShader = __webpack_require__(41);
+	var _vendorHorizontalTiltShiftShader = __webpack_require__(42);
 	
 	var _vendorHorizontalTiltShiftShader2 = _interopRequireDefault(_vendorHorizontalTiltShiftShader);
 	
-	var _vendorVerticalTiltShiftShader = __webpack_require__(42);
+	var _vendorVerticalTiltShiftShader = __webpack_require__(43);
 	
 	var _vendorVerticalTiltShiftShader2 = _interopRequireDefault(_vendorVerticalTiltShiftShader);
 	
-	var _vendorFXAAShader = __webpack_require__(43);
+	var _vendorFXAAShader = __webpack_require__(44);
 	
 	var _vendorFXAAShader2 = _interopRequireDefault(_vendorFXAAShader);
 	
@@ -3195,11 +3196,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._domScene3D = _DOMScene3D2['default'];
 	    this._domScene2D = _DOMScene2D2['default'];
 	
-	    this._renderer = (0, _Renderer2['default'])(container);
+	    var antialias = this._world.options.postProcessing ? false : true;
+	    this._renderer = (0, _Renderer2['default'])(container, antialias);
 	    this._domRenderer3D = (0, _DOMRenderer3D2['default'])(container);
 	    this._domRenderer2D = (0, _DOMRenderer2D2['default'])(container);
 	
 	    this._camera = (0, _Camera2['default'])(container);
+	
+	    this._container = container;
 	
 	    // TODO: Make this optional
 	    this._picking = (0, _Picking2['default'])(this._world, this._renderer, this._camera);
@@ -3208,7 +3212,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    this._frustum = new _three2['default'].Frustum();
 	
-	    this._initPostProcessing();
+	    if (this._world.options.postProcessing) {
+	      this._initPostProcessing();
+	    }
 	  }
 	
 	  // TODO: Set up composer to automatically resize on viewport change
@@ -3220,42 +3226,53 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _initPostProcessing() {
 	      var renderPass = new _vendorRenderPass2['default'](this._scene, this._camera);
 	
-	      var width = this._renderer.getSize().width;
-	      var height = this._renderer.getSize().height;
-	
-	      var pixelRatio = window.devicePixelRatio;
-	
 	      // TODO: Look at using @mattdesl's optimised FXAA shader
 	      // https://github.com/mattdesl/three-shader-fxaa
 	      var fxaaPass = new _vendorShaderPass2['default'](_vendorFXAAShader2['default']);
-	      fxaaPass.uniforms.resolution.value.set(1 / (width * pixelRatio), 1 / (height * pixelRatio));
 	
 	      var hblurPass = new _vendorShaderPass2['default'](_vendorHorizontalTiltShiftShader2['default']);
 	      var vblurPass = new _vendorShaderPass2['default'](_vendorVerticalTiltShiftShader2['default']);
 	      var bluriness = 5;
 	
-	      hblurPass.uniforms.h.value = bluriness / (width * pixelRatio);
-	      vblurPass.uniforms.v.value = bluriness / (height * pixelRatio);
 	      hblurPass.uniforms.r.value = vblurPass.uniforms.r.value = 0.6;
 	
 	      var copyPass = new _vendorShaderPass2['default'](_vendorCopyShader2['default']);
 	      copyPass.renderToScreen = true;
 	
-	      this._composer = new _vendorEffectComposer2['default'](this._renderer);
+	      this._composer = (0, _EffectComposer2['default'])(this._renderer, this._container);
 	
 	      this._composer.addPass(renderPass);
 	      this._composer.addPass(fxaaPass);
 	      this._composer.addPass(hblurPass);
 	      this._composer.addPass(vblurPass);
 	      this._composer.addPass(copyPass);
+	
+	      var self = this;
+	      var updatePostProcessingSize = function updatePostProcessingSize() {
+	        var width = self._container.clientWidth;
+	        var height = self._container.clientHeight;
+	
+	        var pixelRatio = window.devicePixelRatio;
+	
+	        fxaaPass.uniforms.resolution.value.set(1 / (width * pixelRatio), 1 / (height * pixelRatio));
+	
+	        hblurPass.uniforms.h.value = bluriness / (width * pixelRatio);
+	        vblurPass.uniforms.v.value = bluriness / (height * pixelRatio);
+	      };
+	
+	      updatePostProcessingSize();
+	      window.addEventListener('resize', updatePostProcessingSize, false);
 	    }
 	  }, {
 	    key: 'update',
 	    value: function update(delta) {
 	      this.emit('preRender');
 	
-	      // this._renderer.render(this._scene, this._camera);
-	      this._composer.render(delta);
+	      if (this._world.options.postProcessing) {
+	        this._composer.render(delta);
+	      } else {
+	        this._renderer.render(this._scene, this._camera);
+	      }
 	
 	      // Render picking scene
 	      // this._renderer.render(this._picking._pickingScene, this._camera);
@@ -3324,7 +3341,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._scene = null;
 	      this._domScene3D = null;
 	      this._domScene2D = null;
+	
+	      this._composer = null;
 	      this._renderer = null;
+	
 	      this._domRenderer3D = null;
 	      this._domRenderer2D = null;
 	      this._camera = null;
@@ -3446,9 +3466,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	// This can only be accessed from Engine.renderer if you want to reference the
 	// same scene in multiple places
 	
-	exports['default'] = function (container) {
+	exports['default'] = function (container, antialias) {
 	  var renderer = new _three2['default'].WebGLRenderer({
-	    antialias: false
+	    antialias: antialias
 	  });
 	
 	  // TODO: Re-enable when this works with the skybox
@@ -4234,6 +4254,40 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _three = __webpack_require__(24);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var _vendorEffectComposer = __webpack_require__(37);
+	
+	var _vendorEffectComposer2 = _interopRequireDefault(_vendorEffectComposer);
+	
+	exports['default'] = function (renderer, container) {
+	  var composer = new _vendorEffectComposer2['default'](renderer);
+	
+	  var updateSize = function updateSize() {
+	    composer.setSize(container.clientWidth, container.clientHeight);
+	  };
+	
+	  window.addEventListener('resize', updateSize, false);
+	  updateSize();
+	
+	  return composer;
+	};
+	
+	;
+	module.exports = exports['default'];
+
+/***/ },
+/* 37 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
 		value: true
 	});
 	
@@ -4246,15 +4300,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _CopyShader = __webpack_require__(37);
+	var _CopyShader = __webpack_require__(38);
 	
 	var _CopyShader2 = _interopRequireDefault(_CopyShader);
 	
-	var _ShaderPass = __webpack_require__(38);
+	var _ShaderPass = __webpack_require__(39);
 	
 	var _ShaderPass2 = _interopRequireDefault(_ShaderPass);
 	
-	var _MaskPass = __webpack_require__(39);
+	var _MaskPass = __webpack_require__(40);
 	
 	var _MaskPass2 = _interopRequireDefault(_MaskPass);
 	
@@ -4388,7 +4442,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 37 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -4431,7 +4485,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 38 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -4515,7 +4569,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 39 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -4618,7 +4672,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	_three2['default'].ClearMaskPass = ClearMaskPass;
 
 /***/ },
-/* 40 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -4688,7 +4742,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 41 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -4737,7 +4791,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 42 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -4786,7 +4840,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 43 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -4833,7 +4887,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 44 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -4850,7 +4904,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Layer2 = __webpack_require__(45);
+	var _Layer2 = __webpack_require__(46);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -4862,7 +4916,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _Skybox = __webpack_require__(46);
+	var _Skybox = __webpack_require__(47);
 	
 	var _Skybox2 = _interopRequireDefault(_Skybox);
 	
@@ -5016,7 +5070,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.environmentLayer = noNew;
 
 /***/ },
-/* 45 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -5262,7 +5316,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.layer = noNew;
 
 /***/ },
-/* 46 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -5279,11 +5333,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _Sky = __webpack_require__(47);
+	var _Sky = __webpack_require__(48);
 	
 	var _Sky2 = _interopRequireDefault(_Sky);
 	
-	var _lodashThrottle = __webpack_require__(48);
+	var _lodashThrottle = __webpack_require__(49);
 	
 	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
 	
@@ -5495,7 +5549,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.skybox = noNew;
 
 /***/ },
-/* 47 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -5578,7 +5632,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 48 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -5589,7 +5643,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2016 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <https://lodash.com/license>
 	 */
-	var debounce = __webpack_require__(49);
+	var debounce = __webpack_require__(50);
 	
 	/** Used as the `TypeError` message for "Functions" methods. */
 	var FUNC_ERROR_TEXT = 'Expected a function';
@@ -5682,7 +5736,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 49 */
+/* 50 */
 /***/ function(module, exports) {
 
 	/**
@@ -6006,7 +6060,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 50 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -6015,7 +6069,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _ControlsOrbit = __webpack_require__(51);
+	var _ControlsOrbit = __webpack_require__(52);
 	
 	var _ControlsOrbit2 = _interopRequireDefault(_ControlsOrbit);
 	
@@ -6028,7 +6082,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 51 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -6053,7 +6107,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _vendorOrbitControls = __webpack_require__(52);
+	var _vendorOrbitControls = __webpack_require__(53);
 	
 	var _vendorOrbitControls2 = _interopRequireDefault(_vendorOrbitControls);
 	
@@ -6205,7 +6259,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.orbit = noNew;
 
 /***/ },
-/* 52 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -6221,7 +6275,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _hammerjs = __webpack_require__(53);
+	var _hammerjs = __webpack_require__(54);
 	
 	var _hammerjs2 = _interopRequireDefault(_hammerjs);
 	
@@ -7383,7 +7437,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 53 */
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*! Hammer.JS - v2.0.6 - 2015-12-23
@@ -9957,7 +10011,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 54 */
+/* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -9974,19 +10028,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _TileLayer2 = __webpack_require__(55);
+	var _TileLayer2 = __webpack_require__(56);
 	
 	var _TileLayer3 = _interopRequireDefault(_TileLayer2);
 	
-	var _ImageTile = __webpack_require__(65);
+	var _ImageTile = __webpack_require__(66);
 	
 	var _ImageTile2 = _interopRequireDefault(_ImageTile);
 	
-	var _ImageTileLayerBaseMaterial = __webpack_require__(68);
+	var _ImageTileLayerBaseMaterial = __webpack_require__(69);
 	
 	var _ImageTileLayerBaseMaterial2 = _interopRequireDefault(_ImageTileLayerBaseMaterial);
 	
-	var _lodashThrottle = __webpack_require__(48);
+	var _lodashThrottle = __webpack_require__(49);
 	
 	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
 	
@@ -10178,7 +10232,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.imageTileLayer = noNew;
 
 /***/ },
-/* 55 */
+/* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -10195,7 +10249,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Layer2 = __webpack_require__(45);
+	var _Layer2 = __webpack_require__(46);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -10203,7 +10257,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _TileCache = __webpack_require__(56);
+	var _TileCache = __webpack_require__(57);
 	
 	var _TileCache2 = _interopRequireDefault(_TileCache);
 	
@@ -10599,7 +10653,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 56 */
+/* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -10612,7 +10666,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var _lruCache = __webpack_require__(57);
+	var _lruCache = __webpack_require__(58);
 	
 	var _lruCache2 = _interopRequireDefault(_lruCache);
 	
@@ -10680,18 +10734,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.tileCache = noNew;
 
 /***/ },
-/* 57 */
+/* 58 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = LRUCache
 	
 	// This will be a proper iterable 'Map' in engines that support it,
 	// or a fakey-fake PseudoMap in older versions.
-	var Map = __webpack_require__(58)
-	var util = __webpack_require__(61)
+	var Map = __webpack_require__(59)
+	var util = __webpack_require__(62)
 	
 	// A linked list to keep track of recently-used-ness
-	var Yallist = __webpack_require__(64)
+	var Yallist = __webpack_require__(65)
 	
 	// use symbols if possible, otherwise just _props
 	var symbols = {}
@@ -11154,7 +11208,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 58 */
+/* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {if (process.env.npm_package_name === 'pseudomap' &&
@@ -11164,13 +11218,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	if (typeof Map === 'function' && !process.env.TEST_PSEUDOMAP) {
 	  module.exports = Map
 	} else {
-	  module.exports = __webpack_require__(60)
+	  module.exports = __webpack_require__(61)
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(59)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(60)))
 
 /***/ },
-/* 59 */
+/* 60 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -11267,7 +11321,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 60 */
+/* 61 */
 /***/ function(module, exports) {
 
 	var hasOwnProperty = Object.prototype.hasOwnProperty
@@ -11386,7 +11440,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 61 */
+/* 62 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -11914,7 +11968,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.isPrimitive = isPrimitive;
 	
-	exports.isBuffer = __webpack_require__(62);
+	exports.isBuffer = __webpack_require__(63);
 	
 	function objectToString(o) {
 	  return Object.prototype.toString.call(o);
@@ -11958,7 +12012,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *     prototype.
 	 * @param {function} superCtor Constructor function to inherit prototype from.
 	 */
-	exports.inherits = __webpack_require__(63);
+	exports.inherits = __webpack_require__(64);
 	
 	exports._extend = function(origin, add) {
 	  // Don't do anything if add isn't an object
@@ -11976,10 +12030,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return Object.prototype.hasOwnProperty.call(obj, prop);
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(59)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(60)))
 
 /***/ },
-/* 62 */
+/* 63 */
 /***/ function(module, exports) {
 
 	module.exports = function isBuffer(arg) {
@@ -11990,7 +12044,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 63 */
+/* 64 */
 /***/ function(module, exports) {
 
 	if (typeof Object.create === 'function') {
@@ -12019,7 +12073,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 64 */
+/* 65 */
 /***/ function(module, exports) {
 
 	module.exports = Yallist
@@ -12385,7 +12439,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 65 */
+/* 66 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -12402,11 +12456,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Tile2 = __webpack_require__(66);
+	var _Tile2 = __webpack_require__(67);
 	
 	var _Tile3 = _interopRequireDefault(_Tile2);
 	
-	var _vendorBoxHelper = __webpack_require__(67);
+	var _vendorBoxHelper = __webpack_require__(68);
 	
 	var _vendorBoxHelper2 = _interopRequireDefault(_vendorBoxHelper);
 	
@@ -12621,7 +12675,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.imageTile = noNew;
 
 /***/ },
-/* 66 */
+/* 67 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -12874,7 +12928,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 67 */
+/* 68 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -12964,7 +13018,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 68 */
+/* 69 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -13026,7 +13080,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 69 */
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -13043,7 +13097,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _TileLayer2 = __webpack_require__(55);
+	var _TileLayer2 = __webpack_require__(56);
 	
 	var _TileLayer3 = _interopRequireDefault(_TileLayer2);
 	
@@ -13051,11 +13105,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _GeoJSONTile = __webpack_require__(70);
+	var _GeoJSONTile = __webpack_require__(71);
 	
 	var _GeoJSONTile2 = _interopRequireDefault(_GeoJSONTile);
 	
-	var _lodashThrottle = __webpack_require__(48);
+	var _lodashThrottle = __webpack_require__(49);
 	
 	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
 	
@@ -13220,7 +13274,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.geoJSONTileLayer = noNew;
 
 /***/ },
-/* 70 */
+/* 71 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -13237,11 +13291,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Tile2 = __webpack_require__(66);
+	var _Tile2 = __webpack_require__(67);
 	
 	var _Tile3 = _interopRequireDefault(_Tile2);
 	
-	var _vendorBoxHelper = __webpack_require__(67);
+	var _vendorBoxHelper = __webpack_require__(68);
 	
 	var _vendorBoxHelper2 = _interopRequireDefault(_vendorBoxHelper);
 	
@@ -13249,7 +13303,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _reqwest = __webpack_require__(71);
+	var _reqwest = __webpack_require__(72);
 	
 	var _reqwest2 = _interopRequireDefault(_reqwest);
 	
@@ -13263,15 +13317,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// import Offset from 'polygon-offset';
 	
-	var _utilGeoJSON = __webpack_require__(73);
+	var _utilGeoJSON = __webpack_require__(74);
 	
 	var _utilGeoJSON2 = _interopRequireDefault(_utilGeoJSON);
 	
-	var _utilBuffer = __webpack_require__(79);
+	var _utilBuffer = __webpack_require__(80);
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
-	var _enginePickingMaterial = __webpack_require__(80);
+	var _enginePickingMaterial = __webpack_require__(81);
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
@@ -13905,7 +13959,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.geoJSONTile = noNew;
 
 /***/ },
-/* 71 */
+/* 72 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -13929,7 +13983,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  } else {
 	    var XHR2
 	    try {
-	      XHR2 = __webpack_require__(72)
+	      XHR2 = __webpack_require__(73)
 	    } catch (ex) {
 	      throw new Error('Peer dependency `xhr2` required! Please npm install xhr2')
 	    }
@@ -14541,13 +14595,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 72 */
+/* 73 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 73 */
+/* 74 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -14564,19 +14618,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _topojson2 = __webpack_require__(74);
+	var _topojson2 = __webpack_require__(75);
 	
 	var _topojson3 = _interopRequireDefault(_topojson2);
 	
-	var _geojsonMerge = __webpack_require__(75);
+	var _geojsonMerge = __webpack_require__(76);
 	
 	var _geojsonMerge2 = _interopRequireDefault(_geojsonMerge);
 	
-	var _earcut = __webpack_require__(77);
+	var _earcut = __webpack_require__(78);
 	
 	var _earcut2 = _interopRequireDefault(_earcut);
 	
-	var _extrudePolygon = __webpack_require__(78);
+	var _extrudePolygon = __webpack_require__(79);
 	
 	var _extrudePolygon2 = _interopRequireDefault(_extrudePolygon);
 	
@@ -14822,7 +14876,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 74 */
+/* 75 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(function (global, factory) {
@@ -15375,10 +15429,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}));
 
 /***/ },
-/* 75 */
+/* 76 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var normalize = __webpack_require__(76);
+	var normalize = __webpack_require__(77);
 	
 	module.exports = function(inputs) {
 	    return {
@@ -15391,7 +15445,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 76 */
+/* 77 */
 /***/ function(module, exports) {
 
 	module.exports = normalize;
@@ -15440,7 +15494,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 77 */
+/* 78 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -16030,7 +16084,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 78 */
+/* 79 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -16129,7 +16183,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 79 */
+/* 80 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -16400,7 +16454,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 80 */
+/* 81 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -16413,7 +16467,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _PickingShader = __webpack_require__(81);
+	var _PickingShader = __webpack_require__(82);
 	
 	var _PickingShader2 = _interopRequireDefault(_PickingShader);
 	
@@ -16455,7 +16509,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 81 */
+/* 82 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -16479,7 +16533,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 82 */
+/* 83 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -16494,7 +16548,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _GeoJSONTileLayer2 = __webpack_require__(69);
+	var _GeoJSONTileLayer2 = __webpack_require__(70);
 	
 	var _GeoJSONTileLayer3 = _interopRequireDefault(_GeoJSONTileLayer2);
 	
@@ -16529,7 +16583,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.topoJSONTileLayer = noNew;
 
 /***/ },
-/* 83 */
+/* 84 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -16549,7 +16603,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// TODO: Consider adopting GeoJSON CSS
 	// http://wiki.openstreetmap.org/wiki/Geojson_CSS
 	
-	var _LayerGroup2 = __webpack_require__(84);
+	var _LayerGroup2 = __webpack_require__(85);
 	
 	var _LayerGroup3 = _interopRequireDefault(_LayerGroup2);
 	
@@ -16557,31 +16611,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _reqwest = __webpack_require__(71);
+	var _reqwest = __webpack_require__(72);
 	
 	var _reqwest2 = _interopRequireDefault(_reqwest);
 	
-	var _utilGeoJSON = __webpack_require__(73);
+	var _utilGeoJSON = __webpack_require__(74);
 	
 	var _utilGeoJSON2 = _interopRequireDefault(_utilGeoJSON);
 	
-	var _utilBuffer = __webpack_require__(79);
+	var _utilBuffer = __webpack_require__(80);
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
-	var _enginePickingMaterial = __webpack_require__(80);
+	var _enginePickingMaterial = __webpack_require__(81);
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
-	var _geometryPolygonLayer = __webpack_require__(85);
+	var _geometryPolygonLayer = __webpack_require__(86);
 	
 	var _geometryPolygonLayer2 = _interopRequireDefault(_geometryPolygonLayer);
 	
-	var _geometryPolylineLayer = __webpack_require__(86);
+	var _geometryPolylineLayer = __webpack_require__(87);
 	
 	var _geometryPolylineLayer2 = _interopRequireDefault(_geometryPolylineLayer);
 	
-	var _geometryPointLayer = __webpack_require__(87);
+	var _geometryPointLayer = __webpack_require__(88);
 	
 	var _geometryPointLayer2 = _interopRequireDefault(_geometryPointLayer);
 	
@@ -17061,7 +17115,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.geoJSONLayer = noNew;
 
 /***/ },
-/* 84 */
+/* 85 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -17078,7 +17132,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Layer2 = __webpack_require__(45);
+	var _Layer2 = __webpack_require__(46);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -17151,7 +17205,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.layerGroup = noNew;
 
 /***/ },
-/* 85 */
+/* 86 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -17184,7 +17238,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// TODO: Allow _setBufferAttributes to use a custom function passed in to
 	// generate a custom mesh
 	
-	var _Layer2 = __webpack_require__(45);
+	var _Layer2 = __webpack_require__(46);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -17200,19 +17254,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _geoPoint = __webpack_require__(11);
 	
-	var _earcut2 = __webpack_require__(77);
+	var _earcut2 = __webpack_require__(78);
 	
 	var _earcut3 = _interopRequireDefault(_earcut2);
 	
-	var _utilExtrudePolygon = __webpack_require__(78);
+	var _utilExtrudePolygon = __webpack_require__(79);
 	
 	var _utilExtrudePolygon2 = _interopRequireDefault(_utilExtrudePolygon);
 	
-	var _enginePickingMaterial = __webpack_require__(80);
+	var _enginePickingMaterial = __webpack_require__(81);
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
-	var _utilBuffer = __webpack_require__(79);
+	var _utilBuffer = __webpack_require__(80);
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
@@ -17783,7 +17837,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.polygonLayer = noNew;
 
 /***/ },
-/* 86 */
+/* 87 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -17818,7 +17872,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// TODO: Allow _setBufferAttributes to use a custom function passed in to
 	// generate a custom mesh
 	
-	var _Layer2 = __webpack_require__(45);
+	var _Layer2 = __webpack_require__(46);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -17834,11 +17888,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _geoPoint = __webpack_require__(11);
 	
-	var _enginePickingMaterial = __webpack_require__(80);
+	var _enginePickingMaterial = __webpack_require__(81);
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
-	var _utilBuffer = __webpack_require__(79);
+	var _utilBuffer = __webpack_require__(80);
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
@@ -18238,7 +18292,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.polylineLayer = noNew;
 
 /***/ },
-/* 87 */
+/* 88 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -18279,7 +18333,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// How much control should this layer support? Perhaps a different or custom
 	// layer would be better suited for animation, for example.
 	
-	var _Layer2 = __webpack_require__(45);
+	var _Layer2 = __webpack_require__(46);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -18295,11 +18349,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _geoPoint = __webpack_require__(11);
 	
-	var _enginePickingMaterial = __webpack_require__(80);
+	var _enginePickingMaterial = __webpack_require__(81);
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
-	var _utilBuffer = __webpack_require__(79);
+	var _utilBuffer = __webpack_require__(80);
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
@@ -18713,7 +18767,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.pointLayer = noNew;
 
 /***/ },
-/* 88 */
+/* 89 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -18728,7 +18782,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _GeoJSONLayer2 = __webpack_require__(83);
+	var _GeoJSONLayer2 = __webpack_require__(84);
 	
 	var _GeoJSONLayer3 = _interopRequireDefault(_GeoJSONLayer2);
 	

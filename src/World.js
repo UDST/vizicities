@@ -17,7 +17,8 @@ class World extends EventEmitter {
 
     var defaults = {
       crs: CRS.EPSG3857,
-      skybox: false
+      skybox: false,
+      postProcessing: false
     };
 
     this.options = extend({}, defaults, options);

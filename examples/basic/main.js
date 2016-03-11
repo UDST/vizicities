@@ -5,7 +5,8 @@
 var coords = [40.739940, -73.988801];
 
 var world = VIZI.world('world', {
-  skybox: true
+  skybox: true,
+  postProcessing: true
 }).setView(coords);
 
 world._environment._skybox.setInclination(0.4);

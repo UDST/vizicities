@@ -4,9 +4,9 @@ import Scene from './Scene';
 // This can only be accessed from Engine.renderer if you want to reference the
 // same scene in multiple places
 
-export default function(container) {
+export default function(container, antialias) {
   var renderer = new THREE.WebGLRenderer({
-    antialias: false
+    antialias: antialias
   });
 
   // TODO: Re-enable when this works with the skybox

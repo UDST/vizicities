@@ -8,7 +8,7 @@ import DOMRenderer3D from './DOMRenderer3D';
 import DOMRenderer2D from './DOMRenderer2D';
 import Camera from './Camera';
 import Picking from './Picking';
-import EffectComposer from '../vendor/EffectComposer';
+import EffectComposer from './EffectComposer';
 import RenderPass from '../vendor/RenderPass';
 import ShaderPass from '../vendor/ShaderPass';
 import CopyShader from '../vendor/CopyShader';
@@ -28,11 +28,14 @@ class Engine extends EventEmitter {
     this._domScene3D = DOMScene3D;
     this._domScene2D = DOMScene2D;
 
-    this._renderer = Renderer(container);
+    var antialias = (this._world.options.postProcessing) ? false : true;
+    this._renderer = Renderer(container, antialias);
     this._domRenderer3D = DOMRenderer3D(container);
     this._domRenderer2D = DOMRenderer2D(container);
 
     this._camera = Camera(container);
+
+    this._container = container;
 
     // TODO: Make this optional
     this._picking = Picking(this._world, this._renderer, this._camera);
@@ -41,7 +44,9 @@ class Engine extends EventEmitter {
 
     this._frustum = new THREE.Frustum();
 
-    this._initPostProcessing();
+    if (this._world.options.postProcessing) {
+      this._initPostProcessing();
+    }
   }
 
   // TODO: Set up composer to automatically resize on viewport change
@@ -50,41 +55,52 @@ class Engine extends EventEmitter {
   _initPostProcessing() {
     var renderPass = new RenderPass(this._scene, this._camera);
 
-    var width = this._renderer.getSize().width;
-    var height = this._renderer.getSize().height;
-
-    var pixelRatio = window.devicePixelRatio;
-
     // TODO: Look at using @mattdesl's optimised FXAA shader
     // https://github.com/mattdesl/three-shader-fxaa
     var fxaaPass = new ShaderPass(FXAAShader);
-    fxaaPass.uniforms.resolution.value.set(1 / (width * pixelRatio), 1 / (height * pixelRatio));
 
     var hblurPass = new ShaderPass(HorizontalTiltShiftShader);
     var vblurPass = new ShaderPass(VerticalTiltShiftShader);
     var bluriness = 5;
 
-    hblurPass.uniforms.h.value = bluriness / (width * pixelRatio);
-    vblurPass.uniforms.v.value = bluriness / (height * pixelRatio);
     hblurPass.uniforms.r.value = vblurPass.uniforms.r.value = 0.6;
 
     var copyPass = new ShaderPass(CopyShader);
     copyPass.renderToScreen = true;
 
-    this._composer = new EffectComposer(this._renderer);
+    this._composer = EffectComposer(this._renderer, this._container);
 
     this._composer.addPass(renderPass);
     this._composer.addPass(fxaaPass);
     this._composer.addPass(hblurPass);
     this._composer.addPass(vblurPass);
     this._composer.addPass(copyPass);
+
+    var self = this;
+    var updatePostProcessingSize = function() {
+      var width = self._container.clientWidth;
+      var height = self._container.clientHeight;
+
+      var pixelRatio = window.devicePixelRatio;
+
+      fxaaPass.uniforms.resolution.value.set(1 / (width * pixelRatio), 1 / (height * pixelRatio));
+
+      hblurPass.uniforms.h.value = bluriness / (width * pixelRatio);
+      vblurPass.uniforms.v.value = bluriness / (height * pixelRatio);
+    };
+
+    updatePostProcessingSize();
+    window.addEventListener('resize', updatePostProcessingSize, false);
   }
 
   update(delta) {
     this.emit('preRender');
 
-    // this._renderer.render(this._scene, this._camera);
-    this._composer.render(delta);
+    if (this._world.options.postProcessing) {
+      this._composer.render(delta);
+    } else {
+      this._renderer.render(this._scene, this._camera);
+    }
 
     // Render picking scene
     // this._renderer.render(this._picking._pickingScene, this._camera);
@@ -152,7 +168,10 @@ class Engine extends EventEmitter {
     this._scene = null;
     this._domScene3D = null;
     this._domScene2D = null;
+
+    this._composer = null;
     this._renderer = null;
+
     this._domRenderer3D = null;
     this._domRenderer2D = null;
     this._camera = null;
