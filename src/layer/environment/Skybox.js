@@ -55,7 +55,7 @@ class Skybox {
 
   _initSkybox() {
     // Cube camera for skybox
-    this._cubeCamera = new THREE.CubeCamera(1, 200000, 128);
+    this._cubeCamera = new THREE.CubeCamera(1, 2000000, 128);
 
     // Cube material
     var cubeTarget = this._cubeCamera.renderTarget;

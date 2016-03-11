@@ -10,7 +10,10 @@ import Camera from './Camera';
 import Picking from './Picking';
 import EffectComposer from '../vendor/EffectComposer';
 import RenderPass from '../vendor/RenderPass';
-import BokehPass from '../vendor/BokehPass';
+import ShaderPass from '../vendor/ShaderPass';
+import CopyShader from '../vendor/CopyShader';
+import HorizontalTiltShiftShader from '../vendor/HorizontalTiltShiftShader';
+import VerticalTiltShiftShader from '../vendor/VerticalTiltShiftShader';
 
 class Engine extends EventEmitter {
   constructor(container, world) {
@@ -44,27 +47,30 @@ class Engine extends EventEmitter {
   _initPostProcessing() {
     var renderPass = new RenderPass(this._scene, this._camera);
 
-    var bokehPass = new BokehPass(this._scene, this._camera, {
-      focus: 1,
-      aperture: 0.6,
-      // maxblur: 1.0,
-      width: this._renderer.getSize().width,
-      height: this._renderer.getSize().height
-    });
+    var hblur = new ShaderPass(HorizontalTiltShiftShader);
+    var vblur = new ShaderPass(VerticalTiltShiftShader);
+    var bluriness = 5;
 
-    bokehPass.renderToScreen = true;
+    hblur.uniforms.h.value = bluriness / this._renderer.getSize().width;
+    vblur.uniforms.v.value = bluriness / this._renderer.getSize().height;
+    hblur.uniforms.r.value = vblur.uniforms.r.value = 0.6;
+
+    var copyPass = new ShaderPass(CopyShader);
+    copyPass.renderToScreen = true;
 
     this._composer = new EffectComposer(this._renderer);
 
     this._composer.addPass(renderPass);
-    this._composer.addPass(bokehPass);
+    this._composer.addPass(hblur);
+    this._composer.addPass(vblur);
+    this._composer.addPass(copyPass);
   }
 
   update(delta) {
     this.emit('preRender');
 
     // this._renderer.render(this._scene, this._camera);
-    this._composer.render();
+    this._composer.render(delta);
 
     // Render picking scene
     // this._renderer.render(this._picking._pickingScene, this._camera);

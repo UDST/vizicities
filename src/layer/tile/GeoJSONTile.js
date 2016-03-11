@@ -265,7 +265,7 @@ class GeoJSONTile extends Tile {
   _processTileData(data) {
     console.time(this._tile);
 
-    var geojson = GeoJSON.mergeFeatures(data, this._options.topojson);
+    var geojson = GeoJSON.collectFeatures(data, this._options.topojson);
 
     // TODO: Check that GeoJSON is valid / usable
 

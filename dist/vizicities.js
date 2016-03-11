@@ -3159,9 +3159,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _vendorRenderPass2 = _interopRequireDefault(_vendorRenderPass);
 	
-	var _vendorBokehPass = __webpack_require__(41);
+	var _vendorShaderPass = __webpack_require__(38);
 	
-	var _vendorBokehPass2 = _interopRequireDefault(_vendorBokehPass);
+	var _vendorShaderPass2 = _interopRequireDefault(_vendorShaderPass);
+	
+	var _vendorCopyShader = __webpack_require__(37);
+	
+	var _vendorCopyShader2 = _interopRequireDefault(_vendorCopyShader);
+	
+	var _vendorHorizontalTiltShiftShader = __webpack_require__(41);
+	
+	var _vendorHorizontalTiltShiftShader2 = _interopRequireDefault(_vendorHorizontalTiltShiftShader);
+	
+	var _vendorVerticalTiltShiftShader = __webpack_require__(42);
+	
+	var _vendorVerticalTiltShiftShader2 = _interopRequireDefault(_vendorVerticalTiltShiftShader);
 	
 	var Engine = (function (_EventEmitter) {
 	  _inherits(Engine, _EventEmitter);
@@ -3202,20 +3214,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _initPostProcessing() {
 	      var renderPass = new _vendorRenderPass2['default'](this._scene, this._camera);
 	
-	      var bokehPass = new _vendorBokehPass2['default'](this._scene, this._camera, {
-	        focus: 1,
-	        aperture: 0.6,
-	        // maxblur: 1.0,
-	        width: this._renderer.getSize().width,
-	        height: this._renderer.getSize().height
-	      });
+	      var hblur = new _vendorShaderPass2['default'](_vendorHorizontalTiltShiftShader2['default']);
+	      var vblur = new _vendorShaderPass2['default'](_vendorVerticalTiltShiftShader2['default']);
+	      var bluriness = 5;
 	
-	      bokehPass.renderToScreen = true;
+	      hblur.uniforms.h.value = bluriness / this._renderer.getSize().width;
+	      vblur.uniforms.v.value = bluriness / this._renderer.getSize().height;
+	      hblur.uniforms.r.value = vblur.uniforms.r.value = 0.6;
+	
+	      var copyPass = new _vendorShaderPass2['default'](_vendorCopyShader2['default']);
+	      copyPass.renderToScreen = true;
 	
 	      this._composer = new _vendorEffectComposer2['default'](this._renderer);
 	
 	      this._composer.addPass(renderPass);
-	      this._composer.addPass(bokehPass);
+	      this._composer.addPass(hblur);
+	      this._composer.addPass(vblur);
+	      this._composer.addPass(copyPass);
 	    }
 	  }, {
 	    key: 'update',
@@ -3223,7 +3238,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.emit('preRender');
 	
 	      // this._renderer.render(this._scene, this._camera);
-	      this._composer.render();
+	      this._composer.render(delta);
 	
 	      // Render picking scene
 	      // this._renderer.render(this._picking._pickingScene, this._camera);
@@ -4659,11 +4674,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
 	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
 	// jscs:disable
 	/* eslint-disable */
@@ -4672,110 +4687,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _BokehShader = __webpack_require__(42);
-	
-	var _BokehShader2 = _interopRequireDefault(_BokehShader);
-	
 	/**
-	 * Depth-of-field post-process with bokeh shader
+	 * @author alteredq / http://alteredqualia.com/
+	 *
+	 * Simple fake tilt-shift effect, modulating two pass Gaussian blur (see above) by vertical position
+	 *
+	 * - 9 samples per pass
+	 * - standard deviation 2.7
+	 * - "h" and "v" parameters should be set to "1 / width" and "1 / height"
+	 * - "r" parameter control where "focused" horizontal line lies
 	 */
 	
-	var BokehPass = function BokehPass(scene, camera, params) {
+	var HorizontalTiltShiftShader = {
 	
-		this.scene = scene;
-		this.camera = camera;
+		uniforms: {
 	
-		var focus = params.focus !== undefined ? params.focus : 1.0;
-		var aspect = params.aspect !== undefined ? params.aspect : camera.aspect;
-		var aperture = params.aperture !== undefined ? params.aperture : 0.025;
-		var maxblur = params.maxblur !== undefined ? params.maxblur : 1.0;
+			"tDiffuse": { type: "t", value: null },
+			"h": { type: "f", value: 1.0 / 512.0 },
+			"r": { type: "f", value: 0.35 }
 	
-		// render targets
+		},
 	
-		var width = params.width || window.innerWidth || 1;
-		var height = params.height || window.innerHeight || 1;
+		vertexShader: ["varying vec2 vUv;", "void main() {", "vUv = uv;", "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );", "}"].join("\n"),
 	
-		this.renderTargetColor = new _three2['default'].WebGLRenderTarget(width, height, {
-			minFilter: _three2['default'].LinearFilter,
-			magFilter: _three2['default'].LinearFilter,
-			format: _three2['default'].RGBFormat
-		});
-	
-		this.renderTargetDepth = this.renderTargetColor.clone();
-	
-		// depth material
-	
-		this.materialDepth = new _three2['default'].MeshDepthMaterial();
-	
-		// bokeh material
-	
-		if (_BokehShader2['default'] === undefined) {
-	
-			console.error("THREE.BokehPass relies on THREE.BokehShader");
-		}
-	
-		var bokehShader = _BokehShader2['default'];
-		var bokehUniforms = _three2['default'].UniformsUtils.clone(bokehShader.uniforms);
-	
-		bokehUniforms["tDepth"].value = this.renderTargetDepth;
-	
-		bokehUniforms["focus"].value = focus;
-		bokehUniforms["aspect"].value = aspect;
-		bokehUniforms["aperture"].value = aperture;
-		bokehUniforms["maxblur"].value = maxblur;
-	
-		this.materialBokeh = new _three2['default'].ShaderMaterial({
-			uniforms: bokehUniforms,
-			vertexShader: bokehShader.vertexShader,
-			fragmentShader: bokehShader.fragmentShader
-		});
-	
-		this.uniforms = bokehUniforms;
-		this.enabled = true;
-		this.needsSwap = false;
-		this.renderToScreen = false;
-		this.clear = false;
-	
-		this.camera2 = new _three2['default'].OrthographicCamera(-1, 1, 1, -1, 0, 1);
-		this.scene2 = new _three2['default'].Scene();
-	
-		this.quad2 = new _three2['default'].Mesh(new _three2['default'].PlaneBufferGeometry(2, 2), null);
-		this.scene2.add(this.quad2);
-	};
-	
-	BokehPass.prototype = {
-	
-		render: function render(renderer, writeBuffer, readBuffer, delta, maskActive) {
-	
-			this.quad2.material = this.materialBokeh;
-	
-			// Render depth into texture
-	
-			this.scene.overrideMaterial = this.materialDepth;
-	
-			renderer.render(this.scene, this.camera, this.renderTargetDepth, true);
-	
-			// Render bokeh composite
-	
-			this.uniforms["tColor"].value = readBuffer;
-	
-			if (this.renderToScreen) {
-	
-				renderer.render(this.scene2, this.camera2);
-			} else {
-	
-				renderer.render(this.scene2, this.camera2, writeBuffer, this.clear);
-			}
-	
-			this.scene.overrideMaterial = null;
-		}
+		fragmentShader: ["uniform sampler2D tDiffuse;", "uniform float h;", "uniform float r;", "varying vec2 vUv;", "void main() {", "vec4 sum = vec4( 0.0 );", "float hh = h * abs( r - vUv.y );", "sum += texture2D( tDiffuse, vec2( vUv.x - 4.0 * hh, vUv.y ) ) * 0.051;", "sum += texture2D( tDiffuse, vec2( vUv.x - 3.0 * hh, vUv.y ) ) * 0.0918;", "sum += texture2D( tDiffuse, vec2( vUv.x - 2.0 * hh, vUv.y ) ) * 0.12245;", "sum += texture2D( tDiffuse, vec2( vUv.x - 1.0 * hh, vUv.y ) ) * 0.1531;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y ) ) * 0.1633;", "sum += texture2D( tDiffuse, vec2( vUv.x + 1.0 * hh, vUv.y ) ) * 0.1531;", "sum += texture2D( tDiffuse, vec2( vUv.x + 2.0 * hh, vUv.y ) ) * 0.12245;", "sum += texture2D( tDiffuse, vec2( vUv.x + 3.0 * hh, vUv.y ) ) * 0.0918;", "sum += texture2D( tDiffuse, vec2( vUv.x + 4.0 * hh, vUv.y ) ) * 0.051;", "gl_FragColor = sum;", "}"].join("\n")
 	
 	};
 	
-	exports['default'] = BokehPass;
+	exports["default"] = HorizontalTiltShiftShader;
 	
-	_three2['default'].BokehPass = BokehPass;
-	module.exports = exports['default'];
+	_three2["default"].HorizontalTiltShiftShader = HorizontalTiltShiftShader;
+	module.exports = exports["default"];
 
 /***/ },
 /* 42 */
@@ -4797,36 +4739,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * @author alteredq / http://alteredqualia.com/
 	 *
-	 * Depth-of-field shader with bokeh
-	 * ported from GLSL shader by Martins Upitis
-	 * http://artmartinsh.blogspot.com/2010/02/glsl-lens-blur-filter-with-bokeh.html
+	 * Simple fake tilt-shift effect, modulating two pass Gaussian blur (see above) by vertical position
+	 *
+	 * - 9 samples per pass
+	 * - standard deviation 2.7
+	 * - "h" and "v" parameters should be set to "1 / width" and "1 / height"
+	 * - "r" parameter control where "focused" horizontal line lies
 	 */
 	
-	var BokehShader = {
+	var VerticalTiltShiftShader = {
 	
 		uniforms: {
 	
-			"tColor": { type: "t", value: null },
-			"tDepth": { type: "t", value: null },
-			"focus": { type: "f", value: 1.0 },
-			"aspect": { type: "f", value: 1.0 },
-			"aperture": { type: "f", value: 0.025 },
-			"maxblur": { type: "f", value: 1.0 }
+			"tDiffuse": { type: "t", value: null },
+			"v": { type: "f", value: 1.0 / 512.0 },
+			"r": { type: "f", value: 0.35 }
 	
 		},
 	
 		vertexShader: ["varying vec2 vUv;", "void main() {", "vUv = uv;", "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );", "}"].join("\n"),
 	
-		fragmentShader: ["varying vec2 vUv;", "uniform sampler2D tColor;", "uniform sampler2D tDepth;", "uniform float maxblur;", // max blur amount
-		"uniform float aperture;", // aperture - bigger values for shallower depth of field
-	
-		"uniform float focus;", "uniform float aspect;", "void main() {", "vec2 aspectcorrect = vec2( 1.0, aspect );", "vec4 depth1 = texture2D( tDepth, vUv );", "float factor = depth1.x - focus;", "vec2 dofblur = vec2 ( clamp( factor * aperture, -maxblur, maxblur ) );", "vec2 dofblur9 = dofblur * 0.9;", "vec2 dofblur7 = dofblur * 0.7;", "vec2 dofblur4 = dofblur * 0.4;", "vec4 col = vec4( 0.0 );", "col += texture2D( tColor, vUv.xy );", "col += texture2D( tColor, vUv.xy + ( vec2(  0.0,   0.4  ) * aspectcorrect ) * dofblur );", "col += texture2D( tColor, vUv.xy + ( vec2(  0.15,  0.37 ) * aspectcorrect ) * dofblur );", "col += texture2D( tColor, vUv.xy + ( vec2(  0.29,  0.29 ) * aspectcorrect ) * dofblur );", "col += texture2D( tColor, vUv.xy + ( vec2( -0.37,  0.15 ) * aspectcorrect ) * dofblur );", "col += texture2D( tColor, vUv.xy + ( vec2(  0.40,  0.0  ) * aspectcorrect ) * dofblur );", "col += texture2D( tColor, vUv.xy + ( vec2(  0.37, -0.15 ) * aspectcorrect ) * dofblur );", "col += texture2D( tColor, vUv.xy + ( vec2(  0.29, -0.29 ) * aspectcorrect ) * dofblur );", "col += texture2D( tColor, vUv.xy + ( vec2( -0.15, -0.37 ) * aspectcorrect ) * dofblur );", "col += texture2D( tColor, vUv.xy + ( vec2(  0.0,  -0.4  ) * aspectcorrect ) * dofblur );", "col += texture2D( tColor, vUv.xy + ( vec2( -0.15,  0.37 ) * aspectcorrect ) * dofblur );", "col += texture2D( tColor, vUv.xy + ( vec2( -0.29,  0.29 ) * aspectcorrect ) * dofblur );", "col += texture2D( tColor, vUv.xy + ( vec2(  0.37,  0.15 ) * aspectcorrect ) * dofblur );", "col += texture2D( tColor, vUv.xy + ( vec2( -0.4,   0.0  ) * aspectcorrect ) * dofblur );", "col += texture2D( tColor, vUv.xy + ( vec2( -0.37, -0.15 ) * aspectcorrect ) * dofblur );", "col += texture2D( tColor, vUv.xy + ( vec2( -0.29, -0.29 ) * aspectcorrect ) * dofblur );", "col += texture2D( tColor, vUv.xy + ( vec2(  0.15, -0.37 ) * aspectcorrect ) * dofblur );", "col += texture2D( tColor, vUv.xy + ( vec2(  0.15,  0.37 ) * aspectcorrect ) * dofblur9 );", "col += texture2D( tColor, vUv.xy + ( vec2( -0.37,  0.15 ) * aspectcorrect ) * dofblur9 );", "col += texture2D( tColor, vUv.xy + ( vec2(  0.37, -0.15 ) * aspectcorrect ) * dofblur9 );", "col += texture2D( tColor, vUv.xy + ( vec2( -0.15, -0.37 ) * aspectcorrect ) * dofblur9 );", "col += texture2D( tColor, vUv.xy + ( vec2( -0.15,  0.37 ) * aspectcorrect ) * dofblur9 );", "col += texture2D( tColor, vUv.xy + ( vec2(  0.37,  0.15 ) * aspectcorrect ) * dofblur9 );", "col += texture2D( tColor, vUv.xy + ( vec2( -0.37, -0.15 ) * aspectcorrect ) * dofblur9 );", "col += texture2D( tColor, vUv.xy + ( vec2(  0.15, -0.37 ) * aspectcorrect ) * dofblur9 );", "col += texture2D( tColor, vUv.xy + ( vec2(  0.29,  0.29 ) * aspectcorrect ) * dofblur7 );", "col += texture2D( tColor, vUv.xy + ( vec2(  0.40,  0.0  ) * aspectcorrect ) * dofblur7 );", "col += texture2D( tColor, vUv.xy + ( vec2(  0.29, -0.29 ) * aspectcorrect ) * dofblur7 );", "col += texture2D( tColor, vUv.xy + ( vec2(  0.0,  -0.4  ) * aspectcorrect ) * dofblur7 );", "col += texture2D( tColor, vUv.xy + ( vec2( -0.29,  0.29 ) * aspectcorrect ) * dofblur7 );", "col += texture2D( tColor, vUv.xy + ( vec2( -0.4,   0.0  ) * aspectcorrect ) * dofblur7 );", "col += texture2D( tColor, vUv.xy + ( vec2( -0.29, -0.29 ) * aspectcorrect ) * dofblur7 );", "col += texture2D( tColor, vUv.xy + ( vec2(  0.0,   0.4  ) * aspectcorrect ) * dofblur7 );", "col += texture2D( tColor, vUv.xy + ( vec2(  0.29,  0.29 ) * aspectcorrect ) * dofblur4 );", "col += texture2D( tColor, vUv.xy + ( vec2(  0.4,   0.0  ) * aspectcorrect ) * dofblur4 );", "col += texture2D( tColor, vUv.xy + ( vec2(  0.29, -0.29 ) * aspectcorrect ) * dofblur4 );", "col += texture2D( tColor, vUv.xy + ( vec2(  0.0,  -0.4  ) * aspectcorrect ) * dofblur4 );", "col += texture2D( tColor, vUv.xy + ( vec2( -0.29,  0.29 ) * aspectcorrect ) * dofblur4 );", "col += texture2D( tColor, vUv.xy + ( vec2( -0.4,   0.0  ) * aspectcorrect ) * dofblur4 );", "col += texture2D( tColor, vUv.xy + ( vec2( -0.29, -0.29 ) * aspectcorrect ) * dofblur4 );", "col += texture2D( tColor, vUv.xy + ( vec2(  0.0,   0.4  ) * aspectcorrect ) * dofblur4 );", "gl_FragColor = col / 41.0;", "gl_FragColor.a = 1.0;", "}"].join("\n")
+		fragmentShader: ["uniform sampler2D tDiffuse;", "uniform float v;", "uniform float r;", "varying vec2 vUv;", "void main() {", "vec4 sum = vec4( 0.0 );", "float vv = v * abs( r - vUv.y );", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y - 4.0 * vv ) ) * 0.051;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y - 3.0 * vv ) ) * 0.0918;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y - 2.0 * vv ) ) * 0.12245;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y - 1.0 * vv ) ) * 0.1531;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y ) ) * 0.1633;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y + 1.0 * vv ) ) * 0.1531;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y + 2.0 * vv ) ) * 0.12245;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y + 3.0 * vv ) ) * 0.0918;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y + 4.0 * vv ) ) * 0.051;", "gl_FragColor = sum;", "}"].join("\n")
 	
 	};
 	
-	exports["default"] = BokehShader;
+	exports["default"] = VerticalTiltShiftShader;
 	
-	_three2["default"].BokehShader = BokehShader;
+	_three2["default"].VerticalTiltShiftShader = VerticalTiltShiftShader;
 	module.exports = exports["default"];
 
 /***/ },
@@ -5329,7 +5268,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_initSkybox',
 	    value: function _initSkybox() {
 	      // Cube camera for skybox
-	      this._cubeCamera = new _three2['default'].CubeCamera(1, 200000, 128);
+	      this._cubeCamera = new _three2['default'].CubeCamera(1, 2000000, 128);
 	
 	      // Cube material
 	      var cubeTarget = this._cubeCamera.renderTarget;
@@ -13548,7 +13487,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      console.time(this._tile);
 	
-	      var geojson = _utilGeoJSON2['default'].mergeFeatures(data, this._options.topojson);
+	      var geojson = _utilGeoJSON2['default'].collectFeatures(data, this._options.topojson);
 	
 	      // TODO: Check that GeoJSON is valid / usable
 	
