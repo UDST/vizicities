@@ -1,5 +1,5 @@
 // jscs:disable
-/*eslint eqeqeq:0*/
+/* eslint-disable */
 
 /**
  * Based on http://www.emagix.net/academic/mscs-project/item/camera-sync-with-css3-and-webgl-threejs

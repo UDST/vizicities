@@ -1,5 +1,5 @@
 // jscs:disable
-/*eslint eqeqeq:0*/
+/* eslint-disable */
 
 import THREE from 'three';
 

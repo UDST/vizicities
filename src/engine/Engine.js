@@ -8,6 +8,9 @@ import DOMRenderer3D from './DOMRenderer3D';
 import DOMRenderer2D from './DOMRenderer2D';
 import Camera from './Camera';
 import Picking from './Picking';
+import EffectComposer from '../vendor/EffectComposer';
+import RenderPass from '../vendor/RenderPass';
+import BokehPass from '../vendor/BokehPass';
 
 class Engine extends EventEmitter {
   constructor(container, world) {
@@ -33,12 +36,35 @@ class Engine extends EventEmitter {
     this.clock = new THREE.Clock();
 
     this._frustum = new THREE.Frustum();
+
+    this._initPostProcessing();
+  }
+
+  // TODO: Set up composer to automatically resize on viewport change
+  _initPostProcessing() {
+    var renderPass = new RenderPass(this._scene, this._camera);
+
+    var bokehPass = new BokehPass(this._scene, this._camera, {
+      focus: 1,
+      aperture: 0.6,
+      // maxblur: 1.0,
+      width: this._renderer.getSize().width,
+      height: this._renderer.getSize().height
+    });
+
+    bokehPass.renderToScreen = true;
+
+    this._composer = new EffectComposer(this._renderer);
+
+    this._composer.addPass(renderPass);
+    this._composer.addPass(bokehPass);
   }
 
   update(delta) {
     this.emit('preRender');
 
-    this._renderer.render(this._scene, this._camera);
+    // this._renderer.render(this._scene, this._camera);
+    this._composer.render();
 
     // Render picking scene
     // this._renderer.render(this._picking._pickingScene, this._camera);
