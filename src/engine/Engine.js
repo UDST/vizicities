@@ -14,6 +14,7 @@ import ShaderPass from '../vendor/ShaderPass';
 import CopyShader from '../vendor/CopyShader';
 import HorizontalTiltShiftShader from '../vendor/HorizontalTiltShiftShader';
 import VerticalTiltShiftShader from '../vendor/VerticalTiltShiftShader';
+import FXAAShader from '../vendor/FXAAShader';
 
 class Engine extends EventEmitter {
   constructor(container, world) {
@@ -44,16 +45,27 @@ class Engine extends EventEmitter {
   }
 
   // TODO: Set up composer to automatically resize on viewport change
+  // TODO: Update passes that rely on width / height on resize
   _initPostProcessing() {
     var renderPass = new RenderPass(this._scene, this._camera);
 
-    var hblur = new ShaderPass(HorizontalTiltShiftShader);
-    var vblur = new ShaderPass(VerticalTiltShiftShader);
+    var width = this._renderer.getSize().width;
+    var height = this._renderer.getSize().height;
+
+    var pixelRatio = window.devicePixelRatio;
+
+    // TODO: Look at using @mattdesl's optimised FXAA shader
+    // https://github.com/mattdesl/three-shader-fxaa
+    var fxaaPass = new ShaderPass(FXAAShader);
+    fxaaPass.uniforms.resolution.value.set(1 / (width * pixelRatio), 1 / (height * pixelRatio));
+
+    var hblurPass = new ShaderPass(HorizontalTiltShiftShader);
+    var vblurPass = new ShaderPass(VerticalTiltShiftShader);
     var bluriness = 5;
 
-    hblur.uniforms.h.value = bluriness / this._renderer.getSize().width;
-    vblur.uniforms.v.value = bluriness / this._renderer.getSize().height;
-    hblur.uniforms.r.value = vblur.uniforms.r.value = 0.6;
+    hblurPass.uniforms.h.value = bluriness / (width * pixelRatio);
+    vblurPass.uniforms.v.value = bluriness / (height * pixelRatio);
+    hblurPass.uniforms.r.value = vblurPass.uniforms.r.value = 0.6;
 
     var copyPass = new ShaderPass(CopyShader);
     copyPass.renderToScreen = true;
@@ -61,8 +73,9 @@ class Engine extends EventEmitter {
     this._composer = new EffectComposer(this._renderer);
 
     this._composer.addPass(renderPass);
-    this._composer.addPass(hblur);
-    this._composer.addPass(vblur);
+    this._composer.addPass(fxaaPass);
+    this._composer.addPass(hblurPass);
+    this._composer.addPass(vblurPass);
     this._composer.addPass(copyPass);
   }
 

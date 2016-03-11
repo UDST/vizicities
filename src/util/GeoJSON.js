@@ -5,6 +5,8 @@
 import THREE from 'three';
 import topojson from 'topojson';
 import geojsonMerge from 'geojson-merge';
+import earcut from 'earcut';
+import extrudePolygon from './extrudePolygon';
 
 // TODO: Make it so height can be per-coordinate / point but connected together
 // as a linestring (eg. GPS points with an elevation at each point)
@@ -194,6 +196,45 @@ var GeoJSON = (function() {
       colours: _colours,
       flat: allFlat
     };
+  };
+
+  // TODO: This is only used by GeoJSONTile so either roll it into that or
+  // update GeoJSONTile to use the new GeoJSONLayer or geometry layers
+  var _toEarcut = function(data) {
+    var dim = data[0][0].length;
+    var result = {vertices: [], holes: [], dimensions: dim};
+    var holeIndex = 0;
+
+    for (var i = 0; i < data.length; i++) {
+      for (var j = 0; j < data[i].length; j++) {
+        for (var d = 0; d < dim; d++) {
+          result.vertices.push(data[i][j][d]);
+        }
+      }
+      if (i > 0) {
+        holeIndex += data[i - 1].length;
+        result.holes.push(holeIndex);
+      }
+    }
+
+    return result;
+  };
+
+  // TODO: This is only used by GeoJSONTile so either roll it into that or
+  // update GeoJSONTile to use the new GeoJSONLayer or geometry layers
+  var _triangulate = function(contour, holes, dim) {
+    // console.time('earcut');
+
+    var faces = earcut(contour, holes, dim);
+    var result = [];
+
+    for (i = 0, il = faces.length; i < il; i += 3) {
+      result.push(faces.slice(i, i + 3));
+    }
+
+    // console.timeEnd('earcut');
+
+    return result;
   };
 
   return {

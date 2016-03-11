@@ -2,7 +2,7 @@ var world = VIZI.world('world', {
   skybox: true
 }).setView([51.505, -0.09]);
 
-world._environment._skybox.setInclination(0.5);
+world._environment._skybox.setInclination(0.4);
 
 // Add controls
 VIZI.Controls.orbit().addTo(world);

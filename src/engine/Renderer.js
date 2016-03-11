@@ -6,7 +6,7 @@ import Scene from './Scene';
 
 export default function(container) {
   var renderer = new THREE.WebGLRenderer({
-    antialias: true
+    antialias: false
   });
 
   // TODO: Re-enable when this works with the skybox
