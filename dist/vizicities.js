@@ -3482,7 +3482,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  renderer.gammaOutput = true;
 	
 	  renderer.shadowMap.enabled = true;
-	  renderer.shadowMap.cullFace = _three2['default'].CullFaceBack;
+	
+	  // TODO: Work out which of the shadowmap types is best
+	  // https://github.com/mrdoob/three.js/blob/r56/src/Three.js#L107
+	  // renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+	
+	  // TODO: Check that leaving this as default (CullFrontFace) is right
+	  // renderer.shadowMap.cullFace = THREE.CullFaceBack;
 	
 	  container.appendChild(renderer.domElement);
 	
@@ -14649,6 +14655,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	var GeoJSON = (function () {
 	  var defaultStyle = {
 	    color: '#ffffff',
+	    transparent: false,
+	    opacity: 1,
+	    blending: _three2['default'].NormalBlending,
 	    height: 0,
 	    lineOpacity: 1,
 	    lineTransparent: false,
@@ -16848,18 +16857,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      geometry.computeBoundingBox();
 	
+	      // TODO: Make this work when style is a function per feature
+	      var style = typeof this._options.style === 'function' ? this._options.style(this._geojson.features[0]) : this._options.style;
+	      style = (0, _lodashAssign2['default'])({}, _utilGeoJSON2['default'].defaultStyle, style);
+	
 	      var material;
 	      if (this._options.polygonMaterial && this._options.polygonMaterial instanceof THREE.Material) {
 	        material = this._options.polygonMaterial;
 	      } else if (!this._world._environment._skybox) {
 	        material = new THREE.MeshPhongMaterial({
 	          vertexColors: THREE.VertexColors,
-	          side: THREE.BackSide
+	          side: THREE.BackSide,
+	          transparent: style.transparent,
+	          opacity: style.opacity,
+	          blending: style.blending
 	        });
 	      } else {
 	        material = new THREE.MeshStandardMaterial({
 	          vertexColors: THREE.VertexColors,
-	          side: THREE.BackSide
+	          side: THREE.BackSide,
+	          transparent: style.transparent,
+	          opacity: style.opacity,
+	          blending: style.blending
 	        });
 	        material.roughness = 1;
 	        material.metalness = 0.1;
@@ -17301,6 +17320,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // This default style is separate to Util.GeoJSON.defaultStyle
 	      style: {
 	        color: '#ffffff',
+	        transparent: false,
+	        opacity: 1,
+	        blending: _three2['default'].NormalBlending,
 	        height: 0
 	      }
 	    };
@@ -17530,12 +17552,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	      } else if (!this._world._environment._skybox) {
 	        material = new _three2['default'].MeshPhongMaterial({
 	          vertexColors: _three2['default'].VertexColors,
-	          side: _three2['default'].BackSide
+	          side: _three2['default'].BackSide,
+	          transparent: this._options.style.transparent,
+	          opacity: this._options.style.opacity,
+	          blending: this._options.style.blending
 	        });
 	      } else {
 	        material = new _three2['default'].MeshStandardMaterial({
 	          vertexColors: _three2['default'].VertexColors,
-	          side: _three2['default'].BackSide
+	          side: _three2['default'].BackSide,
+	          transparent: this._options.style.transparent,
+	          opacity: this._options.style.opacity,
+	          blending: this._options.style.blending
 	        });
 	        material.roughness = 1;
 	        material.metalness = 0.1;

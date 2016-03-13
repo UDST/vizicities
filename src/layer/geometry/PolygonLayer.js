@@ -38,6 +38,9 @@ class PolygonLayer extends Layer {
       // This default style is separate to Util.GeoJSON.defaultStyle
       style: {
         color: '#ffffff',
+        transparent: false,
+        opacity: 1,
+        blending: THREE.NormalBlending,
         height: 0
       }
     };
@@ -248,12 +251,18 @@ class PolygonLayer extends Layer {
     } else if (!this._world._environment._skybox) {
       material = new THREE.MeshPhongMaterial({
         vertexColors: THREE.VertexColors,
-        side: THREE.BackSide
+        side: THREE.BackSide,
+        transparent: this._options.style.transparent,
+        opacity: this._options.style.opacity,
+        blending: this._options.style.blending
       });
     } else {
       material = new THREE.MeshStandardMaterial({
         vertexColors: THREE.VertexColors,
-        side: THREE.BackSide
+        side: THREE.BackSide,
+        transparent: this._options.style.transparent,
+        opacity: this._options.style.opacity,
+        blending: this._options.style.blending
       });
       material.roughness = 1;
       material.metalness = 0.1;

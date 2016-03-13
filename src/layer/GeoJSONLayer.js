@@ -205,18 +205,28 @@ class GeoJSONLayer extends LayerGroup {
 
     geometry.computeBoundingBox();
 
+    // TODO: Make this work when style is a function per feature
+    var style = (typeof this._options.style === 'function') ? this._options.style(this._geojson.features[0]) : this._options.style;
+    style = extend({}, GeoJSON.defaultStyle, style);
+
     var material;
     if (this._options.polygonMaterial && this._options.polygonMaterial instanceof THREE.Material) {
       material = this._options.polygonMaterial;
     } else if (!this._world._environment._skybox) {
       material = new THREE.MeshPhongMaterial({
         vertexColors: THREE.VertexColors,
-        side: THREE.BackSide
+        side: THREE.BackSide,
+        transparent: style.transparent,
+        opacity: style.opacity,
+        blending: style.blending
       });
     } else {
       material = new THREE.MeshStandardMaterial({
         vertexColors: THREE.VertexColors,
-        side: THREE.BackSide
+        side: THREE.BackSide,
+        transparent: style.transparent,
+        opacity: style.opacity,
+        blending: style.blending
       });
       material.roughness = 1;
       material.metalness = 0.1;

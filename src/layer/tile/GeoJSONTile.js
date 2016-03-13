@@ -10,6 +10,9 @@ import GeoJSON from '../../util/GeoJSON';
 import Buffer from '../../util/Buffer';
 import PickingMaterial from '../../engine/PickingMaterial';
 
+// TODO: Bring styling and output in line with GeoJSON and Geometry layers, if
+// not adopting those layers for outputting tiles
+
 // TODO: Look into using a GeoJSONLayer to represent and output the tile data
 // instead of duplicating a lot of effort within this class
 

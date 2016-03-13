@@ -20,7 +20,13 @@ export default function(container, antialias) {
   renderer.gammaOutput = true;
 
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.cullFace = THREE.CullFaceBack;
+
+  // TODO: Work out which of the shadowmap types is best
+  // https://github.com/mrdoob/three.js/blob/r56/src/Three.js#L107
+  // renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  // TODO: Check that leaving this as default (CullFrontFace) is right
+  // renderer.shadowMap.cullFace = THREE.CullFaceBack;
 
   container.appendChild(renderer.domElement);
 
