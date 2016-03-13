@@ -116,6 +116,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _geoLatLon2 = _interopRequireDefault(_geoLatLon);
 	
+	var _utilIndex = __webpack_require__(90);
+	
+	var _utilIndex2 = _interopRequireDefault(_utilIndex);
+	
 	var VIZI = {
 	  version: '0.3',
 	
@@ -146,7 +150,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Point: _geoPoint2['default'],
 	  point: _geoPoint.point,
 	  LatLon: _geoLatLon2['default'],
-	  latLon: _geoLatLon.latLon
+	  latLon: _geoLatLon.latLon,
+	  Util: _utilIndex2['default']
 	};
 	
 	exports['default'] = VIZI;
@@ -13335,6 +13340,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
+	// TODO: Bring styling and output in line with GeoJSON and Geometry layers, if
+	// not adopting those layers for outputting tiles
+	
 	// TODO: Look into using a GeoJSONLayer to represent and output the tile data
 	// instead of duplicating a lot of effort within this class
 	
@@ -18896,6 +18904,49 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// Initialise without requiring new keyword
 	exports.topoJSONLayer = noNew;
+
+/***/ },
+/* 90 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	// TODO: A lot of these utils don't need to be in separate, tiny files
+	
+	var _Transformation = __webpack_require__(14);
+	
+	var _Transformation2 = _interopRequireDefault(_Transformation);
+	
+	var _wrapNum = __webpack_require__(12);
+	
+	var _wrapNum2 = _interopRequireDefault(_wrapNum);
+	
+	var _extrudePolygon = __webpack_require__(79);
+	
+	var _extrudePolygon2 = _interopRequireDefault(_extrudePolygon);
+	
+	var _GeoJSON = __webpack_require__(74);
+	
+	var _GeoJSON2 = _interopRequireDefault(_GeoJSON);
+	
+	var _Buffer = __webpack_require__(80);
+	
+	var _Buffer2 = _interopRequireDefault(_Buffer);
+	
+	var Util = {};
+	
+	Util.Transformation = _Transformation2['default'];
+	Util.wrapNum = _wrapNum2['default'];
+	Util.extrudePolygon = _extrudePolygon2['default'];
+	Util.GeoJSON = _GeoJSON2['default'];
+	Util.Buffer = _Buffer2['default'];
+	
+	exports['default'] = Util;
+	module.exports = exports['default'];
 
 /***/ }
 /******/ ])
