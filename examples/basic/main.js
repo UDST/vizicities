@@ -1,8 +1,8 @@
 // London
-// var coords = [51.505, -0.09];
+var coords = [51.505, -0.09];
 
 // Manhattan
-var coords = [40.739940, -73.988801];
+// var coords = [40.739940, -73.988801];
 
 var world = VIZI.world('world', {
   skybox: true,

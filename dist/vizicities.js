@@ -10460,6 +10460,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Moved to _outputTiles() for now
 	      // this._removeTiles();
 	
+	      // Order tile-list by zoom so nearest tiles are requested first
+	      checkList.sort(function (a, b) {
+	        return a._quadcode.length < b._quadcode.length;
+	      });
+	
 	      // 5. Filter the tiles remaining in the check list
 	      this._tileList = checkList.filter(function (tile, index) {
 	        // Skip tile if it's not in the current view frustum
