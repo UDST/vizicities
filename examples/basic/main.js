@@ -66,16 +66,16 @@ var topoJSONTileLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/bu
     // Don't show points
     return feature.geometry.type !== 'Point';
   },
-  onEachFeature: function(feature, layer) {
-    if (feature.geometry.type !== 'Polygon') {
-      return;
-    }
-
-    // Make polygons clickable
-    layer.on('click', function(layer, point2d, point3d, intersects) {
-      console.log(layer, point2d, point3d, intersects);
-    });
-  },
+  // onEachFeature: function(feature, layer) {
+  //   if (feature.geometry.type !== 'Polygon') {
+  //     return;
+  //   }
+  //
+  //   // Make polygons clickable
+  //   layer.on('click', function(layer, point2d, point3d, intersects) {
+  //     console.log(layer, point2d, point3d, intersects);
+  //   });
+  // },
   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://whosonfirst.mapzen.com#License">Who\'s On First</a>.'
 }).addTo(world);
 
