@@ -203,7 +203,7 @@ class World extends EventEmitter {
 
     this._layers.push(layer);
 
-    if (layer.isOutput()) {
+    if (layer.isOutput() && layer.isOutputToScene()) {
       // Could move this into Layer but it'll do here for now
       this._engine._scene.add(layer._object3D);
       this._engine._domScene3D.add(layer._domObject3D);
@@ -223,7 +223,7 @@ class World extends EventEmitter {
       this._layers.splice(layerIndex, 1);
     };
 
-    if (layer.isOutput()) {
+    if (layer.isOutput() && layer.isOutputToScene()) {
       this._engine._scene.remove(layer._object3D);
       this._engine._domScene3D.remove(layer._domObject3D);
       this._engine._domScene2D.remove(layer._domObject2D);

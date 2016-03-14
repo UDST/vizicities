@@ -23,7 +23,8 @@ class Layer extends EventEmitter {
     super();
 
     var defaults = {
-      output: true
+      output: true,
+      outputToScene: true
     };
 
     this._options = extend({}, defaults, options);
@@ -107,6 +108,10 @@ class Layer extends EventEmitter {
 
   isOutput() {
     return this._options.output;
+  }
+
+  isOutputToScene() {
+    return this._options.outputToScene;
   }
 
   // Destroys the layer and removes it from the scene and memory

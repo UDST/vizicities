@@ -95,27 +95,27 @@ class GeoJSONTileLayer extends TileLayer {
   _createTile(quadcode, layer) {
     var options = {};
 
-    if (this._options.filter) {
-      options.filter = this._options.filter;
-    }
+    // if (this._options.filter) {
+    //   options.filter = this._options.filter;
+    // }
+    //
+    // if (this._options.style) {
+    //   options.style = this._options.style;
+    // }
+    //
+    // if (this._options.topojson) {
+    //   options.topojson = true;
+    // }
+    //
+    // if (this._options.interactive) {
+    //   options.interactive = true;
+    // }
+    //
+    // if (this._options.onClick) {
+    //   options.onClick = this._options.onClick;
+    // }
 
-    if (this._options.style) {
-      options.style = this._options.style;
-    }
-
-    if (this._options.topojson) {
-      options.topojson = true;
-    }
-
-    if (this._options.picking) {
-      options.picking = true;
-    }
-
-    if (this._options.onClick) {
-      options.onClick = this._options.onClick;
-    }
-
-    return new GeoJSONTile(quadcode, this._path, layer, options);
+    return new GeoJSONTile(quadcode, this._path, layer, this._options);
   }
 
   // Destroys the layer and removes it from the scene and memory
