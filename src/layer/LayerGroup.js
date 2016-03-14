@@ -34,11 +34,14 @@ class LayerGroup extends Layer {
 
   // Destroy the layers and remove them from the scene and memory
   destroy() {
-    for (var i = 0; i < this._layers.length; i++) {
-      this._layers[i].destroy();
-    }
+    // TODO: Sometimes this is already null, find out why
+    if (this._layers) {
+      for (var i = 0; i < this._layers.length; i++) {
+        this._layers[i].destroy();
+      }
 
-    this._layers = null;
+      this._layers = null;
+    }
 
     super.destroy();
   }

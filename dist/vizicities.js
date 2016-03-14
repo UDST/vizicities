@@ -14255,6 +14255,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._pickingMesh = null;
 	      }
 	
+	      if (this._polygonMesh) {
+	        this._polygonMesh = null;
+	      }
+	
+	      if (this._polylineMesh) {
+	        this._polylineMesh = null;
+	      }
+	
+	      if (this._pointMesh) {
+	        this._pointMesh = null;
+	      }
+	
 	      // Run common destruction logic from parent
 	      _get(Object.getPrototypeOf(GeoJSONLayer.prototype), 'destroy', this).call(this);
 	    }
@@ -14340,11 +14352,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'destroy',
 	    value: function destroy() {
-	      for (var i = 0; i < this._layers.length; i++) {
-	        this._layers[i].destroy();
-	      }
+	      // TODO: Sometimes this is already null, find out why
+	      if (this._layers) {
+	        for (var i = 0; i < this._layers.length; i++) {
+	          this._layers[i].destroy();
+	        }
 	
-	      this._layers = null;
+	        this._layers = null;
+	      }
 	
 	      _get(Object.getPrototypeOf(LayerGroup.prototype), 'destroy', this).call(this);
 	    }

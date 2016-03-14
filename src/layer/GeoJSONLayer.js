@@ -493,6 +493,18 @@ class GeoJSONLayer extends LayerGroup {
       this._pickingMesh = null;
     }
 
+    if (this._polygonMesh) {
+      this._polygonMesh = null;
+    }
+
+    if (this._polylineMesh) {
+      this._polylineMesh = null;
+    }
+
+    if (this._pointMesh) {
+      this._pointMesh = null;
+    }
+
     // Run common destruction logic from parent
     super.destroy();
   }
