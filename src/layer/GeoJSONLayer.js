@@ -1,6 +1,11 @@
 // TODO: Consider adopting GeoJSON CSS
 // http://wiki.openstreetmap.org/wiki/Geojson_CSS
 
+// TODO: Allow interaction to be defined per-layer to save on resources
+//
+// For example, only allow polygons to be interactive via a polygonInteractive
+// option
+
 import LayerGroup from './LayerGroup';
 import extend from 'lodash.assign';
 import reqwest from 'reqwest';
@@ -28,7 +33,8 @@ class GeoJSONLayer extends LayerGroup {
       pointGeometry: null,
       pointMaterial: null,
       onPointMesh: null,
-      style: GeoJSON.defaultStyle
+      style: GeoJSON.defaultStyle,
+      keepFeatures: true
     };
 
     var _options = extend({}, defaults, options);
@@ -126,7 +132,12 @@ class GeoJSONLayer extends LayerGroup {
         return;
       }
 
-      layer.feature = feature;
+      // Sometimes you don't want to store a reference to the feature
+      //
+      // For example, to save memory when being used by tile layers
+      if (this._options.keepFeatures) {
+        layer.feature = feature;
+      }
 
       // If defined, call a function for each feature
       //
@@ -183,6 +194,15 @@ class GeoJSONLayer extends LayerGroup {
       this._setPointMesh(mergedPointAttributes);
       this.add(this._pointMesh);
     }
+
+    // Clean up layers
+    //
+    // TODO: Are there ever situations where the unmerged buffer attributes
+    // and coordinates would still be required?
+    this._layers.forEach(layer => {
+      layer.clearBufferAttributes();
+      layer.clearCoordinates();
+    });
   }
 
   // Create and store mesh from buffer attributes
@@ -465,6 +485,8 @@ class GeoJSONLayer extends LayerGroup {
 
     // Clear request reference
     this._request = null;
+
+    this._geojson = null;
 
     if (this._pickingMesh) {
       // TODO: Properly dispose of picking mesh

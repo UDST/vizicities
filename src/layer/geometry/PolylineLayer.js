@@ -94,7 +94,7 @@ class PolylineLayer extends Layer {
   // TODO: Find proper center position instead of returning first coordinate
   // SEE: https://github.com/Leaflet/Leaflet/blob/master/src/layer/vector/Polyline.js#L59
   getCenter() {
-    return this._coordinates[0][0];
+    return this._center;
   }
 
   // Return line bounds in geographic coordinates
@@ -173,10 +173,32 @@ class PolylineLayer extends Layer {
     }
 
     this._bufferAttributes = Buffer.mergeAttributes(attributes);
+
+    // Original attributes are no longer required so free the memory
+    attributes = null;
   }
 
   getBufferAttributes() {
     return this._bufferAttributes;
+  }
+
+  // Used by external components to clear some memory when the attributes
+  // are no longer required to be stored in this layer
+  //
+  // For example, you would want to clear the attributes here after merging them
+  // using something like the GeoJSONLayer
+  clearBufferAttributes() {
+    this._bufferAttributes = null;
+  }
+
+  // Used by external components to clear some memory when the coordinates
+  // are no longer required to be stored in this layer
+  //
+  // For example, you would want to clear the coordinates here after this
+  // layer is merged in something like the GeoJSONLayer
+  clearCoordinates() {
+    this._coordinates = null;
+    this._projectedCoordinates = null;
   }
 
   // Create and store mesh from buffer attributes
@@ -257,6 +279,8 @@ class PolylineLayer extends Layer {
 
     this._projectedBounds = [];
     this._projectedCoordinates = this._projectCoordinates();
+
+    this._center = this._coordinates[0][0];
   }
 
   // Recursively convert input coordinates into LatLon objects
@@ -399,6 +423,9 @@ class PolylineLayer extends Layer {
       // TODO: Properly dispose of picking mesh
       this._pickingMesh = null;
     }
+
+    this.clearCoordinates();
+    this.clearBufferAttributes();
 
     // Run common destruction logic from parent
     super.destroy();

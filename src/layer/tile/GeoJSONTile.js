@@ -11,12 +11,6 @@ import GeoJSON from '../../util/GeoJSON';
 import Buffer from '../../util/Buffer';
 import PickingMaterial from '../../engine/PickingMaterial';
 
-// TODO: Bring styling and output in line with GeoJSON and Geometry layers, if
-// not adopting those layers for outputting tiles
-
-// TODO: Look into using a GeoJSONLayer to represent and output the tile data
-// instead of duplicating a lot of effort within this class
-
 // TODO: Map picking IDs to some reference within the tile data / geometry so
 // that something useful can be done when an object is picked / clicked on
 
@@ -72,7 +66,8 @@ class GeoJSONTile extends Tile {
       pointGeometry: null,
       pointMaterial: null,
       onPointMesh: null,
-      style: GeoJSON.defaultStyle
+      style: GeoJSON.defaultStyle,
+      keepFeatures: false
     };
 
     var _options = extend({}, defaults, options);
@@ -130,38 +125,10 @@ class GeoJSONTile extends Tile {
     }
 
     var mesh = new THREE.Object3D();
-
-    // var geom = new THREE.PlaneBufferGeometry(this._side, this._side, 1);
-    //
-    // var material = new THREE.MeshBasicMaterial({
-    //   depthWrite: false
-    // });
-    //
-    // var localMesh = new THREE.Mesh(geom, material);
-    // localMesh.rotation.x = -90 * Math.PI / 180;
-    //
-    // mesh.add(localMesh);
-    //
-    // var box = new BoxHelper(localMesh);
-    // mesh.add(box);
-    //
     // mesh.add(this._createDebugMesh());
 
     return mesh;
   }
-
-  // _createPickingMesh() {
-  //   if (!this._center) {
-  //     return;
-  //   }
-  //
-  //   var mesh = new THREE.Object3D();
-  //
-  //   mesh.position.x = this._center[0];
-  //   mesh.position.z = this._center[1];
-  //
-  //   return mesh;
-  // }
 
   _createDebugMesh() {
     var canvas = document.createElement('canvas');
@@ -289,339 +256,65 @@ class GeoJSONTile extends Tile {
     this._mesh = this._geojsonLayer._object3D;
     this._pickingMesh = this._geojsonLayer._pickingMesh;
 
-    // var geojson = GeoJSON.collectFeatures(data, this._options.topojson);
+    // Free the GeoJSON memory as we don't need it
     //
-    // // TODO: Check that GeoJSON is valid / usable
+    // TODO: This should probably be a method within GeoJSONLayer
+    this._geojsonLayer._geojson = null;
+
+    // TODO: Fix or store shadow canvas stuff and get rid of this code
+    // Draw footprint on shadow canvas
     //
-    // var features = geojson.features;
+    // TODO: Disabled for the time-being until it can be sped up / moved to
+    // a worker
+    // this._addShadow(coordinates);
+
+    // Output shadow canvas
+
+    // TODO: Disabled for the time-being until it can be sped up / moved to
+    // a worker
+
+    // var texture = new THREE.Texture(this._shadowCanvas);
     //
-    // // Run filter, if provided
-    // if (this._options.filter) {
-    //   features = geojson.features.filter(this._options.filter);
-    // }
+    // // Silky smooth images when tilted
+    // texture.magFilter = THREE.LinearFilter;
+    // texture.minFilter = THREE.LinearMipMapLinearFilter;
     //
-    // var style = this._options.style;
+    // // TODO: Set this to renderer.getMaxAnisotropy() / 4
+    // texture.anisotropy = 4;
     //
-    // var offset = Point(0, 0);
-    // offset.x = -1 * this._center[0];
-    // offset.y = -1 * this._center[1];
+    // texture.needsUpdate = true;
     //
-    // // TODO: Wrap into a helper method so this isn't duplicated in the non-tiled
-    // // GeoJSON output layer
-    // //
-    // // Need to be careful as to not make it impossible to fork this off into a
-    // // worker script at a later stage
-    // //
-    // // Also unsure as to whether it's wise to lump so much into a black box
-    // //
-    // // var meshes = GeoJSON.createMeshes(features, offset, style);
-    //
-    // var polygons = {
-    //   vertices: [],
-    //   faces: [],
-    //   colours: [],
-    //   facesCount: 0,
-    //   allFlat: true
-    // };
-    //
-    // var lines = {
-    //   vertices: [],
-    //   colours: [],
-    //   verticesCount: 0
-    // };
-    //
-    // if (this._options.picking) {
-    //   polygons.pickingIds = [];
-    //   lines.pickingIds = [];
-    // }
-    //
-    // var colour = new THREE.Color();
-    //
-    // features.forEach(feature => {
-    //   // feature.geometry, feature.properties
-    //
-    //   // Skip features that aren't supported
-    //   //
-    //   // TODO: Add support for all GeoJSON geometry types, including Multi...
-    //   // geometry types
-    //   if (
-    //     feature.geometry.type !== 'Polygon' &&
-    //     feature.geometry.type !== 'LineString' &&
-    //     feature.geometry.type !== 'MultiLineString'
-    //   ) {
-    //     return;
-    //   }
-    //
-    //   // Get style object, if provided
-    //   if (typeof this._options.style === 'function') {
-    //     style = extend({}, this._defaultStyle, this._options.style(feature));
-    //   }
-    //
-    //   var coordinates = feature.geometry.coordinates;
-    //
-    //   // if (feature.geometry.type === 'LineString') {
-    //   if (feature.geometry.type === 'LineString') {
-    //     colour.set(style.lineColor);
-    //
-    //     coordinates = coordinates.map(coordinate => {
-    //       var latlon = LatLon(coordinate[1], coordinate[0]);
-    //       var point = this._layer._world.latLonToPoint(latlon);
-    //       return [point.x, point.y];
-    //     });
-    //
-    //     var height = 0;
-    //
-    //     if (style.lineHeight) {
-    //       height = this._world.metresToWorld(style.lineHeight, this._pointScale);
-    //     }
-    //
-    //     var linestringAttributes = GeoJSON.lineStringAttributes(coordinates, colour, height);
-    //
-    //     lines.vertices.push(linestringAttributes.vertices);
-    //     lines.colours.push(linestringAttributes.colours);
-    //
-    //     if (this._options.picking) {
-    //       var pickingId = this._layer.getPickingId();
-    //
-    //       // Inject picking ID
-    //       //
-    //       // TODO: Perhaps handle this within the GeoJSON helper
-    //       lines.pickingIds.push(pickingId);
-    //
-    //       if (this._options.onClick) {
-    //         // TODO: Find a way to properly remove this listener on destroy
-    //         this._world.on('pick-' + pickingId, (point2d, point3d, intersects) => {
-    //           this._options.onClick(feature, point2d, point3d, intersects);
-    //         });
-    //       }
-    //     }
-    //
-    //     lines.verticesCount += linestringAttributes.vertices.length;
-    //   }
-    //
-    //   if (feature.geometry.type === 'MultiLineString') {
-    //     colour.set(style.lineColor);
-    //
-    //     coordinates = coordinates.map(_coordinates => {
-    //       return _coordinates.map(coordinate => {
-    //         var latlon = LatLon(coordinate[1], coordinate[0]);
-    //         var point = this._layer._world.latLonToPoint(latlon);
-    //         return [point.x, point.y];
-    //       });
-    //     });
-    //
-    //     var height = 0;
-    //
-    //     if (style.lineHeight) {
-    //       height = this._world.metresToWorld(style.lineHeight, this._pointScale);
-    //     }
-    //
-    //     var multiLinestringAttributes = GeoJSON.multiLineStringAttributes(coordinates, colour, height);
-    //
-    //     lines.vertices.push(multiLinestringAttributes.vertices);
-    //     lines.colours.push(multiLinestringAttributes.colours);
-    //
-    //     if (this._options.picking) {
-    //       var pickingId = this._layer.getPickingId();
-    //
-    //       // Inject picking ID
-    //       //
-    //       // TODO: Perhaps handle this within the GeoJSON helper
-    //       lines.pickingIds.push(pickingId);
-    //
-    //       if (this._options.onClick) {
-    //         // TODO: Find a way to properly remove this listener on destroy
-    //         this._world.on('pick-' + pickingId, (point2d, point3d, intersects) => {
-    //           this._options.onClick(feature, point2d, point3d, intersects);
-    //         });
-    //       }
-    //     }
-    //
-    //     lines.verticesCount += multiLinestringAttributes.vertices.length;
-    //   }
-    //
-    //   if (feature.geometry.type === 'Polygon') {
-    //     colour.set(style.color);
-    //
-    //     coordinates = coordinates.map(ring => {
-    //       return ring.map(coordinate => {
-    //         var latlon = LatLon(coordinate[1], coordinate[0]);
-    //         var point = this._layer._world.latLonToPoint(latlon);
-    //         return [point.x, point.y];
-    //       });
-    //     });
-    //
-    //     var height = 0;
-    //
-    //     if (style.height) {
-    //       height = this._world.metresToWorld(style.height, this._pointScale);
-    //     }
-    //
-    //     // Draw footprint on shadow canvas
-    //     //
-    //     // TODO: Disabled for the time-being until it can be sped up / moved to
-    //     // a worker
-    //     // this._addShadow(coordinates);
-    //
-    //     var polygonAttributes = GeoJSON.polygonAttributes(coordinates, colour, height);
-    //
-    //     polygons.vertices.push(polygonAttributes.vertices);
-    //     polygons.faces.push(polygonAttributes.faces);
-    //     polygons.colours.push(polygonAttributes.colours);
-    //
-    //     if (this._options.picking) {
-    //       var pickingId = this._layer.getPickingId();
-    //
-    //       // Inject picking ID
-    //       //
-    //       // TODO: Perhaps handle this within the GeoJSON helper
-    //       polygons.pickingIds.push(pickingId);
-    //
-    //       if (this._options.onClick) {
-    //         // TODO: Find a way to properly remove this listener on destroy
-    //         this._world.on('pick-' + pickingId, (point2d, point3d, intersects) => {
-    //           this._options.onClick(feature, point2d, point3d, intersects);
-    //         });
-    //       }
-    //     }
-    //
-    //     if (polygons.allFlat && !polygonAttributes.flat) {
-    //       polygons.allFlat = false;
-    //     }
-    //
-    //     polygons.facesCount += polygonAttributes.faces.length;
-    //   }
-    // });
-    //
-    // // Output shadow canvas
-    // //
-    // // TODO: Disabled for the time-being until it can be sped up / moved to
-    // // a worker
-    //
-    // // var texture = new THREE.Texture(this._shadowCanvas);
-    // //
-    // // // Silky smooth images when tilted
-    // // texture.magFilter = THREE.LinearFilter;
-    // // texture.minFilter = THREE.LinearMipMapLinearFilter;
-    // //
-    // // // TODO: Set this to renderer.getMaxAnisotropy() / 4
-    // // texture.anisotropy = 4;
-    // //
-    // // texture.needsUpdate = true;
-    // //
-    // // var material;
-    // // if (!this._world._environment._skybox) {
-    // //   material = new THREE.MeshBasicMaterial({
-    // //     map: texture,
-    // //     transparent: true,
-    // //     depthWrite: false
-    // //   });
-    // // } else {
-    // //   material = new THREE.MeshStandardMaterial({
-    // //     map: texture,
-    // //     transparent: true,
-    // //     depthWrite: false
-    // //   });
-    // //   material.roughness = 1;
-    // //   material.metalness = 0.1;
-    // //   material.envMap = this._world._environment._skybox.getRenderTarget();
-    // // }
-    // //
-    // // var geom = new THREE.PlaneBufferGeometry(this._side, this._side, 1);
-    // // var mesh = new THREE.Mesh(geom, material);
-    // //
-    // // mesh.castShadow = false;
-    // // mesh.receiveShadow = false;
-    // // mesh.renderOrder = 1;
-    // //
-    // // mesh.rotation.x = -90 * Math.PI / 180;
-    // //
-    // // this._mesh.add(mesh);
-    //
-    // var geometry;
     // var material;
-    // var mesh;
-    //
-    // // Output lines
-    // if (lines.vertices.length > 0) {
-    //   geometry = Buffer.createLineGeometry(lines, offset);
-    //
-    //   material = new THREE.LineBasicMaterial({
-    //     vertexColors: THREE.VertexColors,
-    //     linewidth: style.lineWidth,
-    //     transparent: style.lineTransparent,
-    //     opacity: style.lineOpacity,
-    //     blending: style.lineBlending
+    // if (!this._world._environment._skybox) {
+    //   material = new THREE.MeshBasicMaterial({
+    //     map: texture,
+    //     transparent: true,
+    //     depthWrite: false
     //   });
-    //
-    //   mesh = new THREE.LineSegments(geometry, material);
-    //
-    //   if (style.lineRenderOrder !== undefined) {
-    //     material.depthWrite = false;
-    //     mesh.renderOrder = style.lineRenderOrder;
-    //   }
-    //
-    //   // TODO: Can a line cast a shadow?
-    //   // mesh.castShadow = true;
-    //
-    //   this._mesh.add(mesh);
-    //
-    //   if (this._options.picking) {
-    //     material = new PickingMaterial();
-    //     material.side = THREE.BackSide;
-    //
-    //     // Make the line wider / easier to pick
-    //     material.linewidth = style.lineWidth + material.linePadding;
-    //
-    //     var pickingMesh = new THREE.LineSegments(geometry, material);
-    //     this._pickingMesh.add(pickingMesh);
-    //   }
+    // } else {
+    //   material = new THREE.MeshStandardMaterial({
+    //     map: texture,
+    //     transparent: true,
+    //     depthWrite: false
+    //   });
+    //   material.roughness = 1;
+    //   material.metalness = 0.1;
+    //   material.envMap = this._world._environment._skybox.getRenderTarget();
     // }
     //
-    // // Output polygons
-    // if (polygons.facesCount > 0) {
-    //   geometry = Buffer.createGeometry(polygons, offset);
+    // var geom = new THREE.PlaneBufferGeometry(this._side, this._side, 1);
+    // var mesh = new THREE.Mesh(geom, material);
     //
-    //   if (!this._world._environment._skybox) {
-    //     material = new THREE.MeshPhongMaterial({
-    //       vertexColors: THREE.VertexColors,
-    //       side: THREE.BackSide
-    //     });
-    //   } else {
-    //     material = new THREE.MeshStandardMaterial({
-    //       vertexColors: THREE.VertexColors,
-    //       side: THREE.BackSide
-    //     });
-    //     material.roughness = 1;
-    //     material.metalness = 0.1;
-    //     material.envMapIntensity = 3;
-    //     material.envMap = this._world._environment._skybox.getRenderTarget();
-    //   }
+    // mesh.castShadow = false;
+    // mesh.receiveShadow = false;
+    // mesh.renderOrder = 1;
     //
-    //   mesh = new THREE.Mesh(geometry, material);
+    // mesh.rotation.x = -90 * Math.PI / 180;
     //
-    //   mesh.castShadow = true;
-    //   mesh.receiveShadow = true;
-    //
-    //   if (polygons.allFlat) {
-    //     material.depthWrite = false;
-    //     mesh.renderOrder = 1;
-    //   }
-    //
-    //   this._mesh.add(mesh);
-    //
-    //   if (this._options.picking) {
-    //     material = new PickingMaterial();
-    //     material.side = THREE.BackSide;
-    //
-    //     var pickingMesh = new THREE.Mesh(geometry, material);
-    //     this._pickingMesh.add(pickingMesh);
-    //   }
-    // }
+    // this._mesh.add(mesh);
 
     this._ready = true;
     console.timeEnd(this._tile);
-    console.log(`${this._tile}: ${this._geojsonLayer._geojson.features.length} features`);
   }
 
   _abortRequest() {
