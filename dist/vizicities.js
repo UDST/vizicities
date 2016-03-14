@@ -536,7 +536,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._engine.destroy();
 	      this._engine = null;
 	
-	      // TODO: Probably should clean the container too / remove the canvas
+	      // Clean the container / remove the canvas
+	      while (this._container.firstChild) {
+	        this._container.removeChild(this._container.firstChild);
+	      }
+	
 	      this._container = null;
 	    }
 	  }]);
@@ -4048,10 +4052,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(Picking, [{
 	    key: '_initEvents',
 	    value: function _initEvents() {
-	      window.addEventListener('resize', this._resizeTexture.bind(this), false);
+	      this._resizeHandler = this._resizeTexture.bind(this);
+	      window.addEventListener('resize', this._resizeHandler, false);
 	
-	      // this._renderer.domElement.addEventListener('mousemove', this._onMouseMove.bind(this), false);
-	      this._world._container.addEventListener('mouseup', this._onMouseUp.bind(this), false);
+	      this._mouseUpHandler = this._resizeTexture.bind(this);
+	      this._world._container.addEventListener('mouseup', this._mouseUpHandler, false);
 	
 	      this._world.on('move', this._onWorldMove, this);
 	    }
@@ -4180,8 +4185,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function destroy() {
 	      // TODO: Find a way to properly remove these listeners as they stay
 	      // active at the moment
-	      window.removeEventListener('resize', this._resizeTexture, false);
-	      this._renderer.domElement.removeEventListener('mouseup', this._onMouseUp, false);
+	      window.removeEventListener('resize', this._resizeHandler, false);
+	      this._world._container.removeEventListener('mouseup', this._mouseUpHandler, false);
+	
 	      this._world.off('move', this._onWorldMove);
 	
 	      if (this._pickingScene.children) {

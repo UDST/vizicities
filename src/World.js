@@ -296,7 +296,11 @@ class World extends EventEmitter {
     this._engine.destroy();
     this._engine = null;
 
-    // TODO: Probably should clean the container too / remove the canvas
+    // Clean the container / remove the canvas
+    while (this._container.firstChild) {
+      this._container.removeChild(this._container.firstChild);
+    }
+
     this._container = null;
   }
 }
