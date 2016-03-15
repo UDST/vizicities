@@ -79,6 +79,14 @@ function build() {
         // Proxy the global proj4 variable to require('proj4')
         'proj4': 'proj4'
       },
+      resolve: {
+        alias: {
+          'TweenLite': __dirname + '/node_modules/gsap/src/uncompressed/TweenLite.js',
+          'TweenMax': __dirname + '/node_modules/gsap/src/uncompressed/TweenMax.js',
+          'TimelineLite': __dirname + '/node_modules/gsap/src/uncompressed/TimelineLite.js',
+          'TimelineMax': __dirname + '/node_modules/gsap/src/uncompressed/TimelineMax.js'
+        }
+      },
       module: {
         loaders: [
           { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' }

@@ -1104,6 +1104,16 @@ var OrbitControls = function ( object, domElement ) {
 
 	window.addEventListener( 'keydown', onKeyDown, false );
 
+	// Expose controls methods for programmatic control
+	this.panLeft = panLeft;
+	this.panUp = panUp;
+	this.pan = pan;
+	this.dollyIn = dollyIn;
+	this.dollyOut = dollyOut;
+	this.getZoomScale = getZoomScale;
+	this.rotateLeft = rotateLeft;
+	this.rotateUp = rotateUp;
+
 	// force an update at start
 
 	this.update();

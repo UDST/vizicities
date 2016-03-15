@@ -105,7 +105,7 @@ class World extends EventEmitter {
 
     // Update controls
     this._controls.forEach(controls => {
-      controls.update();
+      controls.update(delta);
     });
 
     this.emit('preUpdate', delta);
