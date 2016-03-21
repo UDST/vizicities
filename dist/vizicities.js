@@ -15148,6 +15148,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	  } else {
 	    material = new _three2['default'].MeshStandardMaterial({
+	      map: texture,
 	      depthWrite: false
 	    });
 	    material.roughness = 1;

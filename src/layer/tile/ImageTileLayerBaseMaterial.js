@@ -35,6 +35,7 @@ export default function(colour, skyboxTarget) {
     });
   } else {
     material = new THREE.MeshStandardMaterial({
+      map: texture,
       depthWrite: false
     });
     material.roughness = 1;
