@@ -15,6 +15,8 @@ import PointLayer, {pointLayer} from './layer/geometry/PointLayer';
 import Point, {point} from './geo/Point';
 import LatLon, {latLon} from './geo/LatLon';
 
+import PickingMaterial from './engine/PickingMaterial';
+
 import Util from './util/index';
 
 const VIZI = {
@@ -48,6 +50,7 @@ const VIZI = {
   point: point,
   LatLon: LatLon,
   latLon: latLon,
+  PickingMaterial: PickingMaterial,
   Util: Util
 };
 

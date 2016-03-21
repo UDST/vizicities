@@ -116,6 +116,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _geoLatLon2 = _interopRequireDefault(_geoLatLon);
 	
+	var _enginePickingMaterial = __webpack_require__(85);
+	
+	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
+	
 	var _utilIndex = __webpack_require__(92);
 	
 	var _utilIndex2 = _interopRequireDefault(_utilIndex);
@@ -151,6 +155,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  point: _geoPoint.point,
 	  LatLon: _geoLatLon2['default'],
 	  latLon: _geoLatLon.latLon,
+	  PickingMaterial: _enginePickingMaterial2['default'],
 	  Util: _utilIndex2['default']
 	};
 	
@@ -4055,7 +4060,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._resizeHandler = this._resizeTexture.bind(this);
 	      window.addEventListener('resize', this._resizeHandler, false);
 	
-	      this._mouseUpHandler = this._resizeTexture.bind(this);
+	      this._mouseUpHandler = this._onMouseUp.bind(this);
 	      this._world._container.addEventListener('mouseup', this._mouseUpHandler, false);
 	
 	      this._world.on('move', this._onWorldMove, this);

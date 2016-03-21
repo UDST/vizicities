@@ -45,7 +45,7 @@ class Picking {
     this._resizeHandler = this._resizeTexture.bind(this);
     window.addEventListener('resize', this._resizeHandler, false);
 
-    this._mouseUpHandler = this._resizeTexture.bind(this);
+    this._mouseUpHandler = this._onMouseUp.bind(this);
     this._world._container.addEventListener('mouseup', this._mouseUpHandler, false);
 
     this._world.on('move', this._onWorldMove, this);
