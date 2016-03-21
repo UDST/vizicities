@@ -5,7 +5,8 @@ export default function(renderer, container) {
   var composer = new EffectComposer(renderer);
 
   var updateSize = function() {
-    composer.setSize(container.clientWidth, container.clientHeight);
+    var pixelRatio = window.devicePixelRatio;
+    composer.setSize(container.clientWidth * pixelRatio, container.clientHeight * pixelRatio);
   };
 
   window.addEventListener('resize', updateSize, false);

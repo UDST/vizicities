@@ -4288,7 +4288,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var composer = new _vendorEffectComposer2['default'](renderer);
 	
 	  var updateSize = function updateSize() {
-	    composer.setSize(container.clientWidth, container.clientHeight);
+	    var pixelRatio = window.devicePixelRatio;
+	    composer.setSize(container.clientWidth * pixelRatio, container.clientHeight * pixelRatio);
 	  };
 	
 	  window.addEventListener('resize', updateSize, false);
