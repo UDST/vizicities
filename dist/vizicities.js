@@ -6225,11 +6225,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // TODO: Long-distance pans should prevent the quadtree grid from trying to
 	    // update by not firing the control update events every frame until the
 	    // pan velocity calms down a bit
+	    //
+	    // TODO: Long-distance plans should zoom out further
 	  }, {
 	    key: 'flyToPoint',
-	    value: function flyToPoint(point, duration, noZoom) {
+	    value: function flyToPoint(point, duration, zoom) {
 	      // Animation time in seconds
-	      var animationTime = duration || 3;
+	      var animationTime = duration || 2;
 	
 	      this._flyTarget = new _three2['default'].Vector3(point.x, 0, point.y);
 	
@@ -6239,6 +6241,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._flyTween = new _TweenLite2['default']({
 	        x: 0,
 	        z: 0,
+	        // zoom: 0,
 	        prev: {
 	          x: 0,
 	          z: 0
@@ -6246,6 +6249,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }, animationTime, {
 	        x: diff.x,
 	        z: diff.z,
+	        // zoom: 1,
 	        onUpdate: function onUpdate(tween) {
 	          var controls = this._controls;
 	
@@ -6260,14 +6264,53 @@ return /******/ (function(modules) { // webpackBootstrap
 	          tween.target.prev.x = tween.target.x;
 	          tween.target.prev.z = tween.target.z;
 	
+	          // console.log(Math.sin((tween.target.zoom - 0.5) * Math.PI));
+	
 	          // TODO: Get zoom to dolly in and out on pan
-	          // controls.object.zoom += Math.sin(Math.PI / tween.target.zoom);
+	          // controls.object.zoom -= Math.sin((tween.target.zoom - 0.5) * Math.PI);
 	          // controls.object.updateProjectionMatrix();
 	        },
 	        onComplete: function onComplete(tween) {
-	          console.log('Arrived at flyTarget');
+	          // console.log(`Arrived at flyTarget`);
 	          this._flyTarget = null;
 	        },
+	        onUpdateParams: ['{self}'],
+	        onCompleteParams: ['{self}'],
+	        callbackScope: this,
+	        ease: Power1.easeInOut
+	      });
+	
+	      if (!zoom) {
+	        return;
+	      }
+	
+	      var zoomTime = animationTime / 2;
+	
+	      this._zoomTweenIn = new _TweenLite2['default']({
+	        zoom: 0
+	      }, zoomTime, {
+	        zoom: 1,
+	        onUpdate: function onUpdate(tween) {
+	          var controls = this._controls;
+	          controls.dollyIn(1 - 0.01 * tween.target.zoom);
+	        },
+	        onComplete: function onComplete(tween) {},
+	        onUpdateParams: ['{self}'],
+	        onCompleteParams: ['{self}'],
+	        callbackScope: this,
+	        ease: Power1.easeInOut
+	      });
+	
+	      this._zoomTweenOut = new _TweenLite2['default']({
+	        zoom: 0
+	      }, zoomTime, {
+	        zoom: 1,
+	        delay: zoomTime,
+	        onUpdate: function onUpdate(tween) {
+	          var controls = this._controls;
+	          controls.dollyOut(0.99 + 0.01 * tween.target.zoom);
+	        },
+	        onComplete: function onComplete(tween) {},
 	        onUpdateParams: ['{self}'],
 	        onCompleteParams: ['{self}'],
 	        callbackScope: this,
