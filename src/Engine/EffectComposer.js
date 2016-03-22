@@ -5,7 +5,12 @@ export default function(renderer, container) {
   var composer = new EffectComposer(renderer);
 
   var updateSize = function() {
-    var pixelRatio = window.devicePixelRatio;
+    // TODO: Re-enable this when perf issues can be solved
+    //
+    // Rendering double the resolution of the screen can be really slow
+    // var pixelRatio = window.devicePixelRatio;
+    var pixelRatio = 1;
+
     composer.setSize(container.clientWidth * pixelRatio, container.clientHeight * pixelRatio);
   };
 

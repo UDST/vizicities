@@ -13,7 +13,14 @@ export default function(container, antialias) {
   // renderer.setClearColor(Scene.fog.color, 1);
 
   renderer.setClearColor(0xffffff, 1);
-  renderer.setPixelRatio(window.devicePixelRatio);
+
+  // TODO: Re-enable this when perf issues can be solved
+  //
+  // Rendering double the resolution of the screen can be really slow
+  // var pixelRatio = window.devicePixelRatio;
+  var pixelRatio = 1;
+
+  renderer.setPixelRatio(pixelRatio);
 
   // Gamma settings make things look nicer
   renderer.gammaInput = true;

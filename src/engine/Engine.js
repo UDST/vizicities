@@ -81,7 +81,11 @@ class Engine extends EventEmitter {
       var width = self._container.clientWidth;
       var height = self._container.clientHeight;
 
-      var pixelRatio = window.devicePixelRatio;
+      // TODO: Re-enable this when perf issues can be solved
+      //
+      // Rendering double the resolution of the screen can be really slow
+      // var pixelRatio = window.devicePixelRatio;
+      var pixelRatio = 1;
 
       fxaaPass.uniforms.resolution.value.set(1 / (width * pixelRatio), 1 / (height * pixelRatio));
 

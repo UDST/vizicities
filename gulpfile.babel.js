@@ -76,17 +76,25 @@ function build() {
       externals: {
         // Proxy the global THREE variable to require('three')
         'three': 'THREE',
+        // Proxy the global THREE variable to require('TweenLite')
+        'TweenLite': 'TweenLite',
+        // Proxy the global THREE variable to require('TweenMax')
+        'TweenMax': 'TweenMax',
+        // Proxy the global THREE variable to require('TimelineLite')
+        'TimelineLite': 'TimelineLite',
+        // Proxy the global THREE variable to require('TimelineMax')
+        'TimelineMax': 'TimelineMax',
         // Proxy the global proj4 variable to require('proj4')
         'proj4': 'proj4'
       },
-      resolve: {
-        alias: {
-          'TweenLite': __dirname + '/node_modules/gsap/src/uncompressed/TweenLite.js',
-          'TweenMax': __dirname + '/node_modules/gsap/src/uncompressed/TweenMax.js',
-          'TimelineLite': __dirname + '/node_modules/gsap/src/uncompressed/TimelineLite.js',
-          'TimelineMax': __dirname + '/node_modules/gsap/src/uncompressed/TimelineMax.js'
-        }
-      },
+      // resolve: {
+      //   alias: {
+      //     'TweenLite': __dirname + '/node_modules/gsap/src/uncompressed/TweenLite.js',
+      //     'TweenMax': __dirname + '/node_modules/gsap/src/uncompressed/TweenMax.js',
+      //     'TimelineLite': __dirname + '/node_modules/gsap/src/uncompressed/TimelineLite.js',
+      //     'TimelineMax': __dirname + '/node_modules/gsap/src/uncompressed/TimelineMax.js'
+      //   }
+      // },
       module: {
         loaders: [
           { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' }
