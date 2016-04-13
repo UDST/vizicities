@@ -3894,6 +3894,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		var viewMatrix = new _three2['default'].Matrix4();
 		var viewProjectionMatrix = new _three2['default'].Matrix4();
 	
+		var frustum = new _three2['default'].Frustum();
+	
 		var domElement = document.createElement('div');
 		domElement.style.overflow = 'hidden';
 	
@@ -3930,6 +3932,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 					domElement.appendChild(element);
 				}
+	
+				// Hide if outside view frustum
+				if (!frustum.containsPoint(object.position)) {
+					element.style.display = 'none';
+				} else {
+					element.style.display = 'block';
+				}
 			}
 	
 			for (var i = 0, l = object.children.length; i < l; i++) {
@@ -3948,6 +3957,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 			viewMatrix.copy(camera.matrixWorldInverse.getInverse(camera.matrixWorld));
 			viewProjectionMatrix.multiplyMatrices(camera.projectionMatrix, viewMatrix);
+	
+			frustum.setFromMatrix(new _three2['default'].Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
 	
 			renderObject(scene, camera);
 		};

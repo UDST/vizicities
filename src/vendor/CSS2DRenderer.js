@@ -42,6 +42,8 @@ var CSS2DRenderer = function () {
 	var viewMatrix = new THREE.Matrix4();
 	var viewProjectionMatrix = new THREE.Matrix4();
 
+	var frustum = new THREE.Frustum();
+
 	var domElement = document.createElement( 'div' );
 	domElement.style.overflow = 'hidden';
 
@@ -81,6 +83,13 @@ var CSS2DRenderer = function () {
 
 			}
 
+			// Hide if outside view frustum
+			if (!frustum.containsPoint(object.position)) {
+				element.style.display = 'none';
+			} else {
+				element.style.display = 'block';
+			}
+
 		}
 
 		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
@@ -101,6 +110,8 @@ var CSS2DRenderer = function () {
 
 		viewMatrix.copy( camera.matrixWorldInverse.getInverse( camera.matrixWorld ) );
 		viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, viewMatrix );
+
+		frustum.setFromMatrix( new THREE.Matrix4().multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse ) );
 
 		renderObject( scene, camera );
 
