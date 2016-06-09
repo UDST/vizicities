@@ -3,7 +3,7 @@ __JavaScript 3D city and data visualisation platform__
 
 [![](http://cl.ly/VS9H/Screen%20Shot%202014-05-10%20at%2016.04.54.png)](http://vizicities.com)
 
-[ViziCities](http://vizicities.com) is a 3D city and data visualisation platform, powered by WebGL. Its purpose is to change the way you look at cities and the data contained within them. It is the brainchild of [Robin Hawkes](http://twitter.com/robhawkes) and [Peter Smart](http://twitter.com/petewsmart) &mdash; [get in touch](#contact--community) if you'd like to discuss the project in more detail.
+[ViziCities](http://vizicities.com) is a 3D city and data visualisation platform, powered by WebGL. Its purpose is to change the way you look at cities and the data contained within them.
 
 **Important links**
 
@@ -226,12 +226,12 @@ If you really need to remove the attribution, please [get in touch](hello@vizici
 
 ## Forked ViziCities 0.1.0-pre? Update your remote URL
 
-The ViziCities repo has been moved away from Robin's personal account and now resides within the ViziCities organisation on GitHub. As a result of this, you'll need to update the remote URL if you've forked ViziCities in the past.
+The ViziCities repo has been moved away from Robin's personal account and now resides within the UDST organisation on GitHub. As a result of this, you'll need to update the remote URL if you've forked ViziCities in the past.
 
 It's pretty easy to do, [GitHub even wrote about how to do it](https://help.github.com/articles/changing-a-remote-s-url/). Running the following command within your ViziCities directory should be enough for most people:
 
 ```bash
-$ git remote set-url origin git@github.com:vizicities/vizicities.git
+$ git remote set-url origin git@github.com:UDST/vizicities.git
 ```
 
 ## Getting involved
