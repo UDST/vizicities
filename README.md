@@ -3,7 +3,7 @@ __Bringing cities to life using the power of open data and the Web__
 
 ![http://vizicities.apps.rawk.es](http://cl.ly/VS9H/Screen%20Shot%202014-05-10%20at%2016.04.54.png)
 
-[ViziCities](http://vizicities.com) is a 3D city and data visualisation platform, powered by WebGL. Its purpose is to change the way you look at cities and the data contained within them. It is the brainchild of [Robin Hawkes](http://twitter.com/robhawkes) and [Peter Smart](http://twitter.com/petewsmart) &mdash; [get in touch](#contact--community) if you'd like to discuss the project with them in more detail.
+[ViziCities](http://vizicities.com) is a 3D city and data visualisation platform, powered by WebGL. Its purpose is to change the way you look at cities and the data contained within them.
 
 ### Demonstration
 
@@ -11,7 +11,7 @@ Here's a [demo of ViziCities](http://vizicities.apps.rawk.es) so you can have a 
 
 ### What does it do?
 
-ViziCities aims to combine data visualisation with a 3D representation of a city to provide a better understanding what's going on. It's a powerful new way of looking at and understanding urban areas. 
+ViziCities aims to combine data visualisation with a 3D representation of a city to provide a better understanding what's going on. It's a powerful new way of looking at and understanding urban areas.
 
 Aside from seeing a city in 3D, here are some of the others things you'll have the power to do:
 
@@ -23,10 +23,6 @@ Aside from seeing a city in 3D, here are some of the others things you'll have t
 
 
 ### Further information
-
-In 2013, Peter and Robin [spoke in detail about ViziCities](https://vimeo.com/66495599) at Front Trends.
-
-[![](https://secure-b.vimeocdn.com/ts/437/939/437939443_640.jpg)](https://vimeo.com/66495599)
 
 For more information you should start here:
 
@@ -144,11 +140,6 @@ There are a couple of things in particular that need your help:
 Communicate with the ViziCities team via email ([hello@vizicities.com](mailto:hello@vizicities.com)) and Twitter ([@ViziCities](http://twitter.com/ViziCities)). All other discussion should happen in the [ViziCities Google Group](https://groups.google.com/forum/#!forum/vizicities), IRC (#vizicities on Freenode) or [relevant GitHub issues page](https://github.com/vizicities/vizicities/issues).
 
 
-## Contributors
-
-[Robin Hawkes](http://twitter.com/robhawkes), [Peter Smart](http://twitter.com/petewsmart), [Matthew Harrison-Jones](http://twitter.com/matt_hojo)
-
-
 ## Libraries and resources used
 
 * [OpenStreetMap](http://openstreetmap.org) – Map data
@@ -176,16 +167,3 @@ Over the past year [we've been producing experiments](http://rawkes.com/articles
 * Zoom using the mouse wheel
 * Pan using the left mouse button
 * Orbit by holding shift and using the left mouse button, or using the middle mouse button
-
-
-## Copyright & license
-
-The MIT License (MIT)
-
-Copyright (c) 2014 - Robin Hawkes & Peter Smart
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

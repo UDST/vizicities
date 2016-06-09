@@ -6,7 +6,7 @@
   "scripts": {
     "test": "grunt test --verbose"
   },
-  "author": "Robin Hawkes & Peter Smart",
+  "author": "Robin Hawkes",
   "license": "MIT",
   "devDependencies": {
     "grunt": "~0.4.1",
