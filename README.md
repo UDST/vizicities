@@ -1,169 +1,271 @@
-# ViziCities [0.1.0-pre] [![Build Status](https://travis-ci.org/vizicities/vizicities.png?branch=master)](https://travis-ci.org/vizicities/vizicities)
-__Bringing cities to life using the power of open data and the Web__
+# ViziCities 0.2.0 [Codename: Hamlet] [![Build Status](https://travis-ci.org/vizicities/vizicities.png?branch=0.2.0)](https://travis-ci.org/vizicities/vizicities)
+__JavaScript 3D city and data visualisation platform__
 
-![http://vizicities.apps.rawk.es](http://cl.ly/VS9H/Screen%20Shot%202014-05-10%20at%2016.04.54.png)
+[![](http://cl.ly/VS9H/Screen%20Shot%202014-05-10%20at%2016.04.54.png)](http://vizicities.com)
 
 [ViziCities](http://vizicities.com) is a 3D city and data visualisation platform, powered by WebGL. Its purpose is to change the way you look at cities and the data contained within them.
 
-### Demonstration
+**Important links**
 
-Here's a [demo of ViziCities](http://vizicities.apps.rawk.es) so you can have a play without having to build it for yourself. Cool, ey?
-
-### What does it do?
-
-ViziCities aims to combine data visualisation with a 3D representation of a city to provide a better understanding what's going on. It's a powerful new way of looking at and understanding urban areas.
-
-Aside from seeing a city in 3D, here are some of the others things you'll have the power to do:
-
-* View public transport (eg. buses, trains, planes) [flowing around a city in realtime](https://vimeo.com/67869313)
-* Use vehicles powered by artificial intelligence to [perform realistic traffic simulation](https://vimeo.com/66512057)
-* Visualise [social data in realtime](https://vimeo.com/67872925)
-* Overlay historic and static data (eg. census data) using traditional techniques (eg. heatmaps)
-* And much more&hellip;
+* Play with an [interactive demo of ViziCities](http://rawgit.com/vizicities/vizicities/0.2.0/examples/basic-example/index.html)
+* Find out more about what you can do with ViziCities [on the website](http://vizicities.com)
+* Read [the documentation](http://dev.vizicities.com) and learn how to make something with ViziCities
 
 
-### Further information
+## Quick install
 
-For more information you should start here:
+Already know what you're doing? Awesome! ViziCities is [installable through Bower](http://bower.io/) so you can quickly get up and running.
 
-* [ViziCities website](http://vizicities.com)
-* [ViziCities announcement article](http://rawkes.com/articles/vizicities-dev-diary-1)
-* [Videos of various ViziCities experiments](https://vimeo.com/channels/vizicities)
+```bash
+$ bower install -p vizicities
+```
 
-## Features
 
-ViziCities is currently in a pre-alpha state, meaning things are changing rapidly and you should expect bugs.
+## ViziCities examples
 
-### 0.1.0-pre
+Here are some examples of ViziCities and how it's being used to help people.
 
-* Load anywhere in the world using coordinates in the URL (#lat,lon) ([like Oslo](http://vizicities.apps.rawk.es/demo.html#59.913869,10.752245))
-* Buildings, water (rivers, canals, etc), and green areas (parks, grass, forest, etc)
-* Dynamic data loading using the OpenStreetMap Overpass API (literally the entire world)
-* Accurate heights based on OpenStreetMap tags, if available
-* Loading of data using a TMS grid system
-* Caching of loaded grid data to prevent duplicated requests
-* Processing of geographic features into 3D objects using Web Workers
-* Controls (zoom, pan and orbit)
-* Basic tests and build status using Travis CI
-* Grunt-based development environment
+* [Data journalism piece](http://interaktiv.morgenpost.de/tempelhofer-feld/) from the Beliner Morgenpost
 
-### Future features
+**Built something with ViziCities?** [Get in touch](hello@vizicities.com), we'd love to showcase it here for everyone else to see and learn from.
 
-* 3D road network
-* Static data visualisation layers (heatmaps, bar charts, etc)
-* Live data visualisation (tweets, public transport, etc)
-* AI vehicles and pedestrians
-* Local weather
-* Post processing (DoF, SSAO, etc)
-* 3D terrain
-* And much more&hellip;
+
+## Changes since 0.1.0-pre
+
+Numerous lessons were learnt after releasing 0.1.0-pre to the public, so much so that the decision was made to start from the beginning and get things right. 0.2.0 is the first attempt at that, a complete rewrite from the ground up. There are some pretty major differences!
+
+### Blueprint API
+
+Data input and visualisation output is now controlled by the [Blueprint API](http://dev.vizicities.com/v0.2.0/docs/using-the-blueprint-api). It's based on the concept of triggers and actions; much like Zapier or IFTTT, just instead for geographic data visualisation. It underpins the entire system for 0.2.0 and it completely changes the way you pull data into ViziCities and how you output it. A lot of hard work went into formulating and constructing it &mdash; we're incredibly proud of it!
+
+In short, the Blueprint API has 3 parts; an input, an output and a mapping configuration. Neither the input nor the output know about each other or care about each others data structure. Everything is neatly brought together by a configuration object that describes which input to use, which output to use, as well as how and, more importantly, when to map the data between them.
+
+It's an incredibly powerful and extensible system and we can't wait to see what you build with it. We're also looking forward to you contributing new inputs and outputs for others to benefit from.
+
+By default, ViziCites now supports:
+
+* Dynamic base maps using standard tile-server URLs (eg. Mapbox)
+* GeoJSON input
+* Basic KML input (only points so far)
+* Collada output
+* Choropleth (heatmap-like) output
+* Dynamic building output from a vector tile source ([like Mapzen](https://github.com/mapzen/vector-datasource/wiki/Mapzen-Vector-Tile-Service))
+
+Make sure to read the [documentation on the Blueprint API](http://dev.vizicities.com/v0.2.0/docs/using-the-blueprint-api) to learn how to use it.
+
+### Easier setup and customisation
+
+It's now much easier to set up and customise ViziCities. It was clear that 0.1.0-pre was far too prescriptive about how to use the system, so an effort has been made to allow customisation via options or overriding of default functionality. Combined with the Blueprint API, you now have full control over the data and visualisations you want to use.
+
+A result of these changes means that setting up ViziCities is different to how you're used to from 0.1.0-pre. It's worth [reading the documentation](http://dev.vizicities.com) to see how much easier and better things have become.
+
+### Vastly improved controls
+
+The control system has received a lot of love since 0.1.0-pre and, aside from being smoother, it now allow you to use multiple methods of control at once. Right now there are just a few to choose from but this number will grow as new systems are contributed. It's also worth mentioning that the view angle caps in 0.1.0 have been removed &mdash; you can now look wherever you want!
+
+
+### Other stuff
+
+* More robust and flexible coordinate projection system
+* Synchronous update and render loop
+* Improved event system
+* Simpler file and directory structure
+* ViziCities Bower package
+* Ready-to-use build of ViziCities in the `build` directory
+* Testing across 100% of the core system
+* Improved Grunt build process
+
 
 ## Known issues
 
-ViziCities is not complete and there are likely many things that could be done better or simply need fixing. Here is a list of the major known issues:
+ViziCities is not complete and there are many things that could be done better or simply need fixing. Here is a list of the major known issues:
 
-* Not all features from OpenStreetMap are being displayed (particularly relations)
-* Performance of tile-based loading mechanism is poor
-* Web Worker processing isn't efficient due to the way scripts and data are loaded
-* Caching is reset on page reload
-* XHR requests for data can take some time, causing visible delay
-* Performance issues with dense cities (eg. NYC)
+* Data isn't cached right now
+* There's no post processing (eg. ambient occlusion, etc)
+* Lighting cannot be easily customised
+* Performance can be improved in areas
+
 
 ## Getting started
 
-ViziCities is at an incredibly early stage right now, but it's usable if you know what you're doing. The following steps should get you up and running without too much trouble.
+Here are some step-by-step instructions on how to get up and running with your first visualisation, a 3D basemap. You can also [use this JSBin](http://jsbin.com/qaqogo/2/edit?html,js,output) to see the example running and play with the code.
 
-### Building ViziCities
+The first step is to download the [latest ViziCities build files](https://github.com/vizicities/vizicities/tree/0.2.0/build) (JS & CSS).
 
-To start off, you'll need to build ViziCities and get an up-to-date JavaScript file.
+Once you've done that then set up the basic HTML and include the ViziCities files:
 
-#### Clone the ViziCities repo
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <title>ViziCities - Basic Example</title>
 
-```
-git clone https://github.com/vizicities/vizicities.git vizicities
-```
+  <style type="text/css">
+    html, body {
+      height: 100%;
+      width: 100%;
+    }
 
-#### [Install Node.js & NPM](http://nodejs.org/)
-If you haven't already, [install Homebrew](http://brew.sh/) before going any further.
+    #vizicities-viewport {
+      height: 100%;
+      width: 100%;
+    }
+  </style>
 
-```
-brew install node
-```
-#### [Install the Grunt CLI](http://gruntjs.com/getting-started)
-
-```
-npm install -g grunt-cli
-```
-
-#### Install the NPM packages
-```
-cd /path/to/vizicities
-npm install
-```
-
-#### Build ViziCities and watch for file changes using Grunt
-```
-cd /path/to/vizicities
-grunt dev
-```
-
-#### Serve examples using Grunt
-Open a new terminal tab or window, then type:
-
-```
-cd /path/to/vizicities
-grunt serve
+  <link rel="stylesheet" type="text/css" href="vizi.css">
+</head>
+<body>
+  <div id="vizicities-viewport"></div>
+  <script src="vizi.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
 ```
 
-Then open [http://localhost:8000/examples](http://localhost:8000/examples)
+At this point you can initialise ViziCities in a new script (`main.js` in this example):
+
+```javascript
+var world = new VIZI.World({
+  viewport: document.querySelector("#vizicities-viewport"),
+  center: new VIZI.LatLon(51.50358, -0.01924)
+});
+```
+
+And add some controls:
+
+```javascript
+var controls = new VIZI.ControlsMap(world.camera, {
+  viewport: world.options.viewport
+});
+```
+
+Let's add a basemap using the Blueprint API:
+
+```javascript
+var mapConfig = {
+  input: {
+    type: "BlueprintInputMapTiles",
+    options: {
+      tilePath: "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}@2x.png"
+    }
+  },
+  output: {
+    type: "BlueprintOutputImageTiles",
+    options: {
+      grids: [{
+        zoom: 13,
+        tilesPerDirection: 5,
+        cullZoom: 11
+      }]
+    }
+  },
+  triggers: [{
+    triggerObject: "output",
+    triggerName: "initialised",
+    triggerArguments: ["tiles"],
+    actionObject: "input",
+    actionName: "requestTiles",
+    actionArguments: ["tiles"],
+    actionOutput: {
+      tiles: "tiles" // actionArg: triggerArg
+    }
+  }, {
+    triggerObject: "output",
+    triggerName: "gridUpdated",
+    triggerArguments: ["tiles"],
+    actionObject: "input",
+    actionName: "requestTiles",
+    actionArguments: ["tiles"],
+    actionOutput: {
+      tiles: "tiles" // actionArg: triggerArg
+    }
+  }, {
+    triggerObject: "input",
+    triggerName: "tileReceived",
+    triggerArguments: ["image", "tile"],
+    actionObject: "output",
+    actionName: "outputImageTile",
+    actionArguments: ["image", "tile"],
+    actionOutput: {
+      image: "image", // actionArg: triggerArg
+      tile: "tile"
+    }
+  }]
+};
+
+var switchboardMap = new VIZI.BlueprintSwitchboard(mapConfig);
+switchboardMap.addToWorld(world);
+```
+
+The last step is to to set up the update and render loop:
+
+```javascript
+var clock = new VIZI.Clock();
+
+var update = function() {
+  var delta = clock.getDelta();
+
+  world.onTick(delta);
+  world.render();
+
+  window.requestAnimationFrame(update);
+};
+
+update();
+```
+
+Load the HTML page in a browser and enjoy your awesome 3D view of London!
 
 
-### Using ViziCities
+## Using ViziCities? Please attribute it
 
-Use the [built in example](https://github.com/vizicities/vizicities/tree/master/examples) to get an idea of what ViziCities can do. Change the coordinates to load a new part of the world (anywhere you want).
+While we love giving you the code to ViziCities for free, we also appreciate getting some recognition for all the hard work that's gone into it. A small, inconspicuous attribution is built into ViziCities and, while possible to remove, we'd really appreciate it if you left it in.
 
+If you really need to remove the attribution, please [get in touch](hello@vizicities.com) and we can work out an alternative.
+
+## Forked ViziCities 0.1.0-pre? Update your remote URL
+
+The ViziCities repo has been moved away from Robin's personal account and now resides within the UDST organisation on GitHub. As a result of this, you'll need to update the remote URL if you've forked ViziCities in the past.
+
+It's pretty easy to do, [GitHub even wrote about how to do it](https://help.github.com/articles/changing-a-remote-s-url/). Running the following command within your ViziCities directory should be enough for most people:
+
+```bash
+$ git remote set-url origin git@github.com:UDST/vizicities.git
+```
 
 ## Getting involved
 
 ViziCities can't happen without your help. We need people to submit bugs, suggest features, share how they're using the project, and contribute code. Sound like you? [Check out exactly how to get involved](https://github.com/vizicities/vizicities/blob/master/CONTRIBUTING.md).
 
-### Suggestions
-
-There are a couple of things in particular that need your help:
-
-* Styling improvements (play with the lighting and materials, add shaders, make things look pretty)
-* Performance improvements (particularly with feature processing, generation and rendering)
-
 
 ## Contact & community
 
-Communicate with the ViziCities team via email ([hello@vizicities.com](mailto:hello@vizicities.com)) and Twitter ([@ViziCities](http://twitter.com/ViziCities)). All other discussion should happen in the [ViziCities Google Group](https://groups.google.com/forum/#!forum/vizicities), IRC (#vizicities on Freenode) or [relevant GitHub issues page](https://github.com/vizicities/vizicities/issues).
+Communicate with the ViziCities team via email ([hello@vizicities.com](mailto:hello@vizicities.com)) and Twitter ([@ViziCities](http://twitter.com/ViziCities)). All other discussion should happen in the [ViziCities Google Group](https://groups.google.com/forum/#!forum/vizicities) or [relevant GitHub issues page](https://github.com/vizicities/vizicities/issues).
 
 
-## Libraries and resources used
+## Libraries used
 
-* [OpenStreetMap](http://openstreetmap.org) – Map data
 * [Three.js](http://threejs.org) – WebGL
-* [D3.js](http://d3js.org) – Geographic coordinate conversion
-* [Underscore.js](http://underscorejs.org) – General helpers
-* [Q](https://github.com/kriskowal/q) – Promises
-* [Throat](https://github.com/ForbesLindesay/throat) - Limiting concurrency
-* [Catiline](http://catilinejs.com) – Web Workers
-* [Dat.gui](https://code.google.com/p/dat-gui) – Debug control panel
-* [FPSMeter](http://darsa.in/fpsmeter) – FPS meter
-* [Moment.js](http://momentjs.com) – Date processing
-* [Simplify.js](http://mourner.github.io/simplify-js) – Polygon simplification
+* [Proj4js](https://github.com/proj4js/proj4js) – Geographic coordinate projection
+* [WildEmitter](https://github.com/HenrikJoreteg/wildemitter) - Event system
+* [Underscore.js](http://underscorejs.org) – General JavaScript helpers
+* [D3.js](http://d3js.org) – Data visualisation helpers
+* [Operative](https://github.com/padolsey/operative) – Web Workers
+* [Mocha](https://github.com/mochajs/mocha) - Testing framework
+* [Chai](http://chaijs.com/) - Test assertions
+* [Bower](http://bower.io/) – Packaging system
 * [Grunt](http://gruntjs.com) – Build system
 
 
-## FAQ
+## Copyright & license
 
-### What happened to all the cool features I saw in the blog posts?
+The MIT License (MIT)
 
-Over the past year [we've been producing experiments](http://rawkes.com/articles/vizicities-dev-diary-2) to prove that ViziCities is possible. These experiments, while working, were not robust and never intended for release. The version of ViziCities you see here is a solid foundation based on the lessons learnt from the previous experiments. It will eventually catch up with those experiments in regards to features.
+Copyright (c) 2014 - Robin Hawkes
 
-### What are the controls?
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-* Zoom using the mouse wheel
-* Pan using the left mouse button
-* Orbit by holding shift and using the left mouse button, or using the middle mouse button
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

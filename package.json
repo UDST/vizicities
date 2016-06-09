@@ -1,29 +1,44 @@
 {
-  "name": "ViziCities",
-  "version": "0.1.0",
+  "name": "vizicities",
+  "version": "0.2.0",
   "description": "3D city and data visualisation platform",
   "main": "index.js",
+  "directories": {
+    "example": "examples",
+    "test": "test"
+  },
   "scripts": {
     "test": "grunt test --verbose"
   },
-  "author": "Robin Hawkes",
-  "license": "MIT",
-  "devDependencies": {
-    "grunt": "~0.4.1",
-    "grunt-contrib-jshint": "~0.7.0",
-    "grunt-contrib-uglify": "~0.2.2",
-    "grunt-contrib-concat": "~0.3.0",
-    "grunt-contrib-watch": "~0.5.3",
-    "grunt-contrib-connect": "~0.5.0",
-    "grunt-notify": "~0.2.15",
-    "mocha": "~1.17.1",
-    "grunt-mocha-phantomjs": "~0.4.0",
-    "chai": "~1.9.0",
-    "sinon": "~1.8.1",
-    "sinon-chai": "~2.5.0"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/UDST/vizicities.git"
   },
-  "repository" :
-  { "type" : "git"
-  , "url" : "https://github.com/robhawkes/vizicities.git"
+  "keywords": [
+    "mapping",
+    "geography",
+    "cities",
+    "urban",
+    "data",
+    "dataviz",
+    "3d"
+  ],
+  "author": "Robin Hawkes <rob@vizicities.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/UDST/vizicities/issues"
+  },
+  "homepage": "https://github.com/UDST/vizicities",
+  "devDependencies": {
+    "chai": "^1.9.2",
+    "grunt": "^0.4.5",
+    "grunt-contrib-concat": "^0.5.0",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-contrib-uglify": "^0.6.0",
+    "grunt-mocha-slimer": "0.0.2",
+    "grunt-react": "^0.10.0",
+    "mocha": "^1.21.5",
+    "sinon": "^1.10.3",
+    "sinon-chai": "^2.6.0"
   }
 }
