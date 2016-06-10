@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/vizicities/vizicities.git"
+    "url": "https://github.com/UDST/vizicities.git"
   },
   "keywords": [
     "mapping",
@@ -29,11 +29,11 @@
     "gis"
   ],
   "author": "ViziCities <hello@vizicities.com>",
-  "license": "MIT",
+  "license": "BSD-3",
   "bugs": {
-    "url": "https://github.com/vizicities/vizicities/issues"
+    "url": "https://github.com/UDST/vizicities/issues"
   },
-  "homepage": "https://github.com/vizicities/vizicities",
+  "homepage": "https://github.com/UDST/vizicities",
   "devDependencies": {
     "babel-core": "^5.2.17",
     "babel-eslint": "^4.0.5",
