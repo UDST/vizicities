@@ -1,4 +1,4 @@
-# ViziCities [0.1.0-pre] [![Build Status](https://travis-ci.org/vizicities/vizicities.png?branch=master)](https://travis-ci.org/vizicities/vizicities)
+# ViziCities (0.1)
 __Bringing cities to life using the power of open data and the Web__
 
 ![http://vizicities.apps.rawk.es](http://cl.ly/VS9H/Screen%20Shot%202014-05-10%20at%2016.04.54.png)
