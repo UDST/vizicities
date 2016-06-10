@@ -1,4 +1,4 @@
-# ViziCities 0.2.0 [Codename: Hamlet] [![Build Status](https://travis-ci.org/vizicities/vizicities.png?branch=0.2.0)](https://travis-ci.org/vizicities/vizicities)
+# ViziCities 0.2.0
 __JavaScript 3D city and data visualisation platform__
 
 [![](http://cl.ly/VS9H/Screen%20Shot%202014-05-10%20at%2016.04.54.png)](http://vizicities.com)
