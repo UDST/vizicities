@@ -1,0 +1,96 @@
+{
+  "name": "vizicities",
+  "version": "0.3.0",
+  "description": "3D city and data visualisation platform",
+  "main": "dist/vizicities.js",
+  "scripts": {
+    "test": "gulp",
+    "lint": "gulp lint",
+    "test-browser": "gulp test-browser",
+    "watch": "gulp watch",
+    "build": "gulp build",
+    "coverage": "gulp coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vizicities/vizicities.git"
+  },
+  "keywords": [
+    "mapping",
+    "geography",
+    "cities",
+    "3d",
+    "webgl",
+    "three.js",
+    "maps",
+    "data",
+    "visualisation",
+    "geojson",
+    "gis"
+  ],
+  "author": "ViziCities <hello@vizicities.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vizicities/vizicities/issues"
+  },
+  "homepage": "https://github.com/vizicities/vizicities",
+  "devDependencies": {
+    "babel-core": "^5.2.17",
+    "babel-eslint": "^4.0.5",
+    "babel-loader": "^5.3.2",
+    "chai": "^3.2.0",
+    "del": "^1.1.1",
+    "glob": "^5.0.14",
+    "gulp": "^3.8.10",
+    "gulp-babel": "^5.0.0",
+    "gulp-eslint": "^1.0.0",
+    "gulp-filter": "^3.0.0",
+    "gulp-istanbul": "^0.10.0",
+    "gulp-jscs": "^3.0.0",
+    "gulp-livereload": "^3.8.1",
+    "gulp-load-plugins": "^0.10.0",
+    "gulp-mocha": "^2.0.0",
+    "gulp-plumber": "^1.0.1",
+    "gulp-rename": "^1.2.0",
+    "gulp-sourcemaps": "^1.3.0",
+    "gulp-uglify": "^1.5.2",
+    "gulp-util": "^3.0.6",
+    "isparta": "^3.0.3",
+    "json-loader": "^0.5.3",
+    "mocha": "^2.1.0",
+    "sinon": "^1.12.2",
+    "sinon-chai": "^2.7.0",
+    "vinyl-source-stream": "^1.0.0",
+    "webpack": "^1.12.2",
+    "webpack-stream": "^2.1.1"
+  },
+  "babelBoilerplateOptions": {
+    "entryFileName": "vizicities",
+    "mainVarName": "VIZI",
+    "mochaGlobals": [
+      "stub",
+      "spy",
+      "expect",
+      "sandbox",
+      "mock",
+      "useFakeTimers",
+      "useFakeXMLHttpRequest",
+      "useFakeServer"
+    ]
+  },
+  "dependencies": {
+    "earcut": "^2.0.8",
+    "eventemitter3": "^1.1.1",
+    "geojson-merge": "^0.1.0",
+    "hammerjs": "^2.0.6",
+    "lodash.assign": "^4.0.2",
+    "lodash.throttle": "^4.0.0",
+    "lru-cache": "^4.0.0",
+    "polygon-offset": "^0.1.0",
+    "proj4": "^2.3.12",
+    "reqwest": "^2.0.5",
+    "three": "^0.74.0",
+    "topojson": "^1.6.24",
+    "xhr2": "^0.1.3"
+  }
+}
