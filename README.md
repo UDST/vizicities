@@ -1,4 +1,4 @@
-# ViziCities 0.2.0
+# ViziCities (0.2)
 __JavaScript 3D city and data visualisation platform__
 
 [![](http://cl.ly/VS9H/Screen%20Shot%202014-05-10%20at%2016.04.54.png)](http://vizicities.com)
