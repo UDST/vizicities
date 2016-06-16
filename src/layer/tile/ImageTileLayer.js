@@ -59,7 +59,7 @@ import extend from 'lodash.assign';
 class ImageTileLayer extends TileLayer {
   constructor(path, options) {
     var defaults = {
-      distance: 200000
+      distance: 300000
     };
 
     options = extend({}, defaults, options);

@@ -55,7 +55,7 @@ class Skybox {
 
   _initSkybox() {
     // Cube camera for skybox
-    this._cubeCamera = new THREE.CubeCamera(1, 2000000, 128);
+    this._cubeCamera = new THREE.CubeCamera(1, 20000000, 128);
 
     // Cube material
     var cubeTarget = this._cubeCamera.renderTarget;
@@ -87,7 +87,7 @@ class Skybox {
       side: THREE.BackSide
     });
 
-    this._mesh = new THREE.Mesh(new THREE.BoxGeometry(190000, 190000, 190000), skyboxMat);
+    this._mesh = new THREE.Mesh(new THREE.BoxGeometry(1900000, 1900000, 1900000), skyboxMat);
 
     this._updateSkybox = true;
   }

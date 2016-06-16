@@ -3362,7 +3362,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// http://stackoverflow.com/q/26655930/997339
 	
 	exports['default'] = function (container) {
-	  var camera = new _three2['default'].PerspectiveCamera(45, 1, 1, 200000);
+	  var camera = new _three2['default'].PerspectiveCamera(45, 1, 1, 2000000);
 	  camera.position.y = 4000;
 	  camera.position.z = 4000;
 	
@@ -4813,7 +4813,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_initSkybox',
 	    value: function _initSkybox() {
 	      // Cube camera for skybox
-	      this._cubeCamera = new _three2['default'].CubeCamera(1, 2000000, 128);
+	      this._cubeCamera = new _three2['default'].CubeCamera(1, 20000000, 128);
 	
 	      // Cube material
 	      var cubeTarget = this._cubeCamera.renderTarget;
@@ -4842,7 +4842,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        side: _three2['default'].BackSide
 	      });
 	
-	      this._mesh = new _three2['default'].Mesh(new _three2['default'].BoxGeometry(190000, 190000, 190000), skyboxMat);
+	      this._mesh = new _three2['default'].Mesh(new _three2['default'].BoxGeometry(1900000, 1900000, 1900000), skyboxMat);
 	
 	      this._updateSkybox = true;
 	    }
@@ -9842,7 +9842,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _classCallCheck(this, ImageTileLayer);
 	
 	    var defaults = {
-	      distance: 200000
+	      distance: 300000
 	    };
 	
 	    options = (0, _lodashAssign2['default'])({}, defaults, options);
@@ -12922,7 +12922,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var defaults = {
 	      maxLOD: 14,
-	      distance: 50000
+	      distance: 30000
 	    };
 	
 	    options = (0, _lodashAssign2['default'])({}, defaults, options);
