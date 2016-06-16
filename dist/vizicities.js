@@ -3363,8 +3363,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports['default'] = function (container) {
 	  var camera = new _three2['default'].PerspectiveCamera(45, 1, 1, 200000);
-	  camera.position.y = 400;
-	  camera.position.z = 400;
+	  camera.position.y = 4000;
+	  camera.position.z = 4000;
 	
 	  var updateSize = function updateSize() {
 	    camera.aspect = container.clientWidth / container.clientHeight;
@@ -4425,7 +4425,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	          this._skyboxLight.castShadow = true;
 	
-	          var d = 1000;
+	          var d = 10000;
 	          this._skyboxLight.shadow.camera.left = -d;
 	          this._skyboxLight.shadow.camera.right = d;
 	          this._skyboxLight.shadow.camera.top = d;

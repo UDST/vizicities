@@ -8,8 +8,8 @@ import THREE from 'three';
 
 export default function(container) {
   var camera = new THREE.PerspectiveCamera(45, 1, 1, 200000);
-  camera.position.y = 400;
-  camera.position.z = 400;
+  camera.position.y = 4000;
+  camera.position.z = 4000;
 
   var updateSize = function() {
     camera.aspect = container.clientWidth / container.clientHeight;

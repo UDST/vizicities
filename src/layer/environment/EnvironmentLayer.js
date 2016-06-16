@@ -79,7 +79,7 @@ class EnvironmentLayer extends Layer {
 
       this._skyboxLight.castShadow = true;
 
-      var d = 1000;
+      var d = 10000;
       this._skyboxLight.shadow.camera.left = -d;
       this._skyboxLight.shadow.camera.right = d;
       this._skyboxLight.shadow.camera.top = d;
