@@ -1,7 +1,7 @@
 {
   "name": "vizicities",
   "version": "0.3.0",
-  "description": "3D city and data visualisation platform",
+  "description": "A framework for 3D geospatial visualisation in the browser",
   "main": "dist/vizicities.js",
   "scripts": {
     "test": "gulp",
@@ -29,17 +29,18 @@
     "gis"
   ],
   "author": "ViziCities <hello@vizicities.com>",
-  "license": "BSD-3",
+  "license": "BSD-3-Clause",
   "bugs": {
     "url": "https://github.com/UDST/vizicities/issues"
   },
   "homepage": "https://github.com/UDST/vizicities",
   "devDependencies": {
     "babel-core": "^5.2.17",
-    "babel-eslint": "^4.0.5",
+    "babel-eslint": "^6.0.4",
     "babel-loader": "^5.3.2",
     "chai": "^3.2.0",
     "del": "^1.1.1",
+    "eslint": "^2.12.0",
     "glob": "^5.0.14",
     "gulp": "^3.8.10",
     "gulp-babel": "^5.0.0",
@@ -86,7 +87,6 @@
     "lodash.assign": "^4.0.2",
     "lodash.throttle": "^4.0.0",
     "lru-cache": "^4.0.0",
-    "polygon-offset": "^0.1.0",
     "proj4": "^2.3.12",
     "reqwest": "^2.0.5",
     "three": "^0.74.0",
