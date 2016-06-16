@@ -1,6 +1,7 @@
 import EventEmitter from 'eventemitter3';
 import extend from 'lodash.assign';
-import CRS from './geo/crs/index';
+// import CRS from './geo/crs/index';
+import Geo from './geo/Geo';
 import {point as Point} from './geo/Point';
 import {latLon as LatLon} from './geo/LatLon';
 import Engine from './engine/Engine';
@@ -16,7 +17,7 @@ class World extends EventEmitter {
     super();
 
     var defaults = {
-      crs: CRS.EPSG3857,
+      // crs: CRS.EPSG3857,
       skybox: false,
       postProcessing: false
     };
@@ -142,7 +143,7 @@ class World extends EventEmitter {
   // For example, this takes a geographic coordinate and returns a point
   // relative to the origin point of the projection (not the world)
   project(latlon) {
-    return this.options.crs.latLonToPoint(LatLon(latlon));
+    return Geo.latLonToPoint(LatLon(latlon));
   }
 
   // Transform world point to geographic coordinate
@@ -152,7 +153,7 @@ class World extends EventEmitter {
   // For example, this takes a point relative to the origin point of the
   // projection (not the world) and returns a geographic coordinate
   unproject(point) {
-    return this.options.crs.pointToLatLon(Point(point));
+    return Geo.pointToLatLon(Point(point));
   }
 
   // Takes into account the origin offset
@@ -175,21 +176,21 @@ class World extends EventEmitter {
 
   // Return pointscale for a given geographic coordinate
   pointScale(latlon, accurate) {
-    return this.options.crs.pointScale(latlon, accurate);
+    return Geo.pointScale(latlon, accurate);
   }
 
   // Convert from real meters to world units
   //
   // TODO: Would be nice not to have to pass in a pointscale here
   metresToWorld(metres, pointScale, zoom) {
-    return this.options.crs.metresToWorld(metres, pointScale, zoom);
+    return Geo.metresToWorld(metres, pointScale, zoom);
   }
 
   // Convert from real meters to world units
   //
   // TODO: Would be nice not to have to pass in a pointscale here
   worldToMetres(worldUnits, pointScale, zoom) {
-    return this.options.crs.worldToMetres(worldUnits, pointScale, zoom);
+    return Geo.worldToMetres(worldUnits, pointScale, zoom);
   }
 
   // Unsure if it's a good idea to expose this here for components like

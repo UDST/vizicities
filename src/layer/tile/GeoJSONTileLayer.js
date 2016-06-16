@@ -38,7 +38,7 @@ class GeoJSONTileLayer extends TileLayer {
   constructor(path, options) {
     var defaults = {
       maxLOD: 14,
-      distance: 2000
+      distance: 50000
     };
 
     options = extend({}, defaults, options);

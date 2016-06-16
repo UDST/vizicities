@@ -1,6 +1,8 @@
 import World, {world} from './World';
 import Controls from './controls/index';
 
+import Geo from './geo/Geo.js';
+
 import Layer, {layer} from './layer/Layer';
 import EnvironmentLayer, {environmentLayer} from './layer/environment/EnvironmentLayer';
 import ImageTileLayer, {imageTileLayer} from './layer/tile/ImageTileLayer';
@@ -26,6 +28,7 @@ const VIZI = {
   World: World,
   world: world,
   Controls: Controls,
+  Geo: Geo,
   Layer: Layer,
   layer: layer,
   EnvironmentLayer: EnvironmentLayer,

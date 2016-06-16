@@ -182,6 +182,14 @@ function testBrowser() {
       externals: {
         // Proxy the global THREE variable to require('three')
         'three': 'THREE',
+        // Proxy the global THREE variable to require('TweenLite')
+        'TweenLite': 'TweenLite',
+        // Proxy the global THREE variable to require('TweenMax')
+        'TweenMax': 'TweenMax',
+        // Proxy the global THREE variable to require('TimelineLite')
+        'TimelineLite': 'TimelineLite',
+        // Proxy the global THREE variable to require('TimelineMax')
+        'TimelineMax': 'TimelineMax',
         // Proxy the global proj4 variable to require('proj4')
         'proj4': 'proj4'
       },

@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("proj4"), require("THREE"), require("TweenLite"));
+		module.exports = factory(require("THREE"), require("TweenLite"));
 	else if(typeof define === 'function' && define.amd)
-		define(["proj4", "THREE", "TweenLite"], factory);
+		define(["THREE", "TweenLite"], factory);
 	else if(typeof exports === 'object')
-		exports["VIZI"] = factory(require("proj4"), require("THREE"), require("TweenLite"));
+		exports["VIZI"] = factory(require("THREE"), require("TweenLite"));
 	else
-		root["VIZI"] = factory(root["proj4"], root["THREE"], root["TweenLite"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_22__, __WEBPACK_EXTERNAL_MODULE_24__, __WEBPACK_EXTERNAL_MODULE_55__) {
+		root["VIZI"] = factory(root["THREE"], root["TweenLite"]);
+})(this, function(__WEBPACK_EXTERNAL_MODULE_10__, __WEBPACK_EXTERNAL_MODULE_41__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -64,63 +64,67 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _World2 = _interopRequireDefault(_World);
 	
-	var _controlsIndex = __webpack_require__(51);
+	var _controlsIndex = __webpack_require__(37);
 	
 	var _controlsIndex2 = _interopRequireDefault(_controlsIndex);
 	
-	var _layerLayer = __webpack_require__(46);
+	var _geoGeoJs = __webpack_require__(6);
+	
+	var _geoGeoJs2 = _interopRequireDefault(_geoGeoJs);
+	
+	var _layerLayer = __webpack_require__(32);
 	
 	var _layerLayer2 = _interopRequireDefault(_layerLayer);
 	
-	var _layerEnvironmentEnvironmentLayer = __webpack_require__(45);
+	var _layerEnvironmentEnvironmentLayer = __webpack_require__(31);
 	
 	var _layerEnvironmentEnvironmentLayer2 = _interopRequireDefault(_layerEnvironmentEnvironmentLayer);
 	
-	var _layerTileImageTileLayer = __webpack_require__(56);
+	var _layerTileImageTileLayer = __webpack_require__(42);
 	
 	var _layerTileImageTileLayer2 = _interopRequireDefault(_layerTileImageTileLayer);
 	
-	var _layerTileGeoJSONTileLayer = __webpack_require__(71);
+	var _layerTileGeoJSONTileLayer = __webpack_require__(57);
 	
 	var _layerTileGeoJSONTileLayer2 = _interopRequireDefault(_layerTileGeoJSONTileLayer);
 	
-	var _layerTileTopoJSONTileLayer = __webpack_require__(89);
+	var _layerTileTopoJSONTileLayer = __webpack_require__(75);
 	
 	var _layerTileTopoJSONTileLayer2 = _interopRequireDefault(_layerTileTopoJSONTileLayer);
 	
-	var _layerGeoJSONLayer = __webpack_require__(73);
+	var _layerGeoJSONLayer = __webpack_require__(59);
 	
 	var _layerGeoJSONLayer2 = _interopRequireDefault(_layerGeoJSONLayer);
 	
-	var _layerTopoJSONLayer = __webpack_require__(90);
+	var _layerTopoJSONLayer = __webpack_require__(76);
 	
 	var _layerTopoJSONLayer2 = _interopRequireDefault(_layerTopoJSONLayer);
 	
-	var _layerGeometryPolygonLayer = __webpack_require__(86);
+	var _layerGeometryPolygonLayer = __webpack_require__(72);
 	
 	var _layerGeometryPolygonLayer2 = _interopRequireDefault(_layerGeometryPolygonLayer);
 	
-	var _layerGeometryPolylineLayer = __webpack_require__(87);
+	var _layerGeometryPolylineLayer = __webpack_require__(73);
 	
 	var _layerGeometryPolylineLayer2 = _interopRequireDefault(_layerGeometryPolylineLayer);
 	
-	var _layerGeometryPointLayer = __webpack_require__(88);
+	var _layerGeometryPointLayer = __webpack_require__(74);
 	
 	var _layerGeometryPointLayer2 = _interopRequireDefault(_layerGeometryPointLayer);
 	
-	var _geoPoint = __webpack_require__(11);
+	var _geoPoint = __webpack_require__(8);
 	
 	var _geoPoint2 = _interopRequireDefault(_geoPoint);
 	
-	var _geoLatLon = __webpack_require__(10);
+	var _geoLatLon = __webpack_require__(7);
 	
 	var _geoLatLon2 = _interopRequireDefault(_geoLatLon);
 	
-	var _enginePickingMaterial = __webpack_require__(84);
+	var _enginePickingMaterial = __webpack_require__(70);
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
-	var _utilIndex = __webpack_require__(91);
+	var _utilIndex = __webpack_require__(77);
 	
 	var _utilIndex2 = _interopRequireDefault(_utilIndex);
 	
@@ -131,6 +135,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  World: _World2['default'],
 	  world: _World.world,
 	  Controls: _controlsIndex2['default'],
+	  Geo: _geoGeoJs2['default'],
 	  Layer: _layerLayer2['default'],
 	  layer: _layerLayer.layer,
 	  EnvironmentLayer: _layerEnvironmentEnvironmentLayer2['default'],
@@ -188,19 +193,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _geoCrsIndex = __webpack_require__(6);
+	// import CRS from './geo/crs/index';
 	
-	var _geoCrsIndex2 = _interopRequireDefault(_geoCrsIndex);
+	var _geoGeo = __webpack_require__(6);
 	
-	var _geoPoint = __webpack_require__(11);
+	var _geoGeo2 = _interopRequireDefault(_geoGeo);
 	
-	var _geoLatLon = __webpack_require__(10);
+	var _geoPoint = __webpack_require__(8);
 	
-	var _engineEngine = __webpack_require__(23);
+	var _geoLatLon = __webpack_require__(7);
+	
+	var _engineEngine = __webpack_require__(9);
 	
 	var _engineEngine2 = _interopRequireDefault(_engineEngine);
 	
-	var _layerEnvironmentEnvironmentLayer = __webpack_require__(45);
+	var _layerEnvironmentEnvironmentLayer = __webpack_require__(31);
 	
 	var _layerEnvironmentEnvironmentLayer2 = _interopRequireDefault(_layerEnvironmentEnvironmentLayer);
 	
@@ -218,7 +225,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _get(Object.getPrototypeOf(World.prototype), 'constructor', this).call(this);
 	
 	    var defaults = {
-	      crs: _geoCrsIndex2['default'].EPSG3857,
+	      // crs: CRS.EPSG3857,
 	      skybox: false,
 	      postProcessing: false
 	    };
@@ -363,7 +370,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'project',
 	    value: function project(latlon) {
-	      return this.options.crs.latLonToPoint((0, _geoLatLon.latLon)(latlon));
+	      return _geoGeo2['default'].latLonToPoint((0, _geoLatLon.latLon)(latlon));
 	    }
 	
 	    // Transform world point to geographic coordinate
@@ -375,7 +382,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'unproject',
 	    value: function unproject(point) {
-	      return this.options.crs.pointToLatLon((0, _geoPoint.point)(point));
+	      return _geoGeo2['default'].pointToLatLon((0, _geoPoint.point)(point));
 	    }
 	
 	    // Takes into account the origin offset
@@ -404,7 +411,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'pointScale',
 	    value: function pointScale(latlon, accurate) {
-	      return this.options.crs.pointScale(latlon, accurate);
+	      return _geoGeo2['default'].pointScale(latlon, accurate);
 	    }
 	
 	    // Convert from real meters to world units
@@ -413,7 +420,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'metresToWorld',
 	    value: function metresToWorld(metres, pointScale, zoom) {
-	      return this.options.crs.metresToWorld(metres, pointScale, zoom);
+	      return _geoGeo2['default'].metresToWorld(metres, pointScale, zoom);
 	    }
 	
 	    // Convert from real meters to world units
@@ -422,7 +429,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'worldToMetres',
 	    value: function worldToMetres(worldUnits, pointScale, zoom) {
-	      return this.options.crs.worldToMetres(worldUnits, pointScale, zoom);
+	      return _geoGeo2['default'].worldToMetres(worldUnits, pointScale, zoom);
 	    }
 	
 	    // Unsure if it's a good idea to expose this here for components like
@@ -2092,389 +2099,223 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	var _LatLon = __webpack_require__(7);
 	
-	var _CRSEPSG3857 = __webpack_require__(7);
+	var _Point = __webpack_require__(8);
 	
-	var _CRSEPSG38572 = _interopRequireDefault(_CRSEPSG3857);
+	var Geo = {};
 	
-	var _CRSEPSG3395 = __webpack_require__(15);
+	// Radius / WGS84 semi-major axis
+	Geo.R = 6378137;
+	Geo.MAX_LATITUDE = 85.0511287798;
 	
-	var _CRSEPSG33952 = _interopRequireDefault(_CRSEPSG3395);
+	// WGS84 eccentricity
+	Geo.ECC = 0.081819191;
+	Geo.ECC2 = 0.081819191 * 0.081819191;
 	
-	var _CRSEPSG4326 = __webpack_require__(17);
+	Geo.project = function (latlon) {
+	  var d = Math.PI / 180;
+	  var max = Geo.MAX_LATITUDE;
+	  var lat = Math.max(Math.min(max, latlon.lat), -max);
+	  var sin = Math.sin(lat * d);
 	
-	var _CRSEPSG43262 = _interopRequireDefault(_CRSEPSG4326);
+	  return (0, _Point.point)(Geo.R * latlon.lon * d, Geo.R * Math.log((1 + sin) / (1 - sin)) / 2);
+	}, Geo.unproject = function (point) {
+	  var d = 180 / Math.PI;
 	
-	var _CRSSimple = __webpack_require__(19);
+	  return (0, _LatLon.latLon)((2 * Math.atan(Math.exp(point.y / Geo.R)) - Math.PI / 2) * d, point.x * d / Geo.R);
+	};
 	
-	var _CRSSimple2 = _interopRequireDefault(_CRSSimple);
+	// Converts geo coords to pixel / WebGL ones
+	// This just reverses the Y axis to match WebGL
+	Geo.latLonToPoint = function (latlon) {
+	  var projected = Geo.project(latlon);
+	  projected.y *= -1;
 	
-	var _CRSProj4 = __webpack_require__(20);
+	  return projected;
+	};
 	
-	var _CRSProj42 = _interopRequireDefault(_CRSProj4);
+	// Converts pixel / WebGL coords to geo coords
+	// This just reverses the Y axis to match WebGL
+	Geo.pointToLatLon = function (point) {
+	  var _point = VIZI.point(point.x, point.y * -1);
+	  return Geo.unproject(_point);
+	};
 	
-	var CRS = {};
+	// Scale factor for converting between real metres and projected metres
+	//
+	// projectedMetres = realMetres * pointScale
+	// realMetres = projectedMetres / pointScale
+	//
+	// Accurate scale factor uses proper Web Mercator scaling
+	// See pg.9: http://www.hydrometronics.com/downloads/Web%20Mercator%20-%20Non-Conformal,%20Non-Mercator%20(notes).pdf
+	// See: http://jsfiddle.net/robhawkes/yws924cf/
+	Geo.pointScale = function (latlon, accurate) {
+	  var rad = Math.PI / 180;
 	
-	CRS.EPSG3857 = _CRSEPSG38572['default'];
-	CRS.EPSG900913 = _CRSEPSG3857.EPSG900913;
-	CRS.EPSG3395 = _CRSEPSG33952['default'];
-	CRS.EPSG4326 = _CRSEPSG43262['default'];
-	CRS.Simple = _CRSSimple2['default'];
-	CRS.Proj4 = _CRSProj42['default'];
+	  var k;
 	
-	exports['default'] = CRS;
+	  if (!accurate) {
+	    k = 1 / Math.cos(latlon.lat * rad);
+	
+	    // [scaleX, scaleY]
+	    return [k, k];
+	  } else {
+	    var lat = latlon.lat * rad;
+	    var lon = latlon.lon * rad;
+	
+	    var a = Geo.R;
+	
+	    var sinLat = Math.sin(lat);
+	    var sinLat2 = sinLat * sinLat;
+	
+	    var cosLat = Math.cos(lat);
+	
+	    // Radius meridian
+	    var p = a * (1 - Geo.ECC2) / Math.pow(1 - Geo.ECC2 * sinLat2, 3 / 2);
+	
+	    // Radius prime meridian
+	    var v = a / Math.sqrt(1 - Geo.ECC2 * sinLat2);
+	
+	    // Scale N/S
+	    var h = a / p / cosLat;
+	
+	    // Scale E/W
+	    k = a / v / cosLat;
+	
+	    // [scaleX, scaleY]
+	    return [k, h];
+	  }
+	};
+	
+	// Convert real metres to projected units
+	//
+	// Latitude scale is chosen because it fluctuates more than longitude
+	Geo.metresToProjected = function (metres, pointScale) {
+	  return metres * pointScale[1];
+	};
+	
+	// Convert projected units to real metres
+	//
+	// Latitude scale is chosen because it fluctuates more than longitude
+	Geo.projectedToMetres = function (projectedUnits, pointScale) {
+	  return projectedUnits / pointScale[1];
+	};
+	
+	// Convert real metres to a value in world (WebGL) units
+	Geo.metresToWorld = function (metres, pointScale, zoom) {
+	  // Transform metres to projected metres using the latitude point scale
+	  //
+	  // Latitude scale is chosen because it fluctuates more than longitude
+	  var projectedMetres = Geo.metresToProjected(metres, pointScale);
+	
+	  var scale = Geo.scale(zoom);
+	
+	  // Half scale if using zoom as WebGL origin is in the centre, not top left
+	  if (zoom) {
+	    scale /= 2;
+	  }
+	
+	  // Scale projected metres
+	  var scaledMetres = scale * projectedMetres;
+	
+	  // Not entirely sure why this is neccessary
+	  if (zoom) {
+	    scaledMetres /= pointScale[1];
+	  }
+	
+	  return scaledMetres;
+	};
+	
+	// Convert world (WebGL) units to a value in real metres
+	Geo.worldToMetres = function (worldUnits, pointScale, zoom) {
+	  var scale = Geo.scale(zoom);
+	
+	  // Half scale if using zoom as WebGL origin is in the centre, not top left
+	  if (zoom) {
+	    scale /= 2;
+	  }
+	
+	  var projectedUnits = worldUnits / scale;
+	  var realMetres = Geo.projectedToMetres(projectedUnits, pointScale);
+	
+	  // Not entirely sure why this is neccessary
+	  if (zoom) {
+	    realMetres *= pointScale[1];
+	  }
+	
+	  return realMetres;
+	};
+	
+	// If zoom is provided, returns the map width in pixels for a given zoom
+	// Else, provides fixed scale value
+	Geo.scale = function (zoom) {
+	  // If zoom is provided then return scale based on map tile zoom
+	  if (zoom >= 0) {
+	    return 256 * Math.pow(2, zoom);
+	    // Else, return fixed scale value to expand projected coordinates from
+	    // their 0 to 1 range into something more practical
+	  } else {
+	      return 1;
+	    }
+	};
+	
+	// Returns zoom level for a given scale value
+	// This only works with a scale value that is based on map pixel width
+	Geo.zoom = function (scale) {
+	  return Math.log(scale / 256) / Math.LN2;
+	};
+	
+	// Distance between two geographical points using spherical law of cosines
+	// approximation or Haversine
+	//
+	// See: http://www.movable-type.co.uk/scripts/latlong.html
+	Geo.distance = function (latlon1, latlon2, accurate) {
+	  var rad = Math.PI / 180;
+	
+	  var lat1;
+	  var lat2;
+	
+	  var a;
+	
+	  if (!accurate) {
+	    lat1 = latlon1.lat * rad;
+	    lat2 = latlon2.lat * rad;
+	
+	    a = Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos((latlon2.lon - latlon1.lon) * rad);
+	
+	    return Geo.R * Math.acos(Math.min(a, 1));
+	  } else {
+	    lat1 = latlon1.lat * rad;
+	    lat2 = latlon2.lat * rad;
+	
+	    var lon1 = latlon1.lon * rad;
+	    var lon2 = latlon2.lon * rad;
+	
+	    var deltaLat = lat2 - lat1;
+	    var deltaLon = lon2 - lon1;
+	
+	    var halfDeltaLat = deltaLat / 2;
+	    var halfDeltaLon = deltaLon / 2;
+	
+	    a = Math.sin(halfDeltaLat) * Math.sin(halfDeltaLat) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(halfDeltaLon) * Math.sin(halfDeltaLon);
+	
+	    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+	
+	    return Geo.R * c;
+	  }
+	};
+	
+	Geo.bounds = (function () {
+	  var d = Geo.R * Math.PI;
+	  return [[-d, -d], [d, d]];
+	})();
+	
+	exports['default'] = Geo;
 	module.exports = exports['default'];
 
 /***/ },
 /* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	/*
-	 * CRS.EPSG3857 (WGS 84 / Pseudo-Mercator) CRS implementation.
-	 *
-	 * Based on:
-	 * https://github.com/Leaflet/Leaflet/blob/master/src/geo/crs/CRS.EPSG3857.js
-	 */
-	
-	var _lodashAssign = __webpack_require__(3);
-	
-	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
-	
-	var _CRSEarth = __webpack_require__(8);
-	
-	var _CRSEarth2 = _interopRequireDefault(_CRSEarth);
-	
-	var _projectionProjectionSphericalMercator = __webpack_require__(13);
-	
-	var _projectionProjectionSphericalMercator2 = _interopRequireDefault(_projectionProjectionSphericalMercator);
-	
-	var _utilTransformation = __webpack_require__(14);
-	
-	var _utilTransformation2 = _interopRequireDefault(_utilTransformation);
-	
-	var _EPSG3857 = {
-	  code: 'EPSG:3857',
-	  projection: _projectionProjectionSphericalMercator2['default'],
-	
-	  // Work out how to de-dupe this (scoping issue)
-	  transformScale: 1 / (Math.PI * _projectionProjectionSphericalMercator2['default'].R),
-	
-	  // Scale and transformation inputs changed to account for central origin in
-	  // WebGL, instead of top-left origin used in Leaflet
-	  transformation: (function () {
-	    // TODO: Cannot use this.transformScale due to scope
-	    var scale = 1 / (Math.PI * _projectionProjectionSphericalMercator2['default'].R);
-	
-	    return new _utilTransformation2['default'](scale, 0, -scale, 0);
-	  })()
-	};
-	
-	var EPSG3857 = (0, _lodashAssign2['default'])({}, _CRSEarth2['default'], _EPSG3857);
-	
-	var EPSG900913 = (0, _lodashAssign2['default'])({}, EPSG3857, {
-	  code: 'EPSG:900913'
-	});
-	
-	exports.EPSG900913 = EPSG900913;
-	exports['default'] = EPSG3857;
-
-/***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	/*
-	 * CRS.Earth is the base class for all CRS representing Earth.
-	 *
-	 * Based on:
-	 * https://github.com/Leaflet/Leaflet/blob/master/src/geo/crs/CRS.Earth.js
-	 */
-	
-	var _lodashAssign = __webpack_require__(3);
-	
-	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
-	
-	var _CRS = __webpack_require__(9);
-	
-	var _CRS2 = _interopRequireDefault(_CRS);
-	
-	var _LatLon = __webpack_require__(10);
-	
-	var Earth = {
-	  wrapLon: [-180, 180],
-	
-	  R: 6378137,
-	
-	  // Distance between two geographical points using spherical law of cosines
-	  // approximation or Haversine
-	  //
-	  // See: http://www.movable-type.co.uk/scripts/latlong.html
-	  distance: function distance(latlon1, latlon2, accurate) {
-	    var rad = Math.PI / 180;
-	
-	    var lat1;
-	    var lat2;
-	
-	    var a;
-	
-	    if (!accurate) {
-	      lat1 = latlon1.lat * rad;
-	      lat2 = latlon2.lat * rad;
-	
-	      a = Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos((latlon2.lon - latlon1.lon) * rad);
-	
-	      return this.R * Math.acos(Math.min(a, 1));
-	    } else {
-	      lat1 = latlon1.lat * rad;
-	      lat2 = latlon2.lat * rad;
-	
-	      var lon1 = latlon1.lon * rad;
-	      var lon2 = latlon2.lon * rad;
-	
-	      var deltaLat = lat2 - lat1;
-	      var deltaLon = lon2 - lon1;
-	
-	      var halfDeltaLat = deltaLat / 2;
-	      var halfDeltaLon = deltaLon / 2;
-	
-	      a = Math.sin(halfDeltaLat) * Math.sin(halfDeltaLat) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(halfDeltaLon) * Math.sin(halfDeltaLon);
-	
-	      var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-	
-	      return this.R * c;
-	    }
-	  },
-	
-	  // Scale factor for converting between real metres and projected metres
-	  //
-	  // projectedMetres = realMetres * pointScale
-	  // realMetres = projectedMetres / pointScale
-	  //
-	  // Defaults to a scale factor of 1 if no calculation method exists
-	  //
-	  // Probably need to run this through the CRS transformation or similar so the
-	  // resulting scale is relative to the dimensions of the world space
-	  // Eg. 1 metre in projected space is likly scaled up or down to some other
-	  // number
-	  pointScale: function pointScale(latlon, accurate) {
-	    return this.projection.pointScale ? this.projection.pointScale(latlon, accurate) : [1, 1];
-	  },
-	
-	  // Convert real metres to projected units
-	  //
-	  // Latitude scale is chosen because it fluctuates more than longitude
-	  metresToProjected: function metresToProjected(metres, pointScale) {
-	    return metres * pointScale[1];
-	  },
-	
-	  // Convert projected units to real metres
-	  //
-	  // Latitude scale is chosen because it fluctuates more than longitude
-	  projectedToMetres: function projectedToMetres(projectedUnits, pointScale) {
-	    return projectedUnits / pointScale[1];
-	  },
-	
-	  // Convert real metres to a value in world (WebGL) units
-	  metresToWorld: function metresToWorld(metres, pointScale, zoom) {
-	    // Transform metres to projected metres using the latitude point scale
-	    //
-	    // Latitude scale is chosen because it fluctuates more than longitude
-	    var projectedMetres = this.metresToProjected(metres, pointScale);
-	
-	    var scale = this.scale(zoom);
-	
-	    // Half scale if using zoom as WebGL origin is in the centre, not top left
-	    if (zoom) {
-	      scale /= 2;
-	    }
-	
-	    // Scale projected metres
-	    var scaledMetres = scale * (this.transformScale * projectedMetres);
-	
-	    // Not entirely sure why this is neccessary
-	    if (zoom) {
-	      scaledMetres /= pointScale[1];
-	    }
-	
-	    return scaledMetres;
-	  },
-	
-	  // Convert world (WebGL) units to a value in real metres
-	  worldToMetres: function worldToMetres(worldUnits, pointScale, zoom) {
-	    var scale = this.scale(zoom);
-	
-	    // Half scale if using zoom as WebGL origin is in the centre, not top left
-	    if (zoom) {
-	      scale /= 2;
-	    }
-	
-	    var projectedUnits = worldUnits / scale / this.transformScale;
-	    var realMetres = this.projectedToMetres(projectedUnits, pointScale);
-	
-	    // Not entirely sure why this is neccessary
-	    if (zoom) {
-	      realMetres *= pointScale[1];
-	    }
-	
-	    return realMetres;
-	  }
-	};
-	
-	exports['default'] = (0, _lodashAssign2['default'])({}, _CRS2['default'], Earth);
-	module.exports = exports['default'];
-
-/***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	/*
-	 * CRS is the base object for all defined CRS (Coordinate Reference Systems)
-	 *
-	 * Based on:
-	 * https://github.com/Leaflet/Leaflet/blob/master/src/geo/crs/CRS.js
-	 */
-	
-	var _LatLon = __webpack_require__(10);
-	
-	var _Point = __webpack_require__(11);
-	
-	var _utilWrapNum = __webpack_require__(12);
-	
-	var _utilWrapNum2 = _interopRequireDefault(_utilWrapNum);
-	
-	var CRS = {
-	  // Scale factor determines final dimensions of world space
-	  //
-	  // Projection transformation in range -1 to 1 is multiplied by scale factor to
-	  // find final world coordinates
-	  //
-	  // Scale factor can be considered as half the amount of the desired dimension
-	  // for the largest side when transformation is equal to 1 or -1, or as the
-	  // distance between 0 and 1 on the largest side
-	  //
-	  // For example, if you want the world dimensions to be between -1000 and 1000
-	  // then the scale factor will be 1000
-	  scaleFactor: 1000000,
-	
-	  // Converts geo coords to pixel / WebGL ones
-	  latLonToPoint: function latLonToPoint(latlon, zoom) {
-	    var projectedPoint = this.projection.project(latlon);
-	    var scale = this.scale(zoom);
-	
-	    // Half scale if using zoom as WebGL origin is in the centre, not top left
-	    if (zoom) {
-	      scale /= 2;
-	    }
-	
-	    return this.transformation._transform(projectedPoint, scale);
-	  },
-	
-	  // Converts pixel / WebGL coords to geo coords
-	  pointToLatLon: function pointToLatLon(point, zoom) {
-	    var scale = this.scale(zoom);
-	
-	    // Half scale if using zoom as WebGL origin is in the centre, not top left
-	    if (zoom) {
-	      scale /= 2;
-	    }
-	
-	    var untransformedPoint = this.transformation.untransform(point, scale);
-	
-	    return this.projection.unproject(untransformedPoint);
-	  },
-	
-	  // Converts geo coords to projection-specific coords (e.g. in meters)
-	  project: function project(latlon) {
-	    return this.projection.project(latlon);
-	  },
-	
-	  // Converts projected coords to geo coords
-	  unproject: function unproject(point) {
-	    return this.projection.unproject(point);
-	  },
-	
-	  // If zoom is provided, returns the map width in pixels for a given zoom
-	  // Else, provides fixed scale value
-	  scale: function scale(zoom) {
-	    // If zoom is provided then return scale based on map tile zoom
-	    if (zoom >= 0) {
-	      return 256 * Math.pow(2, zoom);
-	      // Else, return fixed scale value to expand projected coordinates from
-	      // their 0 to 1 range into something more practical
-	    } else {
-	        return this.scaleFactor;
-	      }
-	  },
-	
-	  // Returns zoom level for a given scale value
-	  // This only works with a scale value that is based on map pixel width
-	  zoom: function zoom(scale) {
-	    return Math.log(scale / 256) / Math.LN2;
-	  },
-	
-	  // Returns the bounds of the world in projected coords if applicable
-	  getProjectedBounds: function getProjectedBounds(zoom) {
-	    if (this.infinite) {
-	      return null;
-	    }
-	
-	    var b = this.projection.bounds;
-	    var s = this.scale(zoom);
-	
-	    // Half scale if using zoom as WebGL origin is in the centre, not top left
-	    if (zoom) {
-	      s /= 2;
-	    }
-	
-	    // Bottom left
-	    var min = this.transformation.transform((0, _Point.point)(b[0]), s);
-	
-	    // Top right
-	    var max = this.transformation.transform((0, _Point.point)(b[1]), s);
-	
-	    return [min, max];
-	  },
-	
-	  // Whether a coordinate axis wraps in a given range (e.g. longitude from -180 to 180); depends on CRS
-	  // wrapLon: [min, max],
-	  // wrapLat: [min, max],
-	
-	  // If true, the coordinate space will be unbounded (infinite in all directions)
-	  // infinite: false,
-	
-	  // Wraps geo coords in certain ranges if applicable
-	  wrapLatLon: function wrapLatLon(latlon) {
-	    var lat = this.wrapLat ? (0, _utilWrapNum2['default'])(latlon.lat, this.wrapLat, true) : latlon.lat;
-	    var lon = this.wrapLon ? (0, _utilWrapNum2['default'])(latlon.lon, this.wrapLon, true) : latlon.lon;
-	    var alt = latlon.alt;
-	
-	    return (0, _LatLon.latLon)(lat, lon, alt);
-	  }
-	};
-	
-	exports['default'] = CRS;
-	module.exports = exports['default'];
-
-/***/ },
-/* 10 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -2551,7 +2392,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.latLon = noNew;
 
 /***/ },
-/* 11 */
+/* 8 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -2639,666 +2480,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.point = _point;
 
 /***/ },
-/* 12 */
-/***/ function(module, exports) {
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	/*
-	 * Wrap the given number to lie within a certain range (eg. longitude)
-	 *
-	 * Based on:
-	 * https://github.com/Leaflet/Leaflet/blob/master/src/core/Util.js
-	 */
-	
-	var wrapNum = function wrapNum(x, range, includeMax) {
-	  var max = range[1];
-	  var min = range[0];
-	  var d = max - min;
-	  return x === max && includeMax ? x : ((x - min) % d + d) % d + min;
-	};
-	
-	exports["default"] = wrapNum;
-	module.exports = exports["default"];
-
-/***/ },
-/* 13 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	/*
-	 * Spherical Mercator is the most popular map projection, used by EPSG:3857 CRS
-	 * used by default.
-	 *
-	 * Based on:
-	 * https://github.com/Leaflet/Leaflet/blob/master/src/geo/projection/Projection.SphericalMercator.js
-	 */
-	
-	var _LatLon = __webpack_require__(10);
-	
-	var _Point = __webpack_require__(11);
-	
-	var SphericalMercator = {
-	  // Radius / WGS84 semi-major axis
-	  R: 6378137,
-	  MAX_LATITUDE: 85.0511287798,
-	
-	  // WGS84 eccentricity
-	  ECC: 0.081819191,
-	  ECC2: 0.081819191 * 0.081819191,
-	
-	  project: function project(latlon) {
-	    var d = Math.PI / 180;
-	    var max = this.MAX_LATITUDE;
-	    var lat = Math.max(Math.min(max, latlon.lat), -max);
-	    var sin = Math.sin(lat * d);
-	
-	    return (0, _Point.point)(this.R * latlon.lon * d, this.R * Math.log((1 + sin) / (1 - sin)) / 2);
-	  },
-	
-	  unproject: function unproject(point) {
-	    var d = 180 / Math.PI;
-	
-	    return (0, _LatLon.latLon)((2 * Math.atan(Math.exp(point.y / this.R)) - Math.PI / 2) * d, point.x * d / this.R);
-	  },
-	
-	  // Scale factor for converting between real metres and projected metres
-	  //
-	  // projectedMetres = realMetres * pointScale
-	  // realMetres = projectedMetres / pointScale
-	  //
-	  // Accurate scale factor uses proper Web Mercator scaling
-	  // See pg.9: http://www.hydrometronics.com/downloads/Web%20Mercator%20-%20Non-Conformal,%20Non-Mercator%20(notes).pdf
-	  // See: http://jsfiddle.net/robhawkes/yws924cf/
-	  pointScale: function pointScale(latlon, accurate) {
-	    var rad = Math.PI / 180;
-	
-	    var k;
-	
-	    if (!accurate) {
-	      k = 1 / Math.cos(latlon.lat * rad);
-	
-	      // [scaleX, scaleY]
-	      return [k, k];
-	    } else {
-	      var lat = latlon.lat * rad;
-	      var lon = latlon.lon * rad;
-	
-	      var a = this.R;
-	
-	      var sinLat = Math.sin(lat);
-	      var sinLat2 = sinLat * sinLat;
-	
-	      var cosLat = Math.cos(lat);
-	
-	      // Radius meridian
-	      var p = a * (1 - this.ECC2) / Math.pow(1 - this.ECC2 * sinLat2, 3 / 2);
-	
-	      // Radius prime meridian
-	      var v = a / Math.sqrt(1 - this.ECC2 * sinLat2);
-	
-	      // Scale N/S
-	      var h = a / p / cosLat;
-	
-	      // Scale E/W
-	      k = a / v / cosLat;
-	
-	      // [scaleX, scaleY]
-	      return [k, h];
-	    }
-	  },
-	
-	  // Not using this.R due to scoping
-	  bounds: (function () {
-	    var d = 6378137 * Math.PI;
-	    return [[-d, -d], [d, d]];
-	  })()
-	};
-	
-	exports['default'] = SphericalMercator;
-	module.exports = exports['default'];
-
-/***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-	
-	/*
-	 * Transformation is an utility class to perform simple point transformations
-	 * through a 2d-matrix.
-	 *
-	 * Based on:
-	 * https://github.com/Leaflet/Leaflet/blob/master/src/geometry/Transformation.js
-	 */
-	
-	var _geoPoint = __webpack_require__(11);
-	
-	var Transformation = (function () {
-	  function Transformation(a, b, c, d) {
-	    _classCallCheck(this, Transformation);
-	
-	    this._a = a;
-	    this._b = b;
-	    this._c = c;
-	    this._d = d;
-	  }
-	
-	  _createClass(Transformation, [{
-	    key: 'transform',
-	    value: function transform(point, scale) {
-	      // Copy input point as to not destroy the original data
-	      return this._transform(point.clone(), scale);
-	    }
-	
-	    // Destructive transform (faster)
-	  }, {
-	    key: '_transform',
-	    value: function _transform(point, scale) {
-	      scale = scale || 1;
-	
-	      point.x = scale * (this._a * point.x + this._b);
-	      point.y = scale * (this._c * point.y + this._d);
-	      return point;
-	    }
-	  }, {
-	    key: 'untransform',
-	    value: function untransform(point, scale) {
-	      scale = scale || 1;
-	      return (0, _geoPoint.point)((point.x / scale - this._b) / this._a, (point.y / scale - this._d) / this._c);
-	    }
-	  }]);
-	
-	  return Transformation;
-	})();
-	
-	exports['default'] = Transformation;
-	module.exports = exports['default'];
-
-/***/ },
-/* 15 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	/*
-	 * CRS.EPSG3395 (WGS 84 / World Mercator) CRS implementation.
-	 *
-	 * Based on:
-	 * https://github.com/Leaflet/Leaflet/blob/master/src/geo/crs/CRS.EPSG3395.js
-	 */
-	
-	var _lodashAssign = __webpack_require__(3);
-	
-	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
-	
-	var _CRSEarth = __webpack_require__(8);
-	
-	var _CRSEarth2 = _interopRequireDefault(_CRSEarth);
-	
-	var _projectionProjectionMercator = __webpack_require__(16);
-	
-	var _projectionProjectionMercator2 = _interopRequireDefault(_projectionProjectionMercator);
-	
-	var _utilTransformation = __webpack_require__(14);
-	
-	var _utilTransformation2 = _interopRequireDefault(_utilTransformation);
-	
-	var _EPSG3395 = {
-	  code: 'EPSG:3395',
-	  projection: _projectionProjectionMercator2['default'],
-	
-	  // Work out how to de-dupe this (scoping issue)
-	  transformScale: 1 / (Math.PI * _projectionProjectionMercator2['default'].R),
-	
-	  // Scale and transformation inputs changed to account for central origin in
-	  // WebGL, instead of top-left origin used in Leaflet
-	  transformation: (function () {
-	    // TODO: Cannot use this.transformScale due to scope
-	    var scale = 1 / (Math.PI * _projectionProjectionMercator2['default'].R);
-	
-	    return new _utilTransformation2['default'](scale, 0, -scale, 0);
-	  })()
-	};
-	
-	var EPSG3395 = (0, _lodashAssign2['default'])({}, _CRSEarth2['default'], _EPSG3395);
-	
-	exports['default'] = EPSG3395;
-	module.exports = exports['default'];
-
-/***/ },
-/* 16 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	/*
-	 * Mercator projection that takes into account that the Earth is not a perfect
-	 * sphere. Less popular than spherical mercator; used by projections like
-	 * EPSG:3395.
-	 *
-	 * Based on:
-	 * https://github.com/Leaflet/Leaflet/blob/master/src/geo/projection/Projection.Mercator.js
-	 */
-	
-	var _LatLon = __webpack_require__(10);
-	
-	var _Point = __webpack_require__(11);
-	
-	var Mercator = {
-	  // Radius / WGS84 semi-major axis
-	  R: 6378137,
-	  R_MINOR: 6356752.314245179,
-	
-	  // WGS84 eccentricity
-	  ECC: 0.081819191,
-	  ECC2: 0.081819191 * 0.081819191,
-	
-	  project: function project(latlon) {
-	    var d = Math.PI / 180;
-	    var r = this.R;
-	    var y = latlon.lat * d;
-	    var tmp = this.R_MINOR / r;
-	    var e = Math.sqrt(1 - tmp * tmp);
-	    var con = e * Math.sin(y);
-	
-	    var ts = Math.tan(Math.PI / 4 - y / 2) / Math.pow((1 - con) / (1 + con), e / 2);
-	    y = -r * Math.log(Math.max(ts, 1E-10));
-	
-	    return (0, _Point.point)(latlon.lon * d * r, y);
-	  },
-	
-	  unproject: function unproject(point) {
-	    var d = 180 / Math.PI;
-	    var r = this.R;
-	    var tmp = this.R_MINOR / r;
-	    var e = Math.sqrt(1 - tmp * tmp);
-	    var ts = Math.exp(-point.y / r);
-	    var phi = Math.PI / 2 - 2 * Math.atan(ts);
-	
-	    for (var i = 0, dphi = 0.1, con; i < 15 && Math.abs(dphi) > 1e-7; i++) {
-	      con = e * Math.sin(phi);
-	      con = Math.pow((1 - con) / (1 + con), e / 2);
-	      dphi = Math.PI / 2 - 2 * Math.atan(ts * con) - phi;
-	      phi += dphi;
-	    }
-	
-	    return (0, _LatLon.latLon)(phi * d, point.x * d / r);
-	  },
-	
-	  // Scale factor for converting between real metres and projected metres
-	  //
-	  // projectedMetres = realMetres * pointScale
-	  // realMetres = projectedMetres / pointScale
-	  //
-	  // See pg.8: http://www.hydrometronics.com/downloads/Web%20Mercator%20-%20Non-Conformal,%20Non-Mercator%20(notes).pdf
-	  pointScale: function pointScale(latlon) {
-	    var rad = Math.PI / 180;
-	    var lat = latlon.lat * rad;
-	    var sinLat = Math.sin(lat);
-	    var sinLat2 = sinLat * sinLat;
-	    var cosLat = Math.cos(lat);
-	
-	    var k = Math.sqrt(1 - this.ECC2 * sinLat2) / cosLat;
-	
-	    // [scaleX, scaleY]
-	    return [k, k];
-	  },
-	
-	  bounds: [[-20037508.34279, -15496570.73972], [20037508.34279, 18764656.23138]]
-	};
-	
-	exports['default'] = Mercator;
-	module.exports = exports['default'];
-
-/***/ },
-/* 17 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	/*
-	 * CRS.EPSG4326 is a CRS popular among advanced GIS specialists.
-	 *
-	 * Based on:
-	 * https://github.com/Leaflet/Leaflet/blob/master/src/geo/crs/CRS.EPSG4326.js
-	 */
-	
-	var _lodashAssign = __webpack_require__(3);
-	
-	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
-	
-	var _CRSEarth = __webpack_require__(8);
-	
-	var _CRSEarth2 = _interopRequireDefault(_CRSEarth);
-	
-	var _projectionProjectionLatLon = __webpack_require__(18);
-	
-	var _projectionProjectionLatLon2 = _interopRequireDefault(_projectionProjectionLatLon);
-	
-	var _utilTransformation = __webpack_require__(14);
-	
-	var _utilTransformation2 = _interopRequireDefault(_utilTransformation);
-	
-	var _EPSG4326 = {
-	  code: 'EPSG:4326',
-	  projection: _projectionProjectionLatLon2['default'],
-	
-	  // Work out how to de-dupe this (scoping issue)
-	  transformScale: 1 / 180,
-	
-	  // Scale and transformation inputs changed to account for central origin in
-	  // WebGL, instead of top-left origin used in Leaflet
-	  //
-	  // TODO: Cannot use this.transformScale due to scope
-	  transformation: new _utilTransformation2['default'](1 / 180, 0, -1 / 180, 0)
-	};
-	
-	var EPSG4326 = (0, _lodashAssign2['default'])({}, _CRSEarth2['default'], _EPSG4326);
-	
-	exports['default'] = EPSG4326;
-	module.exports = exports['default'];
-
-/***/ },
-/* 18 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	/*
-	 * Simple equirectangular (Plate Carree) projection, used by CRS like EPSG:4326
-	 * and Simple.
-	 *
-	 * Based on:
-	 * https://github.com/Leaflet/Leaflet/blob/master/src/geo/projection/Projection.LonLat.js
-	 */
-	
-	var _LatLon = __webpack_require__(10);
-	
-	var _Point = __webpack_require__(11);
-	
-	var ProjectionLatLon = {
-	  project: function project(latlon) {
-	    return (0, _Point.point)(latlon.lon, latlon.lat);
-	  },
-	
-	  unproject: function unproject(point) {
-	    return (0, _LatLon.latLon)(point.y, point.x);
-	  },
-	
-	  // Scale factor for converting between real metres and degrees
-	  //
-	  // degrees = realMetres * pointScale
-	  // realMetres = degrees / pointScale
-	  //
-	  // See: http://stackoverflow.com/questions/639695/how-to-convert-latitude-or-longitude-to-meters
-	  // See: http://gis.stackexchange.com/questions/75528/length-of-a-degree-where-do-the-terms-in-this-formula-come-from
-	  pointScale: function pointScale(latlon) {
-	    var m1 = 111132.92;
-	    var m2 = -559.82;
-	    var m3 = 1.175;
-	    var m4 = -0.0023;
-	    var p1 = 111412.84;
-	    var p2 = -93.5;
-	    var p3 = 0.118;
-	
-	    var rad = Math.PI / 180;
-	    var lat = latlon.lat * rad;
-	
-	    var latlen = m1 + m2 * Math.cos(2 * lat) + m3 * Math.cos(4 * lat) + m4 * Math.cos(6 * lat);
-	    var lonlen = p1 * Math.cos(lat) + p2 * Math.cos(3 * lat) + p3 * Math.cos(5 * lat);
-	
-	    return [1 / latlen, 1 / lonlen];
-	  },
-	
-	  bounds: [[-180, -90], [180, 90]]
-	};
-	
-	exports['default'] = ProjectionLatLon;
-	module.exports = exports['default'];
-
-/***/ },
-/* 19 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	/*
-	 * A simple CRS that can be used for flat non-Earth maps like panoramas or game
-	 * maps.
-	 *
-	 * Based on:
-	 * https://github.com/Leaflet/Leaflet/blob/master/src/geo/crs/CRS.Simple.js
-	 */
-	
-	var _lodashAssign = __webpack_require__(3);
-	
-	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
-	
-	var _CRS = __webpack_require__(9);
-	
-	var _CRS2 = _interopRequireDefault(_CRS);
-	
-	var _projectionProjectionLatLon = __webpack_require__(18);
-	
-	var _projectionProjectionLatLon2 = _interopRequireDefault(_projectionProjectionLatLon);
-	
-	var _utilTransformation = __webpack_require__(14);
-	
-	var _utilTransformation2 = _interopRequireDefault(_utilTransformation);
-	
-	var _Simple = {
-	  projection: _projectionProjectionLatLon2['default'],
-	
-	  // Straight 1:1 mapping (-1, -1 would be top-left)
-	  transformation: new _utilTransformation2['default'](1, 0, 1, 0),
-	
-	  scale: function scale(zoom) {
-	    // If zoom is provided then return scale based on map tile zoom
-	    if (zoom) {
-	      return Math.pow(2, zoom);
-	      // Else, make no change to scale – may need to increase this or make it a
-	      // user-definable variable
-	    } else {
-	        return 1;
-	      }
-	  },
-	
-	  zoom: function zoom(scale) {
-	    return Math.log(scale) / Math.LN2;
-	  },
-	
-	  distance: function distance(latlon1, latlon2) {
-	    var dx = latlon2.lon - latlon1.lon;
-	    var dy = latlon2.lat - latlon1.lat;
-	
-	    return Math.sqrt(dx * dx + dy * dy);
-	  },
-	
-	  infinite: true
-	};
-	
-	var Simple = (0, _lodashAssign2['default'])({}, _CRS2['default'], _Simple);
-	
-	exports['default'] = Simple;
-	module.exports = exports['default'];
-
-/***/ },
-/* 20 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	/*
-	 * CRS.Proj4 for any Proj4-supported CRS.
-	 */
-	
-	var _lodashAssign = __webpack_require__(3);
-	
-	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
-	
-	var _CRSEarth = __webpack_require__(8);
-	
-	var _CRSEarth2 = _interopRequireDefault(_CRSEarth);
-	
-	var _projectionProjectionProj4 = __webpack_require__(21);
-	
-	var _projectionProjectionProj42 = _interopRequireDefault(_projectionProjectionProj4);
-	
-	var _utilTransformation = __webpack_require__(14);
-	
-	var _utilTransformation2 = _interopRequireDefault(_utilTransformation);
-	
-	var _Proj4 = function _Proj4(code, def, bounds) {
-	  var projection = (0, _projectionProjectionProj42['default'])(def, bounds);
-	
-	  // Transformation calcuations
-	  var diffX = projection.bounds[1][0] - projection.bounds[0][0];
-	  var diffY = projection.bounds[1][1] - projection.bounds[0][1];
-	
-	  var halfX = diffX / 2;
-	  var halfY = diffY / 2;
-	
-	  // This is the raw scale factor
-	  var scaleX = 1 / halfX;
-	  var scaleY = 1 / halfY;
-	
-	  // Find the minimum scale factor
-	  //
-	  // The minimum scale factor comes from the largest side and is the one
-	  // you want to use for both axis so they stay relative in dimension
-	  var scale = Math.min(scaleX, scaleY);
-	
-	  // Find amount to offset each axis by to make the central point lie on
-	  // the [0,0] origin
-	  var offsetX = scale * (projection.bounds[0][0] + halfX);
-	  var offsetY = scale * (projection.bounds[0][1] + halfY);
-	
-	  return {
-	    code: code,
-	    projection: projection,
-	
-	    transformScale: scale,
-	
-	    // Map the input to a [-1,1] range with [0,0] in the centre
-	    transformation: new _utilTransformation2['default'](scale, -offsetX, -scale, offsetY)
-	  };
-	};
-	
-	var Proj4 = function Proj4(code, def, bounds) {
-	  return (0, _lodashAssign2['default'])({}, _CRSEarth2['default'], _Proj4(code, def, bounds));
-	};
-	
-	exports['default'] = Proj4;
-	module.exports = exports['default'];
-
-/***/ },
-/* 21 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	/*
-	 * Proj4 support for any projection.
-	 */
-	
-	var _proj4 = __webpack_require__(22);
-	
-	var _proj42 = _interopRequireDefault(_proj4);
-	
-	var _LatLon = __webpack_require__(10);
-	
-	var _Point = __webpack_require__(11);
-	
-	var Proj4 = function Proj4(def, bounds) {
-	  var proj = (0, _proj42['default'])(def);
-	
-	  var project = function project(latlon) {
-	    return (0, _Point.point)(proj.forward([latlon.lon, latlon.lat]));
-	  };
-	
-	  var unproject = function unproject(point) {
-	    var inverse = proj.inverse([point.x, point.y]);
-	    return (0, _LatLon.latLon)(inverse[1], inverse[0]);
-	  };
-	
-	  return {
-	    project: project,
-	    unproject: unproject,
-	
-	    // Scale factor for converting between real metres and projected metres\
-	    //
-	    // Need to work out the best way to provide the pointScale calculations
-	    // for custom, unknown projections (if wanting to override default)
-	    //
-	    // For now, user can manually override crs.pointScale or
-	    // crs.projection.pointScale
-	    //
-	    // projectedMetres = realMetres * pointScale
-	    // realMetres = projectedMetres / pointScale
-	    pointScale: function pointScale(latlon, accurate) {
-	      return [1, 1];
-	    },
-	
-	    // Try and calculate bounds if none are provided
-	    //
-	    // This will provide incorrect bounds for some projections, so perhaps make
-	    // bounds a required input instead
-	    bounds: (function () {
-	      if (bounds) {
-	        return bounds;
-	      } else {
-	        var bottomLeft = project([-90, -180]);
-	        var topRight = project([90, 180]);
-	
-	        return [bottomLeft, topRight];
-	      }
-	    })()
-	  };
-	};
-	
-	exports['default'] = Proj4;
-	module.exports = exports['default'];
-
-/***/ },
-/* 22 */
-/***/ function(module, exports) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_22__;
-
-/***/ },
-/* 23 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -3319,67 +2501,67 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _eventemitter32 = _interopRequireDefault(_eventemitter3);
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _Scene = __webpack_require__(25);
+	var _Scene = __webpack_require__(11);
 	
 	var _Scene2 = _interopRequireDefault(_Scene);
 	
-	var _DOMScene3D = __webpack_require__(26);
+	var _DOMScene3D = __webpack_require__(12);
 	
 	var _DOMScene3D2 = _interopRequireDefault(_DOMScene3D);
 	
-	var _DOMScene2D = __webpack_require__(27);
+	var _DOMScene2D = __webpack_require__(13);
 	
 	var _DOMScene2D2 = _interopRequireDefault(_DOMScene2D);
 	
-	var _Renderer = __webpack_require__(28);
+	var _Renderer = __webpack_require__(14);
 	
 	var _Renderer2 = _interopRequireDefault(_Renderer);
 	
-	var _DOMRenderer3D = __webpack_require__(29);
+	var _DOMRenderer3D = __webpack_require__(15);
 	
 	var _DOMRenderer3D2 = _interopRequireDefault(_DOMRenderer3D);
 	
-	var _DOMRenderer2D = __webpack_require__(31);
+	var _DOMRenderer2D = __webpack_require__(17);
 	
 	var _DOMRenderer2D2 = _interopRequireDefault(_DOMRenderer2D);
 	
-	var _Camera = __webpack_require__(33);
+	var _Camera = __webpack_require__(19);
 	
 	var _Camera2 = _interopRequireDefault(_Camera);
 	
-	var _Picking = __webpack_require__(34);
+	var _Picking = __webpack_require__(20);
 	
 	var _Picking2 = _interopRequireDefault(_Picking);
 	
-	var _EffectComposer = __webpack_require__(36);
+	var _EffectComposer = __webpack_require__(22);
 	
 	var _EffectComposer2 = _interopRequireDefault(_EffectComposer);
 	
-	var _vendorRenderPass = __webpack_require__(41);
+	var _vendorRenderPass = __webpack_require__(27);
 	
 	var _vendorRenderPass2 = _interopRequireDefault(_vendorRenderPass);
 	
-	var _vendorShaderPass = __webpack_require__(39);
+	var _vendorShaderPass = __webpack_require__(25);
 	
 	var _vendorShaderPass2 = _interopRequireDefault(_vendorShaderPass);
 	
-	var _vendorCopyShader = __webpack_require__(38);
+	var _vendorCopyShader = __webpack_require__(24);
 	
 	var _vendorCopyShader2 = _interopRequireDefault(_vendorCopyShader);
 	
-	var _vendorHorizontalTiltShiftShader = __webpack_require__(42);
+	var _vendorHorizontalTiltShiftShader = __webpack_require__(28);
 	
 	var _vendorHorizontalTiltShiftShader2 = _interopRequireDefault(_vendorHorizontalTiltShiftShader);
 	
-	var _vendorVerticalTiltShiftShader = __webpack_require__(43);
+	var _vendorVerticalTiltShiftShader = __webpack_require__(29);
 	
 	var _vendorVerticalTiltShiftShader2 = _interopRequireDefault(_vendorVerticalTiltShiftShader);
 	
-	var _vendorFXAAShader = __webpack_require__(44);
+	var _vendorFXAAShader = __webpack_require__(30);
 	
 	var _vendorFXAAShader2 = _interopRequireDefault(_vendorFXAAShader);
 	
@@ -3572,13 +2754,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 24 */
+/* 10 */
 /***/ function(module, exports) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_24__;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_10__;
 
 /***/ },
-/* 25 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -3587,7 +2769,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -3605,7 +2787,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 26 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -3614,7 +2796,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -3629,7 +2811,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 27 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -3638,7 +2820,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -3653,7 +2835,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 28 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -3662,11 +2844,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _Scene = __webpack_require__(25);
+	var _Scene = __webpack_require__(11);
 	
 	var _Scene2 = _interopRequireDefault(_Scene);
 	
@@ -3720,7 +2902,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 29 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -3729,13 +2911,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _vendorCSS3DRenderer = __webpack_require__(30);
+	var _vendorCSS3DRenderer = __webpack_require__(16);
 	
-	var _DOMScene3D = __webpack_require__(26);
+	var _DOMScene3D = __webpack_require__(12);
 	
 	var _DOMScene3D2 = _interopRequireDefault(_DOMScene3D);
 	
@@ -3764,7 +2946,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 30 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -3781,7 +2963,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -3987,7 +3169,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	_three2['default'].CSS3DRenderer = CSS3DRenderer;
 
 /***/ },
-/* 31 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -3996,13 +3178,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _vendorCSS2DRenderer = __webpack_require__(32);
+	var _vendorCSS2DRenderer = __webpack_require__(18);
 	
-	var _DOMScene2D = __webpack_require__(27);
+	var _DOMScene2D = __webpack_require__(13);
 	
 	var _DOMScene2D2 = _interopRequireDefault(_DOMScene2D);
 	
@@ -4031,7 +3213,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 32 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -4047,7 +3229,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -4160,7 +3342,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	_three2['default'].CSS2DRenderer = CSS2DRenderer;
 
 /***/ },
-/* 33 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -4169,7 +3351,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -4199,7 +3381,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 34 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -4212,13 +3394,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _geoPoint = __webpack_require__(11);
+	var _geoPoint = __webpack_require__(8);
 	
-	var _PickingScene = __webpack_require__(35);
+	var _PickingScene = __webpack_require__(21);
 	
 	var _PickingScene2 = _interopRequireDefault(_PickingScene);
 	
@@ -4459,7 +3641,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 35 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -4468,7 +3650,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -4483,7 +3665,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 36 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -4492,11 +3674,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _vendorEffectComposer = __webpack_require__(37);
+	var _vendorEffectComposer = __webpack_require__(23);
 	
 	var _vendorEffectComposer2 = _interopRequireDefault(_vendorEffectComposer);
 	
@@ -4523,7 +3705,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 37 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -4535,19 +3717,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	// jscs:disable
 	/* eslint-disable */
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _CopyShader = __webpack_require__(38);
+	var _CopyShader = __webpack_require__(24);
 	
 	var _CopyShader2 = _interopRequireDefault(_CopyShader);
 	
-	var _ShaderPass = __webpack_require__(39);
+	var _ShaderPass = __webpack_require__(25);
 	
 	var _ShaderPass2 = _interopRequireDefault(_ShaderPass);
 	
-	var _MaskPass = __webpack_require__(40);
+	var _MaskPass = __webpack_require__(26);
 	
 	var _MaskPass2 = _interopRequireDefault(_MaskPass);
 	
@@ -4681,7 +3863,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 38 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -4693,7 +3875,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// jscs:disable
 	/* eslint-disable */
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -4724,7 +3906,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 39 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -4736,7 +3918,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// jscs:disable
 	/* eslint-disable */
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -4808,7 +3990,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 40 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -4820,7 +4002,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// jscs:disable
 	/* eslint-disable */
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -4911,7 +4093,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	_three2['default'].ClearMaskPass = ClearMaskPass;
 
 /***/ },
-/* 41 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -4923,7 +4105,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// jscs:disable
 	/* eslint-disable */
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -4981,7 +4163,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 42 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -4993,7 +4175,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// jscs:disable
 	/* eslint-disable */
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -5030,7 +4212,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 43 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -5042,7 +4224,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// jscs:disable
 	/* eslint-disable */
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -5079,7 +4261,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 44 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -5091,7 +4273,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// jscs:disable
 	/* eslint-disable */
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -5126,7 +4308,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 45 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -5143,7 +4325,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Layer2 = __webpack_require__(46);
+	var _Layer2 = __webpack_require__(32);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -5151,11 +4333,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _Skybox = __webpack_require__(47);
+	var _Skybox = __webpack_require__(33);
 	
 	var _Skybox2 = _interopRequireDefault(_Skybox);
 	
@@ -5309,7 +4491,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.environmentLayer = noNew;
 
 /***/ },
-/* 46 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -5334,17 +4516,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _engineScene = __webpack_require__(25);
+	var _engineScene = __webpack_require__(11);
 	
 	var _engineScene2 = _interopRequireDefault(_engineScene);
 	
-	var _vendorCSS3DRenderer = __webpack_require__(30);
+	var _vendorCSS3DRenderer = __webpack_require__(16);
 	
-	var _vendorCSS2DRenderer = __webpack_require__(32);
+	var _vendorCSS2DRenderer = __webpack_require__(18);
 	
 	// TODO: Make sure nothing is left behind in the heap after calling destroy()
 	
@@ -5561,7 +4743,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.layer = noNew;
 
 /***/ },
-/* 47 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -5574,15 +4756,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _Sky = __webpack_require__(48);
+	var _Sky = __webpack_require__(34);
 	
 	var _Sky2 = _interopRequireDefault(_Sky);
 	
-	var _lodashThrottle = __webpack_require__(49);
+	var _lodashThrottle = __webpack_require__(35);
 	
 	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
 	
@@ -5794,7 +4976,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.skybox = noNew;
 
 /***/ },
-/* 48 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -5822,7 +5004,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Three.js integration by zz85 http://twitter.com/blurspline
 	*/
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -5877,7 +5059,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 49 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -5888,7 +5070,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2016 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <https://lodash.com/license>
 	 */
-	var debounce = __webpack_require__(50);
+	var debounce = __webpack_require__(36);
 	
 	/** Used as the `TypeError` message for "Functions" methods. */
 	var FUNC_ERROR_TEXT = 'Expected a function';
@@ -5983,7 +5165,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 50 */
+/* 36 */
 /***/ function(module, exports) {
 
 	/**
@@ -6383,7 +5565,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 51 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -6392,7 +5574,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _ControlsOrbit = __webpack_require__(52);
+	var _ControlsOrbit = __webpack_require__(38);
 	
 	var _ControlsOrbit2 = _interopRequireDefault(_ControlsOrbit);
 	
@@ -6405,7 +5587,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 52 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -6426,15 +5608,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _eventemitter32 = _interopRequireDefault(_eventemitter3);
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _vendorOrbitControls = __webpack_require__(53);
+	var _vendorOrbitControls = __webpack_require__(39);
 	
 	var _vendorOrbitControls2 = _interopRequireDefault(_vendorOrbitControls);
 	
-	var _TweenLite = __webpack_require__(55);
+	var _TweenLite = __webpack_require__(41);
 	
 	var _TweenLite2 = _interopRequireDefault(_TweenLite);
 	
@@ -6718,7 +5900,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.orbit = noNew;
 
 /***/ },
-/* 53 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -6730,11 +5912,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	// jscs:disable
 	/* eslint-disable */
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _hammerjs = __webpack_require__(54);
+	var _hammerjs = __webpack_require__(40);
 	
 	var _hammerjs2 = _interopRequireDefault(_hammerjs);
 	
@@ -7906,7 +7088,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 54 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*! Hammer.JS - v2.0.7 - 2016-04-22
@@ -10555,13 +9737,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 55 */
+/* 41 */
 /***/ function(module, exports) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_55__;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_41__;
 
 /***/ },
-/* 56 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -10578,23 +9760,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _TileLayer2 = __webpack_require__(57);
+	var _TileLayer2 = __webpack_require__(43);
 	
 	var _TileLayer3 = _interopRequireDefault(_TileLayer2);
 	
-	var _ImageTile = __webpack_require__(67);
+	var _ImageTile = __webpack_require__(53);
 	
 	var _ImageTile2 = _interopRequireDefault(_ImageTile);
 	
-	var _ImageTileLayerBaseMaterial = __webpack_require__(70);
+	var _ImageTileLayerBaseMaterial = __webpack_require__(56);
 	
 	var _ImageTileLayerBaseMaterial2 = _interopRequireDefault(_ImageTileLayerBaseMaterial);
 	
-	var _lodashThrottle = __webpack_require__(49);
+	var _lodashThrottle = __webpack_require__(35);
 	
 	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -10782,7 +9964,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.imageTileLayer = noNew;
 
 /***/ },
-/* 57 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -10799,7 +9981,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Layer2 = __webpack_require__(46);
+	var _Layer2 = __webpack_require__(32);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -10807,11 +9989,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _TileCache = __webpack_require__(58);
+	var _TileCache = __webpack_require__(44);
 	
 	var _TileCache2 = _interopRequireDefault(_TileCache);
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -11208,7 +10390,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 58 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -11221,7 +10403,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var _lruCache = __webpack_require__(59);
+	var _lruCache = __webpack_require__(45);
 	
 	var _lruCache2 = _interopRequireDefault(_lruCache);
 	
@@ -11289,18 +10471,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.tileCache = noNew;
 
 /***/ },
-/* 59 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = LRUCache
 	
 	// This will be a proper iterable 'Map' in engines that support it,
 	// or a fakey-fake PseudoMap in older versions.
-	var Map = __webpack_require__(60)
-	var util = __webpack_require__(63)
+	var Map = __webpack_require__(46)
+	var util = __webpack_require__(49)
 	
 	// A linked list to keep track of recently-used-ness
-	var Yallist = __webpack_require__(66)
+	var Yallist = __webpack_require__(52)
 	
 	// use symbols if possible, otherwise just _props
 	var symbols = {}
@@ -11764,7 +10946,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 60 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {if (process.env.npm_package_name === 'pseudomap' &&
@@ -11774,13 +10956,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	if (typeof Map === 'function' && !process.env.TEST_PSEUDOMAP) {
 	  module.exports = Map
 	} else {
-	  module.exports = __webpack_require__(62)
+	  module.exports = __webpack_require__(48)
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(61)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(47)))
 
 /***/ },
-/* 61 */
+/* 47 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -11905,7 +11087,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 62 */
+/* 48 */
 /***/ function(module, exports) {
 
 	var hasOwnProperty = Object.prototype.hasOwnProperty
@@ -12024,7 +11206,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 63 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -12552,7 +11734,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.isPrimitive = isPrimitive;
 	
-	exports.isBuffer = __webpack_require__(64);
+	exports.isBuffer = __webpack_require__(50);
 	
 	function objectToString(o) {
 	  return Object.prototype.toString.call(o);
@@ -12596,7 +11778,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *     prototype.
 	 * @param {function} superCtor Constructor function to inherit prototype from.
 	 */
-	exports.inherits = __webpack_require__(65);
+	exports.inherits = __webpack_require__(51);
 	
 	exports._extend = function(origin, add) {
 	  // Don't do anything if add isn't an object
@@ -12614,10 +11796,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return Object.prototype.hasOwnProperty.call(obj, prop);
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(61)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(47)))
 
 /***/ },
-/* 64 */
+/* 50 */
 /***/ function(module, exports) {
 
 	module.exports = function isBuffer(arg) {
@@ -12628,7 +11810,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 65 */
+/* 51 */
 /***/ function(module, exports) {
 
 	if (typeof Object.create === 'function') {
@@ -12657,7 +11839,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 66 */
+/* 52 */
 /***/ function(module, exports) {
 
 	module.exports = Yallist
@@ -13023,7 +12205,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 67 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -13040,15 +12222,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Tile2 = __webpack_require__(68);
+	var _Tile2 = __webpack_require__(54);
 	
 	var _Tile3 = _interopRequireDefault(_Tile2);
 	
-	var _vendorBoxHelper = __webpack_require__(69);
+	var _vendorBoxHelper = __webpack_require__(55);
 	
 	var _vendorBoxHelper2 = _interopRequireDefault(_vendorBoxHelper);
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -13259,7 +12441,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.imageTile = noNew;
 
 /***/ },
-/* 68 */
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -13272,11 +12454,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var _geoPoint = __webpack_require__(11);
+	var _geoPoint = __webpack_require__(8);
 	
-	var _geoLatLon = __webpack_require__(10);
+	var _geoLatLon = __webpack_require__(7);
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -13512,7 +12694,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 69 */
+/* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -13524,7 +12706,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// jscs:disable
 	/* eslint-disable */
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -13602,7 +12784,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 70 */
+/* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -13611,7 +12793,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -13665,7 +12847,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 71 */
+/* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -13682,7 +12864,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _TileLayer2 = __webpack_require__(57);
+	var _TileLayer2 = __webpack_require__(43);
 	
 	var _TileLayer3 = _interopRequireDefault(_TileLayer2);
 	
@@ -13690,15 +12872,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _GeoJSONTile = __webpack_require__(72);
+	var _GeoJSONTile = __webpack_require__(58);
 	
 	var _GeoJSONTile2 = _interopRequireDefault(_GeoJSONTile);
 	
-	var _lodashThrottle = __webpack_require__(49);
+	var _lodashThrottle = __webpack_require__(35);
 	
 	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -13740,7 +12922,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var defaults = {
 	      maxLOD: 14,
-	      distance: 2000
+	      distance: 50000
 	    };
 	
 	    options = (0, _lodashAssign2['default'])({}, defaults, options);
@@ -13859,7 +13041,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.geoJSONTileLayer = noNew;
 
 /***/ },
-/* 72 */
+/* 58 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -13876,27 +13058,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Tile2 = __webpack_require__(68);
+	var _Tile2 = __webpack_require__(54);
 	
 	var _Tile3 = _interopRequireDefault(_Tile2);
 	
-	var _GeoJSONLayer = __webpack_require__(73);
+	var _GeoJSONLayer = __webpack_require__(59);
 	
-	var _vendorBoxHelper = __webpack_require__(69);
+	var _vendorBoxHelper = __webpack_require__(55);
 	
 	var _vendorBoxHelper2 = _interopRequireDefault(_vendorBoxHelper);
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _reqwest = __webpack_require__(75);
+	var _reqwest = __webpack_require__(61);
 	
 	var _reqwest2 = _interopRequireDefault(_reqwest);
 	
-	var _geoPoint = __webpack_require__(11);
+	var _geoPoint = __webpack_require__(8);
 	
-	var _geoLatLon = __webpack_require__(10);
+	var _geoLatLon = __webpack_require__(7);
 	
 	var _lodashAssign = __webpack_require__(3);
 	
@@ -13904,15 +13086,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// import Offset from 'polygon-offset';
 	
-	var _utilGeoJSON = __webpack_require__(77);
+	var _utilGeoJSON = __webpack_require__(63);
 	
 	var _utilGeoJSON2 = _interopRequireDefault(_utilGeoJSON);
 	
-	var _utilBuffer = __webpack_require__(83);
+	var _utilBuffer = __webpack_require__(69);
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
-	var _enginePickingMaterial = __webpack_require__(84);
+	var _enginePickingMaterial = __webpack_require__(70);
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
@@ -14263,7 +13445,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.geoJSONTile = noNew;
 
 /***/ },
-/* 73 */
+/* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -14288,7 +13470,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// For example, only allow polygons to be interactive via a polygonInteractive
 	// option
 	
-	var _LayerGroup2 = __webpack_require__(74);
+	var _LayerGroup2 = __webpack_require__(60);
 	
 	var _LayerGroup3 = _interopRequireDefault(_LayerGroup2);
 	
@@ -14296,31 +13478,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _reqwest = __webpack_require__(75);
+	var _reqwest = __webpack_require__(61);
 	
 	var _reqwest2 = _interopRequireDefault(_reqwest);
 	
-	var _utilGeoJSON = __webpack_require__(77);
+	var _utilGeoJSON = __webpack_require__(63);
 	
 	var _utilGeoJSON2 = _interopRequireDefault(_utilGeoJSON);
 	
-	var _utilBuffer = __webpack_require__(83);
+	var _utilBuffer = __webpack_require__(69);
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
-	var _enginePickingMaterial = __webpack_require__(84);
+	var _enginePickingMaterial = __webpack_require__(70);
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
-	var _geometryPolygonLayer = __webpack_require__(86);
+	var _geometryPolygonLayer = __webpack_require__(72);
 	
 	var _geometryPolygonLayer2 = _interopRequireDefault(_geometryPolygonLayer);
 	
-	var _geometryPolylineLayer = __webpack_require__(87);
+	var _geometryPolylineLayer = __webpack_require__(73);
 	
 	var _geometryPolylineLayer2 = _interopRequireDefault(_geometryPolylineLayer);
 	
-	var _geometryPointLayer = __webpack_require__(88);
+	var _geometryPointLayer = __webpack_require__(74);
 	
 	var _geometryPointLayer2 = _interopRequireDefault(_geometryPointLayer);
 	
@@ -14852,7 +14034,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.geoJSONLayer = noNew;
 
 /***/ },
-/* 74 */
+/* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -14869,7 +14051,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Layer2 = __webpack_require__(46);
+	var _Layer2 = __webpack_require__(32);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -14945,7 +14127,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.layerGroup = noNew;
 
 /***/ },
-/* 75 */
+/* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -14969,7 +14151,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  } else {
 	    var XHR2
 	    try {
-	      XHR2 = __webpack_require__(76)
+	      XHR2 = __webpack_require__(62)
 	    } catch (ex) {
 	      throw new Error('Peer dependency `xhr2` required! Please npm install xhr2')
 	    }
@@ -15581,13 +14763,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 76 */
+/* 62 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 77 */
+/* 63 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -15600,23 +14782,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * GeoJSON helpers for handling data and generating objects
 	 */
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _topojson2 = __webpack_require__(78);
+	var _topojson2 = __webpack_require__(64);
 	
 	var _topojson3 = _interopRequireDefault(_topojson2);
 	
-	var _geojsonMerge = __webpack_require__(79);
+	var _geojsonMerge = __webpack_require__(65);
 	
 	var _geojsonMerge2 = _interopRequireDefault(_geojsonMerge);
 	
-	var _earcut = __webpack_require__(81);
+	var _earcut = __webpack_require__(67);
 	
 	var _earcut2 = _interopRequireDefault(_earcut);
 	
-	var _extrudePolygon = __webpack_require__(82);
+	var _extrudePolygon = __webpack_require__(68);
 	
 	var _extrudePolygon2 = _interopRequireDefault(_extrudePolygon);
 	
@@ -15865,7 +15047,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 78 */
+/* 64 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(function (global, factory) {
@@ -16415,10 +15597,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}));
 
 /***/ },
-/* 79 */
+/* 65 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var normalize = __webpack_require__(80);
+	var normalize = __webpack_require__(66);
 	
 	module.exports = function(inputs) {
 	    return {
@@ -16431,7 +15613,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 80 */
+/* 66 */
 /***/ function(module, exports) {
 
 	module.exports = normalize;
@@ -16480,7 +15662,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 81 */
+/* 67 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -17130,7 +16312,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 82 */
+/* 68 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -17229,7 +16411,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 83 */
+/* 69 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -17242,7 +16424,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * BufferGeometry helpers
 	 */
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -17500,7 +16682,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 84 */
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -17509,11 +16691,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _PickingShader = __webpack_require__(85);
+	var _PickingShader = __webpack_require__(71);
 	
 	var _PickingShader2 = _interopRequireDefault(_PickingShader);
 	
@@ -17555,7 +16737,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 85 */
+/* 71 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -17579,7 +16761,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 86 */
+/* 72 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -17612,7 +16794,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// TODO: Allow _setBufferAttributes to use a custom function passed in to
 	// generate a custom mesh
 	
-	var _Layer2 = __webpack_require__(46);
+	var _Layer2 = __webpack_require__(32);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -17620,27 +16802,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _geoLatLon = __webpack_require__(10);
+	var _geoLatLon = __webpack_require__(7);
 	
-	var _geoPoint = __webpack_require__(11);
+	var _geoPoint = __webpack_require__(8);
 	
-	var _earcut2 = __webpack_require__(81);
+	var _earcut2 = __webpack_require__(67);
 	
 	var _earcut3 = _interopRequireDefault(_earcut2);
 	
-	var _utilExtrudePolygon = __webpack_require__(82);
+	var _utilExtrudePolygon = __webpack_require__(68);
 	
 	var _utilExtrudePolygon2 = _interopRequireDefault(_utilExtrudePolygon);
 	
-	var _enginePickingMaterial = __webpack_require__(84);
+	var _enginePickingMaterial = __webpack_require__(70);
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
-	var _utilBuffer = __webpack_require__(83);
+	var _utilBuffer = __webpack_require__(69);
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
@@ -18255,7 +17437,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.polygonLayer = noNew;
 
 /***/ },
-/* 87 */
+/* 73 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -18290,7 +17472,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// TODO: Allow _setBufferAttributes to use a custom function passed in to
 	// generate a custom mesh
 	
-	var _Layer2 = __webpack_require__(46);
+	var _Layer2 = __webpack_require__(32);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -18298,19 +17480,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _geoLatLon = __webpack_require__(10);
+	var _geoLatLon = __webpack_require__(7);
 	
-	var _geoPoint = __webpack_require__(11);
+	var _geoPoint = __webpack_require__(8);
 	
-	var _enginePickingMaterial = __webpack_require__(84);
+	var _enginePickingMaterial = __webpack_require__(70);
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
-	var _utilBuffer = __webpack_require__(83);
+	var _utilBuffer = __webpack_require__(69);
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
@@ -18776,7 +17958,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.polylineLayer = noNew;
 
 /***/ },
-/* 88 */
+/* 74 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -18817,7 +17999,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// How much control should this layer support? Perhaps a different or custom
 	// layer would be better suited for animation, for example.
 	
-	var _Layer2 = __webpack_require__(46);
+	var _Layer2 = __webpack_require__(32);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -18825,19 +18007,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _three = __webpack_require__(24);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _geoLatLon = __webpack_require__(10);
+	var _geoLatLon = __webpack_require__(7);
 	
-	var _geoPoint = __webpack_require__(11);
+	var _geoPoint = __webpack_require__(8);
 	
-	var _enginePickingMaterial = __webpack_require__(84);
+	var _enginePickingMaterial = __webpack_require__(70);
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
-	var _utilBuffer = __webpack_require__(83);
+	var _utilBuffer = __webpack_require__(69);
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
@@ -19284,7 +18466,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.pointLayer = noNew;
 
 /***/ },
-/* 89 */
+/* 75 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -19299,7 +18481,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _GeoJSONTileLayer2 = __webpack_require__(71);
+	var _GeoJSONTileLayer2 = __webpack_require__(57);
 	
 	var _GeoJSONTileLayer3 = _interopRequireDefault(_GeoJSONTileLayer2);
 	
@@ -19334,7 +18516,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.topoJSONTileLayer = noNew;
 
 /***/ },
-/* 90 */
+/* 76 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -19349,7 +18531,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _GeoJSONLayer2 = __webpack_require__(73);
+	var _GeoJSONLayer2 = __webpack_require__(59);
 	
 	var _GeoJSONLayer3 = _interopRequireDefault(_GeoJSONLayer2);
 	
@@ -19385,7 +18567,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.topoJSONLayer = noNew;
 
 /***/ },
-/* 91 */
+/* 77 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -19396,23 +18578,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// TODO: A lot of these utils don't need to be in separate, tiny files
 	
-	var _Transformation = __webpack_require__(14);
+	var _Transformation = __webpack_require__(78);
 	
 	var _Transformation2 = _interopRequireDefault(_Transformation);
 	
-	var _wrapNum = __webpack_require__(12);
+	var _wrapNum = __webpack_require__(79);
 	
 	var _wrapNum2 = _interopRequireDefault(_wrapNum);
 	
-	var _extrudePolygon = __webpack_require__(82);
+	var _extrudePolygon = __webpack_require__(68);
 	
 	var _extrudePolygon2 = _interopRequireDefault(_extrudePolygon);
 	
-	var _GeoJSON = __webpack_require__(77);
+	var _GeoJSON = __webpack_require__(63);
 	
 	var _GeoJSON2 = _interopRequireDefault(_GeoJSON);
 	
-	var _Buffer = __webpack_require__(83);
+	var _Buffer = __webpack_require__(69);
 	
 	var _Buffer2 = _interopRequireDefault(_Buffer);
 	
@@ -19426,6 +18608,93 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports['default'] = Util;
 	module.exports = exports['default'];
+
+/***/ },
+/* 78 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	/*
+	 * Transformation is an utility class to perform simple point transformations
+	 * through a 2d-matrix.
+	 *
+	 * Based on:
+	 * https://github.com/Leaflet/Leaflet/blob/master/src/geometry/Transformation.js
+	 */
+	
+	var _geoPoint = __webpack_require__(8);
+	
+	var Transformation = (function () {
+	  function Transformation(a, b, c, d) {
+	    _classCallCheck(this, Transformation);
+	
+	    this._a = a;
+	    this._b = b;
+	    this._c = c;
+	    this._d = d;
+	  }
+	
+	  _createClass(Transformation, [{
+	    key: 'transform',
+	    value: function transform(point, scale) {
+	      // Copy input point as to not destroy the original data
+	      return this._transform(point.clone(), scale);
+	    }
+	
+	    // Destructive transform (faster)
+	  }, {
+	    key: '_transform',
+	    value: function _transform(point, scale) {
+	      scale = scale || 1;
+	
+	      point.x = scale * (this._a * point.x + this._b);
+	      point.y = scale * (this._c * point.y + this._d);
+	      return point;
+	    }
+	  }, {
+	    key: 'untransform',
+	    value: function untransform(point, scale) {
+	      scale = scale || 1;
+	      return (0, _geoPoint.point)((point.x / scale - this._b) / this._a, (point.y / scale - this._d) / this._c);
+	    }
+	  }]);
+	
+	  return Transformation;
+	})();
+	
+	exports['default'] = Transformation;
+	module.exports = exports['default'];
+
+/***/ },
+/* 79 */
+/***/ function(module, exports) {
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	/*
+	 * Wrap the given number to lie within a certain range (eg. longitude)
+	 *
+	 * Based on:
+	 * https://github.com/Leaflet/Leaflet/blob/master/src/core/Util.js
+	 */
+	
+	var wrapNum = function wrapNum(x, range, includeMax) {
+	  var max = range[1];
+	  var min = range[0];
+	  var d = max - min;
+	  return x === max && includeMax ? x : ((x - min) % d + d) % d + min;
+	};
+	
+	exports["default"] = wrapNum;
+	module.exports = exports["default"];
 
 /***/ }
 /******/ ])
