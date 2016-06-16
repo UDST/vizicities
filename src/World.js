@@ -1,6 +1,5 @@
 import EventEmitter from 'eventemitter3';
 import extend from 'lodash.assign';
-// import CRS from './geo/crs/index';
 import Geo from './geo/Geo';
 import {point as Point} from './geo/Point';
 import {latLon as LatLon} from './geo/LatLon';
@@ -17,7 +16,6 @@ class World extends EventEmitter {
     super();
 
     var defaults = {
-      // crs: CRS.EPSG3857,
       skybox: false,
       postProcessing: false
     };
