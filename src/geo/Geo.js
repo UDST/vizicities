@@ -44,7 +44,7 @@ Geo.latLonToPoint = function(latlon) {
 // Converts pixel / WebGL coords to geo coords
 // This just reverses the Y axis to match WebGL
 Geo.pointToLatLon = function(point) {
-  var _point = VIZI.point(point.x, point.y * -1);
+  var _point = Point(point.x, point.y * -1);
   return Geo.unproject(_point);
 };
 
@@ -109,46 +109,26 @@ Geo.projectedToMetres = function(projectedUnits, pointScale) {
 };
 
 // Convert real metres to a value in world (WebGL) units
-Geo.metresToWorld = function(metres, pointScale, zoom) {
+Geo.metresToWorld = function(metres, pointScale) {
   // Transform metres to projected metres using the latitude point scale
   //
   // Latitude scale is chosen because it fluctuates more than longitude
   var projectedMetres = Geo.metresToProjected(metres, pointScale);
 
-  var scale = Geo.scale(zoom);
-
-  // Half scale if using zoom as WebGL origin is in the centre, not top left
-  if (zoom) {
-    scale /= 2;
-  }
+  var scale = Geo.scale();
 
   // Scale projected metres
   var scaledMetres = (scale * projectedMetres);
-
-  // Not entirely sure why this is neccessary
-  if (zoom) {
-    scaledMetres /= pointScale[1];
-  }
 
   return scaledMetres;
 };
 
 // Convert world (WebGL) units to a value in real metres
-Geo.worldToMetres = function(worldUnits, pointScale, zoom) {
-  var scale = Geo.scale(zoom);
-
-  // Half scale if using zoom as WebGL origin is in the centre, not top left
-  if (zoom) {
-    scale /= 2;
-  }
+Geo.worldToMetres = function(worldUnits, pointScale) {
+  var scale = Geo.scale();
 
   var projectedUnits = worldUnits / scale;
   var realMetres = Geo.projectedToMetres(projectedUnits, pointScale);
-
-  // Not entirely sure why this is neccessary
-  if (zoom) {
-    realMetres *= pointScale[1];
-  }
 
   return realMetres;
 };

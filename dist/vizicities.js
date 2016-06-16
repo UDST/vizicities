@@ -193,8 +193,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	// import CRS from './geo/crs/index';
-	
 	var _geoGeo = __webpack_require__(6);
 	
 	var _geoGeo2 = _interopRequireDefault(_geoGeo);
@@ -225,7 +223,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _get(Object.getPrototypeOf(World.prototype), 'constructor', this).call(this);
 	
 	    var defaults = {
-	      // crs: CRS.EPSG3857,
 	      skybox: false,
 	      postProcessing: false
 	    };
@@ -2138,7 +2135,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// Converts pixel / WebGL coords to geo coords
 	// This just reverses the Y axis to match WebGL
 	Geo.pointToLatLon = function (point) {
-	  var _point = VIZI.point(point.x, point.y * -1);
+	  var _point = (0, _Point.point)(point.x, point.y * -1);
 	  return Geo.unproject(_point);
 	};
 	
@@ -2203,46 +2200,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	// Convert real metres to a value in world (WebGL) units
-	Geo.metresToWorld = function (metres, pointScale, zoom) {
+	Geo.metresToWorld = function (metres, pointScale) {
 	  // Transform metres to projected metres using the latitude point scale
 	  //
 	  // Latitude scale is chosen because it fluctuates more than longitude
 	  var projectedMetres = Geo.metresToProjected(metres, pointScale);
 	
-	  var scale = Geo.scale(zoom);
-	
-	  // Half scale if using zoom as WebGL origin is in the centre, not top left
-	  if (zoom) {
-	    scale /= 2;
-	  }
+	  var scale = Geo.scale();
 	
 	  // Scale projected metres
 	  var scaledMetres = scale * projectedMetres;
-	
-	  // Not entirely sure why this is neccessary
-	  if (zoom) {
-	    scaledMetres /= pointScale[1];
-	  }
 	
 	  return scaledMetres;
 	};
 	
 	// Convert world (WebGL) units to a value in real metres
-	Geo.worldToMetres = function (worldUnits, pointScale, zoom) {
-	  var scale = Geo.scale(zoom);
-	
-	  // Half scale if using zoom as WebGL origin is in the centre, not top left
-	  if (zoom) {
-	    scale /= 2;
-	  }
+	Geo.worldToMetres = function (worldUnits, pointScale) {
+	  var scale = Geo.scale();
 	
 	  var projectedUnits = worldUnits / scale;
 	  var realMetres = Geo.projectedToMetres(projectedUnits, pointScale);
-	
-	  // Not entirely sure why this is neccessary
-	  if (zoom) {
-	    realMetres *= pointScale[1];
-	  }
 	
 	  return realMetres;
 	};
@@ -18578,11 +18555,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// TODO: A lot of these utils don't need to be in separate, tiny files
 	
-	var _Transformation = __webpack_require__(78);
-	
-	var _Transformation2 = _interopRequireDefault(_Transformation);
-	
-	var _wrapNum = __webpack_require__(79);
+	var _wrapNum = __webpack_require__(78);
 	
 	var _wrapNum2 = _interopRequireDefault(_wrapNum);
 	
@@ -18600,7 +18573,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var Util = {};
 	
-	Util.Transformation = _Transformation2['default'];
 	Util.wrapNum = _wrapNum2['default'];
 	Util.extrudePolygon = _extrudePolygon2['default'];
 	Util.GeoJSON = _GeoJSON2['default'];
@@ -18611,69 +18583,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 78 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-	
-	/*
-	 * Transformation is an utility class to perform simple point transformations
-	 * through a 2d-matrix.
-	 *
-	 * Based on:
-	 * https://github.com/Leaflet/Leaflet/blob/master/src/geometry/Transformation.js
-	 */
-	
-	var _geoPoint = __webpack_require__(8);
-	
-	var Transformation = (function () {
-	  function Transformation(a, b, c, d) {
-	    _classCallCheck(this, Transformation);
-	
-	    this._a = a;
-	    this._b = b;
-	    this._c = c;
-	    this._d = d;
-	  }
-	
-	  _createClass(Transformation, [{
-	    key: 'transform',
-	    value: function transform(point, scale) {
-	      // Copy input point as to not destroy the original data
-	      return this._transform(point.clone(), scale);
-	    }
-	
-	    // Destructive transform (faster)
-	  }, {
-	    key: '_transform',
-	    value: function _transform(point, scale) {
-	      scale = scale || 1;
-	
-	      point.x = scale * (this._a * point.x + this._b);
-	      point.y = scale * (this._c * point.y + this._d);
-	      return point;
-	    }
-	  }, {
-	    key: 'untransform',
-	    value: function untransform(point, scale) {
-	      scale = scale || 1;
-	      return (0, _geoPoint.point)((point.x / scale - this._b) / this._a, (point.y / scale - this._d) / this._c);
-	    }
-	  }]);
-	
-	  return Transformation;
-	})();
-	
-	exports['default'] = Transformation;
-	module.exports = exports['default'];
-
-/***/ },
-/* 79 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, "__esModule", {
