@@ -568,6 +568,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
+	var has = Object.prototype.hasOwnProperty;
+	
 	//
 	// We store our EE objects in a plain object whose properties are event names.
 	// If `Object.create(null)` is not supported we prefix the event names with a
@@ -583,7 +585,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @param {Function} fn Event handler to be called.
 	 * @param {Mixed} context Context for function execution.
-	 * @param {Boolean} once Only emit once
+	 * @param {Boolean} [once=false] Only emit once
 	 * @api private
 	 */
 	function EE(fn, context, once) {
@@ -602,12 +604,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	function EventEmitter() { /* Nothing to set */ }
 	
 	/**
-	 * Holds the assigned EventEmitters by name.
+	 * Hold the assigned EventEmitters by name.
 	 *
 	 * @type {Object}
 	 * @private
 	 */
 	EventEmitter.prototype._events = undefined;
+	
+	/**
+	 * Return an array listing the events for which the emitter has registered
+	 * listeners.
+	 *
+	 * @returns {Array}
+	 * @api public
+	 */
+	EventEmitter.prototype.eventNames = function eventNames() {
+	  var events = this._events
+	    , names = []
+	    , name;
+	
+	  if (!events) return names;
+	
+	  for (name in events) {
+	    if (has.call(events, name)) names.push(prefix ? name.slice(1) : name);
+	  }
+	
+	  if (Object.getOwnPropertySymbols) {
+	    return names.concat(Object.getOwnPropertySymbols(events));
+	  }
+	
+	  return names;
+	};
 	
 	/**
 	 * Return a list of assigned event listeners.
@@ -694,8 +721,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Register a new EventListener for the given event.
 	 *
 	 * @param {String} event Name of the event.
-	 * @param {Functon} fn Callback function.
-	 * @param {Mixed} context The context of the function.
+	 * @param {Function} fn Callback function.
+	 * @param {Mixed} [context=this] The context of the function.
 	 * @api public
 	 */
 	EventEmitter.prototype.on = function on(event, fn, context) {
@@ -719,7 +746,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @param {String} event Name of the event.
 	 * @param {Function} fn Callback function.
-	 * @param {Mixed} context The context of the function.
+	 * @param {Mixed} [context=this] The context of the function.
 	 * @api public
 	 */
 	EventEmitter.prototype.once = function once(event, fn, context) {
@@ -835,12 +862,12 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
-	 * lodash 4.0.2 (Custom Build) <https://lodash.com/>
+	 * lodash (Custom Build) <https://lodash.com/>
 	 * Build: `lodash modularize exports="npm" -o ./`
-	 * Copyright 2012-2016 The Dojo Foundation <http://dojofoundation.org/>
+	 * Copyright jQuery Foundation and other contributors <https://jquery.org/>
+	 * Released under MIT license <https://lodash.com/license>
 	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2016 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <https://lodash.com/license>
+	 * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 */
 	var keys = __webpack_require__(4),
 	    rest = __webpack_require__(5);
@@ -855,20 +882,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	/** Used to detect unsigned integer values. */
 	var reIsUint = /^(?:0|[1-9]\d*)$/;
 	
-	/**
-	 * Checks if `value` is a valid array-like index.
-	 *
-	 * @private
-	 * @param {*} value The value to check.
-	 * @param {number} [length=MAX_SAFE_INTEGER] The upper bounds of a valid index.
-	 * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
-	 */
-	function isIndex(value, length) {
-	  value = (typeof value == 'number' || reIsUint.test(value)) ? +value : -1;
-	  length = length == null ? MAX_SAFE_INTEGER : length;
-	  return value > -1 && value % 1 == 0 && value < length;
-	}
-	
 	/** Used for built-in method references. */
 	var objectProto = Object.prototype;
 	
@@ -876,10 +889,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	var hasOwnProperty = objectProto.hasOwnProperty;
 	
 	/**
-	 * Used to resolve the [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
+	 * Used to resolve the
+	 * [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
 	 * of values.
 	 */
 	var objectToString = objectProto.toString;
+	
+	/** Built-in value references. */
+	var propertyIsEnumerable = objectProto.propertyIsEnumerable;
+	
+	/** Detect if properties shadowing those on `Object.prototype` are non-enumerable. */
+	var nonEnumShadows = !propertyIsEnumerable.call({ 'valueOf': 1 }, 'valueOf');
 	
 	/**
 	 * Assigns `value` to `key` of `object` if the existing value is not equivalent
@@ -893,8 +913,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function assignValue(object, key, value) {
 	  var objValue = object[key];
-	  if ((!eq(objValue, value) ||
-	        (eq(objValue, objectProto[key]) && !hasOwnProperty.call(object, key))) ||
+	  if (!(hasOwnProperty.call(object, key) && eq(objValue, value)) ||
 	      (value === undefined && !(key in object))) {
 	    object[key] = value;
 	  }
@@ -905,7 +924,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @private
 	 * @param {string} key The key of the property to get.
-	 * @returns {Function} Returns the new function.
+	 * @returns {Function} Returns the new accessor function.
 	 */
 	function baseProperty(key) {
 	  return function(object) {
@@ -918,34 +937,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @private
 	 * @param {Object} source The object to copy properties from.
-	 * @param {Array} props The property names to copy.
-	 * @param {Object} [object={}] The object to copy properties to.
-	 * @returns {Object} Returns `object`.
-	 */
-	function copyObject(source, props, object) {
-	  return copyObjectWith(source, props, object);
-	}
-	
-	/**
-	 * This function is like `copyObject` except that it accepts a function to
-	 * customize copied values.
-	 *
-	 * @private
-	 * @param {Object} source The object to copy properties from.
-	 * @param {Array} props The property names to copy.
+	 * @param {Array} props The property identifiers to copy.
 	 * @param {Object} [object={}] The object to copy properties to.
 	 * @param {Function} [customizer] The function to customize copied values.
 	 * @returns {Object} Returns `object`.
 	 */
-	function copyObjectWith(source, props, object, customizer) {
+	function copyObject(source, props, object, customizer) {
 	  object || (object = {});
 	
 	  var index = -1,
 	      length = props.length;
 	
 	  while (++index < length) {
-	    var key = props[index],
-	        newValue = customizer ? customizer(object[key], source[key], key, object, source) : source[key];
+	    var key = props[index];
+	
+	    var newValue = customizer
+	      ? customizer(object[key], source[key], key, object, source)
+	      : source[key];
 	
 	    assignValue(object, key, newValue);
 	  }
@@ -966,7 +974,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        customizer = length > 1 ? sources[length - 1] : undefined,
 	        guard = length > 2 ? sources[2] : undefined;
 	
-	    customizer = typeof customizer == 'function' ? (length--, customizer) : undefined;
+	    customizer = (assigner.length > 3 && typeof customizer == 'function')
+	      ? (length--, customizer)
+	      : undefined;
+	
 	    if (guard && isIterateeCall(sources[0], sources[1], guard)) {
 	      customizer = length < 3 ? undefined : customizer;
 	      length = 1;
@@ -985,8 +996,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Gets the "length" property value of `object`.
 	 *
-	 * **Note:** This function is used to avoid a [JIT bug](https://bugs.webkit.org/show_bug.cgi?id=142792)
-	 * that affects Safari on at least iOS 8.1-8.3 ARM64.
+	 * **Note:** This function is used to avoid a
+	 * [JIT bug](https://bugs.webkit.org/show_bug.cgi?id=142792) that affects
+	 * Safari on at least iOS 8.1-8.3 ARM64.
 	 *
 	 * @private
 	 * @param {Object} object The object to query.
@@ -995,13 +1007,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	var getLength = baseProperty('length');
 	
 	/**
-	 * Checks if the provided arguments are from an iteratee call.
+	 * Checks if `value` is a valid array-like index.
+	 *
+	 * @private
+	 * @param {*} value The value to check.
+	 * @param {number} [length=MAX_SAFE_INTEGER] The upper bounds of a valid index.
+	 * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
+	 */
+	function isIndex(value, length) {
+	  length = length == null ? MAX_SAFE_INTEGER : length;
+	  return !!length &&
+	    (typeof value == 'number' || reIsUint.test(value)) &&
+	    (value > -1 && value % 1 == 0 && value < length);
+	}
+	
+	/**
+	 * Checks if the given arguments are from an iteratee call.
 	 *
 	 * @private
 	 * @param {*} value The potential iteratee value argument.
 	 * @param {*} index The potential iteratee index or key argument.
 	 * @param {*} object The potential iteratee object argument.
-	 * @returns {boolean} Returns `true` if the arguments are from an iteratee call, else `false`.
+	 * @returns {boolean} Returns `true` if the arguments are from an iteratee call,
+	 *  else `false`.
 	 */
 	function isIterateeCall(value, index, object) {
 	  if (!isObject(object)) {
@@ -1009,19 +1037,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	  var type = typeof index;
 	  if (type == 'number'
-	      ? (isArrayLike(object) && isIndex(index, object.length))
-	      : (type == 'string' && index in object)) {
+	        ? (isArrayLike(object) && isIndex(index, object.length))
+	        : (type == 'string' && index in object)
+	      ) {
 	    return eq(object[index], value);
 	  }
 	  return false;
 	}
 	
 	/**
-	 * Performs a [`SameValueZero`](http://ecma-international.org/ecma-262/6.0/#sec-samevaluezero)
+	 * Checks if `value` is likely a prototype object.
+	 *
+	 * @private
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is a prototype, else `false`.
+	 */
+	function isPrototype(value) {
+	  var Ctor = value && value.constructor,
+	      proto = (typeof Ctor == 'function' && Ctor.prototype) || objectProto;
+	
+	  return value === proto;
+	}
+	
+	/**
+	 * Performs a
+	 * [`SameValueZero`](http://ecma-international.org/ecma-262/6.0/#sec-samevaluezero)
 	 * comparison between two values to determine if they are equivalent.
 	 *
 	 * @static
 	 * @memberOf _
+	 * @since 4.0.0
 	 * @category Lang
 	 * @param {*} value The value to compare.
 	 * @param {*} other The other value to compare.
@@ -1057,7 +1102,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @static
 	 * @memberOf _
-	 * @type Function
+	 * @since 4.0.0
 	 * @category Lang
 	 * @param {*} value The value to check.
 	 * @returns {boolean} Returns `true` if `value` is array-like, else `false`.
@@ -1076,8 +1121,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * // => false
 	 */
 	function isArrayLike(value) {
-	  return value != null &&
-	    !(typeof value == 'function' && isFunction(value)) && isLength(getLength(value));
+	  return value != null && isLength(getLength(value)) && !isFunction(value);
 	}
 	
 	/**
@@ -1085,9 +1129,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @static
 	 * @memberOf _
+	 * @since 0.1.0
 	 * @category Lang
 	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
+	 * @returns {boolean} Returns `true` if `value` is correctly classified,
+	 *  else `false`.
 	 * @example
 	 *
 	 * _.isFunction(_);
@@ -1098,8 +1144,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function isFunction(value) {
 	  // The use of `Object#toString` avoids issues with the `typeof` operator
-	  // in Safari 8 which returns 'object' for typed array constructors, and
-	  // PhantomJS 1.9 which returns 'function' for `NodeList` instances.
+	  // in Safari 8 which returns 'object' for typed array and weak map constructors,
+	  // and PhantomJS 1.9 which returns 'function' for `NodeList` instances.
 	  var tag = isObject(value) ? objectToString.call(value) : '';
 	  return tag == funcTag || tag == genTag;
 	}
@@ -1107,13 +1153,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Checks if `value` is a valid array-like length.
 	 *
-	 * **Note:** This function is loosely based on [`ToLength`](http://ecma-international.org/ecma-262/6.0/#sec-tolength).
+	 * **Note:** This function is loosely based on
+	 * [`ToLength`](http://ecma-international.org/ecma-262/6.0/#sec-tolength).
 	 *
 	 * @static
 	 * @memberOf _
+	 * @since 4.0.0
 	 * @category Lang
 	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
+	 * @returns {boolean} Returns `true` if `value` is a valid length,
+	 *  else `false`.
 	 * @example
 	 *
 	 * _.isLength(3);
@@ -1129,15 +1178,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * // => false
 	 */
 	function isLength(value) {
-	  return typeof value == 'number' && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
+	  return typeof value == 'number' &&
+	    value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
 	}
 	
 	/**
-	 * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
-	 * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+	 * Checks if `value` is the
+	 * [language type](http://www.ecma-international.org/ecma-262/6.0/#sec-ecmascript-language-types)
+	 * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
 	 *
 	 * @static
 	 * @memberOf _
+	 * @since 0.1.0
 	 * @category Lang
 	 * @param {*} value The value to check.
 	 * @returns {boolean} Returns `true` if `value` is an object, else `false`.
@@ -1161,19 +1213,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	/**
-	 * Assigns own enumerable properties of source objects to the destination
-	 * object. Source objects are applied from left to right. Subsequent sources
-	 * overwrite property assignments of previous sources.
+	 * Assigns own enumerable string keyed properties of source objects to the
+	 * destination object. Source objects are applied from left to right.
+	 * Subsequent sources overwrite property assignments of previous sources.
 	 *
 	 * **Note:** This method mutates `object` and is loosely based on
 	 * [`Object.assign`](https://mdn.io/Object/assign).
 	 *
 	 * @static
 	 * @memberOf _
+	 * @since 0.10.0
 	 * @category Object
 	 * @param {Object} object The destination object.
 	 * @param {...Object} [sources] The source objects.
 	 * @returns {Object} Returns `object`.
+	 * @see _.assignIn
 	 * @example
 	 *
 	 * function Foo() {
@@ -1191,7 +1245,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * // => { 'a': 1, 'c': 3, 'e': 5 }
 	 */
 	var assign = createAssigner(function(object, source) {
-	  copyObject(source, keys(source), object);
+	  if (nonEnumShadows || isPrototype(source) || isArrayLike(source)) {
+	    copyObject(source, keys(source), object);
+	    return;
+	  }
+	  for (var key in source) {
+	    if (hasOwnProperty.call(source, key)) {
+	      assignValue(object, key, source[key]);
+	    }
+	  }
 	});
 	
 	module.exports = assign;
@@ -1202,12 +1264,12 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	/**
-	 * lodash 4.0.2 (Custom Build) <https://lodash.com/>
+	 * lodash (Custom Build) <https://lodash.com/>
 	 * Build: `lodash modularize exports="npm" -o ./`
-	 * Copyright 2012-2016 The Dojo Foundation <http://dojofoundation.org/>
+	 * Copyright jQuery Foundation and other contributors <https://jquery.org/>
+	 * Released under MIT license <https://lodash.com/license>
 	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2016 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <https://lodash.com/license>
+	 * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 */
 	
 	/** Used as references for various `Number` constants. */
@@ -1241,20 +1303,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return result;
 	}
 	
-	/**
-	 * Checks if `value` is a valid array-like index.
-	 *
-	 * @private
-	 * @param {*} value The value to check.
-	 * @param {number} [length=MAX_SAFE_INTEGER] The upper bounds of a valid index.
-	 * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
-	 */
-	function isIndex(value, length) {
-	  value = (typeof value == 'number' || reIsUint.test(value)) ? +value : -1;
-	  length = length == null ? MAX_SAFE_INTEGER : length;
-	  return value > -1 && value % 1 == 0 && value < length;
-	}
-	
 	/** Used for built-in method references. */
 	var objectProto = Object.prototype;
 	
@@ -1262,17 +1310,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	var hasOwnProperty = objectProto.hasOwnProperty;
 	
 	/**
-	 * Used to resolve the [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
+	 * Used to resolve the
+	 * [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
 	 * of values.
 	 */
 	var objectToString = objectProto.toString;
 	
 	/** Built-in value references. */
-	var getPrototypeOf = Object.getPrototypeOf,
-	    propertyIsEnumerable = objectProto.propertyIsEnumerable;
+	var propertyIsEnumerable = objectProto.propertyIsEnumerable;
 	
 	/* Built-in method references for those with the same name as other `lodash` methods. */
-	var nativeKeys = Object.keys;
+	var nativeGetPrototype = Object.getPrototypeOf,
+	    nativeKeys = Object.keys;
 	
 	/**
 	 * The base implementation of `_.has` without support for deep paths.
@@ -1287,7 +1336,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // that are composed entirely of index properties, return `false` for
 	  // `hasOwnProperty` checks of them.
 	  return hasOwnProperty.call(object, key) ||
-	    (typeof object == 'object' && key in object && getPrototypeOf(object) === null);
+	    (typeof object == 'object' && key in object && getPrototype(object) === null);
 	}
 	
 	/**
@@ -1295,7 +1344,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * property of prototypes or treat sparse arrays as dense.
 	 *
 	 * @private
-	 * @type Function
 	 * @param {Object} object The object to query.
 	 * @returns {Array} Returns the array of property names.
 	 */
@@ -1308,7 +1356,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @private
 	 * @param {string} key The key of the property to get.
-	 * @returns {Function} Returns the new function.
+	 * @returns {Function} Returns the new accessor function.
 	 */
 	function baseProperty(key) {
 	  return function(object) {
@@ -1319,14 +1367,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Gets the "length" property value of `object`.
 	 *
-	 * **Note:** This function is used to avoid a [JIT bug](https://bugs.webkit.org/show_bug.cgi?id=142792)
-	 * that affects Safari on at least iOS 8.1-8.3 ARM64.
+	 * **Note:** This function is used to avoid a
+	 * [JIT bug](https://bugs.webkit.org/show_bug.cgi?id=142792) that affects
+	 * Safari on at least iOS 8.1-8.3 ARM64.
 	 *
 	 * @private
 	 * @param {Object} object The object to query.
 	 * @returns {*} Returns the "length" value.
 	 */
 	var getLength = baseProperty('length');
+	
+	/**
+	 * Gets the `[[Prototype]]` of `value`.
+	 *
+	 * @private
+	 * @param {*} value The value to query.
+	 * @returns {null|Object} Returns the `[[Prototype]]`.
+	 */
+	function getPrototype(value) {
+	  return nativeGetPrototype(Object(value));
+	}
 	
 	/**
 	 * Creates an array of index keys for `object` values of arrays,
@@ -1343,6 +1403,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return baseTimes(length, String);
 	  }
 	  return null;
+	}
+	
+	/**
+	 * Checks if `value` is a valid array-like index.
+	 *
+	 * @private
+	 * @param {*} value The value to check.
+	 * @param {number} [length=MAX_SAFE_INTEGER] The upper bounds of a valid index.
+	 * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
+	 */
+	function isIndex(value, length) {
+	  length = length == null ? MAX_SAFE_INTEGER : length;
+	  return !!length &&
+	    (typeof value == 'number' || reIsUint.test(value)) &&
+	    (value > -1 && value % 1 == 0 && value < length);
 	}
 	
 	/**
@@ -1364,9 +1439,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @static
 	 * @memberOf _
+	 * @since 0.1.0
 	 * @category Lang
 	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
+	 * @returns {boolean} Returns `true` if `value` is correctly classified,
+	 *  else `false`.
 	 * @example
 	 *
 	 * _.isArguments(function() { return arguments; }());
@@ -1386,10 +1463,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @static
 	 * @memberOf _
-	 * @type Function
+	 * @since 0.1.0
+	 * @type {Function}
 	 * @category Lang
 	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
+	 * @returns {boolean} Returns `true` if `value` is correctly classified,
+	 *  else `false`.
 	 * @example
 	 *
 	 * _.isArray([1, 2, 3]);
@@ -1413,7 +1492,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @static
 	 * @memberOf _
-	 * @type Function
+	 * @since 4.0.0
 	 * @category Lang
 	 * @param {*} value The value to check.
 	 * @returns {boolean} Returns `true` if `value` is array-like, else `false`.
@@ -1432,8 +1511,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * // => false
 	 */
 	function isArrayLike(value) {
-	  return value != null &&
-	    !(typeof value == 'function' && isFunction(value)) && isLength(getLength(value));
+	  return value != null && isLength(getLength(value)) && !isFunction(value);
 	}
 	
 	/**
@@ -1442,10 +1520,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @static
 	 * @memberOf _
-	 * @type Function
+	 * @since 4.0.0
 	 * @category Lang
 	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is an array-like object, else `false`.
+	 * @returns {boolean} Returns `true` if `value` is an array-like object,
+	 *  else `false`.
 	 * @example
 	 *
 	 * _.isArrayLikeObject([1, 2, 3]);
@@ -1469,9 +1548,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @static
 	 * @memberOf _
+	 * @since 0.1.0
 	 * @category Lang
 	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
+	 * @returns {boolean} Returns `true` if `value` is correctly classified,
+	 *  else `false`.
 	 * @example
 	 *
 	 * _.isFunction(_);
@@ -1482,8 +1563,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function isFunction(value) {
 	  // The use of `Object#toString` avoids issues with the `typeof` operator
-	  // in Safari 8 which returns 'object' for typed array constructors, and
-	  // PhantomJS 1.9 which returns 'function' for `NodeList` instances.
+	  // in Safari 8 which returns 'object' for typed array and weak map constructors,
+	  // and PhantomJS 1.9 which returns 'function' for `NodeList` instances.
 	  var tag = isObject(value) ? objectToString.call(value) : '';
 	  return tag == funcTag || tag == genTag;
 	}
@@ -1491,13 +1572,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Checks if `value` is a valid array-like length.
 	 *
-	 * **Note:** This function is loosely based on [`ToLength`](http://ecma-international.org/ecma-262/6.0/#sec-tolength).
+	 * **Note:** This function is loosely based on
+	 * [`ToLength`](http://ecma-international.org/ecma-262/6.0/#sec-tolength).
 	 *
 	 * @static
 	 * @memberOf _
+	 * @since 4.0.0
 	 * @category Lang
 	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
+	 * @returns {boolean} Returns `true` if `value` is a valid length,
+	 *  else `false`.
 	 * @example
 	 *
 	 * _.isLength(3);
@@ -1513,15 +1597,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * // => false
 	 */
 	function isLength(value) {
-	  return typeof value == 'number' && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
+	  return typeof value == 'number' &&
+	    value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
 	}
 	
 	/**
-	 * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
-	 * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+	 * Checks if `value` is the
+	 * [language type](http://www.ecma-international.org/ecma-262/6.0/#sec-ecmascript-language-types)
+	 * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
 	 *
 	 * @static
 	 * @memberOf _
+	 * @since 0.1.0
 	 * @category Lang
 	 * @param {*} value The value to check.
 	 * @returns {boolean} Returns `true` if `value` is an object, else `false`.
@@ -1550,6 +1637,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @static
 	 * @memberOf _
+	 * @since 4.0.0
 	 * @category Lang
 	 * @param {*} value The value to check.
 	 * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
@@ -1575,10 +1663,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Checks if `value` is classified as a `String` primitive or object.
 	 *
 	 * @static
+	 * @since 0.1.0
 	 * @memberOf _
 	 * @category Lang
 	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
+	 * @returns {boolean} Returns `true` if `value` is correctly classified,
+	 *  else `false`.
 	 * @example
 	 *
 	 * _.isString('abc');
@@ -1600,6 +1690,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * for more details.
 	 *
 	 * @static
+	 * @since 0.1.0
 	 * @memberOf _
 	 * @category Object
 	 * @param {Object} object The object to query.
@@ -1647,12 +1738,12 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	/**
-	 * lodash 4.0.1 (Custom Build) <https://lodash.com/>
+	 * lodash (Custom Build) <https://lodash.com/>
 	 * Build: `lodash modularize exports="npm" -o ./`
-	 * Copyright 2012-2016 The Dojo Foundation <http://dojofoundation.org/>
+	 * Copyright jQuery Foundation and other contributors <https://jquery.org/>
+	 * Released under MIT license <https://lodash.com/license>
 	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2016 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <https://lodash.com/license>
+	 * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 */
 	
 	/** Used as the `TypeError` message for "Functions" methods. */
@@ -1665,7 +1756,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/** `Object#toString` result references. */
 	var funcTag = '[object Function]',
-	    genTag = '[object GeneratorFunction]';
+	    genTag = '[object GeneratorFunction]',
+	    symbolTag = '[object Symbol]';
 	
 	/** Used to match leading and trailing whitespace. */
 	var reTrim = /^\s+|\s+$/g;
@@ -1689,7 +1781,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @private
 	 * @param {Function} func The function to invoke.
 	 * @param {*} thisArg The `this` binding of `func`.
-	 * @param {...*} args The arguments to invoke `func` with.
+	 * @param {Array} args The arguments to invoke `func` with.
 	 * @returns {*} Returns the result of `func`.
 	 */
 	function apply(func, thisArg, args) {
@@ -1707,7 +1799,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var objectProto = Object.prototype;
 	
 	/**
-	 * Used to resolve the [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
+	 * Used to resolve the
+	 * [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
 	 * of values.
 	 */
 	var objectToString = objectProto.toString;
@@ -1717,12 +1810,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/**
 	 * Creates a function that invokes `func` with the `this` binding of the
-	 * created function and arguments from `start` and beyond provided as an array.
+	 * created function and arguments from `start` and beyond provided as
+	 * an array.
 	 *
-	 * **Note:** This method is based on the [rest parameter](https://mdn.io/rest_parameters).
+	 * **Note:** This method is based on the
+	 * [rest parameter](https://mdn.io/rest_parameters).
 	 *
 	 * @static
 	 * @memberOf _
+	 * @since 4.0.0
 	 * @category Function
 	 * @param {Function} func The function to apply a rest parameter to.
 	 * @param {number} [start=func.length-1] The start position of the rest parameter.
@@ -1771,9 +1867,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @static
 	 * @memberOf _
+	 * @since 0.1.0
 	 * @category Lang
 	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
+	 * @returns {boolean} Returns `true` if `value` is correctly classified,
+	 *  else `false`.
 	 * @example
 	 *
 	 * _.isFunction(_);
@@ -1784,18 +1882,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function isFunction(value) {
 	  // The use of `Object#toString` avoids issues with the `typeof` operator
-	  // in Safari 8 which returns 'object' for typed array constructors, and
-	  // PhantomJS 1.9 which returns 'function' for `NodeList` instances.
+	  // in Safari 8 which returns 'object' for typed array and weak map constructors,
+	  // and PhantomJS 1.9 which returns 'function' for `NodeList` instances.
 	  var tag = isObject(value) ? objectToString.call(value) : '';
 	  return tag == funcTag || tag == genTag;
 	}
 	
 	/**
-	 * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
-	 * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+	 * Checks if `value` is the
+	 * [language type](http://www.ecma-international.org/ecma-262/6.0/#sec-ecmascript-language-types)
+	 * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
 	 *
 	 * @static
 	 * @memberOf _
+	 * @since 0.1.0
 	 * @category Lang
 	 * @param {*} value The value to check.
 	 * @returns {boolean} Returns `true` if `value` is an object, else `false`.
@@ -1819,30 +1919,80 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	/**
-	 * Converts `value` to an integer.
-	 *
-	 * **Note:** This function is loosely based on [`ToInteger`](http://www.ecma-international.org/ecma-262/6.0/#sec-tointeger).
+	 * Checks if `value` is object-like. A value is object-like if it's not `null`
+	 * and has a `typeof` result of "object".
 	 *
 	 * @static
 	 * @memberOf _
+	 * @since 4.0.0
 	 * @category Lang
-	 * @param {*} value The value to convert.
-	 * @returns {number} Returns the converted integer.
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
 	 * @example
 	 *
-	 * _.toInteger(3);
-	 * // => 3
+	 * _.isObjectLike({});
+	 * // => true
 	 *
-	 * _.toInteger(Number.MIN_VALUE);
-	 * // => 0
+	 * _.isObjectLike([1, 2, 3]);
+	 * // => true
 	 *
-	 * _.toInteger(Infinity);
+	 * _.isObjectLike(_.noop);
+	 * // => false
+	 *
+	 * _.isObjectLike(null);
+	 * // => false
+	 */
+	function isObjectLike(value) {
+	  return !!value && typeof value == 'object';
+	}
+	
+	/**
+	 * Checks if `value` is classified as a `Symbol` primitive or object.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is correctly classified,
+	 *  else `false`.
+	 * @example
+	 *
+	 * _.isSymbol(Symbol.iterator);
+	 * // => true
+	 *
+	 * _.isSymbol('abc');
+	 * // => false
+	 */
+	function isSymbol(value) {
+	  return typeof value == 'symbol' ||
+	    (isObjectLike(value) && objectToString.call(value) == symbolTag);
+	}
+	
+	/**
+	 * Converts `value` to a finite number.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.12.0
+	 * @category Lang
+	 * @param {*} value The value to convert.
+	 * @returns {number} Returns the converted number.
+	 * @example
+	 *
+	 * _.toFinite(3.2);
+	 * // => 3.2
+	 *
+	 * _.toFinite(Number.MIN_VALUE);
+	 * // => 5e-324
+	 *
+	 * _.toFinite(Infinity);
 	 * // => 1.7976931348623157e+308
 	 *
-	 * _.toInteger('3');
-	 * // => 3
+	 * _.toFinite('3.2');
+	 * // => 3.2
 	 */
-	function toInteger(value) {
+	function toFinite(value) {
 	  if (!value) {
 	    return value === 0 ? value : 0;
 	  }
@@ -1851,8 +2001,40 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var sign = (value < 0 ? -1 : 1);
 	    return sign * MAX_INTEGER;
 	  }
-	  var remainder = value % 1;
-	  return value === value ? (remainder ? value - remainder : value) : 0;
+	  return value === value ? value : 0;
+	}
+	
+	/**
+	 * Converts `value` to an integer.
+	 *
+	 * **Note:** This function is loosely based on
+	 * [`ToInteger`](http://www.ecma-international.org/ecma-262/6.0/#sec-tointeger).
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to convert.
+	 * @returns {number} Returns the converted integer.
+	 * @example
+	 *
+	 * _.toInteger(3.2);
+	 * // => 3
+	 *
+	 * _.toInteger(Number.MIN_VALUE);
+	 * // => 0
+	 *
+	 * _.toInteger(Infinity);
+	 * // => 1.7976931348623157e+308
+	 *
+	 * _.toInteger('3.2');
+	 * // => 3
+	 */
+	function toInteger(value) {
+	  var result = toFinite(value),
+	      remainder = result % 1;
+	
+	  return result === result ? (remainder ? result - remainder : result) : 0;
 	}
 	
 	/**
@@ -1860,13 +2042,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @static
 	 * @memberOf _
+	 * @since 4.0.0
 	 * @category Lang
 	 * @param {*} value The value to process.
 	 * @returns {number} Returns the number.
 	 * @example
 	 *
-	 * _.toNumber(3);
-	 * // => 3
+	 * _.toNumber(3.2);
+	 * // => 3.2
 	 *
 	 * _.toNumber(Number.MIN_VALUE);
 	 * // => 5e-324
@@ -1874,10 +2057,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * _.toNumber(Infinity);
 	 * // => Infinity
 	 *
-	 * _.toNumber('3');
-	 * // => 3
+	 * _.toNumber('3.2');
+	 * // => 3.2
 	 */
 	function toNumber(value) {
+	  if (typeof value == 'number') {
+	    return value;
+	  }
+	  if (isSymbol(value)) {
+	    return NAN;
+	  }
 	  if (isObject(value)) {
 	    var other = isFunction(value.valueOf) ? value.valueOf() : value;
 	    value = isObject(other) ? (other + '') : other;
@@ -5692,7 +5881,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
-	 * lodash 4.0.0 (Custom Build) <https://lodash.com/>
+	 * lodash 4.0.1 (Custom Build) <https://lodash.com/>
 	 * Build: `lodash modularize exports="npm" -o ./`
 	 * Copyright 2012-2016 The Dojo Foundation <http://dojofoundation.org/>
 	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
@@ -5715,7 +5904,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * result of the last `func` invocation.
 	 *
 	 * **Note:** If `leading` and `trailing` options are `true`, `func` is invoked
-	 * on the trailing edge of the timeout only if the the throttled function is
+	 * on the trailing edge of the timeout only if the throttled function is
 	 * invoked more than once during the `wait` timeout.
 	 *
 	 * See [David Corbacho's article](http://drupalmotion.com/article/debounce-and-throttle-visual-explanation)
@@ -5734,14 +5923,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @returns {Function} Returns the new throttled function.
 	 * @example
 	 *
-	 * // avoid excessively updating the position while scrolling
+	 * // Avoid excessively updating the position while scrolling.
 	 * jQuery(window).on('scroll', _.throttle(updatePosition, 100));
 	 *
-	 * // invoke `renewToken` when the click event is fired, but not more than once every 5 minutes
+	 * // Invoke `renewToken` when the click event is fired, but not more than once every 5 minutes.
 	 * var throttled = _.throttle(renewToken, 300000, { 'trailing': false });
 	 * jQuery(element).on('click', throttled);
 	 *
-	 * // cancel a trailing throttled invocation
+	 * // Cancel the trailing throttled invocation.
 	 * jQuery(window).on('popstate', throttled.cancel);
 	 */
 	function throttle(func, wait, options) {
@@ -5755,7 +5944,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    leading = 'leading' in options ? !!options.leading : leading;
 	    trailing = 'trailing' in options ? !!options.trailing : trailing;
 	  }
-	  return debounce(func, wait, { 'leading': leading, 'maxWait': wait, 'trailing': trailing });
+	  return debounce(func, wait, {
+	    'leading': leading,
+	    'maxWait': wait,
+	    'trailing': trailing
+	  });
 	}
 	
 	/**
@@ -5782,8 +5975,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * // => false
 	 */
 	function isObject(value) {
-	  // Avoid a V8 JIT bug in Chrome 19-20.
-	  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
 	  var type = typeof value;
 	  return !!value && (type == 'object' || type == 'function');
 	}
@@ -5796,12 +5987,12 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	/**
-	 * lodash 4.0.1 (Custom Build) <https://lodash.com/>
+	 * lodash 4.0.6 (Custom Build) <https://lodash.com/>
 	 * Build: `lodash modularize exports="npm" -o ./`
-	 * Copyright 2012-2016 The Dojo Foundation <http://dojofoundation.org/>
+	 * Copyright jQuery Foundation and other contributors <https://jquery.org/>
+	 * Released under MIT license <https://lodash.com/license>
 	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
-	 * Copyright 2009-2016 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 * Available under MIT license <https://lodash.com/license>
+	 * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 */
 	
 	/** Used as the `TypeError` message for "Functions" methods. */
@@ -5812,7 +6003,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/** `Object#toString` result references. */
 	var funcTag = '[object Function]',
-	    genTag = '[object GeneratorFunction]';
+	    genTag = '[object GeneratorFunction]',
+	    symbolTag = '[object Symbol]';
 	
 	/** Used to match leading and trailing whitespace. */
 	var reTrim = /^\s+|\s+$/g;
@@ -5833,13 +6025,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	var objectProto = Object.prototype;
 	
 	/**
-	 * Used to resolve the [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
+	 * Used to resolve the
+	 * [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
 	 * of values.
 	 */
 	var objectToString = objectProto.toString;
 	
 	/* Built-in method references for those with the same name as other `lodash` methods. */
-	var nativeMax = Math.max;
+	var nativeMax = Math.max,
+	    nativeMin = Math.min;
 	
 	/**
 	 * Gets the timestamp of the number of milliseconds that have elapsed since
@@ -5847,7 +6041,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @static
 	 * @memberOf _
-	 * @type Function
+	 * @since 2.4.0
+	 * @type {Function}
 	 * @category Date
 	 * @returns {number} Returns the timestamp.
 	 * @example
@@ -5855,7 +6050,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * _.defer(function(stamp) {
 	 *   console.log(_.now() - stamp);
 	 * }, _.now());
-	 * // => logs the number of milliseconds it took for the deferred function to be invoked
+	 * // => Logs the number of milliseconds it took for the deferred function to be invoked.
 	 */
 	var now = Date.now;
 	
@@ -5870,24 +6065,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * to the debounced function return the result of the last `func` invocation.
 	 *
 	 * **Note:** If `leading` and `trailing` options are `true`, `func` is invoked
-	 * on the trailing edge of the timeout only if the the debounced function is
+	 * on the trailing edge of the timeout only if the debounced function is
 	 * invoked more than once during the `wait` timeout.
 	 *
-	 * See [David Corbacho's article](http://drupalmotion.com/article/debounce-and-throttle-visual-explanation)
+	 * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
 	 * for details over the differences between `_.debounce` and `_.throttle`.
 	 *
 	 * @static
 	 * @memberOf _
+	 * @since 0.1.0
 	 * @category Function
 	 * @param {Function} func The function to debounce.
 	 * @param {number} [wait=0] The number of milliseconds to delay.
-	 * @param {Object} [options] The options object.
-	 * @param {boolean} [options.leading=false] Specify invoking on the leading
-	 *  edge of the timeout.
-	 * @param {number} [options.maxWait] The maximum time `func` is allowed to be
-	 *  delayed before it's invoked.
-	 * @param {boolean} [options.trailing=true] Specify invoking on the trailing
-	 *  edge of the timeout.
+	 * @param {Object} [options={}] The options object.
+	 * @param {boolean} [options.leading=false]
+	 *  Specify invoking on the leading edge of the timeout.
+	 * @param {number} [options.maxWait]
+	 *  The maximum time `func` is allowed to be delayed before it's invoked.
+	 * @param {boolean} [options.trailing=true]
+	 *  Specify invoking on the trailing edge of the timeout.
 	 * @returns {Function} Returns the new debounced function.
 	 * @example
 	 *
@@ -5909,16 +6105,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * jQuery(window).on('popstate', debounced.cancel);
 	 */
 	function debounce(func, wait, options) {
-	  var args,
-	      maxTimeoutId,
+	  var lastArgs,
+	      lastThis,
+	      maxWait,
 	      result,
-	      stamp,
-	      thisArg,
-	      timeoutId,
-	      trailingCall,
-	      lastCalled = 0,
+	      timerId,
+	      lastCallTime = 0,
+	      lastInvokeTime = 0,
 	      leading = false,
-	      maxWait = false,
+	      maxing = false,
 	      trailing = true;
 	
 	  if (typeof func != 'function') {
@@ -5927,94 +6122,104 @@ return /******/ (function(modules) { // webpackBootstrap
 	  wait = toNumber(wait) || 0;
 	  if (isObject(options)) {
 	    leading = !!options.leading;
-	    maxWait = 'maxWait' in options && nativeMax(toNumber(options.maxWait) || 0, wait);
+	    maxing = 'maxWait' in options;
+	    maxWait = maxing ? nativeMax(toNumber(options.maxWait) || 0, wait) : maxWait;
 	    trailing = 'trailing' in options ? !!options.trailing : trailing;
 	  }
 	
-	  function cancel() {
-	    if (timeoutId) {
-	      clearTimeout(timeoutId);
-	    }
-	    if (maxTimeoutId) {
-	      clearTimeout(maxTimeoutId);
-	    }
-	    lastCalled = 0;
-	    args = maxTimeoutId = thisArg = timeoutId = trailingCall = undefined;
-	  }
+	  function invokeFunc(time) {
+	    var args = lastArgs,
+	        thisArg = lastThis;
 	
-	  function complete(isCalled, id) {
-	    if (id) {
-	      clearTimeout(id);
-	    }
-	    maxTimeoutId = timeoutId = trailingCall = undefined;
-	    if (isCalled) {
-	      lastCalled = now();
-	      result = func.apply(thisArg, args);
-	      if (!timeoutId && !maxTimeoutId) {
-	        args = thisArg = undefined;
-	      }
-	    }
-	  }
-	
-	  function delayed() {
-	    var remaining = wait - (now() - stamp);
-	    if (remaining <= 0 || remaining > wait) {
-	      complete(trailingCall, maxTimeoutId);
-	    } else {
-	      timeoutId = setTimeout(delayed, remaining);
-	    }
-	  }
-	
-	  function flush() {
-	    if ((timeoutId && trailingCall) || (maxTimeoutId && trailing)) {
-	      result = func.apply(thisArg, args);
-	    }
-	    cancel();
+	    lastArgs = lastThis = undefined;
+	    lastInvokeTime = time;
+	    result = func.apply(thisArg, args);
 	    return result;
 	  }
 	
-	  function maxDelayed() {
-	    complete(trailing, timeoutId);
+	  function leadingEdge(time) {
+	    // Reset any `maxWait` timer.
+	    lastInvokeTime = time;
+	    // Start the timer for the trailing edge.
+	    timerId = setTimeout(timerExpired, wait);
+	    // Invoke the leading edge.
+	    return leading ? invokeFunc(time) : result;
+	  }
+	
+	  function remainingWait(time) {
+	    var timeSinceLastCall = time - lastCallTime,
+	        timeSinceLastInvoke = time - lastInvokeTime,
+	        result = wait - timeSinceLastCall;
+	
+	    return maxing ? nativeMin(result, maxWait - timeSinceLastInvoke) : result;
+	  }
+	
+	  function shouldInvoke(time) {
+	    var timeSinceLastCall = time - lastCallTime,
+	        timeSinceLastInvoke = time - lastInvokeTime;
+	
+	    // Either this is the first call, activity has stopped and we're at the
+	    // trailing edge, the system time has gone backwards and we're treating
+	    // it as the trailing edge, or we've hit the `maxWait` limit.
+	    return (!lastCallTime || (timeSinceLastCall >= wait) ||
+	      (timeSinceLastCall < 0) || (maxing && timeSinceLastInvoke >= maxWait));
+	  }
+	
+	  function timerExpired() {
+	    var time = now();
+	    if (shouldInvoke(time)) {
+	      return trailingEdge(time);
+	    }
+	    // Restart the timer.
+	    timerId = setTimeout(timerExpired, remainingWait(time));
+	  }
+	
+	  function trailingEdge(time) {
+	    clearTimeout(timerId);
+	    timerId = undefined;
+	
+	    // Only invoke if we have `lastArgs` which means `func` has been
+	    // debounced at least once.
+	    if (trailing && lastArgs) {
+	      return invokeFunc(time);
+	    }
+	    lastArgs = lastThis = undefined;
+	    return result;
+	  }
+	
+	  function cancel() {
+	    if (timerId !== undefined) {
+	      clearTimeout(timerId);
+	    }
+	    lastCallTime = lastInvokeTime = 0;
+	    lastArgs = lastThis = timerId = undefined;
+	  }
+	
+	  function flush() {
+	    return timerId === undefined ? result : trailingEdge(now());
 	  }
 	
 	  function debounced() {
-	    args = arguments;
-	    stamp = now();
-	    thisArg = this;
-	    trailingCall = trailing && (timeoutId || !leading);
+	    var time = now(),
+	        isInvoking = shouldInvoke(time);
 	
-	    if (maxWait === false) {
-	      var leadingCall = leading && !timeoutId;
-	    } else {
-	      if (!maxTimeoutId && !leading) {
-	        lastCalled = stamp;
-	      }
-	      var remaining = maxWait - (stamp - lastCalled),
-	          isCalled = remaining <= 0 || remaining > maxWait;
+	    lastArgs = arguments;
+	    lastThis = this;
+	    lastCallTime = time;
 	
-	      if (isCalled) {
-	        if (maxTimeoutId) {
-	          maxTimeoutId = clearTimeout(maxTimeoutId);
-	        }
-	        lastCalled = stamp;
-	        result = func.apply(thisArg, args);
+	    if (isInvoking) {
+	      if (timerId === undefined) {
+	        return leadingEdge(lastCallTime);
 	      }
-	      else if (!maxTimeoutId) {
-	        maxTimeoutId = setTimeout(maxDelayed, remaining);
+	      if (maxing) {
+	        // Handle invocations in a tight loop.
+	        clearTimeout(timerId);
+	        timerId = setTimeout(timerExpired, wait);
+	        return invokeFunc(lastCallTime);
 	      }
 	    }
-	    if (isCalled && timeoutId) {
-	      timeoutId = clearTimeout(timeoutId);
-	    }
-	    else if (!timeoutId && wait !== maxWait) {
-	      timeoutId = setTimeout(delayed, wait);
-	    }
-	    if (leadingCall) {
-	      isCalled = true;
-	      result = func.apply(thisArg, args);
-	    }
-	    if (isCalled && !timeoutId && !maxTimeoutId) {
-	      args = thisArg = undefined;
+	    if (timerId === undefined) {
+	      timerId = setTimeout(timerExpired, wait);
 	    }
 	    return result;
 	  }
@@ -6028,9 +6233,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @static
 	 * @memberOf _
+	 * @since 0.1.0
 	 * @category Lang
 	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
+	 * @returns {boolean} Returns `true` if `value` is correctly classified,
+	 *  else `false`.
 	 * @example
 	 *
 	 * _.isFunction(_);
@@ -6041,18 +6248,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function isFunction(value) {
 	  // The use of `Object#toString` avoids issues with the `typeof` operator
-	  // in Safari 8 which returns 'object' for typed array constructors, and
-	  // PhantomJS 1.9 which returns 'function' for `NodeList` instances.
+	  // in Safari 8 which returns 'object' for typed array and weak map constructors,
+	  // and PhantomJS 1.9 which returns 'function' for `NodeList` instances.
 	  var tag = isObject(value) ? objectToString.call(value) : '';
 	  return tag == funcTag || tag == genTag;
 	}
 	
 	/**
-	 * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
-	 * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+	 * Checks if `value` is the
+	 * [language type](http://www.ecma-international.org/ecma-262/6.0/#sec-ecmascript-language-types)
+	 * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
 	 *
 	 * @static
 	 * @memberOf _
+	 * @since 0.1.0
 	 * @category Lang
 	 * @param {*} value The value to check.
 	 * @returns {boolean} Returns `true` if `value` is an object, else `false`.
@@ -6076,10 +6285,62 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	/**
+	 * Checks if `value` is object-like. A value is object-like if it's not `null`
+	 * and has a `typeof` result of "object".
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+	 * @example
+	 *
+	 * _.isObjectLike({});
+	 * // => true
+	 *
+	 * _.isObjectLike([1, 2, 3]);
+	 * // => true
+	 *
+	 * _.isObjectLike(_.noop);
+	 * // => false
+	 *
+	 * _.isObjectLike(null);
+	 * // => false
+	 */
+	function isObjectLike(value) {
+	  return !!value && typeof value == 'object';
+	}
+	
+	/**
+	 * Checks if `value` is classified as a `Symbol` primitive or object.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is correctly classified,
+	 *  else `false`.
+	 * @example
+	 *
+	 * _.isSymbol(Symbol.iterator);
+	 * // => true
+	 *
+	 * _.isSymbol('abc');
+	 * // => false
+	 */
+	function isSymbol(value) {
+	  return typeof value == 'symbol' ||
+	    (isObjectLike(value) && objectToString.call(value) == symbolTag);
+	}
+	
+	/**
 	 * Converts `value` to a number.
 	 *
 	 * @static
 	 * @memberOf _
+	 * @since 4.0.0
 	 * @category Lang
 	 * @param {*} value The value to process.
 	 * @returns {number} Returns the number.
@@ -6098,6 +6359,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * // => 3
 	 */
 	function toNumber(value) {
+	  if (typeof value == 'number') {
+	    return value;
+	  }
+	  if (isSymbol(value)) {
+	    return NAN;
+	  }
 	  if (isObject(value)) {
 	    var other = isFunction(value.valueOf) ? value.valueOf() : value;
 	    value = isObject(other) ? (other + '') : other;
@@ -7642,11 +7909,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_RESULT__;/*! Hammer.JS - v2.0.6 - 2015-12-23
+	var __WEBPACK_AMD_DEFINE_RESULT__;/*! Hammer.JS - v2.0.7 - 2016-04-22
 	 * http://hammerjs.github.io/
 	 *
-	 * Copyright (c) 2015 Jorik Tangelder;
-	 * Licensed under the  license */
+	 * Copyright (c) 2016 Jorik Tangelder;
+	 * Licensed under the MIT license */
 	(function(window, document, exportName, undefined) {
 	  'use strict';
 	
@@ -7774,7 +8041,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * means that properties in dest will be overwritten by the ones in src.
 	 * @param {Object} dest
 	 * @param {Object} src
-	 * @param {Boolean=false} [merge]
+	 * @param {Boolean} [merge=false]
 	 * @returns {Object} dest
 	 */
 	var extend = deprecate(function extend(dest, src, merge) {
@@ -8435,7 +8702,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.evEl = MOUSE_ELEMENT_EVENTS;
 	    this.evWin = MOUSE_WINDOW_EVENTS;
 	
-	    this.allow = true; // used by Input.TouchMouse to disable mouse events
 	    this.pressed = false; // mousedown state
 	
 	    Input.apply(this, arguments);
@@ -8458,8 +8724,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            eventType = INPUT_END;
 	        }
 	
-	        // mouse must be down, and mouse events are allowed (see the TouchMouse input)
-	        if (!this.pressed || !this.allow) {
+	        // mouse must be down
+	        if (!this.pressed) {
 	            return;
 	        }
 	
@@ -8742,12 +9008,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @constructor
 	 * @extends Input
 	 */
+	
+	var DEDUP_TIMEOUT = 2500;
+	var DEDUP_DISTANCE = 25;
+	
 	function TouchMouseInput() {
 	    Input.apply(this, arguments);
 	
 	    var handler = bindFn(this.handler, this);
 	    this.touch = new TouchInput(this.manager, handler);
 	    this.mouse = new MouseInput(this.manager, handler);
+	
+	    this.primaryTouch = null;
+	    this.lastTouches = [];
 	}
 	
 	inherit(TouchMouseInput, Input, {
@@ -8761,17 +9034,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var isTouch = (inputData.pointerType == INPUT_TYPE_TOUCH),
 	            isMouse = (inputData.pointerType == INPUT_TYPE_MOUSE);
 	
-	        // when we're in a touch event, so  block all upcoming mouse events
-	        // most mobile browser also emit mouseevents, right after touchstart
-	        if (isTouch) {
-	            this.mouse.allow = false;
-	        } else if (isMouse && !this.mouse.allow) {
+	        if (isMouse && inputData.sourceCapabilities && inputData.sourceCapabilities.firesTouchEvents) {
 	            return;
 	        }
 	
-	        // reset the allowMouse when we're done
-	        if (inputEvent & (INPUT_END | INPUT_CANCEL)) {
-	            this.mouse.allow = true;
+	        // when we're in a touch event, record touches to  de-dupe synthetic mouse event
+	        if (isTouch) {
+	            recordTouches.call(this, inputEvent, inputData);
+	        } else if (isMouse && isSyntheticEvent.call(this, inputData)) {
+	            return;
 	        }
 	
 	        this.callback(manager, inputEvent, inputData);
@@ -8786,6 +9057,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	});
 	
+	function recordTouches(eventType, eventData) {
+	    if (eventType & INPUT_START) {
+	        this.primaryTouch = eventData.changedPointers[0].identifier;
+	        setLastTouch.call(this, eventData);
+	    } else if (eventType & (INPUT_END | INPUT_CANCEL)) {
+	        setLastTouch.call(this, eventData);
+	    }
+	}
+	
+	function setLastTouch(eventData) {
+	    var touch = eventData.changedPointers[0];
+	
+	    if (touch.identifier === this.primaryTouch) {
+	        var lastTouch = {x: touch.clientX, y: touch.clientY};
+	        this.lastTouches.push(lastTouch);
+	        var lts = this.lastTouches;
+	        var removeLastTouch = function() {
+	            var i = lts.indexOf(lastTouch);
+	            if (i > -1) {
+	                lts.splice(i, 1);
+	            }
+	        };
+	        setTimeout(removeLastTouch, DEDUP_TIMEOUT);
+	    }
+	}
+	
+	function isSyntheticEvent(eventData) {
+	    var x = eventData.srcEvent.clientX, y = eventData.srcEvent.clientY;
+	    for (var i = 0; i < this.lastTouches.length; i++) {
+	        var t = this.lastTouches[i];
+	        var dx = Math.abs(x - t.x), dy = Math.abs(y - t.y);
+	        if (dx <= DEDUP_DISTANCE && dy <= DEDUP_DISTANCE) {
+	            return true;
+	        }
+	    }
+	    return false;
+	}
+	
 	var PREFIXED_TOUCH_ACTION = prefixed(TEST_ELEMENT.style, 'touchAction');
 	var NATIVE_TOUCH_ACTION = PREFIXED_TOUCH_ACTION !== undefined;
 	
@@ -8796,6 +9105,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var TOUCH_ACTION_NONE = 'none';
 	var TOUCH_ACTION_PAN_X = 'pan-x';
 	var TOUCH_ACTION_PAN_Y = 'pan-y';
+	var TOUCH_ACTION_MAP = getTouchActionProps();
 	
 	/**
 	 * Touch Action
@@ -8820,7 +9130,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            value = this.compute();
 	        }
 	
-	        if (NATIVE_TOUCH_ACTION && this.manager.element.style) {
+	        if (NATIVE_TOUCH_ACTION && this.manager.element.style && TOUCH_ACTION_MAP[value]) {
 	            this.manager.element.style[PREFIXED_TOUCH_ACTION] = value;
 	        }
 	        this.actions = value.toLowerCase().trim();
@@ -8852,11 +9162,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param {Object} input
 	     */
 	    preventDefaults: function(input) {
-	        // not needed with native support for the touchAction property
-	        if (NATIVE_TOUCH_ACTION) {
-	            return;
-	        }
-	
 	        var srcEvent = input.srcEvent;
 	        var direction = input.offsetDirection;
 	
@@ -8867,9 +9172,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        var actions = this.actions;
-	        var hasNone = inStr(actions, TOUCH_ACTION_NONE);
-	        var hasPanY = inStr(actions, TOUCH_ACTION_PAN_Y);
-	        var hasPanX = inStr(actions, TOUCH_ACTION_PAN_X);
+	        var hasNone = inStr(actions, TOUCH_ACTION_NONE) && !TOUCH_ACTION_MAP[TOUCH_ACTION_NONE];
+	        var hasPanY = inStr(actions, TOUCH_ACTION_PAN_Y) && !TOUCH_ACTION_MAP[TOUCH_ACTION_PAN_Y];
+	        var hasPanX = inStr(actions, TOUCH_ACTION_PAN_X) && !TOUCH_ACTION_MAP[TOUCH_ACTION_PAN_X];
 	
 	        if (hasNone) {
 	            //do not prevent defaults if this is a tap gesture
@@ -8938,6 +9243,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    return TOUCH_ACTION_AUTO;
+	}
+	
+	function getTouchActionProps() {
+	    if (!NATIVE_TOUCH_ACTION) {
+	        return false;
+	    }
+	    var touchMap = {};
+	    var cssSupports = window.CSS && window.CSS.supports;
+	    ['auto', 'manipulation', 'pan-y', 'pan-x', 'pan-x pan-y', 'none'].forEach(function(val) {
+	
+	        // If css.supports is not supported but there is native touch-action assume it supports
+	        // all values. This is the case for IE 10 and 11.
+	        touchMap[val] = cssSupports ? window.CSS.supports('touch-action', val) : true;
+	    });
+	    return touchMap;
 	}
 	
 	/**
@@ -9736,7 +10056,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * @const {string}
 	 */
-	Hammer.VERSION = '2.0.6';
+	Hammer.VERSION = '2.0.7';
 	
 	/**
 	 * default settings
@@ -9867,6 +10187,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.handlers = {};
 	    this.session = {};
 	    this.recognizers = [];
+	    this.oldCssProps = {};
 	
 	    this.element = element;
 	    this.input = createInputInstance(this);
@@ -10045,6 +10366,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @returns {EventEmitter} this
 	     */
 	    on: function(events, handler) {
+	        if (events === undefined) {
+	            return;
+	        }
+	        if (handler === undefined) {
+	            return;
+	        }
+	
 	        var handlers = this.handlers;
 	        each(splitStr(events), function(event) {
 	            handlers[event] = handlers[event] || [];
@@ -10060,6 +10388,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @returns {EventEmitter} this
 	     */
 	    off: function(events, handler) {
+	        if (events === undefined) {
+	            return;
+	        }
+	
 	        var handlers = this.handlers;
 	        each(splitStr(events), function(event) {
 	            if (!handler) {
@@ -10124,9 +10456,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (!element.style) {
 	        return;
 	    }
+	    var prop;
 	    each(manager.options.cssProps, function(value, name) {
-	        element.style[prefixed(element.style, name)] = add ? value : '';
+	        prop = prefixed(element.style, name);
+	        if (add) {
+	            manager.oldCssProps[prop] = element.style[prop];
+	            element.style[prop] = value;
+	        } else {
+	            element.style[prop] = manager.oldCssProps[prop] || '';
+	        }
 	    });
+	    if (!add) {
+	        manager.oldCssProps = {};
+	    }
 	}
 	
 	/**
@@ -10964,6 +11306,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var symbols = {}
 	var hasSymbol = typeof Symbol === 'function'
 	var makeSymbol
+	/* istanbul ignore if */
 	if (hasSymbol) {
 	  makeSymbol = function (key) {
 	    return Symbol.for(key)
@@ -11443,12 +11786,40 @@ return /******/ (function(modules) { // webpackBootstrap
 	// shim for using process in browser
 	
 	var process = module.exports = {};
+	
+	// cached from whatever global is present so that test runners that stub it
+	// don't break things.  But we need to wrap it in a try catch in case it is
+	// wrapped in strict mode code which doesn't define any globals.  It's inside a
+	// function because try/catches deoptimize in certain engines.
+	
+	var cachedSetTimeout;
+	var cachedClearTimeout;
+	
+	(function () {
+	  try {
+	    cachedSetTimeout = setTimeout;
+	  } catch (e) {
+	    cachedSetTimeout = function () {
+	      throw new Error('setTimeout is not defined');
+	    }
+	  }
+	  try {
+	    cachedClearTimeout = clearTimeout;
+	  } catch (e) {
+	    cachedClearTimeout = function () {
+	      throw new Error('clearTimeout is not defined');
+	    }
+	  }
+	} ())
 	var queue = [];
 	var draining = false;
 	var currentQueue;
 	var queueIndex = -1;
 	
 	function cleanUpNextTick() {
+	    if (!draining || !currentQueue) {
+	        return;
+	    }
 	    draining = false;
 	    if (currentQueue.length) {
 	        queue = currentQueue.concat(queue);
@@ -11464,7 +11835,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (draining) {
 	        return;
 	    }
-	    var timeout = setTimeout(cleanUpNextTick);
+	    var timeout = cachedSetTimeout(cleanUpNextTick);
 	    draining = true;
 	
 	    var len = queue.length;
@@ -11481,7 +11852,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    currentQueue = null;
 	    draining = false;
-	    clearTimeout(timeout);
+	    cachedClearTimeout(timeout);
 	}
 	
 	process.nextTick = function (fun) {
@@ -11493,7 +11864,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    queue.push(new Item(fun, args));
 	    if (queue.length === 1 && !draining) {
-	        setTimeout(drainQueue, 0);
+	        cachedSetTimeout(drainQueue, 0);
 	    }
 	};
 	
@@ -15500,12 +15871,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	(function (global, factory) {
 	   true ? factory(exports) :
 	  typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	  (factory((global.topojson = {})));
+	  (factory((global.topojson = global.topojson || {})));
 	}(this, function (exports) { 'use strict';
 	
 	  function noop() {}
 	
-	  function absolute(transform) {
+	  function transformAbsolute(transform) {
 	    if (!transform) return noop;
 	    var x0,
 	        y0,
@@ -15520,7 +15891,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	  }
 	
-	  function relative(transform) {
+	  function transformRelative(transform) {
 	    if (!transform) return noop;
 	    var x0,
 	        y0,
@@ -15530,8 +15901,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        dy = transform.translate[1];
 	    return function(point, i) {
 	      if (!i) x0 = y0 = 0;
-	      var x1 = (point[0] - dx) / kx | 0,
-	          y1 = (point[1] - dy) / ky | 0;
+	      var x1 = Math.round((point[0] - dx) / kx),
+	          y1 = Math.round((point[1] - dy) / ky);
 	      point[0] = x1 - x0;
 	      point[1] = y1 - y0;
 	      x0 = x1;
@@ -15573,21 +15944,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	  function object(topology, o) {
-	    var absolute$$ = absolute(topology.transform),
+	    var absolute = transformAbsolute(topology.transform),
 	        arcs = topology.arcs;
 	
 	    function arc(i, points) {
 	      if (points.length) points.pop();
 	      for (var a = arcs[i < 0 ? ~i : i], k = 0, n = a.length, p; k < n; ++k) {
 	        points.push(p = a[k].slice());
-	        absolute$$(p, k);
+	        absolute(p, k);
 	      }
 	      if (i < 0) reverse(points, n);
 	    }
 	
 	    function point(p) {
 	      p = p.slice();
-	      absolute$$(p, 0);
+	      absolute(p, 0);
 	      return p;
 	    }
 	
@@ -15749,7 +16120,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return {type: "MultiLineString", arcs: stitchArcs(topology, arcs)};
 	  }
 	
-	  function triangle(triangle) {
+	  function cartesianTriangleArea(triangle) {
 	    var a = triangle[0], b = triangle[1], c = triangle[2];
 	    return Math.abs((a[0] - c[0]) * (b[1] - a[1]) - (a[0] - b[0]) * (c[1] - a[1]));
 	  }
@@ -15793,8 +16164,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      polygons.push(polygon);
 	    }
 	
-	    function exterior(ring$$) {
-	      return ring(object(topology, {type: "Polygon", arcs: [ring$$]}).coordinates[0]) > 0; // TODO allow spherical?
+	    function area(ring$$) {
+	      return Math.abs(ring(object(topology, {type: "Polygon", arcs: [ring$$]}).coordinates[0]));
 	    }
 	
 	    polygons.forEach(function(polygon) {
@@ -15844,14 +16215,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // If more than one ring is returned,
 	        // at most one of these rings can be the exterior;
-	        // this exterior ring has the same winding order
-	        // as any exterior ring in the original polygons.
+	        // choose the one with the greatest absolute area.
 	        if ((n = arcs.length) > 1) {
-	          var sgn = exterior(polygons[0][0]);
-	          for (var i = 0, t; i < n; ++i) {
-	            if (sgn === exterior(arcs[i])) {
-	              t = arcs[0], arcs[0] = arcs[i], arcs[i] = t;
-	              break;
+	          for (var i = 1, k = area(arcs[0]), ki, t; i < n; ++i) {
+	            if ((ki = area(arcs[i])) > k) {
+	              t = arcs[0], arcs[0] = arcs[i], arcs[i] = t, k = ki;
 	            }
 	          }
 	        }
@@ -15961,11 +16329,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	  function presimplify(topology, triangleArea) {
-	    var absolute$$ = absolute(topology.transform),
-	        relative$$ = relative(topology.transform),
+	    var absolute = transformAbsolute(topology.transform),
+	        relative = transformRelative(topology.transform),
 	        heap = minAreaHeap();
 	
-	    if (!triangleArea) triangleArea = triangle;
+	    if (!triangleArea) triangleArea = cartesianTriangleArea;
 	
 	    topology.arcs.forEach(function(arc) {
 	      var triangles = [],
@@ -15981,7 +16349,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Infinity will be computed in the next step.
 	      for (i = 0, n = arc.length; i < n; ++i) {
 	        p = arc[i];
-	        absolute$$(arc[i] = [p[0], p[1], Infinity], i);
+	        absolute(arc[i] = [p[0], p[1], Infinity], i);
 	      }
 	
 	      for (i = 1, n = arc.length - 1; i < n; ++i) {
@@ -16021,7 +16389,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      }
 	
-	      arc.forEach(relative$$);
+	      arc.forEach(relative);
 	    });
 	
 	    function update(triangle) {
@@ -16033,7 +16401,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return topology;
 	  }
 	
-	  var version = "1.6.24";
+	  var version = "1.6.26";
 	
 	  exports.version = version;
 	  exports.mesh = mesh;
@@ -16159,20 +16527,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// create a circular doubly linked list from polygon points in the specified winding order
 	function linkedList(data, start, end, dim, clockwise) {
-	    var sum = 0,
-	        i, j, last;
+	    var i, last;
 	
-	    // calculate original winding order of a polygon ring
-	    for (i = start, j = end - dim; i < end; i += dim) {
-	        sum += (data[j] - data[i]) * (data[i + 1] + data[j + 1]);
-	        j = i;
-	    }
-	
-	    // link points into circular doubly-linked list in the specified winding order
-	    if (clockwise === (sum > 0)) {
+	    if (clockwise === (signedArea(data, start, end, dim) > 0)) {
 	        for (i = start; i < end; i += dim) last = insertNode(i, data[i], data[i + 1], last);
 	    } else {
 	        for (i = end - dim; i >= start; i -= dim) last = insertNode(i, data[i], data[i + 1], last);
+	    }
+	
+	    if (last && equals(last, last.next)) {
+	        removeNode(last);
+	        last = last.next;
 	    }
 	
 	    return last;
@@ -16322,8 +16687,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var a = p.prev,
 	            b = p.next.next;
 	
-	        // a self-intersection where edge (v[i-1],v[i]) intersects (v[i+1],v[i+2])
-	        if (intersects(a, p, p.next, b) && locallyInside(a, b) && locallyInside(b, a)) {
+	        if (!equals(a, b) && intersects(a, p, p.next, b) && locallyInside(a, b) && locallyInside(b, a)) {
 	
 	            triangles.push(a.i / dim);
 	            triangles.push(p.i / dim);
@@ -16419,6 +16783,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var x = p.x + (hy - p.y) * (p.next.x - p.x) / (p.next.y - p.y);
 	            if (x <= hx && x > qx) {
 	                qx = x;
+	                if (x === hx) {
+	                    if (hy === p.y) return p;
+	                    if (hy === p.next.y) return p.next;
+	                }
 	                m = p.x < p.next.x ? p : p.next;
 	            }
 	        }
@@ -16427,21 +16795,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    if (!m) return null;
 	
-	    if (hole.x === m.x) return m.prev; // hole touches outer segment; pick lower endpoint
+	    if (hx === qx) return m.prev; // hole touches outer segment; pick lower endpoint
 	
 	    // look for points inside the triangle of hole point, segment intersection and endpoint;
 	    // if there are no points found, we have a valid connection;
 	    // otherwise choose the point of the minimum angle with the ray as connection point
 	
 	    var stop = m,
+	        mx = m.x,
+	        my = m.y,
 	        tanMin = Infinity,
 	        tan;
 	
 	    p = m.next;
 	
 	    while (p !== stop) {
-	        if (hx >= p.x && p.x >= m.x &&
-	                pointInTriangle(hy < m.y ? hx : qx, hy, m.x, m.y, hy < m.y ? qx : hx, hy, p.x, p.y)) {
+	        if (hx >= p.x && p.x >= mx &&
+	                pointInTriangle(hy < my ? hx : qx, hy, mx, my, hy < my ? qx : hx, hy, p.x, p.y)) {
 	
 	            tan = Math.abs(hy - p.y) / (hx - p.x); // tangential
 	
@@ -16575,7 +16945,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// check if a diagonal between two polygon nodes is valid (lies in polygon interior)
 	function isValidDiagonal(a, b) {
-	    return equals(a, b) || a.next.i !== b.i && a.prev.i !== b.i && !intersectsPolygon(a, b) &&
+	    return a.next.i !== b.i && a.prev.i !== b.i && !intersectsPolygon(a, b) &&
 	           locallyInside(a, b) && locallyInside(b, a) && middleInside(a, b);
 	}
 	
@@ -16591,6 +16961,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// check if two segments intersect
 	function intersects(p1, q1, p2, q2) {
+	    if ((equals(p1, q1) && equals(p2, q2)) ||
+	        (equals(p1, q2) && equals(p2, q1))) return true;
 	    return area(p1, q1, p2) > 0 !== area(p1, q1, q2) > 0 &&
 	           area(p2, q2, p1) > 0 !== area(p2, q2, q1) > 0;
 	}
@@ -16699,6 +17071,62 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // indicates whether this is a steiner point
 	    this.steiner = false;
 	}
+	
+	// return a percentage difference between the polygon area and its triangulation area;
+	// used to verify correctness of triangulation
+	earcut.deviation = function (data, holeIndices, dim, triangles) {
+	    var hasHoles = holeIndices && holeIndices.length;
+	    var outerLen = hasHoles ? holeIndices[0] * dim : data.length;
+	
+	    var polygonArea = Math.abs(signedArea(data, 0, outerLen, dim));
+	    if (hasHoles) {
+	        for (var i = 0, len = holeIndices.length; i < len; i++) {
+	            var start = holeIndices[i] * dim;
+	            var end = i < len - 1 ? holeIndices[i + 1] * dim : data.length;
+	            polygonArea -= Math.abs(signedArea(data, start, end, dim));
+	        }
+	    }
+	
+	    var trianglesArea = 0;
+	    for (i = 0; i < triangles.length; i += 3) {
+	        var a = triangles[i] * dim;
+	        var b = triangles[i + 1] * dim;
+	        var c = triangles[i + 2] * dim;
+	        trianglesArea += Math.abs(
+	            (data[a] - data[c]) * (data[b + 1] - data[a + 1]) -
+	            (data[a] - data[b]) * (data[c + 1] - data[a + 1]));
+	    }
+	
+	    return polygonArea === 0 && trianglesArea === 0 ? 0 :
+	        Math.abs((trianglesArea - polygonArea) / polygonArea);
+	};
+	
+	function signedArea(data, start, end, dim) {
+	    var sum = 0;
+	    for (var i = start, j = end - dim; i < end; i += dim) {
+	        sum += (data[j] - data[i]) * (data[i + 1] + data[j + 1]);
+	        j = i;
+	    }
+	    return sum;
+	}
+	
+	// turn a polygon in a multi-dimensional array form (e.g. as in GeoJSON) into a form Earcut accepts
+	earcut.flatten = function (data) {
+	    var dim = data[0][0].length,
+	        result = {vertices: [], holes: [], dimensions: dim},
+	        holeIndex = 0;
+	
+	    for (var i = 0; i < data.length; i++) {
+	        for (var j = 0; j < data[i].length; j++) {
+	            for (var d = 0; d < dim; d++) result.vertices.push(data[i][j][d]);
+	        }
+	        if (i > 0) {
+	            holeIndex += data[i - 1].length;
+	            result.holes.push(holeIndex);
+	        }
+	    }
+	    return result;
+	};
 
 
 /***/ },
