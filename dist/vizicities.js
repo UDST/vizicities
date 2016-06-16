@@ -9842,7 +9842,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _classCallCheck(this, ImageTileLayer);
 	
 	    var defaults = {
-	      distance: 40000
+	      distance: 200000
 	    };
 	
 	    options = (0, _lodashAssign2['default'])({}, defaults, options);
@@ -9860,7 +9860,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      _get(Object.getPrototypeOf(ImageTileLayer.prototype), '_onAdd', this).call(this, world);
 	
 	      // Add base layer
-	      var geom = new _three2['default'].PlaneBufferGeometry(200000, 200000, 1);
+	      var geom = new _three2['default'].PlaneBufferGeometry(2000000, 2000000, 1);
 	
 	      var baseMaterial;
 	      if (this._world._environment._skybox) {

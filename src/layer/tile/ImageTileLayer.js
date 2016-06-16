@@ -59,7 +59,7 @@ import extend from 'lodash.assign';
 class ImageTileLayer extends TileLayer {
   constructor(path, options) {
     var defaults = {
-      distance: 40000
+      distance: 200000
     };
 
     options = extend({}, defaults, options);
@@ -73,7 +73,7 @@ class ImageTileLayer extends TileLayer {
     super._onAdd(world);
 
     // Add base layer
-    var geom = new THREE.PlaneBufferGeometry(200000, 200000, 1);
+    var geom = new THREE.PlaneBufferGeometry(2000000, 2000000, 1);
 
     var baseMaterial;
     if (this._world._environment._skybox) {
