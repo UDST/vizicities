@@ -4359,9 +4359,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      if (!this._options.skybox) {
 	        var directionalLight = new _three2['default'].DirectionalLight(0xffffff, 1);
-	        directionalLight.position.x = 1000;
-	        directionalLight.position.y = 1000;
-	        directionalLight.position.z = 1000;
+	        directionalLight.position.x = 10000;
+	        directionalLight.position.y = 10000;
+	        directionalLight.position.z = 10000;
 	
 	        // TODO: Get shadows working in non-PBR scenes
 	
@@ -4384,18 +4384,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // // directionalLight.shadow.darkness = 0.15;
 	
 	        var directionalLight2 = new _three2['default'].DirectionalLight(0xffffff, 0.5);
-	        directionalLight2.position.x = -1000;
-	        directionalLight2.position.y = 1000;
-	        directionalLight2.position.z = -1000;
+	        directionalLight2.position.x = -10000;
+	        directionalLight2.position.y = 10000;
+	        directionalLight2.position.z = 0;
 	
-	        // var helper = new THREE.DirectionalLightHelper(directionalLight, 10);
-	        // var helper2 = new THREE.DirectionalLightHelper(directionalLight2, 10);
+	        var directionalLight3 = new _three2['default'].DirectionalLight(0xffffff, 0.5);
+	        directionalLight3.position.x = 10000;
+	        directionalLight3.position.y = 10000;
+	        directionalLight3.position.z = -10000;
 	
 	        this.add(directionalLight);
 	        this.add(directionalLight2);
+	        this.add(directionalLight3);
 	
+	        // var helper = new THREE.DirectionalLightHelper(directionalLight, 10);
+	        // var helper2 = new THREE.DirectionalLightHelper(directionalLight2, 10);
+	        // var helper3 = new THREE.DirectionalLightHelper(directionalLight3, 10);
+	        //
 	        // this.add(helper);
 	        // this.add(helper2);
+	        // this.add(helper3);
 	      } else {
 	          // Directional light that will be projected from the sun
 	          this._skyboxLight = new _three2['default'].DirectionalLight(0xffffff, 1);

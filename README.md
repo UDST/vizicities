@@ -20,6 +20,12 @@ Already know what you're doing? Here's the quickest way to install ViziCities...
 
 ## Examples
 
+* Basic example (2D basemap and 3D buildings)
+* Buildings coloured by height
+* GeoJSON example (points, linestrings and polygons)
+* NYC MTA routes
+* All the things (will test even the best computers)
+
 
 ## Main changes since 0.2
 

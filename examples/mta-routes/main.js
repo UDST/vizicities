@@ -6,11 +6,10 @@ var world = VIZI.world('world', {
   postProcessing: false
 }).setView(coords);
 
-// world._environment._skybox.setInclination(0.3);
-
 // Add controls
 VIZI.Controls.orbit().addTo(world);
 
+// CartoDB basemap
 VIZI.imageTileLayer('http://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
 }).addTo(world);
@@ -25,9 +24,6 @@ VIZI.geoJSONLayer('https://cdn.rawgit.com/robhawkes/0b08e6e60fd329bf2ef342c1122b
     return {
       lineColor: colour,
       lineWidth: 1.5,
-      // lineTransparent: true,
-      // lineOpacity: 0.2,
-      // lineBlending: THREE.AdditiveBlending,
       lineRenderOrder: 2
     };
   },
