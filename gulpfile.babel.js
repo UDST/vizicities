@@ -235,10 +235,10 @@ gulp.task('lint-gulpfile', lintGulpfile);
 gulp.task('lint', ['lint-src', 'lint-test', 'lint-gulpfile']);
 
 // Move CSS
-gulp.task('move-css', moveCSS);
+gulp.task('move-css', ['clean'], moveCSS);
 
 // Build two versions of the library
-gulp.task('build', ['lint', 'clean', 'move-css'], build);
+gulp.task('build', ['lint', 'move-css'], build);
 
 // Lint and run our tests
 gulp.task('test', ['lint'], test);
