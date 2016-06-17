@@ -233,6 +233,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._controls = [];
 	
 	    this._initContainer(domId);
+	    this._initAttribution();
 	    this._initEngine();
 	    this._initEnvironment();
 	    this._initEvents();
@@ -247,6 +248,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_initContainer',
 	    value: function _initContainer(domId) {
 	      this._container = document.getElementById(domId);
+	    }
+	  }, {
+	    key: '_initAttribution',
+	    value: function _initAttribution() {
+	      var message = '<a href="http://vizicities.com" target="_blank">Powered by ViziCities</a>';
+	
+	      var element = document.createElement('div');
+	      element.classList.add('vizicities-attribution');
+	
+	      element.innerHTML = message;
+	
+	      this._container.appendChild(element);
 	    }
 	  }, {
 	    key: '_initEngine',

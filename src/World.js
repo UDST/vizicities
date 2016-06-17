@@ -26,6 +26,7 @@ class World extends EventEmitter {
     this._controls = [];
 
     this._initContainer(domId);
+    this._initAttribution();
     this._initEngine();
     this._initEnvironment();
     this._initEvents();
@@ -38,6 +39,17 @@ class World extends EventEmitter {
 
   _initContainer(domId) {
     this._container = document.getElementById(domId);
+  }
+
+  _initAttribution() {
+    var message = '<a href="http://vizicities.com" target="_blank">Powered by ViziCities</a>';
+
+    var element = document.createElement('div');
+    element.classList.add('vizicities-attribution');
+
+    element.innerHTML = message;
+
+    this._container.appendChild(element);
   }
 
   _initEngine() {

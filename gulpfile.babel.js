@@ -87,14 +87,6 @@ function build() {
         // Proxy the global proj4 variable to require('proj4')
         'proj4': 'proj4'
       },
-      // resolve: {
-      //   alias: {
-      //     'TweenLite': __dirname + '/node_modules/gsap/src/uncompressed/TweenLite.js',
-      //     'TweenMax': __dirname + '/node_modules/gsap/src/uncompressed/TweenMax.js',
-      //     'TimelineLite': __dirname + '/node_modules/gsap/src/uncompressed/TimelineLite.js',
-      //     'TimelineMax': __dirname + '/node_modules/gsap/src/uncompressed/TimelineMax.js'
-      //   }
-      // },
       module: {
         loaders: [
           { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' }
@@ -118,6 +110,11 @@ function build() {
     .pipe($.sourcemaps.write('./'))
     .pipe(gulp.dest(destinationFolder))
     .pipe($.livereload());
+}
+
+function moveCSS() {
+  return gulp.src(path.join('src', config.entryFileName + '.css'))
+    .pipe(gulp.dest(destinationFolder));
 }
 
 function _mocha() {
@@ -237,8 +234,11 @@ gulp.task('lint-gulpfile', lintGulpfile);
 // Lint everything
 gulp.task('lint', ['lint-src', 'lint-test', 'lint-gulpfile']);
 
+// Move CSS
+gulp.task('move-css', moveCSS);
+
 // Build two versions of the library
-gulp.task('build', ['lint', 'clean'], build);
+gulp.task('build', ['lint', 'clean', 'move-css'], build);
 
 // Lint and run our tests
 gulp.task('test', ['lint'], test);
