@@ -21,7 +21,25 @@ Already know what you're doing? Here's the quickest way to install ViziCities...
 ## Examples
 
 
-## Changes since 0.2
+## Main changes since 0.2
+
+* Re-written from the ground up
+* Complete overhaul of visual styling
+* Massive performance improvements across the board
+* Vastly simplified setup and API
+* Better management and cleanup of memory
+* Sophisticated quadtree-based grid system
+* Physically-based lighting and materials (when enabled)
+* Realistic day/night skybox (when enabled)
+* Shadows based on position of sun in sky (when enabled)
+* Built-in support for image-based tile endpoints
+* Built-in support for GeoJSON and TopoJSON tile endpoints
+* Built-in support for non-tiled GeoJSON and TopoJSON files
+* Click events on individual features (when enabled)
+* Internal caching of tile-based endpoints
+* Easier to extend and add new functionality
+* Easier to access and use general three.js features within ViziCities
+* Separation of three.js from the core ViziCities codebase
 
 
 ## Getting started
@@ -47,4 +65,4 @@ Want to share an interesting use of ViziCities, or perhaps just have a question 
 
 ## License
 
-ViziCities is copyright UrbanSim Inc. and uses the fair and simple BSD-3 license. Want to see it in full? No problem, [you can read it here](https://github.com/UDST/vizicities/blob/master/LICENSE).
+ViziCities is copyright [UrbanSim Inc.](http://www.urbansim.com/) and uses the fair and simple BSD-3 license. Want to see it in full? No problem, [you can read it here](https://github.com/UDST/vizicities/blob/master/LICENSE).
