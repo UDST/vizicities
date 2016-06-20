@@ -138,7 +138,7 @@ If you absolutely have to remove the attribution then please get in touch and we
 
 Want to use ViziCities but don't want to customise it yourself? Or perhaps you have an idea that might benefit from ViziCities but aren't sure how to make it a reality? We offer consultancy related to ViziCities projects and would love to see how we can help you.
 
-Interested? [Get in touch with us](hello@vizicities.com) and let's get talking.
+Interested? [Get in touch with us](mailto:hello@vizicities.com) and let's get talking.
 
 
 ## Contact us
