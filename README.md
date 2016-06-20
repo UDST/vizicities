@@ -7,21 +7,21 @@ A framework for 3D geospatial visualisation in the browser
 
 ### Important links
 
-* Examples
-* Getting started
-* Attribution
-* License
+* [Examples](#examples)
+* [Getting started](#getting-started)
+* [Attribution](#using-vizicities-please-attribute-it)
+* [License](#license)
 
 
 ## Examples
 
-* Basic example (2D basemap and 3D buildings) ([demo]())
-* Buildings coloured by height ([demo]())
-* Basic GeoJSON example (points, linestrings and polygons) ([demo]())
-* Interactivity (clicking on features) ([demo]())
-* NYC MTA routes ([demo]())
-* Lots of GeoJSON features ([demo]())
-* All the things (will test even the best computers) ([demo]())
+* [Basic example](https://github.com/UDST/vizicities/tree/master/examples/basic) (2D basemap and 3D buildings) ([demo]())
+* [Buildings coloured by height](https://github.com/UDST/vizicities/tree/master/examples/colour-by-height) ([demo]())
+* [Basic GeoJSON example](https://github.com/UDST/vizicities/tree/master/examples/geojson) (points, linestrings and polygons) ([demo]())
+* [Interactivity](https://github.com/UDST/vizicities/tree/master/examples/interactive) (clicking on features) ([demo]())
+* [NYC MTA routes](https://github.com/UDST/vizicities/tree/master/examples/mta-routes) ([demo]())
+* [Lots of GeoJSON](https://github.com/UDST/vizicities/tree/master/examples/lots-of-features) features ([demo]())
+* [All the things](https://github.com/UDST/vizicities/tree/master/examples/all-the-things) (will test even the best computers) ([demo]())
 
 
 ## Main changes since 0.2
@@ -134,20 +134,16 @@ While we love giving you free and open access to the code for ViziCities, we als
 If you absolutely have to remove the attribution then please get in touch and we can work something out.
 
 
-## Getting involved
-
-* Wishlist / suggested tasks
-* How to contribute
-
-
 ## Consultancy work
 
-We offer consultancy work...
+Want to use ViziCities but don't want to customise it yourself? Or perhaps you have an idea that might benefit from ViziCities but aren't sure how to make it a reality? We offer consultancy related to ViziCities projects and would love to see how we can help you.
+
+Interested? [Get in touch with us](hello@vizicities.com) and let's get talking.
 
 
 ## Contact us
 
-Want to share an interesting use of ViziCities, or perhaps just have a question about it? You can communicate with the ViziCities team via email (hello@vizicities.com) and Twitter (@ViziCities).
+Want to share an interesting use of ViziCities, or perhaps just have a question about it? You can communicate with the ViziCities team via email ([hello@vizicities.com](mailto:hello@vizicities.com)) and Twitter ([@ViziCities](http://twitter.com/ViziCities)).
 
 
 ## License
