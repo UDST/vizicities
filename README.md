@@ -7,7 +7,7 @@ __JavaScript 3D city and data visualisation platform__
 
 **Important links**
 
-* Play with an [interactive demo of ViziCities](http://rawgit.com/vizicities/vizicities/0.2.0/examples/basic-example/index.html)
+* Play with an [interactive demo of ViziCities](http://rawgit.com/UDST/vizicities/master/examples/basic-example/index.html)
 * Find out more about what you can do with ViziCities [on the website](http://vizicities.com)
 * Read [the documentation](http://dev.vizicities.com) and learn how to make something with ViziCities
 
