@@ -143,7 +143,7 @@ Interested? [Get in touch with us](mailto:vizicities@urbansim.com) and let's get
 
 ## Contact us
 
-Want to share an interesting use of ViziCities, or perhaps just have a question about it? You can communicate with the ViziCities team via email ([hello@vizicities.com](mailto:vizicities@urbansim.com)) and Twitter ([@ViziCities](http://twitter.com/ViziCities)).
+Want to share an interesting use of ViziCities, or perhaps just have a question about it? You can communicate with the ViziCities team via email ([vizicities@urbansim.com](mailto:vizicities@urbansim.com)) and Twitter ([@ViziCities](http://twitter.com/ViziCities)).
 
 
 ## License
