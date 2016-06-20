@@ -2,7 +2,7 @@
 
 A framework for 3D geospatial visualisation in the browser
 
-![]()
+![](http://cl.ly/3q0y3k133R1a/vizicities.jpg)
 
 
 ### Important links
@@ -15,11 +15,13 @@ A framework for 3D geospatial visualisation in the browser
 
 ## Examples
 
-* Basic example (2D basemap and 3D buildings)
-* Buildings coloured by height
-* GeoJSON example (points, linestrings and polygons)
-* NYC MTA routes
-* All the things (will test even the best computers)
+* Basic example (2D basemap and 3D buildings) ([demo]())
+* Buildings coloured by height ([demo]())
+* Basic GeoJSON example (points, linestrings and polygons) ([demo]())
+* Interactivity (clicking on features) ([demo]())
+* NYC MTA routes ([demo]())
+* Lots of GeoJSON features ([demo]())
+* All the things (will test even the best computers) ([demo]())
 
 
 ## Main changes since 0.2

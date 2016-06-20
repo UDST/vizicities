@@ -87,7 +87,6 @@
     "lodash.assign": "^4.0.2",
     "lodash.throttle": "^4.0.0",
     "lru-cache": "^4.0.0",
-    "proj4": "^2.3.12",
     "reqwest": "^2.0.5",
     "three": "^0.74.0",
     "topojson": "^1.6.24",
