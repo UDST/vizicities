@@ -15,13 +15,13 @@ A framework for 3D geospatial visualisation in the browser
 
 ## Examples
 
-* [Basic example](https://github.com/UDST/vizicities/tree/master/examples/basic) (2D basemap and 3D buildings) ([demo]())
-* [Buildings coloured by height](https://github.com/UDST/vizicities/tree/master/examples/colour-by-height) ([demo]())
-* [Basic GeoJSON example](https://github.com/UDST/vizicities/tree/master/examples/geojson) (points, linestrings and polygons) ([demo]())
-* [Interactivity](https://github.com/UDST/vizicities/tree/master/examples/interactive) (clicking on features) ([demo]())
-* [NYC MTA routes](https://github.com/UDST/vizicities/tree/master/examples/mta-routes) ([demo]())
-* [Lots of GeoJSON](https://github.com/UDST/vizicities/tree/master/examples/lots-of-features) features ([demo]())
-* [All the things](https://github.com/UDST/vizicities/tree/master/examples/all-the-things) (will test even the best computers) ([demo]())
+* [Basic example](https://github.com/UDST/vizicities/tree/master/examples/basic) (2D basemap and 3D buildings) ([demo](http://vizicities.com/demos/basic/))
+* [Buildings coloured by height](https://github.com/UDST/vizicities/tree/master/examples/colour-by-height) ([demo](http://vizicities.com/demos/colour-by-height))
+* [Basic GeoJSON example](https://github.com/UDST/vizicities/tree/master/examples/geojson) (points, linestrings and polygons) ([demo](http://vizicities.com/demos/geojson))
+* [Interactivity](https://github.com/UDST/vizicities/tree/master/examples/interactive) (open console and click on features) ([demo](http://vizicities.com/demos/interactive))
+* [NYC MTA routes](https://github.com/UDST/vizicities/tree/master/examples/mta-routes) ([demo](http://vizicities.com/demos/mta-routes))
+* [Lots of GeoJSON](https://github.com/UDST/vizicities/tree/master/examples/lots-of-features) features ([demo](http://vizicities.com/demos/lots-of-features))
+* [All the things](https://github.com/UDST/vizicities/tree/master/examples/all-the-things) (will test even the best computers) ([demo](http://vizicities.com/demos/all-the-things))
 
 
 ## Main changes since 0.2
