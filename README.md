@@ -2,7 +2,7 @@
 
 A framework for 3D geospatial visualisation in the browser
 
-![](http://cl.ly/3q0y3k133R1a/vizicities.jpg)
+![](http://i.giphy.com/l46Cntn0H9I0AdZ72.gif)
 
 
 ### Important links
