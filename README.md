@@ -138,12 +138,12 @@ If you absolutely have to remove the attribution then please get in touch and we
 
 Want to use ViziCities but don't want to customise it yourself? Or perhaps you have an idea that might benefit from ViziCities but aren't sure how to make it a reality? We offer consultancy related to ViziCities projects and would love to see how we can help you.
 
-Interested? [Get in touch with us](mailto:hello@vizicities.com) and let's get talking.
+Interested? [Get in touch with us](mailto:vizicities@urbansim.com) and let's get talking.
 
 
 ## Contact us
 
-Want to share an interesting use of ViziCities, or perhaps just have a question about it? You can communicate with the ViziCities team via email ([hello@vizicities.com](mailto:hello@vizicities.com)) and Twitter ([@ViziCities](http://twitter.com/ViziCities)).
+Want to share an interesting use of ViziCities, or perhaps just have a question about it? You can communicate with the ViziCities team via email ([hello@vizicities.com](mailto:vizicities@urbansim.com)) and Twitter ([@ViziCities](http://twitter.com/ViziCities)).
 
 
 ## License
