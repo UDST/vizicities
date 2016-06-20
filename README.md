@@ -2,7 +2,7 @@
 
 A framework for 3D geospatial visualisation in the browser
 
-![](https://cloud.githubusercontent.com/assets/22612/16195132/1c0b2176-36f0-11e6-853b-3e93c04c4b17.gif)
+[![](https://cloud.githubusercontent.com/assets/22612/16195132/1c0b2176-36f0-11e6-853b-3e93c04c4b17.gif)](http://vizicities.com/demos/all-the-things)
 
 
 ### Important links
