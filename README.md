@@ -15,13 +15,13 @@ A framework for 3D geospatial visualization in the browser
 
 ## Examples
 
-* [Basic example](https://github.com/UDST/vizicities/tree/master/examples/basic) (2D basemap and 3D buildings) ([demo](http://vizicities.com/demos/basic/))
-* [Buildings coloured by height](https://github.com/UDST/vizicities/tree/master/examples/colour-by-height) ([demo](http://vizicities.com/demos/colour-by-height))
-* [Basic GeoJSON example](https://github.com/UDST/vizicities/tree/master/examples/geojson) (points, linestrings and polygons) ([demo](http://vizicities.com/demos/geojson))
-* [Interactivity](https://github.com/UDST/vizicities/tree/master/examples/interactive) (open console and click on features) ([demo](http://vizicities.com/demos/interactive))
-* [NYC MTA routes](https://github.com/UDST/vizicities/tree/master/examples/mta-routes) ([demo](http://vizicities.com/demos/mta-routes))
-* [Lots of GeoJSON](https://github.com/UDST/vizicities/tree/master/examples/lots-of-features) features ([demo](http://vizicities.com/demos/lots-of-features))
-* [All the things](https://github.com/UDST/vizicities/tree/master/examples/all-the-things) (will test even the best computers) ([demo](http://vizicities.com/demos/all-the-things))
+* [Basic example](https://github.com/UDST/vizicities/tree/master/examples/basic) (2D basemap and 3D buildings) ([demo](http://cdn.rawgit.com/UDST/vizicities/master/examples/basic/index.html))
+* [Buildings coloured by height](https://github.com/UDST/vizicities/tree/master/examples/colour-by-height) ([demo](http://cdn.rawgit.com/UDST/vizicities/master/examples/colour-by-height/index.html))
+* [Basic GeoJSON example](https://github.com/UDST/vizicities/tree/master/examples/geojson) (points, linestrings and polygons) ([demo](http://cdn.rawgit.com/UDST/vizicities/master/examples/geojson/index.html))
+* [Interactivity](https://github.com/UDST/vizicities/tree/master/examples/interactive) (open console and click on features) ([demo](http://cdn.rawgit.com/UDST/vizicities/master/examples/interactive/index.html))
+* [NYC MTA routes](https://github.com/UDST/vizicities/tree/master/examples/mta-routes) ([demo](http://cdn.rawgit.com/UDST/vizicities/master/examples/mta-routes/index.html))
+* [Lots of GeoJSON](https://github.com/UDST/vizicities/tree/master/examples/lots-of-features) features ([demo](http://cdn.rawgit.com/UDST/vizicities/master/examples/lots-of-features/index.html))
+* [All the things](https://github.com/UDST/vizicities/tree/master/examples/all-the-things) (will test even the best computers) ([demo](http://cdn.rawgit.com/UDST/vizicities/master/examples/all-the-things/index.html))
 
 
 ## Main changes since 0.2
