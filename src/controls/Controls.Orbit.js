@@ -62,6 +62,8 @@ class Orbit extends EventEmitter {
   // pan velocity calms down a bit
   //
   // TODO: Long-distance plans should zoom out further
+  //
+  // TODO: Return a promise?
   flyToPoint(point, duration, zoom) {
     // Animation time in seconds
     var animationTime = duration || 2;
@@ -163,6 +165,7 @@ class Orbit extends EventEmitter {
     );
   }
 
+  // TODO: Return a promise?
   flyToLatLon(latlon, duration, noZoom) {
     var point = this._world.latLonToPoint(latlon);
     this.flyToPoint(point, duration, noZoom);
@@ -206,7 +209,7 @@ class Orbit extends EventEmitter {
   // Add controls to world instance and store world reference
   addTo(world) {
     world.addControls(this);
-    return this;
+    return Promise.resolve(this);
   }
 
   // Internal method called by World.addControls to actually add the controls
@@ -228,7 +231,10 @@ class Orbit extends EventEmitter {
 
     this._initEvents();
 
+    // TODO: Remove now that this is a promise?
     this.emit('added');
+
+    return Promise.resolve(this);
   }
 
   // Destroys the controls and removes them from memory

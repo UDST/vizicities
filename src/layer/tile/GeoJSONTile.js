@@ -251,70 +251,71 @@ class GeoJSONTile extends Tile {
     console.time(this._tile);
 
     // Using this creates a huge amount of memory due to the quantity of tiles
-    this._geojsonLayer = GeoJSONLayer(data, this._options).addTo(this._world);
+    this._geojsonLayer = GeoJSONLayer(data, this._options);
+    this._geojsonLayer.addTo(this._world).then(() => {
+      this._mesh = this._geojsonLayer._object3D;
+      this._pickingMesh = this._geojsonLayer._pickingMesh;
 
-    this._mesh = this._geojsonLayer._object3D;
-    this._pickingMesh = this._geojsonLayer._pickingMesh;
+      // Free the GeoJSON memory as we don't need it
+      //
+      // TODO: This should probably be a method within GeoJSONLayer
+      this._geojsonLayer._geojson = null;
 
-    // Free the GeoJSON memory as we don't need it
-    //
-    // TODO: This should probably be a method within GeoJSONLayer
-    this._geojsonLayer._geojson = null;
+      // TODO: Fix or store shadow canvas stuff and get rid of this code
+      // Draw footprint on shadow canvas
+      //
+      // TODO: Disabled for the time-being until it can be sped up / moved to
+      // a worker
+      // this._addShadow(coordinates);
 
-    // TODO: Fix or store shadow canvas stuff and get rid of this code
-    // Draw footprint on shadow canvas
-    //
-    // TODO: Disabled for the time-being until it can be sped up / moved to
-    // a worker
-    // this._addShadow(coordinates);
+      // Output shadow canvas
 
-    // Output shadow canvas
+      // TODO: Disabled for the time-being until it can be sped up / moved to
+      // a worker
 
-    // TODO: Disabled for the time-being until it can be sped up / moved to
-    // a worker
+      // var texture = new THREE.Texture(this._shadowCanvas);
+      //
+      // // Silky smooth images when tilted
+      // texture.magFilter = THREE.LinearFilter;
+      // texture.minFilter = THREE.LinearMipMapLinearFilter;
+      //
+      // // TODO: Set this to renderer.getMaxAnisotropy() / 4
+      // texture.anisotropy = 4;
+      //
+      // texture.needsUpdate = true;
+      //
+      // var material;
+      // if (!this._world._environment._skybox) {
+      //   material = new THREE.MeshBasicMaterial({
+      //     map: texture,
+      //     transparent: true,
+      //     depthWrite: false
+      //   });
+      // } else {
+      //   material = new THREE.MeshStandardMaterial({
+      //     map: texture,
+      //     transparent: true,
+      //     depthWrite: false
+      //   });
+      //   material.roughness = 1;
+      //   material.metalness = 0.1;
+      //   material.envMap = this._world._environment._skybox.getRenderTarget();
+      // }
+      //
+      // var geom = new THREE.PlaneBufferGeometry(this._side, this._side, 1);
+      // var mesh = new THREE.Mesh(geom, material);
+      //
+      // mesh.castShadow = false;
+      // mesh.receiveShadow = false;
+      // mesh.renderOrder = 1;
+      //
+      // mesh.rotation.x = -90 * Math.PI / 180;
+      //
+      // this._mesh.add(mesh);
 
-    // var texture = new THREE.Texture(this._shadowCanvas);
-    //
-    // // Silky smooth images when tilted
-    // texture.magFilter = THREE.LinearFilter;
-    // texture.minFilter = THREE.LinearMipMapLinearFilter;
-    //
-    // // TODO: Set this to renderer.getMaxAnisotropy() / 4
-    // texture.anisotropy = 4;
-    //
-    // texture.needsUpdate = true;
-    //
-    // var material;
-    // if (!this._world._environment._skybox) {
-    //   material = new THREE.MeshBasicMaterial({
-    //     map: texture,
-    //     transparent: true,
-    //     depthWrite: false
-    //   });
-    // } else {
-    //   material = new THREE.MeshStandardMaterial({
-    //     map: texture,
-    //     transparent: true,
-    //     depthWrite: false
-    //   });
-    //   material.roughness = 1;
-    //   material.metalness = 0.1;
-    //   material.envMap = this._world._environment._skybox.getRenderTarget();
-    // }
-    //
-    // var geom = new THREE.PlaneBufferGeometry(this._side, this._side, 1);
-    // var mesh = new THREE.Mesh(geom, material);
-    //
-    // mesh.castShadow = false;
-    // mesh.receiveShadow = false;
-    // mesh.renderOrder = 1;
-    //
-    // mesh.rotation.x = -90 * Math.PI / 180;
-    //
-    // this._mesh.add(mesh);
-
-    this._ready = true;
-    console.timeEnd(this._tile);
+      this._ready = true;
+      console.timeEnd(this._tile);
+    });
   }
 
   _abortRequest() {

@@ -85,6 +85,8 @@ class PolylineLayer extends Layer {
       // Output mesh
       this.add(this._mesh);
     }
+
+    return Promise.resolve(this);
   }
 
   // Return center of polyline as a LatLon
