@@ -16,7 +16,7 @@ class LayerGroup extends Layer {
 
   addLayer(layer) {
     this._layers.push(layer);
-    this._world.addLayer(layer);
+    return this._world.addLayer(layer);
   }
 
   removeLayer(layer) {

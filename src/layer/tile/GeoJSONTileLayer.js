@@ -49,16 +49,20 @@ class GeoJSONTileLayer extends TileLayer {
   }
 
   _onAdd(world) {
-    super._onAdd(world);
+    return new Promise((resolve, reject) => {
+      super._onAdd(world).then(() => {
+        // Trigger initial quadtree calculation on the next frame
+        //
+        // TODO: This is a hack to ensure the camera is all set up - a better
+        // solution should be found
+        setTimeout(() => {
+          this._calculateLOD();
+          this._initEvents();
+        }, 0);
 
-    // Trigger initial quadtree calculation on the next frame
-    //
-    // TODO: This is a hack to ensure the camera is all set up - a better
-    // solution should be found
-    setTimeout(() => {
-      this._calculateLOD();
-      this._initEvents();
-    }, 0);
+        resolve(this);
+      }).catch(reject);
+    });
   }
 
   _initEvents() {

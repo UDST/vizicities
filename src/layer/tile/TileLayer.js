@@ -82,6 +82,8 @@ class TileLayer extends Layer {
   _onAdd(world) {
     this.addToPicking(this._tilesPicking);
     this.add(this._tiles);
+
+    return Promise.resolve();
   }
 
   _updateFrustum() {

@@ -35,4 +35,6 @@ VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.topo
     return feature.geometry.type !== 'Point';
   },
   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://whosonfirst.mapzen.com#License">Who\'s On First</a>.'
-}).addTo(world);
+}).addTo(world).then(() => {
+  console.log('Added to world');
+});

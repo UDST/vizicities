@@ -91,6 +91,8 @@ class PointLayer extends Layer {
       // Output mesh
       this.add(this._mesh);
     }
+
+    return Promise.resolve(this);
   }
 
   // Return center of point as a LatLon

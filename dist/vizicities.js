@@ -218,6 +218,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _inherits(World, _EventEmitter);
 	
 	  function World(domId, options) {
+	    var _this = this;
+	
 	    _classCallCheck(this, World);
 	
 	    _get(Object.getPrototypeOf(World.prototype), 'constructor', this).call(this);
@@ -235,13 +237,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._initContainer(domId);
 	    this._initAttribution();
 	    this._initEngine();
-	    this._initEnvironment();
-	    this._initEvents();
 	
-	    this._pause = false;
+	    this._initEnvironment().then(function () {
+	      _this._initEvents();
 	
-	    // Kick off the update and render loop
-	    this._update();
+	      _this._pause = false;
+	
+	      // Kick off the update and render loop
+	      _this._update();
+	    });
 	  }
 	
 	  _createClass(World, [{
@@ -281,7 +285,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // add some method of disable / overriding the environment settings
 	      this._environment = new _layerEnvironmentEnvironmentLayer2['default']({
 	        skybox: this.options.skybox
-	      }).addTo(this);
+	      });
+	
+	      return this._environment.addTo(this);
 	    }
 	  }, {
 	    key: '_initEvents',
@@ -452,7 +458,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'addLayer',
 	    value: function addLayer(layer) {
-	      layer._addToWorld(this);
+	      var _this2 = this;
 	
 	      this._layers.push(layer);
 	
@@ -463,8 +469,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._engine._domScene2D.add(layer._domObject2D);
 	      }
 	
-	      this.emit('layerAdded', layer);
-	      return this;
+	      return new Promise(function (resolve, reject) {
+	        layer._addToWorld(_this2).then(function () {
+	          _this2.emit('layerAdded', layer);
+	          resolve(_this2);
+	        })['catch'](reject);
+	      });
 	    }
 	
 	    // Remove layer from world and scene but don't destroy it entirely
@@ -485,7 +495,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      this.emit('layerRemoved');
-	      return this;
+	
+	      return Promise.resolve(this);
 	    }
 	  }, {
 	    key: 'addControls',
@@ -495,7 +506,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._controls.push(controls);
 	
 	      this.emit('controlsAdded', controls);
-	      return this;
+	
+	      return Promise.resolve(this);
 	    }
 	
 	    // Remove controls from world but don't destroy them entirely
@@ -509,7 +521,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      };
 	
 	      this.emit('controlsRemoved', controls);
-	      return this;
+	
+	      return Promise.resolve(this);
 	    }
 	  }, {
 	    key: 'stop',
@@ -4358,6 +4371,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      // this._initGrid();
+	
+	      return Promise.resolve(this);
 	    }
 	
 	    // Not fleshed out or thought through yet
@@ -4604,18 +4619,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'addTo',
 	    value: function addTo(world) {
-	      world.addLayer(this);
-	      return this;
+	      return world.addLayer(this);
 	    }
 	
 	    // Internal method called by World.addLayer to actually add the layer
 	  }, {
 	    key: '_addToWorld',
 	    value: function _addToWorld(world) {
+	      var _this = this;
+	
 	      this._world = world;
-	      this._onAdd(world);
-	      this.emit('added');
+	
+	      return new Promise(function (resolve, reject) {
+	        _this._onAdd(world).then(function () {
+	          _this.emit('added');
+	          resolve(_this);
+	        })['catch'](reject);
+	      });
 	    }
+	
+	    // Must return a promise
 	  }, {
 	    key: '_onAdd',
 	    value: function _onAdd(world) {}
@@ -5706,6 +5729,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // pan velocity calms down a bit
 	    //
 	    // TODO: Long-distance plans should zoom out further
+	    //
+	    // TODO: Return a promise?
 	  }, {
 	    key: 'flyToPoint',
 	    value: function flyToPoint(point, duration, zoom) {
@@ -5796,6 +5821,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        ease: Power1.easeInOut
 	      });
 	    }
+	
+	    // TODO: Return a promise?
 	  }, {
 	    key: 'flyToLatLon',
 	    value: function flyToLatLon(latlon, duration, noZoom) {
@@ -5845,7 +5872,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'addTo',
 	    value: function addTo(world) {
 	      world.addControls(this);
-	      return this;
+	      return Promise.resolve(this);
 	    }
 	
 	    // Internal method called by World.addControls to actually add the controls
@@ -5869,7 +5896,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      this._initEvents();
 	
+	      // TODO: Remove now that this is a promise?
 	      this.emit('added');
+	
+	      return Promise.resolve(this);
 	    }
 	
 	    // Destroys the controls and removes them from memory
@@ -9855,37 +9885,41 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _onAdd(world) {
 	      var _this = this;
 	
-	      _get(Object.getPrototypeOf(ImageTileLayer.prototype), '_onAdd', this).call(this, world);
+	      return new Promise(function (resolve, reject) {
+	        _get(Object.getPrototypeOf(ImageTileLayer.prototype), '_onAdd', _this).call(_this, world).then(function () {
+	          // Add base layer
+	          var geom = new _three2['default'].PlaneBufferGeometry(2000000, 2000000, 1);
 	
-	      // Add base layer
-	      var geom = new _three2['default'].PlaneBufferGeometry(2000000, 2000000, 1);
+	          var baseMaterial;
+	          if (_this._world._environment._skybox) {
+	            baseMaterial = (0, _ImageTileLayerBaseMaterial2['default'])('#f5f5f3', _this._world._environment._skybox.getRenderTarget());
+	          } else {
+	            baseMaterial = (0, _ImageTileLayerBaseMaterial2['default'])('#f5f5f3');
+	          }
 	
-	      var baseMaterial;
-	      if (this._world._environment._skybox) {
-	        baseMaterial = (0, _ImageTileLayerBaseMaterial2['default'])('#f5f5f3', this._world._environment._skybox.getRenderTarget());
-	      } else {
-	        baseMaterial = (0, _ImageTileLayerBaseMaterial2['default'])('#f5f5f3');
-	      }
+	          var mesh = new _three2['default'].Mesh(geom, baseMaterial);
+	          mesh.renderOrder = 0;
+	          mesh.rotation.x = -90 * Math.PI / 180;
 	
-	      var mesh = new _three2['default'].Mesh(geom, baseMaterial);
-	      mesh.renderOrder = 0;
-	      mesh.rotation.x = -90 * Math.PI / 180;
+	          // TODO: It might be overkill to receive a shadow on the base layer as it's
+	          // rarely seen (good to have if performance difference is negligible)
+	          mesh.receiveShadow = true;
 	
-	      // TODO: It might be overkill to receive a shadow on the base layer as it's
-	      // rarely seen (good to have if performance difference is negligible)
-	      mesh.receiveShadow = true;
+	          _this._baseLayer = mesh;
+	          _this.add(mesh);
 	
-	      this._baseLayer = mesh;
-	      this.add(mesh);
+	          // Trigger initial quadtree calculation on the next frame
+	          //
+	          // TODO: This is a hack to ensure the camera is all set up - a better
+	          // solution should be found
+	          setTimeout(function () {
+	            _this._calculateLOD();
+	            _this._initEvents();
+	          }, 0);
 	
-	      // Trigger initial quadtree calculation on the next frame
-	      //
-	      // TODO: This is a hack to ensure the camera is all set up - a better
-	      // solution should be found
-	      setTimeout(function () {
-	        _this._calculateLOD();
-	        _this._initEvents();
-	      }, 0);
+	          resolve(_this);
+	        })['catch'](reject);
+	      });
 	    }
 	  }, {
 	    key: '_initEvents',
@@ -10082,6 +10116,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _onAdd(world) {
 	      this.addToPicking(this._tilesPicking);
 	      this.add(this._tiles);
+	
+	      return Promise.resolve();
 	    }
 	  }, {
 	    key: '_updateFrustum',
@@ -12935,16 +12971,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _onAdd(world) {
 	      var _this = this;
 	
-	      _get(Object.getPrototypeOf(GeoJSONTileLayer.prototype), '_onAdd', this).call(this, world);
+	      return new Promise(function (resolve, reject) {
+	        _get(Object.getPrototypeOf(GeoJSONTileLayer.prototype), '_onAdd', _this).call(_this, world).then(function () {
+	          // Trigger initial quadtree calculation on the next frame
+	          //
+	          // TODO: This is a hack to ensure the camera is all set up - a better
+	          // solution should be found
+	          setTimeout(function () {
+	            _this._calculateLOD();
+	            _this._initEvents();
+	          }, 0);
 	
-	      // Trigger initial quadtree calculation on the next frame
-	      //
-	      // TODO: This is a hack to ensure the camera is all set up - a better
-	      // solution should be found
-	      setTimeout(function () {
-	        _this._calculateLOD();
-	        _this._initEvents();
-	      }, 0);
+	          resolve(_this);
+	        })['catch'](reject);
+	      });
 	    }
 	  }, {
 	    key: '_initEvents',
@@ -13351,73 +13391,76 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_processTileData',
 	    value: function _processTileData(data) {
+	      var _this3 = this;
+	
 	      console.time(this._tile);
 	
 	      // Using this creates a huge amount of memory due to the quantity of tiles
-	      this._geojsonLayer = (0, _GeoJSONLayer.geoJSONLayer)(data, this._options).addTo(this._world);
+	      this._geojsonLayer = (0, _GeoJSONLayer.geoJSONLayer)(data, this._options);
+	      this._geojsonLayer.addTo(this._world).then(function () {
+	        _this3._mesh = _this3._geojsonLayer._object3D;
+	        _this3._pickingMesh = _this3._geojsonLayer._pickingMesh;
 	
-	      this._mesh = this._geojsonLayer._object3D;
-	      this._pickingMesh = this._geojsonLayer._pickingMesh;
+	        // Free the GeoJSON memory as we don't need it
+	        //
+	        // TODO: This should probably be a method within GeoJSONLayer
+	        _this3._geojsonLayer._geojson = null;
 	
-	      // Free the GeoJSON memory as we don't need it
-	      //
-	      // TODO: This should probably be a method within GeoJSONLayer
-	      this._geojsonLayer._geojson = null;
+	        // TODO: Fix or store shadow canvas stuff and get rid of this code
+	        // Draw footprint on shadow canvas
+	        //
+	        // TODO: Disabled for the time-being until it can be sped up / moved to
+	        // a worker
+	        // this._addShadow(coordinates);
 	
-	      // TODO: Fix or store shadow canvas stuff and get rid of this code
-	      // Draw footprint on shadow canvas
-	      //
-	      // TODO: Disabled for the time-being until it can be sped up / moved to
-	      // a worker
-	      // this._addShadow(coordinates);
+	        // Output shadow canvas
 	
-	      // Output shadow canvas
+	        // TODO: Disabled for the time-being until it can be sped up / moved to
+	        // a worker
 	
-	      // TODO: Disabled for the time-being until it can be sped up / moved to
-	      // a worker
+	        // var texture = new THREE.Texture(this._shadowCanvas);
+	        //
+	        // // Silky smooth images when tilted
+	        // texture.magFilter = THREE.LinearFilter;
+	        // texture.minFilter = THREE.LinearMipMapLinearFilter;
+	        //
+	        // // TODO: Set this to renderer.getMaxAnisotropy() / 4
+	        // texture.anisotropy = 4;
+	        //
+	        // texture.needsUpdate = true;
+	        //
+	        // var material;
+	        // if (!this._world._environment._skybox) {
+	        //   material = new THREE.MeshBasicMaterial({
+	        //     map: texture,
+	        //     transparent: true,
+	        //     depthWrite: false
+	        //   });
+	        // } else {
+	        //   material = new THREE.MeshStandardMaterial({
+	        //     map: texture,
+	        //     transparent: true,
+	        //     depthWrite: false
+	        //   });
+	        //   material.roughness = 1;
+	        //   material.metalness = 0.1;
+	        //   material.envMap = this._world._environment._skybox.getRenderTarget();
+	        // }
+	        //
+	        // var geom = new THREE.PlaneBufferGeometry(this._side, this._side, 1);
+	        // var mesh = new THREE.Mesh(geom, material);
+	        //
+	        // mesh.castShadow = false;
+	        // mesh.receiveShadow = false;
+	        // mesh.renderOrder = 1;
+	        //
+	        // mesh.rotation.x = -90 * Math.PI / 180;
+	        //
+	        // this._mesh.add(mesh);
 	
-	      // var texture = new THREE.Texture(this._shadowCanvas);
-	      //
-	      // // Silky smooth images when tilted
-	      // texture.magFilter = THREE.LinearFilter;
-	      // texture.minFilter = THREE.LinearMipMapLinearFilter;
-	      //
-	      // // TODO: Set this to renderer.getMaxAnisotropy() / 4
-	      // texture.anisotropy = 4;
-	      //
-	      // texture.needsUpdate = true;
-	      //
-	      // var material;
-	      // if (!this._world._environment._skybox) {
-	      //   material = new THREE.MeshBasicMaterial({
-	      //     map: texture,
-	      //     transparent: true,
-	      //     depthWrite: false
-	      //   });
-	      // } else {
-	      //   material = new THREE.MeshStandardMaterial({
-	      //     map: texture,
-	      //     transparent: true,
-	      //     depthWrite: false
-	      //   });
-	      //   material.roughness = 1;
-	      //   material.metalness = 0.1;
-	      //   material.envMap = this._world._environment._skybox.getRenderTarget();
-	      // }
-	      //
-	      // var geom = new THREE.PlaneBufferGeometry(this._side, this._side, 1);
-	      // var mesh = new THREE.Mesh(geom, material);
-	      //
-	      // mesh.castShadow = false;
-	      // mesh.receiveShadow = false;
-	      // mesh.renderOrder = 1;
-	      //
-	      // mesh.rotation.x = -90 * Math.PI / 180;
-	      //
-	      // this._mesh.add(mesh);
-	
-	      this._ready = true;
-	      console.timeEnd(this._tile);
+	        _this3._ready = true;
+	        console.timeEnd(_this3._tile);
+	      });
 	    }
 	  }, {
 	    key: '_abortRequest',
@@ -13556,10 +13599,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // Request data from URL if needed
 	      if (typeof this._geojson === 'string') {
-	        this._requestData(this._geojson);
+	        return this._requestData(this._geojson);
 	      } else {
 	        // Process and add GeoJSON to layer
-	        this._processData(this._geojson);
+	        return this._processData(this._geojson);
 	      }
 	    }
 	  }, {
@@ -13567,19 +13610,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _requestData(url) {
 	      var _this = this;
 	
-	      this._request = (0, _reqwest2['default'])({
-	        url: url,
-	        type: 'json',
-	        crossOrigin: true
-	      }).then(function (res) {
-	        // Clear request reference
-	        _this._request = null;
-	        _this._processData(res);
-	      })['catch'](function (err) {
-	        console.error(err);
+	      return new Promise(function (resolve, reject) {
+	        _this._request = (0, _reqwest2['default'])({
+	          url: url,
+	          type: 'json',
+	          crossOrigin: true
+	        }).then(function (res) {
+	          // Clear request reference
+	          _this._request = null;
+	          _this._processData(res).then(function () {
+	            resolve(_this);
+	          });
+	        })['catch'](function (err) {
+	          console.error(err);
 	
-	        // Clear request reference
-	        _this._request = null;
+	          // Clear request reference
+	          _this._request = null;
+	        });
 	      });
 	    }
 	
@@ -13647,6 +13694,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          _this2._options.onEachFeature(feature, layer);
 	        }
 	
+	        // TODO: Make this a promise array and only continue on completion
 	        _this2.addLayer(layer);
 	      });
 	
@@ -13704,6 +13752,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        layer.clearBufferAttributes();
 	        layer.clearCoordinates();
 	      });
+	
+	      return Promise.resolve();
 	    }
 	
 	    // Create and store mesh from buffer attributes
@@ -14078,7 +14128,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'addLayer',
 	    value: function addLayer(layer) {
 	      this._layers.push(layer);
-	      this._world.addLayer(layer);
+	      return this._world.addLayer(layer);
 	    }
 	  }, {
 	    key: 'removeLayer',
@@ -16888,6 +16938,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // Output mesh
 	        this.add(this._mesh);
 	      }
+	
+	      return Promise.resolve(this);
 	    }
 	
 	    // Return center of polygon as a LatLon
@@ -17561,6 +17613,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // Output mesh
 	        this.add(this._mesh);
 	      }
+	
+	      return Promise.resolve(this);
 	    }
 	
 	    // Return center of polyline as a LatLon
@@ -18088,6 +18142,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // Output mesh
 	        this.add(this._mesh);
 	      }
+	
+	      return Promise.resolve(this);
 	    }
 	
 	    // Return center of point as a LatLon
