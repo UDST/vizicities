@@ -3,12 +3,12 @@ import THREE from 'three';
 import OrbitControls from '../vendor/OrbitControls';
 import TweenLite from 'TweenLite';
 
-// Prevent animation from pausing when tab is inactive
-TweenLite.lagSmoothing(0);
-
 class Orbit extends EventEmitter {
   constructor() {
     super();
+
+    // Prevent animation from pausing when tab is inactive
+    TweenLite.lagSmoothing(0);
   }
 
   // Proxy control events

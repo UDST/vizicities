@@ -5618,9 +5618,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _TweenLite2 = _interopRequireDefault(_TweenLite);
 	
-	// Prevent animation from pausing when tab is inactive
-	_TweenLite2['default'].lagSmoothing(0);
-	
 	var Orbit = (function (_EventEmitter) {
 	  _inherits(Orbit, _EventEmitter);
 	
@@ -5628,6 +5625,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _classCallCheck(this, Orbit);
 	
 	    _get(Object.getPrototypeOf(Orbit.prototype), 'constructor', this).call(this);
+	
+	    // Prevent animation from pausing when tab is inactive
+	    _TweenLite2['default'].lagSmoothing(0);
 	  }
 	
 	  // Proxy control events
