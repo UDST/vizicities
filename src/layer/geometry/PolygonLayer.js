@@ -82,6 +82,8 @@ class PolygonLayer extends Layer {
       // Output mesh
       this.add(this._mesh);
     }
+
+    return Promise.resolve(this);
   }
 
   // Return center of polygon as a LatLon

@@ -24,6 +24,8 @@ class EnvironmentLayer extends Layer {
     }
 
     // this._initGrid();
+
+    return Promise.resolve(this);
   }
 
   // Not fleshed out or thought through yet

@@ -62,27 +62,33 @@ class GeoJSONLayer extends LayerGroup {
 
     // Request data from URL if needed
     if (typeof this._geojson === 'string') {
-      this._requestData(this._geojson);
+      return this._requestData(this._geojson);
     } else {
       // Process and add GeoJSON to layer
-      this._processData(this._geojson);
+      return this._processData(this._geojson);
     }
   }
 
   _requestData(url) {
-    this._request = reqwest({
-      url: url,
-      type: 'json',
-      crossOrigin: true
-    }).then(res => {
-      // Clear request reference
-      this._request = null;
-      this._processData(res);
-    }).catch(err => {
-      console.error(err);
+    return new Promise((resolve, reject) => {
+      this._request = reqwest({
+        url: url,
+        type: 'json',
+        crossOrigin: true
+      }).then(res => {
+        // Clear request reference
+        this._request = null;
+        this._processData(res).then(() => {
+          resolve(this);
+        });
+      }).catch(err => {
+        console.error(err);
 
-      // Clear request reference
-      this._request = null;
+        // Clear request reference
+        this._request = null;
+
+        reject(err);
+      });
     });
   }
 
@@ -146,6 +152,7 @@ class GeoJSONLayer extends LayerGroup {
         this._options.onEachFeature(feature, layer);
       }
 
+      // TODO: Make this a promise array and only continue on completion
       this.addLayer(layer);
     });
 
@@ -203,6 +210,8 @@ class GeoJSONLayer extends LayerGroup {
       layer.clearBufferAttributes();
       layer.clearCoordinates();
     });
+
+    return Promise.resolve();
   }
 
   // Create and store mesh from buffer attributes

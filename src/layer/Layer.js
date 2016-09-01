@@ -68,17 +68,22 @@ class Layer extends EventEmitter {
 
   // Add layer to world instance and store world reference
   addTo(world) {
-    world.addLayer(this);
-    return this;
+    return world.addLayer(this);
   }
 
   // Internal method called by World.addLayer to actually add the layer
   _addToWorld(world) {
     this._world = world;
-    this._onAdd(world);
-    this.emit('added');
+
+    return new Promise((resolve, reject) => {
+      this._onAdd(world).then(() => {
+        this.emit('added');
+        resolve(this);
+      }).catch(reject);
+    });
   }
 
+  // Must return a promise
   _onAdd(world) {}
 
   getPickingId() {

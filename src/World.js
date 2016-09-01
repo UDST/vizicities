@@ -28,13 +28,15 @@ class World extends EventEmitter {
     this._initContainer(domId);
     this._initAttribution();
     this._initEngine();
-    this._initEnvironment();
-    this._initEvents();
 
-    this._pause = false;
+    this._initEnvironment().then(() => {
+      this._initEvents();
 
-    // Kick off the update and render loop
-    this._update();
+      this._pause = false;
+
+      // Kick off the update and render loop
+      this._update();
+    });
   }
 
   _initContainer(domId) {
@@ -69,7 +71,9 @@ class World extends EventEmitter {
     // add some method of disable / overriding the environment settings
     this._environment = new EnvironmentLayer({
       skybox: this.options.skybox
-    }).addTo(this);
+    });
+
+    return this._environment.addTo(this);
   }
 
   _initEvents() {
@@ -210,8 +214,6 @@ class World extends EventEmitter {
   }
 
   addLayer(layer) {
-    layer._addToWorld(this);
-
     this._layers.push(layer);
 
     if (layer.isOutput() && layer.isOutputToScene()) {
@@ -221,8 +223,12 @@ class World extends EventEmitter {
       this._engine._domScene2D.add(layer._domObject2D);
     }
 
-    this.emit('layerAdded', layer);
-    return this;
+    return new Promise((resolve, reject) => {
+      layer._addToWorld(this).then(() => {
+        this.emit('layerAdded', layer);
+        resolve(this);
+      }).catch(reject);
+    });
   }
 
   // Remove layer from world and scene but don't destroy it entirely
@@ -241,7 +247,8 @@ class World extends EventEmitter {
     }
 
     this.emit('layerRemoved');
-    return this;
+
+    return Promise.resolve(this);
   }
 
   addControls(controls) {
@@ -250,7 +257,8 @@ class World extends EventEmitter {
     this._controls.push(controls);
 
     this.emit('controlsAdded', controls);
-    return this;
+
+    return Promise.resolve(this);
   }
 
   // Remove controls from world but don't destroy them entirely
@@ -262,7 +270,8 @@ class World extends EventEmitter {
     };
 
     this.emit('controlsRemoved', controls);
-    return this;
+
+    return Promise.resolve(this);
   }
 
   stop() {

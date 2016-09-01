@@ -70,37 +70,41 @@ class ImageTileLayer extends TileLayer {
   }
 
   _onAdd(world) {
-    super._onAdd(world);
+    return new Promise((resolve, reject) => {
+      super._onAdd(world).then(() => {
+        // Add base layer
+        var geom = new THREE.PlaneBufferGeometry(2000000, 2000000, 1);
 
-    // Add base layer
-    var geom = new THREE.PlaneBufferGeometry(2000000, 2000000, 1);
+        var baseMaterial;
+        if (this._world._environment._skybox) {
+          baseMaterial = ImageTileLayerBaseMaterial('#f5f5f3', this._world._environment._skybox.getRenderTarget());
+        } else {
+          baseMaterial = ImageTileLayerBaseMaterial('#f5f5f3');
+        }
 
-    var baseMaterial;
-    if (this._world._environment._skybox) {
-      baseMaterial = ImageTileLayerBaseMaterial('#f5f5f3', this._world._environment._skybox.getRenderTarget());
-    } else {
-      baseMaterial = ImageTileLayerBaseMaterial('#f5f5f3');
-    }
+        var mesh = new THREE.Mesh(geom, baseMaterial);
+        mesh.renderOrder = 0;
+        mesh.rotation.x = -90 * Math.PI / 180;
 
-    var mesh = new THREE.Mesh(geom, baseMaterial);
-    mesh.renderOrder = 0;
-    mesh.rotation.x = -90 * Math.PI / 180;
+        // TODO: It might be overkill to receive a shadow on the base layer as it's
+        // rarely seen (good to have if performance difference is negligible)
+        mesh.receiveShadow = true;
 
-    // TODO: It might be overkill to receive a shadow on the base layer as it's
-    // rarely seen (good to have if performance difference is negligible)
-    mesh.receiveShadow = true;
+        this._baseLayer = mesh;
+        this.add(mesh);
 
-    this._baseLayer = mesh;
-    this.add(mesh);
+        // Trigger initial quadtree calculation on the next frame
+        //
+        // TODO: This is a hack to ensure the camera is all set up - a better
+        // solution should be found
+        setTimeout(() => {
+          this._calculateLOD();
+          this._initEvents();
+        }, 0);
 
-    // Trigger initial quadtree calculation on the next frame
-    //
-    // TODO: This is a hack to ensure the camera is all set up - a better
-    // solution should be found
-    setTimeout(() => {
-      this._calculateLOD();
-      this._initEvents();
-    }, 0);
+        resolve(this);
+      }).catch(reject);
+    });
   }
 
   _initEvents() {
