@@ -112,6 +112,51 @@ function build() {
     .pipe($.livereload());
 }
 
+function buildWorker() {
+  return gulp.src(path.join('src', config.entryFileName + '-worker.js'))
+    .pipe($.plumber())
+    .pipe(webpackStream({
+      output: {
+        filename: exportFileName + '-worker.js',
+        libraryTarget: 'umd',
+        library: config.mainVarName
+      },
+      externals: {
+        // Proxy the global THREE variable to require('three')
+        'three': 'THREE',
+        // Proxy the global THREE variable to require('TweenLite')
+        'TweenLite': 'TweenLite',
+        // Proxy the global THREE variable to require('TweenMax')
+        'TweenMax': 'TweenMax',
+        // Proxy the global THREE variable to require('TimelineLite')
+        'TimelineLite': 'TimelineLite',
+        // Proxy the global THREE variable to require('TimelineMax')
+        'TimelineMax': 'TimelineMax'
+      },
+      module: {
+        loaders: [
+          { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' },
+        ]
+      },
+      devtool: 'source-map'
+    }))
+    .pipe(gulp.dest(destinationFolder))
+    .pipe($.filter(['*', '!**/*.js.map']))
+    .pipe($.rename(exportFileName + '-worker.min.js'))
+    .pipe($.sourcemaps.init({ loadMaps: true }))
+
+    // Don't mangle class names so we can use them in the console
+    // jscs:disable
+    // .pipe($.uglify({ mangle: { keep_fnames: true }}))
+    // jscs:enable
+
+    // Using the mangle option above breaks the sourcemap for some reason
+    .pipe($.uglify())
+
+    .pipe($.sourcemaps.write('./'))
+    .pipe(gulp.dest(destinationFolder));
+}
+
 function moveCSS() {
   return gulp.src(path.join('src', config.entryFileName + '.css'))
     .pipe(gulp.dest(destinationFolder));
@@ -239,6 +284,9 @@ gulp.task('move-css', ['clean'], moveCSS);
 
 // Build two versions of the library
 gulp.task('build', ['lint', 'move-css'], build);
+
+// Build two versions of the library
+gulp.task('build-worker', [], buildWorker);
 
 // Lint and run our tests
 gulp.task('test', ['lint'], test);

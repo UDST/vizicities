@@ -5,6 +5,100 @@
 import THREE from 'three';
 
 var Buffer = (function() {
+  // Merge TypedArrays of the same type
+  // Returns merged array as well as indexes for splitting the array
+  var mergeFloat32Arrays = function(arrays) {
+    var size = 0;
+    var map = new Int32Array(arrays.length * 2);
+
+    var lastIndex = 0;
+    var length;
+
+    // Find size of each array
+    arrays.forEach((_array, index) => {
+      length = _array.length;
+      size += length;
+      map.set([lastIndex, lastIndex + length], index * 2);
+      lastIndex += length;
+    });
+
+    // Create a new array of total size
+    var mergedArray = new Float32Array(size);
+
+    // Add each array to the new array
+    arrays.forEach((_array, index) => {
+      mergedArray.set(_array, map[index * 2]);
+    });
+
+    return [
+      mergedArray,
+      map
+    ];
+  };
+
+  var splitFloat32Array = function(data) {
+    var arr = data[0];
+    var map = data[1];
+
+    var start;
+    var arrays = [];
+
+    // Iterate over map
+    for (var i = 0; i < map.length / 2; i++) {
+      start = i * 2;
+      arrays.push(arr.subarray(map[start], map[start + 1]));
+    }
+
+    return arrays;
+  };
+
+  // TODO: Create a generic method that can work for any typed array
+  var mergeUint8Arrays = function(arrays) {
+    var size = 0;
+    var map = new Int32Array(arrays.length * 2);
+
+    var lastIndex = 0;
+    var length;
+
+    // Find size of each array
+    arrays.forEach((_array, index) => {
+      length = _array.length;
+      size += length;
+      map.set([lastIndex, lastIndex + length], index * 2);
+      lastIndex += length;
+    });
+
+    // Create a new array of total size
+    var mergedArray = new Uint8Array(size);
+
+    // Add each array to the new array
+    arrays.forEach((_array, index) => {
+      mergedArray.set(_array, map[index * 2]);
+    });
+
+    return [
+      mergedArray,
+      map
+    ];
+  };
+
+  // TODO: Dedupe with splitFloat32Array
+  var splitUint8Array = function(data) {
+    var arr = data[0];
+    var map = data[1];
+
+    var start;
+    var arrays = [];
+
+    // Iterate over map
+    for (var i = 0; i < map.length / 2; i++) {
+      start = i * 2;
+      arrays.push(arr.subarray(map[start], map[start + 1]));
+    }
+
+    return arrays;
+  };
+
   // Merge multiple attribute objects into a single attribute object
   //
   // Attribute objects must all use the same attribute keys
@@ -247,10 +341,27 @@ var Buffer = (function() {
     return geometry;
   };
 
+  var textEncoder = new TextEncoder('utf-8');
+  var textDecoder = new TextDecoder('utf-8');
+
+  var stringToUint8Array = function(str) {
+    return textEncoder.encode(str);
+  };
+
+  var uint8ArrayToString = function(ab) {
+    return textDecoder.decode(ab);
+  };
+
   return {
+    mergeFloat32Arrays: mergeFloat32Arrays,
+    splitFloat32Array: splitFloat32Array,
+    mergeUint8Arrays: mergeUint8Arrays,
+    splitUint8Array: splitUint8Array,
     mergeAttributes: mergeAttributes,
     createLineGeometry: createLineGeometry,
-    createGeometry: createGeometry
+    createGeometry: createGeometry,
+    stringToUint8Array: stringToUint8Array,
+    uint8ArrayToString: uint8ArrayToString
   };
 })();
 

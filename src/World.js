@@ -5,6 +5,7 @@ import {point as Point} from './geo/Point';
 import {latLon as LatLon} from './geo/LatLon';
 import Engine from './engine/Engine';
 import EnvironmentLayer from './layer/environment/EnvironmentLayer';
+import Worker from './util/Worker';
 
 // TODO: Make sure nothing is left behind in the heap after calling destroy()
 
@@ -37,6 +38,10 @@ class World extends EventEmitter {
       // Kick off the update and render loop
       this._update();
     });
+  }
+
+  createWorkers(maxWorkers, workerScript) {
+    return Worker.createWorkers(maxWorkers, workerScript);
   }
 
   _initContainer(domId) {

@@ -116,6 +116,8 @@ class PolygonLayer extends Layer {
   }
 
   // Create and store reference to THREE.BufferAttribute data for this layer
+  //
+  // TODO: Remove this and instead use the SetBufferAttributes static method
   _setBufferAttributes() {
     var attributes;
 
@@ -142,10 +144,10 @@ class PolygonLayer extends Layer {
       // For each polygon
       attributes = this._projectedCoordinates.map(_projectedCoordinates => {
         // Convert coordinates to earcut format
-        var _earcut = this._toEarcut(_projectedCoordinates);
+        var _earcut = PolygonLayer.ToEarcut(_projectedCoordinates);
 
         // Triangulate faces using earcut
-        var faces = this._triangulate(_earcut.vertices, _earcut.holes, _earcut.dimensions);
+        var faces = PolygonLayer.Triangulate(_earcut.vertices, _earcut.holes, _earcut.dimensions);
 
         var groupedVertices = [];
         for (i = 0, il = _earcut.vertices.length; i < il; i += _earcut.dimensions) {
@@ -219,7 +221,7 @@ class PolygonLayer extends Layer {
         }
 
         // Convert polygon representation to proper attribute arrays
-        return this._toAttributes(polygon);
+        return PolygonLayer.ToAttributes(polygon);
       });
     }
 
@@ -227,6 +229,113 @@ class PolygonLayer extends Layer {
 
     // Original attributes are no longer required so free the memory
     attributes = null;
+  }
+
+  // TODO: Ensure that this has feature parity with the non-static method
+  static SetBufferAttributes(coordinates, options) {
+    return new Promise((resolve, reject) => {
+      var height = 0;
+
+      // Convert height into world units
+      if (options.style.height && options.style.height !== 0) {
+        height = Geo.metresToWorld(options.style.height, options.pointScale);
+      }
+
+      var colour = new THREE.Color();
+      colour.set(options.style.color);
+
+      // Light and dark colours used for poor-mans AO gradient on object sides
+      var light = new THREE.Color(0xffffff);
+      var shadow  = new THREE.Color(0x666666);
+
+      var flat = true;
+
+      // For each polygon
+      var attributes = coordinates.map(_coordinates => {
+        // Convert coordinates to earcut format
+        var _earcut = PolygonLayer.ToEarcut(_coordinates);
+
+        // Triangulate faces using earcut
+        var faces = PolygonLayer.Triangulate(_earcut.vertices, _earcut.holes, _earcut.dimensions);
+
+        var groupedVertices = [];
+        for (i = 0, il = _earcut.vertices.length; i < il; i += _earcut.dimensions) {
+          groupedVertices.push(_earcut.vertices.slice(i, i + _earcut.dimensions));
+        }
+
+        var extruded = extrudePolygon(groupedVertices, faces, {
+          bottom: 0,
+          top: height
+        });
+
+        var topColor = colour.clone().multiply(light);
+        var bottomColor = colour.clone().multiply(shadow);
+
+        var _vertices = extruded.positions;
+        var _faces = [];
+        var _colours = [];
+
+        var _colour;
+        extruded.top.forEach((face, fi) => {
+          _colour = [];
+
+          _colour.push([colour.r, colour.g, colour.b]);
+          _colour.push([colour.r, colour.g, colour.b]);
+          _colour.push([colour.r, colour.g, colour.b]);
+
+          _faces.push(face);
+          _colours.push(_colour);
+        });
+
+        if (extruded.sides) {
+          flat = false;
+
+          // Set up colours for every vertex with poor-mans AO on the sides
+          extruded.sides.forEach((face, fi) => {
+            _colour = [];
+
+            // First face is always bottom-bottom-top
+            if (fi % 2 === 0) {
+              _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+              _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+              _colour.push([topColor.r, topColor.g, topColor.b]);
+            // Reverse winding for the second face
+            // top-top-bottom
+            } else {
+              _colour.push([topColor.r, topColor.g, topColor.b]);
+              _colour.push([topColor.r, topColor.g, topColor.b]);
+              _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+            }
+
+            _faces.push(face);
+            _colours.push(_colour);
+          });
+        }
+
+        // Skip bottom as there's no point rendering it
+        // allFaces.push(extruded.faces);
+
+        var polygon = {
+          vertices: _vertices,
+          faces: _faces,
+          colours: _colours,
+          facesCount: _faces.length
+        };
+
+        if (options.interactive && options.pickingId) {
+          // Inject picking ID
+          polygon.pickingId = options.pickingId;
+        }
+
+        // Convert polygon representation to proper attribute arrays
+        return PolygonLayer.ToAttributes(polygon);
+      });
+
+      resolve({
+        attributes: attributes,
+        flat: flat
+      });
+    });
   }
 
   getBufferAttributes() {
@@ -378,7 +487,7 @@ class PolygonLayer extends Layer {
   }
 
   // Convert coordinates array to something earcut can understand
-  _toEarcut(coordinates) {
+  static ToEarcut(coordinates) {
     var dim = 2;
     var result = {vertices: [], holes: [], dimensions: dim};
     var holeIndex = 0;
@@ -400,7 +509,7 @@ class PolygonLayer extends Layer {
   }
 
   // Triangulate earcut-based input using earcut
-  _triangulate(contour, holes, dim) {
+  static Triangulate(contour, holes, dim) {
     // console.time('earcut');
 
     var faces = earcut(contour, holes, dim);
@@ -419,7 +528,7 @@ class PolygonLayer extends Layer {
   // THREE.BufferGeometry
   //
   // TODO: Can this be simplified? It's messy and huge
-  _toAttributes(polygon) {
+  static ToAttributes(polygon) {
     // Three components per vertex per face (3 x 3 = 9)
     var vertices = new Float32Array(polygon.facesCount * 9);
     var normals = new Float32Array(polygon.facesCount * 9);
