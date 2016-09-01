@@ -86,6 +86,8 @@ class GeoJSONLayer extends LayerGroup {
 
         // Clear request reference
         this._request = null;
+
+        reject(err);
       });
     });
   }
