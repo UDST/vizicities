@@ -208,8 +208,7 @@ class Orbit extends EventEmitter {
 
   // Add controls to world instance and store world reference
   addTo(world) {
-    world.addControls(this);
-    return Promise.resolve(this);
+    return world.addControls(this);
   }
 
   // Internal method called by World.addControls to actually add the controls
