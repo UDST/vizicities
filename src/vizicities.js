@@ -8,6 +8,8 @@ import EnvironmentLayer, {environmentLayer} from './layer/environment/Environmen
 import ImageTileLayer, {imageTileLayer} from './layer/tile/ImageTileLayer';
 import GeoJSONTileLayer, {geoJSONTileLayer} from './layer/tile/GeoJSONTileLayer';
 import TopoJSONTileLayer, {topoJSONTileLayer} from './layer/tile/TopoJSONTileLayer';
+import GeoJSONWorkerTileLayer, {geoJSONWorkerTileLayer} from './layer/tile/GeoJSONWorkerTileLayer';
+import TopoJSONWorkerTileLayer, {topoJSONWorkerTileLayer} from './layer/tile/TopoJSONWorkerTileLayer';
 import GeoJSONLayer, {geoJSONLayer} from './layer/GeoJSONLayer';
 import TopoJSONLayer, {topoJSONLayer} from './layer/TopoJSONLayer';
 import GeoJSONWorkerLayer, {geoJSONWorkerLayer} from './layer/GeoJSONWorkerLayer';
@@ -41,6 +43,10 @@ const VIZI = {
   geoJSONTileLayer: geoJSONTileLayer,
   TopoJSONTileLayer: TopoJSONTileLayer,
   topoJSONTileLayer: topoJSONTileLayer,
+  GeoJSONWorkerTileLayer: GeoJSONWorkerTileLayer,
+  geoJSONWorkerTileLayer: geoJSONWorkerTileLayer,
+  TopoJSONWorkerTileLayer: TopoJSONWorkerTileLayer,
+  topoJSONWorkerTileLayer: topoJSONWorkerTileLayer,
   GeoJSONLayer: GeoJSONLayer,
   geoJSONLayer: geoJSONLayer,
   TopoJSONLayer: TopoJSONLayer,

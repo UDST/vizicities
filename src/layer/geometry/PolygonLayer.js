@@ -17,6 +17,7 @@
 import Layer from '../Layer';
 import extend from 'lodash.assign';
 import THREE from 'three';
+import Geo from '../../geo/Geo';
 import {latLon as LatLon} from '../../geo/LatLon';
 import {point as Point} from '../../geo/Point';
 import earcut from 'earcut';
