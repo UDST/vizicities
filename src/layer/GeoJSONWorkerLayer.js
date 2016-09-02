@@ -225,6 +225,11 @@ class GeoJSONWorkerLayer extends Layer {
           this.add(this._polygonMesh);
         }
 
+        // Clean up
+        results.attributes = null;
+        results.flats = null;
+        results = null;
+
         resolve();
       });
     });
