@@ -22,7 +22,7 @@ class WorkerPool {
       Promise.all(workerPromises).then(() => {
         if (DEBUG) { console.log('All workers ready', performance.now()); }
         resolve();
-      });
+      }).catch(reject);
     });
   }
 
@@ -41,7 +41,7 @@ class WorkerPool {
         this.workers.push(worker);
 
         resolve();
-      });
+      }).catch(reject);
     });
   }
 

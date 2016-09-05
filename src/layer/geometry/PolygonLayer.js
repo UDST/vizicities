@@ -234,7 +234,7 @@ class PolygonLayer extends Layer {
 
   // TODO: Ensure that this has feature parity with the non-static method
   static SetBufferAttributes(coordinates, options) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       var height = 0;
 
       // Convert height into world units

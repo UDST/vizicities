@@ -63,7 +63,7 @@ class GeoJSONWorkerLayer extends Layer {
         transferrables.push(geojson.buffer);
         this._execWorker(geojson, this._options.topojson, this._world._originPoint, style, this._options.interactive, transferrables).then(() => {
           resolve();
-        });
+        }).catch(reject);
       } else if (typeof this._options.onEachFeature === 'function') {
         GeoJSONWorkerLayer.RequestGeoJSON(geojson).then((res) => {
           var fc = GeoJSON.collectFeatures(res, this._options.topojson);
@@ -80,12 +80,12 @@ class GeoJSONWorkerLayer extends Layer {
 
           this._execWorker(geojson, false, this._options.headers, this._world._originPoint, style, this._options.interactive, transferrables).then(() => {
             resolve();
-          });
+          }).catch(reject);
         });
       } else {
         this._execWorker(geojson, this._options.topojson, this._options.headers, this._world._originPoint, style, this._options.interactive, transferrables).then(() => {
           resolve();
-        });
+        }).catch(reject);
       }
     });
   }
@@ -291,9 +291,9 @@ class GeoJSONWorkerLayer extends Layer {
             });
 
             var point;
-            var projected = converted.map(_coordinates => {
-              return _coordinates.map(ring => {
-                return ring.map(latlon => {
+            var projected = converted.map((_coordinates) => {
+              return _coordinates.map((ring) => {
+                return ring.map((latlon) => {
                   point = Geo.latLonToPoint(latlon)._subtract(originPoint);
 
                   if (!pointScale) {
