@@ -1,6 +1,7 @@
 import THREE from 'three';
 import {point as Point} from '../geo/Point';
 import PickingScene from './PickingScene';
+import throttle from 'lodash.throttle';
 
 // TODO: Look into a way of setting this up without passing in a renderer and
 // camera from the engine
@@ -45,8 +46,10 @@ class Picking {
     this._resizeHandler = this._resizeTexture.bind(this);
     window.addEventListener('resize', this._resizeHandler, false);
 
+    this._throttledMouseMoveHandler = throttle(this._onMouseMove.bind(this), 50);
     this._mouseUpHandler = this._onMouseUp.bind(this);
     this._world._container.addEventListener('mouseup', this._mouseUpHandler, false);
+    this._world._container.addEventListener('mousemove', this._throttledMouseMoveHandler, false);
 
     this._world.on('move', this._onWorldMove, this);
   }
@@ -57,13 +60,23 @@ class Picking {
       return;
     }
 
-    var point = Point(event.clientX, event.clientY);
+    var point = Point(event.clientX - this._world._container.offsetLeft, event.clientY - this._world._container.offsetTop);
 
     var normalisedPoint = Point(0, 0);
     normalisedPoint.x = (point.x / this._width) * 2 - 1;
     normalisedPoint.y = -(point.y / this._height) * 2 + 1;
 
     this._pick(point, normalisedPoint);
+  }
+
+  _onMouseMove(event) {
+    var point = Point(event.clientX - this._world._container.offsetLeft, event.clientY - this._world._container.offsetTop);
+
+    var normalisedPoint = Point(0, 0);
+    normalisedPoint.x = (point.x / this._width) * 2 - 1;
+    normalisedPoint.y = -(point.y / this._height) * 2 + 1;
+
+    this._pick(point, normalisedPoint, true);
   }
 
   _onWorldMove() {
@@ -104,7 +117,7 @@ class Picking {
     }
   }
 
-  _pick(point, normalisedPoint) {
+  _pick(point, normalisedPoint, hover) {
     this._update();
 
     var index = point.x + (this._pickingTexture.height - point.y) * this._pickingTexture.width;
@@ -114,6 +127,12 @@ class Picking {
 
     // Skip if ID is 16646655 (white) as the background returns this
     if (id === 16646655) {
+      if (hover) {
+        this._world.emit('pick-hover-reset');
+      } else {
+        this._world.emit('pick-click-reset');
+      }
+
       return;
     }
 
@@ -135,8 +154,16 @@ class Picking {
     // people use the picking API and what the returned data should be
     //
     // TODO: Look into the leak potential for passing so much by reference here
-    this._world.emit('pick', id, _point2d, _point3d, intersects);
-    this._world.emit('pick-' + id, _point2d, _point3d, intersects);
+    // this._world.emit('pick', id, _point2d, _point3d, intersects);
+    // this._world.emit('pick-' + id, _point2d, _point3d, intersects);
+
+    if (hover) {
+      this._world.emit('pick-hover', id, _point2d, _point3d, intersects);
+      this._world.emit('pick-hover-' + id, _point2d, _point3d, intersects);
+    } else {
+      this._world.emit('pick-click', id, _point2d, _point3d, intersects);
+      this._world.emit('pick-click-' + id, _point2d, _point3d, intersects);
+    }
   }
 
   // Add mesh to picking scene
@@ -163,6 +190,7 @@ class Picking {
     // active at the moment
     window.removeEventListener('resize', this._resizeHandler, false);
     this._world._container.removeEventListener('mouseup', this._mouseUpHandler, false);
+    this._world._container.removeEventListener('mousemove', this._throttledMouseMoveHandler, false);
 
     this._world.off('move', this._onWorldMove);
 
