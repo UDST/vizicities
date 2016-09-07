@@ -21,7 +21,8 @@ world.createWorkers(7).then(() => {
   });;
 
   // Buildings from Mapzen
-  VIZI.topoJSONWorkerTileLayer('https://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
+  VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
+    workers: true,
     interactive: false,
     style: function(feature) {
       var height;

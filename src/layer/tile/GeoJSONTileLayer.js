@@ -38,7 +38,8 @@ class GeoJSONTileLayer extends TileLayer {
   constructor(path, options) {
     var defaults = {
       maxLOD: 14,
-      distance: 30000
+      distance: 30000,
+      workers: false
     };
 
     options = extend({}, defaults, options);
@@ -78,7 +79,7 @@ class GeoJSONTileLayer extends TileLayer {
 
   // Update and output tiles each frame (throttled)
   _onWorldUpdate() {
-    if (this._pauseOutput) {
+    if (this._pauseOutput || this._disableOutput) {
       return;
     }
 
@@ -87,38 +88,24 @@ class GeoJSONTileLayer extends TileLayer {
 
   // Update tiles grid after world move, but don't output them
   _onWorldMove(latlon, point) {
+    if (this._disableOutput) {
+      return;
+    }
+
     this._pauseOutput = false;
     this._calculateLOD();
   }
 
   // Pause updates during control movement for less visual jank
   _onControlsMove() {
+    if (this._disableOutput) {
+      return;
+    }
+
     this._pauseOutput = true;
   }
 
   _createTile(quadcode, layer) {
-    var options = {};
-
-    // if (this._options.filter) {
-    //   options.filter = this._options.filter;
-    // }
-    //
-    // if (this._options.style) {
-    //   options.style = this._options.style;
-    // }
-    //
-    // if (this._options.topojson) {
-    //   options.topojson = true;
-    // }
-    //
-    // if (this._options.interactive) {
-    //   options.interactive = true;
-    // }
-    //
-    // if (this._options.onClick) {
-    //   options.onClick = this._options.onClick;
-    // }
-
     return new GeoJSONTile(quadcode, this._path, layer, this._options);
   }
 

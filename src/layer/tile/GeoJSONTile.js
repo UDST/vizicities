@@ -1,5 +1,6 @@
 import Tile from './Tile';
 import {geoJSONLayer as GeoJSONLayer} from '../GeoJSONLayer';
+import {geoJSONWorkerLayer as GeoJSONWorkerLayer} from '../GeoJSONWorkerLayer';
 import BoxHelper from '../../vendor/BoxHelper';
 import THREE from 'three';
 import reqwest from 'reqwest';
@@ -51,6 +52,7 @@ class GeoJSONTile extends Tile {
     this._defaultStyle = GeoJSON.defaultStyle;
 
     var defaults = {
+      workers: false,
       output: true,
       outputToScene: false,
       interactive: false,
@@ -231,27 +233,33 @@ class GeoJSONTile extends Tile {
 
     var url = this._getTileURL(urlParams);
 
-    this._request = reqwest({
-      url: url,
-      type: 'json',
-      crossOrigin: true
-    }).then(res => {
-      // Clear request reference
-      this._request = null;
-      this._processTileData(res);
-    }).catch(err => {
-      console.error(err);
+    if (!this._options.workers) {
+      this._request = reqwest({
+        url: url,
+        type: 'json',
+        crossOrigin: true
+      }).then(res => {
+        // Clear request reference
+        this._request = null;
+        this._processTileData(res);
+      }).catch(err => {
+        console.error(err);
 
-      // Clear request reference
-      this._request = null;
-    });
+        // Clear request reference
+        this._request = null;
+      });
+    } else {
+      this._processTileData(url);
+    }
   }
 
   _processTileData(data) {
     console.time(this._tile);
 
+    var GeoJSONClass = (!this._options.workers) ? GeoJSONLayer : GeoJSONWorkerLayer;
+
     // Using this creates a huge amount of memory due to the quantity of tiles
-    this._geojsonLayer = GeoJSONLayer(data, this._options);
+    this._geojsonLayer = GeoJSONClass(data, this._options);
     this._geojsonLayer.addTo(this._world).then(() => {
       this._mesh = this._geojsonLayer._object3D;
       this._pickingMesh = this._geojsonLayer._pickingMesh;
@@ -259,7 +267,9 @@ class GeoJSONTile extends Tile {
       // Free the GeoJSON memory as we don't need it
       //
       // TODO: This should probably be a method within GeoJSONLayer
-      this._geojsonLayer._geojson = null;
+      if (this._geojsonLayer._geojson) {
+        this._geojsonLayer._geojson = null;
+      }
 
       // TODO: Fix or store shadow canvas stuff and get rid of this code
       // Draw footprint on shadow canvas
