@@ -98,112 +98,228 @@ class GeoJSONWorkerLayer extends Layer {
       Worker.exec('GeoJSONWorkerLayer.Process', [geojson, topojson, headers, originPoint, style, interactive], transferrables).then((results) => {
         console.timeEnd('Worker round trip');
 
-        var splitPositions = Buffer.splitFloat32Array(results.attributes.positions);
-        var splitNormals = Buffer.splitFloat32Array(results.attributes.normals);
-        var splitColors = Buffer.splitFloat32Array(results.attributes.colors);
-
-        var splitProperties;
-        if (results.properties) {
-          splitProperties = Buffer.splitUint8Array(results.properties);
+        if (results.polygons) {
+          this._processPolygonResults(results.polygons);
         }
 
-        var flats = results.flats;
-
-        var objects = [];
-        var obj;
-        var pickingId;
-        var pickingIds;
-        var properties;
-
-        var polygonAttributeLengths = {
-          positions: 3,
-          normals: 3,
-          colors: 3
-        };
-
-        for (var i = 0; i < splitPositions.length; i++) {
-          if (splitProperties && splitProperties[i]) {
-            properties = JSON.parse(Buffer.uint8ArrayToString(splitProperties[i]));
-          } else {
-            properties = {};
-          }
-
-          // WORKERS: obj.attributes should actually an array of polygons for
-          // the feature, though the current logic isn't aware of that
-          obj = {
-            attributes: [{
-              positions: splitPositions[i],
-              normals: splitNormals[i],
-              colors: splitColors[i]
-            }],
-            properties: properties,
-            flat: flats[i]
-          };
-
-          // WORKERS: If interactive, generate unique ID for each feature, create
-          // the buffer attributes and set up event listeners
-          if (this._options.interactive) {
-            pickingId = this.getPickingId();
-
-            pickingIds = new Float32Array(splitPositions[i].length / 3);
-            pickingIds.fill(pickingId);
-
-            obj.attributes[0].pickingIds = pickingIds;
-
-            polygonAttributeLengths.pickingIds = 1;
-
-            this._addPicking(pickingId, properties);
-          }
-
-          if (typeof this._options.onAddAttributes === 'function') {
-            var customAttributes = this._options.onAddAttributes(obj.attributes[0], properties);
-            var customAttribute;
-            for (var key in customAttributes) {
-              customAttribute = customAttributes[key];
-              obj.attributes[0][key] = customAttribute.value;
-              polygonAttributeLengths[key] = customAttribute.length;
-            }
-          }
-
-          objects.push(obj);
-        }
-
-        var polygonAttributes = [];
-
-        var polygonFlat = true;
-
-        var obj;
-        for (var i = 0; i < objects.length; i++) {
-          obj = objects[i];
-
-          if (polygonFlat && !obj.flat) {
-            polygonFlat = false;
-          }
-
-          var bufferAttributes = Buffer.mergeAttributes(obj.attributes);
-          polygonAttributes.push(bufferAttributes);
-        };
-
-        if (polygonAttributes.length > 0) {
-          var mergedPolygonAttributes = Buffer.mergeAttributes(polygonAttributes);
-
-          // TODO: Make this work when style is a function per feature
-          var style = (typeof this._options.style === 'function') ? this._options.style(objects[0]) : this._options.style;
-          style = extend({}, GeoJSON.defaultStyle, style);
-
-          this._setPolygonMesh(mergedPolygonAttributes, polygonAttributeLengths, style, polygonFlat).then((result) => {
-            this._polygonMesh = result.mesh;
-            this.add(this._polygonMesh);
-
-            if (result.pickingMesh) {
-              this._pickingMesh.add(pickingMesh);
-            }
-          });
+        if (results.polylines) {
+          this._processPolylineResults(results.polylines);
         }
 
         resolve();
       });
     });
+  }
+
+  // TODO: Dedupe with polyline method
+  _processPolygonResults(results) {
+    var splitPositions = Buffer.splitFloat32Array(results.attributes.positions);
+    var splitNormals = Buffer.splitFloat32Array(results.attributes.normals);
+    var splitColors = Buffer.splitFloat32Array(results.attributes.colors);
+
+    var splitProperties;
+    if (results.properties) {
+      splitProperties = Buffer.splitUint8Array(results.properties);
+    }
+
+    var flats = results.flats;
+
+    var objects = [];
+    var obj;
+    var pickingId;
+    var pickingIds;
+    var properties;
+
+    var polygonAttributeLengths = {
+      positions: 3,
+      normals: 3,
+      colors: 3
+    };
+
+    for (var i = 0; i < splitPositions.length; i++) {
+      if (splitProperties && splitProperties[i]) {
+        properties = JSON.parse(Buffer.uint8ArrayToString(splitProperties[i]));
+      } else {
+        properties = {};
+      }
+
+      // WORKERS: obj.attributes should actually an array of polygons for
+      // the feature, though the current logic isn't aware of that
+      obj = {
+        attributes: [{
+          positions: splitPositions[i],
+          normals: splitNormals[i],
+          colors: splitColors[i]
+        }],
+        properties: properties,
+        flat: flats[i]
+      };
+
+      // WORKERS: If interactive, generate unique ID for each feature, create
+      // the buffer attributes and set up event listeners
+      if (this._options.interactive) {
+        pickingId = this.getPickingId();
+
+        pickingIds = new Float32Array(splitPositions[i].length / 3);
+        pickingIds.fill(pickingId);
+
+        obj.attributes[0].pickingIds = pickingIds;
+
+        polygonAttributeLengths.pickingIds = 1;
+
+        this._addPicking(pickingId, properties);
+      }
+
+      // TODO: Make this specific to polygon attributes
+      if (typeof this._options.onAddAttributes === 'function') {
+        var customAttributes = this._options.onAddAttributes(obj.attributes[0], properties);
+        var customAttribute;
+        for (var key in customAttributes) {
+          customAttribute = customAttributes[key];
+          obj.attributes[0][key] = customAttribute.value;
+          polygonAttributeLengths[key] = customAttribute.length;
+        }
+      }
+
+      objects.push(obj);
+    }
+
+    var polygonAttributes = [];
+
+    var polygonFlat = true;
+
+    var obj;
+    for (var i = 0; i < objects.length; i++) {
+      obj = objects[i];
+
+      if (polygonFlat && !obj.flat) {
+        polygonFlat = false;
+      }
+
+      var bufferAttributes = Buffer.mergeAttributes(obj.attributes);
+      polygonAttributes.push(bufferAttributes);
+    };
+
+    if (polygonAttributes.length > 0) {
+      var mergedPolygonAttributes = Buffer.mergeAttributes(polygonAttributes);
+
+      // TODO: Make this work when style is a function per feature
+      var style = (typeof this._options.style === 'function') ? this._options.style(objects[0]) : this._options.style;
+      style = extend({}, GeoJSON.defaultStyle, style);
+
+      this._setPolygonMesh(mergedPolygonAttributes, polygonAttributeLengths, style, polygonFlat).then((result) => {
+        this._polygonMesh = result.mesh;
+        this.add(this._polygonMesh);
+
+        if (result.pickingMesh) {
+          this._pickingMesh.add(pickingMesh);
+        }
+      });
+    }
+  }
+
+  // TODO: Dedupe with polygon method
+  _processPolylineResults(results) {
+    var splitPositions = Buffer.splitFloat32Array(results.attributes.positions);
+    var splitColors = Buffer.splitFloat32Array(results.attributes.colors);
+
+    var splitProperties;
+    if (results.properties) {
+      splitProperties = Buffer.splitUint8Array(results.properties);
+    }
+
+    var flats = results.flats;
+
+    var objects = [];
+    var obj;
+    var pickingId;
+    var pickingIds;
+    var properties;
+
+    var polylineAttributeLengths = {
+      positions: 3,
+      colors: 3
+    };
+
+    for (var i = 0; i < splitPositions.length; i++) {
+      if (splitProperties && splitProperties[i]) {
+        properties = JSON.parse(Buffer.uint8ArrayToString(splitProperties[i]));
+      } else {
+        properties = {};
+      }
+
+      // WORKERS: obj.attributes should actually an array of polygons for
+      // the feature, though the current logic isn't aware of that
+      obj = {
+        attributes: [{
+          positions: splitPositions[i],
+          colors: splitColors[i]
+        }],
+        properties: properties,
+        flat: flats[i]
+      };
+
+      // WORKERS: If interactive, generate unique ID for each feature, create
+      // the buffer attributes and set up event listeners
+      if (this._options.interactive) {
+        pickingId = this.getPickingId();
+
+        pickingIds = new Float32Array(splitPositions[i].length / 3);
+        pickingIds.fill(pickingId);
+
+        obj.attributes[0].pickingIds = pickingIds;
+
+        polylineAttributeLengths.pickingIds = 1;
+
+        this._addPicking(pickingId, properties);
+      }
+
+      // TODO: Make this specific to polyline attributes
+      if (typeof this._options.onAddAttributes === 'function') {
+        var customAttributes = this._options.onAddAttributes(obj.attributes[0], properties);
+        var customAttribute;
+        for (var key in customAttributes) {
+          customAttribute = customAttributes[key];
+          obj.attributes[0][key] = customAttribute.value;
+          polylineAttributeLengths[key] = customAttribute.length;
+        }
+      }
+
+      objects.push(obj);
+    }
+
+    var polylineAttributes = [];
+
+    var polylineFlat = true;
+
+    var obj;
+    for (var i = 0; i < objects.length; i++) {
+      obj = objects[i];
+
+      if (polylineFlat && !obj.flat) {
+        polylineFlat = false;
+      }
+
+      var bufferAttributes = Buffer.mergeAttributes(obj.attributes);
+      polylineAttributes.push(bufferAttributes);
+    };
+
+    if (polylineAttributes.length > 0) {
+      var mergedPolylineAttributes = Buffer.mergeAttributes(polylineAttributes);
+
+      // TODO: Make this work when style is a function per feature
+      var style = (typeof this._options.style === 'function') ? this._options.style(objects[0]) : this._options.style;
+      style = extend({}, GeoJSON.defaultStyle, style);
+
+      this._setPolylineMesh(mergedPolylineAttributes, polylineAttributeLengths, style, polylineFlat).then((result) => {
+        this._polylineMesh = result.mesh;
+        this.add(this._polylineMesh);
+
+        if (result.pickingMesh) {
+          this._pickingMesh.add(pickingMesh);
+        }
+      });
+    }
   }
 
   // TODO: At some point this needs to return all the features to the main thread
@@ -352,20 +468,25 @@ class GeoJSONWorkerLayer extends Layer {
           polylineBufferPromises.push(PolylineLayer.SetBufferAttributes(polyline.projected, polyline.options));
         };
 
+        var data = {};
+        var transferrables = [];
+
         // TODO: Make this work with polylines too
+        // TODO: Make this so it's not a nest of promises
         GeoJSONWorkerLayer.ProcessPolygons(polygonBufferPromises, polygons, _properties).then((result) => {
-          resolve({
-            data: result.data,
-            transferrables: result.transferrables
+          data.polygons = result.data;
+          transferrables = transferrables.concat(result.transferrables);
+
+          GeoJSONWorkerLayer.ProcessPolylines(polylineBufferPromises, polylines, _properties).then((result) => {
+            data.polylines = result.data;
+            transferrables = transferrables.concat(result.transferrables);
+
+            resolve({
+              data: data,
+              transferrables: transferrables
+            });
           });
         });
-
-        // GeoJSONWorkerLayer.ProcessPolylines(polylineBufferPromises, polylines, _properties).then((result) => {
-        //   resolve({
-        //     data: result.data,
-        //     transferrables: result.transferrables
-        //   });
-        // });
       });
     });
   }
@@ -556,6 +677,10 @@ class GeoJSONWorkerLayer extends Layer {
   // Could make this an abstract method for each geometry layer
   _setPolygonMesh(attributes, attributeLengths, style, flat) {
     return PolygonLayer.SetMesh(attributes, attributeLengths, flat, style, this._options, this._world._environment._skybox);
+  }
+
+  _setPolylineMesh(attributes, attributeLengths, style, flat) {
+    return PolylineLayer.SetMesh(attributes, attributeLengths, flat, style, this._options);
   }
 
   // Set up and re-emit interaction events
