@@ -272,17 +272,6 @@ class PolygonLayer extends Layer {
   static SetMesh(attributes, attributeLengths, flat, style, options, skybox) {
     var geometry = new THREE.BufferGeometry();
 
-    // TODO: Remove
-    // // itemSize = 3 because there are 3 values (components) per vertex
-    // geometry.addAttribute('position', new THREE.BufferAttribute(attributes.positions, 3));
-    // geometry.addAttribute('normal', new THREE.BufferAttribute(attributes.normals, 3));
-    // geometry.addAttribute('color', new THREE.BufferAttribute(attributes.colours, 3));
-
-    // TODO: Remove
-    // if (attributes.pickingIds) {
-    //   geometry.addAttribute('pickingId', new THREE.BufferAttribute(attributes.pickingIds, 1));
-    // }
-
     for (var key in attributes) {
       geometry.addAttribute(key.slice(0, -1), new THREE.BufferAttribute(attributes[key], attributeLengths[key]));
     }
@@ -336,9 +325,6 @@ class PolygonLayer extends Layer {
       material.side = THREE.BackSide;
 
       var pickingMesh = new THREE.Mesh(geometry, material);
-
-      // TODO: Move this to after whatever calls PolygonLayer.SetMesh()
-      // this._pickingMesh.add(pickingMesh);
     }
 
     return Promise.resolve({
