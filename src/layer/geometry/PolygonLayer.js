@@ -33,8 +33,8 @@ class PolygonLayer extends Layer {
       // Custom material override
       //
       // TODO: Should this be in the style object?
-      material: null,
-      onMesh: null,
+      polygonMaterial: null,
+      onPolygonMesh: null,
       onBufferAttributes: null,
       // This default style is separate to Util.GeoJSON.defaultStyle
       style: {

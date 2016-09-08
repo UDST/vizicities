@@ -6,6 +6,7 @@ import Worker from '../util/Worker';
 import Buffer from '../util/Buffer';
 import Stringify from '../util/Stringify';
 import PolygonLayer from './geometry/PolygonLayer';
+import PolylineLayer from './geometry/PolylineLayer';
 import {latLon as LatLon} from '../geo/LatLon';
 import {point as Point} from '../geo/Point';
 import Geo from '../geo/Geo';
@@ -228,6 +229,7 @@ class GeoJSONWorkerLayer extends Layer {
 
         var pointScale;
         var polygons = [];
+        var polylines = [];
 
         // Deserialise style function if provided
         if (typeof _style === 'string') {
@@ -295,102 +297,240 @@ class GeoJSONWorkerLayer extends Layer {
             polygons.push(polygon);
           }
 
-          if (geometry.type === 'LineString' || geometry.type === 'MultiLineString') {}
+          if (geometry.type === 'LineString' || geometry.type === 'MultiLineString') {
+            coordinates = (PolylineLayer.isSingle(coordinates)) ? [coordinates] : coordinates;
+
+            var converted = coordinates.map(_coordinates => {
+              return _coordinates.map(coordinate => {
+                return LatLon(coordinate[1], coordinate[0]);
+              });
+            });
+
+            var point;
+            var projected = converted.map((_coordinates) => {
+              return _coordinates.map((latlon) => {
+                point = Geo.latLonToPoint(latlon)._subtract(originPoint);
+
+                if (!pointScale) {
+                  pointScale = Geo.pointScale(latlon);
+                }
+
+                return point;
+              });
+            });
+
+            var polyline = {
+              projected: projected,
+              options: {
+                pointScale: pointScale,
+                style: style
+              }
+            };
+
+            if (_properties) {
+              polyline.properties = feature.properties;
+            }
+
+            polylines.push(polyline);
+          }
 
           if (geometry.type === 'Point' || geometry.type === 'MultiPoint') {}
         };
 
-        var bufferPromises = [];
+        var polygonBufferPromises = [];
+        var polylineBufferPromises = [];
 
         var polygon;
         for (var i = 0; i < polygons.length; i++) {
           polygon = polygons[i];
-          bufferPromises.push(PolygonLayer.SetBufferAttributes(polygon.projected, polygon.options));
+          polygonBufferPromises.push(PolygonLayer.SetBufferAttributes(polygon.projected, polygon.options));
         };
 
-        Promise.all(bufferPromises).then((results) => {
-          var transferrables = [];
-          var transferrablesSize = 0;
+        var polyline;
+        for (var i = 0; i < polylines.length; i++) {
+          polyline = polylines[i];
+          polylineBufferPromises.push(PolylineLayer.SetBufferAttributes(polyline.projected, polyline.options));
+        };
 
-          var positions = [];
-          var normals = [];
-          var colors = [];
-          // var pickingIds = [];
-
-          var properties = [];
-
-          var flats = [];
-          var polygon;
-
-          var result;
-          for (var i = 0; i < results.length; i++) {
-            result = results[i];
-
-            polygon = polygons[i];
-
-            // WORKERS: Making this a typed array will speed up transfer time
-            // As things stand this adds on a few milliseconds
-            flats.push(result.flat);
-
-            // WORKERS: result.attributes is actually an array of polygons for each
-            // feature, though the current logic isn't keeping these all together
-
-            var attributes;
-            for (var j = 0; j < result.attributes.length; j++) {
-              attributes = result.attributes[j];
-
-              positions.push(attributes.positions);
-              normals.push(attributes.normals);
-              colors.push(attributes.colors);
-
-              if (_properties) {
-                properties.push(Buffer.stringToUint8Array(JSON.stringify(polygon.properties)));
-              }
-            };
-          };
-
-          var mergedAttributes = {
-            positions: Buffer.mergeFloat32Arrays(positions),
-            normals: Buffer.mergeFloat32Arrays(normals),
-            colors: Buffer.mergeFloat32Arrays(colors)
-          };
-
-          transferrables.push(mergedAttributes.positions[0].buffer);
-          transferrables.push(mergedAttributes.positions[1].buffer);
-
-          transferrables.push(mergedAttributes.normals[0].buffer);
-          transferrables.push(mergedAttributes.normals[1].buffer);
-
-          transferrables.push(mergedAttributes.colors[0].buffer);
-          transferrables.push(mergedAttributes.colors[1].buffer);
-
-          var mergedProperties;
-          if (_properties) {
-            mergedProperties = Buffer.mergeUint8Arrays(properties);
-
-            transferrables.push(mergedProperties[0].buffer);
-            transferrables.push(mergedProperties[1].buffer);
-          }
-
-          var output = {
-            attributes: mergedAttributes,
-            flats: flats
-          };
-
-          if (_properties) {
-            output.properties = mergedProperties;
-          }
-
-          // TODO: Also return GeoJSON features that can be mapped to objects on
-          // the main thread. Allow user to provide filter / toggles to only return
-          // properties from the GeoJSON that they need (eg. don't return geometry,
-          // or don't return properties.height)
+        // TODO: Make this work with polylines too
+        GeoJSONWorkerLayer.ProcessPolygons(polygonBufferPromises, polygons, _properties).then((result) => {
           resolve({
-            data: output,
-            transferrables: transferrables
+            data: result.data,
+            transferrables: result.transferrables
           });
         });
+
+        // GeoJSONWorkerLayer.ProcessPolylines(polylineBufferPromises, polylines, _properties).then((result) => {
+        //   resolve({
+        //     data: result.data,
+        //     transferrables: result.transferrables
+        //   });
+        // });
       });
+    });
+  }
+
+  static ProcessPolygons(polygonPromises, polygons, _properties) {
+    return new Promise((resolve, reject) => {
+      Promise.all(polygonPromises).then((results) => {
+        var transferrables = [];
+
+        var positions = [];
+        var normals = [];
+        var colors = [];
+
+        var properties = [];
+
+        var flats = [];
+        var polygon;
+
+        var result;
+        for (var i = 0; i < results.length; i++) {
+          result = results[i];
+
+          polygon = polygons[i];
+
+          // WORKERS: Making this a typed array will speed up transfer time
+          // As things stand this adds on a few milliseconds
+          flats.push(result.flat);
+
+          // WORKERS: result.attributes is actually an array of polygons for each
+          // feature, though the current logic isn't keeping these all together
+
+          var attributes;
+          for (var j = 0; j < result.attributes.length; j++) {
+            attributes = result.attributes[j];
+
+            positions.push(attributes.positions);
+            normals.push(attributes.normals);
+            colors.push(attributes.colors);
+
+            if (_properties) {
+              properties.push(Buffer.stringToUint8Array(JSON.stringify(polygon.properties)));
+            }
+          };
+        };
+
+        var mergedAttributes = {
+          positions: Buffer.mergeFloat32Arrays(positions),
+          normals: Buffer.mergeFloat32Arrays(normals),
+          colors: Buffer.mergeFloat32Arrays(colors)
+        };
+
+        transferrables.push(mergedAttributes.positions[0].buffer);
+        transferrables.push(mergedAttributes.positions[1].buffer);
+
+        transferrables.push(mergedAttributes.normals[0].buffer);
+        transferrables.push(mergedAttributes.normals[1].buffer);
+
+        transferrables.push(mergedAttributes.colors[0].buffer);
+        transferrables.push(mergedAttributes.colors[1].buffer);
+
+        var mergedProperties;
+        if (_properties) {
+          mergedProperties = Buffer.mergeUint8Arrays(properties);
+
+          transferrables.push(mergedProperties[0].buffer);
+          transferrables.push(mergedProperties[1].buffer);
+        }
+
+        var output = {
+          attributes: mergedAttributes,
+          flats: flats
+        };
+
+        if (_properties) {
+          output.properties = mergedProperties;
+        }
+
+        // TODO: Also return GeoJSON features that can be mapped to objects on
+        // the main thread. Allow user to provide filter / toggles to only return
+        // properties from the GeoJSON that they need (eg. don't return geometry,
+        // or don't return properties.height)
+        resolve({
+          data: output,
+          transferrables: transferrables
+        });
+      }).catch(reject);
+    });
+  }
+
+  static ProcessPolylines(polylinePromises, polylines, _properties) {
+    return new Promise((resolve, reject) => {
+      Promise.all(polylinePromises).then((results) => {
+        var transferrables = [];
+
+        var positions = [];
+        var colors = [];
+
+        var properties = [];
+
+        var flats = [];
+        var polyline;
+
+        var result;
+        for (var i = 0; i < results.length; i++) {
+          result = results[i];
+
+          polyline = polylines[i];
+
+          // WORKERS: Making this a typed array will speed up transfer time
+          // As things stand this adds on a few milliseconds
+          flats.push(result.flat);
+
+          // WORKERS: result.attributes is actually an array of polygons for each
+          // feature, though the current logic isn't keeping these all together
+
+          var attributes;
+          for (var j = 0; j < result.attributes.length; j++) {
+            attributes = result.attributes[j];
+
+            positions.push(attributes.positions);
+            colors.push(attributes.colors);
+
+            if (_properties) {
+              properties.push(Buffer.stringToUint8Array(JSON.stringify(polyline.properties)));
+            }
+          };
+        };
+
+        var mergedAttributes = {
+          positions: Buffer.mergeFloat32Arrays(positions),
+          colors: Buffer.mergeFloat32Arrays(colors)
+        };
+
+        transferrables.push(mergedAttributes.positions[0].buffer);
+        transferrables.push(mergedAttributes.positions[1].buffer);
+
+        transferrables.push(mergedAttributes.colors[0].buffer);
+        transferrables.push(mergedAttributes.colors[1].buffer);
+
+        var mergedProperties;
+        if (_properties) {
+          mergedProperties = Buffer.mergeUint8Arrays(properties);
+
+          transferrables.push(mergedProperties[0].buffer);
+          transferrables.push(mergedProperties[1].buffer);
+        }
+
+        var output = {
+          attributes: mergedAttributes,
+          flats: flats
+        };
+
+        if (_properties) {
+          output.properties = mergedProperties;
+        }
+
+        // TODO: Also return GeoJSON features that can be mapped to objects on
+        // the main thread. Allow user to provide filter / toggles to only return
+        // properties from the GeoJSON that they need (eg. don't return geometry,
+        // or don't return properties.height)
+        resolve({
+          data: output,
+          transferrables: transferrables
+        });
+      }).catch(reject);
     });
   }
 
