@@ -98,197 +98,153 @@ class GeoJSONLayer extends LayerGroup {
   // Need to be careful as to not make it impossible to fork this off into a
   // worker script at a later stage
   _processData(data) {
-    // Collects features into a single FeatureCollection
-    //
-    // Also converts TopoJSON to GeoJSON if instructed
-    this._geojson = GeoJSON.collectFeatures(data, this._options.topojson);
+    return new Promise((resolve) => {
+      // Collects features into a single FeatureCollection
+      //
+      // Also converts TopoJSON to GeoJSON if instructed
+      this._geojson = GeoJSON.collectFeatures(data, this._options.topojson);
 
-    // TODO: Check that GeoJSON is valid / usable
+      // TODO: Check that GeoJSON is valid / usable
 
-    var features = this._geojson.features;
+      var features = this._geojson.features;
 
-    // Run filter, if provided
-    if (this._options.filter) {
-      features = this._geojson.features.filter(this._options.filter);
-    }
-
-    var defaults = {};
-
-    // Assume that a style won't be set per feature
-    var style = this._options.style;
-
-    var options;
-    features.forEach(feature => {
-      // Get per-feature style object, if provided
-      if (typeof this._options.style === 'function') {
-        style = extend({}, GeoJSON.defaultStyle, this._options.style(feature));
+      // Run filter, if provided
+      if (this._options.filter) {
+        features = this._geojson.features.filter(this._options.filter);
       }
 
-      options = extend({}, defaults, {
-        // If merging feature layers, stop them outputting themselves
-        // If not, let feature layers output themselves to the world
-        output: !this.isOutput(),
-        interactive: this._options.interactive,
-        style: style
+      var defaults = {};
+
+      // Assume that a style won't be set per feature
+      var style = this._options.style;
+
+      var layerPromises = [];
+
+      var options;
+      features.forEach(feature => {
+        // Get per-feature style object, if provided
+        if (typeof this._options.style === 'function') {
+          style = extend({}, GeoJSON.defaultStyle, this._options.style(feature));
+        }
+
+        options = extend({}, defaults, {
+          // If merging feature layers, stop them outputting themselves
+          // If not, let feature layers output themselves to the world
+          output: !this.isOutput(),
+          interactive: this._options.interactive,
+          style: style
+        });
+
+        var layer = this._featureToLayer(feature, options);
+
+        if (!layer) {
+          return;
+        }
+
+        // Sometimes you don't want to store a reference to the feature
+        //
+        // For example, to save memory when being used by tile layers
+        if (this._options.keepFeatures) {
+          layer.feature = feature;
+        }
+
+        // If defined, call a function for each feature
+        //
+        // This is commonly used for adding event listeners from the user script
+        if (this._options.onEachFeature) {
+          this._options.onEachFeature(feature, layer);
+        }
+
+        // TODO: Make this a promise array and only continue on completion
+        layerPromises.push(this.addLayer(layer));
       });
 
-      var layer = this._featureToLayer(feature, options);
-
-      if (!layer) {
-        return;
-      }
-
-      // Sometimes you don't want to store a reference to the feature
-      //
-      // For example, to save memory when being used by tile layers
-      if (this._options.keepFeatures) {
-        layer.feature = feature;
-      }
-
-      // If defined, call a function for each feature
-      //
-      // This is commonly used for adding event listeners from the user script
-      if (this._options.onEachFeature) {
-        this._options.onEachFeature(feature, layer);
-      }
-
-      // TODO: Make this a promise array and only continue on completion
-      this.addLayer(layer);
-    });
-
-    // If merging layers do that now, otherwise skip as the geometry layers
-    // should have already outputted themselves
-    if (!this.isOutput()) {
-      return;
-    }
-
-    // From here on we can assume that we want to merge the layers
-
-    var polygonAttributes = [];
-    var polygonFlat = true;
-
-    var polylineAttributes = [];
-    var pointAttributes = [];
-
-    this._layers.forEach(layer => {
-      if (layer instanceof PolygonLayer) {
-        polygonAttributes.push(layer.getBufferAttributes());
-
-        if (polygonFlat && !layer.isFlat()) {
-          polygonFlat = false;
+      Promise.all(layerPromises).then((results) => {
+        // If merging layers do that now, otherwise skip as the geometry layers
+        // should have already outputted themselves
+        if (!this.isOutput()) {
+          resolve();
+          return;
         }
-      } else if (layer instanceof PolylineLayer) {
-        polylineAttributes.push(layer.getBufferAttributes());
-      } else if (layer instanceof PointLayer) {
-        pointAttributes.push(layer.getBufferAttributes());
-      }
+
+        // From here on we can assume that we want to merge the layers
+
+        var polygonAttributes = [];
+        var polygonAttributeLengths = {
+          positions: 3,
+          normals: 3,
+          colors: 3
+        };
+        var polygonFlat = true;
+
+        var polylineAttributes = [];
+        var pointAttributes = [];
+
+        this._layers.forEach(layer => {
+          if (layer instanceof PolygonLayer) {
+            polygonAttributes.push(layer.getBufferAttributes());
+
+            if (polygonFlat && !layer.isFlat()) {
+              polygonFlat = false;
+            }
+
+            if (this._options.interactive) {
+              polygonAttributeLengths.pickingIds = 1;
+            }
+          } else if (layer instanceof PolylineLayer) {
+            polylineAttributes.push(layer.getBufferAttributes());
+          } else if (layer instanceof PointLayer) {
+            pointAttributes.push(layer.getBufferAttributes());
+          }
+        });
+
+        if (polygonAttributes.length > 0) {
+          var mergedPolygonAttributes = Buffer.mergeAttributes(polygonAttributes);
+          this._setPolygonMesh(mergedPolygonAttributes, polygonAttributeLengths, polygonFlat).then((result) => {
+            this._polygonMesh = result.mesh;
+            this.add(this._polygonMesh);
+
+            if (result.pickingMesh) {
+              this._pickingMesh.add(pickingMesh);
+            }
+          });
+        }
+
+        if (polylineAttributes.length > 0) {
+          var mergedPolylineAttributes = Buffer.mergeAttributes(polylineAttributes);
+          this._setPolylineMesh(mergedPolylineAttributes);
+          this.add(this._polylineMesh);
+        }
+
+        if (pointAttributes.length > 0) {
+          var mergedPointAttributes = Buffer.mergeAttributes(pointAttributes);
+          this._setPointMesh(mergedPointAttributes);
+          this.add(this._pointMesh);
+        }
+
+        // Clean up layers
+        //
+        // TODO: Are there ever situations where the unmerged buffer attributes
+        // and coordinates would still be required?
+        this._layers.forEach(layer => {
+          layer.clearBufferAttributes();
+          layer.clearCoordinates();
+        });
+
+        resolve();
+      });
     });
-
-    if (polygonAttributes.length > 0) {
-      var mergedPolygonAttributes = Buffer.mergeAttributes(polygonAttributes);
-      this._setPolygonMesh(mergedPolygonAttributes, polygonFlat);
-      this.add(this._polygonMesh);
-    }
-
-    if (polylineAttributes.length > 0) {
-      var mergedPolylineAttributes = Buffer.mergeAttributes(polylineAttributes);
-      this._setPolylineMesh(mergedPolylineAttributes);
-      this.add(this._polylineMesh);
-    }
-
-    if (pointAttributes.length > 0) {
-      var mergedPointAttributes = Buffer.mergeAttributes(pointAttributes);
-      this._setPointMesh(mergedPointAttributes);
-      this.add(this._pointMesh);
-    }
-
-    // Clean up layers
-    //
-    // TODO: Are there ever situations where the unmerged buffer attributes
-    // and coordinates would still be required?
-    this._layers.forEach(layer => {
-      layer.clearBufferAttributes();
-      layer.clearCoordinates();
-    });
-
-    return Promise.resolve();
   }
 
   // Create and store mesh from buffer attributes
   //
-  // TODO: De-dupe this from the individual mesh creation logic within each
-  // geometry layer (materials, settings, etc)
-  //
-  // Could make this an abstract method for each geometry layer
-  _setPolygonMesh(attributes, flat) {
-    var geometry = new THREE.BufferGeometry();
-
-    // itemSize = 3 because there are 3 values (components) per vertex
-    geometry.addAttribute('position', new THREE.BufferAttribute(attributes.vertices, 3));
-    geometry.addAttribute('normal', new THREE.BufferAttribute(attributes.normals, 3));
-    geometry.addAttribute('color', new THREE.BufferAttribute(attributes.colours, 3));
-
-    if (attributes.pickingIds) {
-      geometry.addAttribute('pickingId', new THREE.BufferAttribute(attributes.pickingIds, 1));
-    }
-
-    geometry.computeBoundingBox();
-
+  // TODO: Probably remove this and call static method directly as it's just a proxy
+  _setPolygonMesh(attributes, attributeLengths, flat) {
     // TODO: Make this work when style is a function per feature
     var style = (typeof this._options.style === 'function') ? this._options.style(this._geojson.features[0]) : this._options.style;
     style = extend({}, GeoJSON.defaultStyle, style);
 
-    var material;
-    if (this._options.polygonMaterial && this._options.polygonMaterial instanceof THREE.Material) {
-      material = this._options.polygonMaterial;
-    } else if (!this._world._environment._skybox) {
-      material = new THREE.MeshPhongMaterial({
-        vertexColors: THREE.VertexColors,
-        side: THREE.BackSide,
-        transparent: style.transparent,
-        opacity: style.opacity,
-        blending: style.blending
-      });
-    } else {
-      material = new THREE.MeshStandardMaterial({
-        vertexColors: THREE.VertexColors,
-        side: THREE.BackSide,
-        transparent: style.transparent,
-        opacity: style.opacity,
-        blending: style.blending
-      });
-      material.roughness = 1;
-      material.metalness = 0.1;
-      material.envMapIntensity = 3;
-      material.envMap = this._world._environment._skybox.getRenderTarget();
-    }
-
-    var mesh;
-
-    // Pass mesh through callback, if defined
-    if (typeof this._options.onPolygonMesh === 'function') {
-      mesh = this._options.onPolygonMesh(geometry, material);
-    } else {
-      mesh = new THREE.Mesh(geometry, material);
-
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-    }
-
-    if (flat) {
-      material.depthWrite = false;
-      mesh.renderOrder = 1;
-    }
-
-    if (this._options.interactive && this._pickingMesh) {
-      material = new PickingMaterial();
-      material.side = THREE.BackSide;
-
-      var pickingMesh = new THREE.Mesh(geometry, material);
-      this._pickingMesh.add(pickingMesh);
-    }
-
-    this._polygonMesh = mesh;
+    return PolygonLayer.SetMesh(attributes, attributeLengths, flat, style, this._options, this._world._environment._skybox);
   }
 
   _setPolylineMesh(attributes) {

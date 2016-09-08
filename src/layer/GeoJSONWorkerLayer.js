@@ -97,19 +97,14 @@ class GeoJSONWorkerLayer extends Layer {
       Worker.exec('GeoJSONWorkerLayer.Process', [geojson, topojson, headers, originPoint, style, interactive], transferrables).then((results) => {
         console.timeEnd('Worker round trip');
 
-        var splitVertices = Buffer.splitFloat32Array(results.attributes.vertices);
+        var splitPositions = Buffer.splitFloat32Array(results.attributes.positions);
         var splitNormals = Buffer.splitFloat32Array(results.attributes.normals);
-        var splitColours = Buffer.splitFloat32Array(results.attributes.colours);
+        var splitColors = Buffer.splitFloat32Array(results.attributes.colors);
 
         var splitProperties;
         if (results.properties) {
           splitProperties = Buffer.splitUint8Array(results.properties);
         }
-
-        // var splitPickingIds;
-        // if (results.pickingIds) {
-        //   splitPickingIds = Buffer.splitFloat32Array(results.attributes.pickingIds);
-        // }
 
         var flats = results.flats;
 
@@ -125,7 +120,7 @@ class GeoJSONWorkerLayer extends Layer {
           colors: 3
         };
 
-        for (var i = 0; i < splitVertices.length; i++) {
+        for (var i = 0; i < splitPositions.length; i++) {
           if (splitProperties && splitProperties[i]) {
             properties = JSON.parse(Buffer.uint8ArrayToString(splitProperties[i]));
           } else {
@@ -136,24 +131,20 @@ class GeoJSONWorkerLayer extends Layer {
           // the feature, though the current logic isn't aware of that
           obj = {
             attributes: [{
-              positions: splitVertices[i],
+              positions: splitPositions[i],
               normals: splitNormals[i],
-              colors: splitColours[i]
+              colors: splitColors[i]
             }],
             properties: properties,
             flat: flats[i]
           };
-
-          // if (splitPickingIds && splitPickingIds[i]) {
-          //   obj.attributes.pickingIds = splitPickingIds[i];
-          // }
 
           // WORKERS: If interactive, generate unique ID for each feature, create
           // the buffer attributes and set up event listeners
           if (this._options.interactive) {
             pickingId = this.getPickingId();
 
-            pickingIds = new Float32Array(splitVertices[i].length / 3);
+            pickingIds = new Float32Array(splitPositions[i].length / 3);
             pickingIds.fill(pickingId);
 
             obj.attributes[0].pickingIds = pickingIds;
@@ -192,28 +183,6 @@ class GeoJSONWorkerLayer extends Layer {
           polygonAttributes.push(bufferAttributes);
         };
 
-        // console.log(splitVertices, splitNormals, splitColours, splitPickingIds);
-
-        // var layer;
-
-        // var polygonAttributes = [];
-        // var polygonFlat = true;
-
-        // objects.forEach((obj, index) => {
-        //   layer = polygonWorkerLayers[index];
-        //   layer.createGeometry(obj);
-
-        //   if (layer.isOutput()) {
-        //     return;
-        //   }
-
-        //   polygonAttributes.push(layer.getBufferAttributes());
-
-        //   if (polygonFlat && !layer.isFlat()) {
-        //     polygonFlat = false;
-        //   }
-        // });
-
         if (polygonAttributes.length > 0) {
           var mergedPolygonAttributes = Buffer.mergeAttributes(polygonAttributes);
 
@@ -221,8 +190,14 @@ class GeoJSONWorkerLayer extends Layer {
           var style = (typeof this._options.style === 'function') ? this._options.style(objects[0]) : this._options.style;
           style = extend({}, GeoJSON.defaultStyle, style);
 
-          this._setPolygonMesh(mergedPolygonAttributes, polygonAttributeLengths, style, polygonFlat);
-          this.add(this._polygonMesh);
+          this._setPolygonMesh(mergedPolygonAttributes, polygonAttributeLengths, style, polygonFlat).then((result) => {
+            this._polygonMesh = result.mesh;
+            this.add(this._polygonMesh);
+
+            if (result.pickingMesh) {
+              this._pickingMesh.add(pickingMesh);
+            }
+          });
         }
 
         resolve();
@@ -337,9 +312,9 @@ class GeoJSONWorkerLayer extends Layer {
           var transferrables = [];
           var transferrablesSize = 0;
 
-          var vertices = [];
+          var positions = [];
           var normals = [];
-          var colours = [];
+          var colors = [];
           // var pickingIds = [];
 
           var properties = [];
@@ -364,14 +339,9 @@ class GeoJSONWorkerLayer extends Layer {
             for (var j = 0; j < result.attributes.length; j++) {
               attributes = result.attributes[j];
 
-              vertices.push(attributes.vertices);
+              positions.push(attributes.positions);
               normals.push(attributes.normals);
-              colours.push(attributes.colours);
-
-              // WORKERS: Handle interaction back in the main thread
-              // if (attributes.pickingIds) {
-              //   pickingIds.push(attributes.pickingIds);
-              // }
+              colors.push(attributes.colors);
 
               if (_properties) {
                 properties.push(Buffer.stringToUint8Array(JSON.stringify(polygon.properties)));
@@ -380,19 +350,19 @@ class GeoJSONWorkerLayer extends Layer {
           };
 
           var mergedAttributes = {
-            vertices: Buffer.mergeFloat32Arrays(vertices),
+            positions: Buffer.mergeFloat32Arrays(positions),
             normals: Buffer.mergeFloat32Arrays(normals),
-            colours: Buffer.mergeFloat32Arrays(colours)
+            colors: Buffer.mergeFloat32Arrays(colors)
           };
 
-          transferrables.push(mergedAttributes.vertices[0].buffer);
-          transferrables.push(mergedAttributes.vertices[1].buffer);
+          transferrables.push(mergedAttributes.positions[0].buffer);
+          transferrables.push(mergedAttributes.positions[1].buffer);
 
           transferrables.push(mergedAttributes.normals[0].buffer);
           transferrables.push(mergedAttributes.normals[1].buffer);
 
-          transferrables.push(mergedAttributes.colours[0].buffer);
-          transferrables.push(mergedAttributes.colours[1].buffer);
+          transferrables.push(mergedAttributes.colors[0].buffer);
+          transferrables.push(mergedAttributes.colors[1].buffer);
 
           var mergedProperties;
           if (_properties) {
@@ -401,13 +371,6 @@ class GeoJSONWorkerLayer extends Layer {
             transferrables.push(mergedProperties[0].buffer);
             transferrables.push(mergedProperties[1].buffer);
           }
-
-          // WORKERS: Handle interaction back in the main thread
-          // if (pickingIds.length > 0) {
-          //   mergedAttributes.pickingIds = Buffer.mergeFloat32Arrays(pickingIds);
-          //   transferrables.push(mergedAttributes.pickingIds[0].buffer);
-          //   transferrables.push(mergedAttributes.pickingIds[1].buffer);
-          // }
 
           var output = {
             attributes: mergedAttributes,
@@ -452,70 +415,7 @@ class GeoJSONWorkerLayer extends Layer {
   //
   // Could make this an abstract method for each geometry layer
   _setPolygonMesh(attributes, attributeLengths, style, flat) {
-    var geometry = new THREE.BufferGeometry();
-
-    for (var key in attributes) {
-      geometry.addAttribute(key.slice(0, -1), new THREE.BufferAttribute(attributes[key], attributeLengths[key]));
-    }
-
-    geometry.computeBoundingBox();
-
-    // Temporary until the above style logic is fixed for workers
-    // var style = extend({}, GeoJSON.defaultStyle);
-
-    var material;
-    if (this._options.polygonMaterial && this._options.polygonMaterial instanceof THREE.Material) {
-      material = this._options.polygonMaterial;
-    } else if (!this._world._environment._skybox) {
-      material = new THREE.MeshPhongMaterial({
-        vertexColors: THREE.VertexColors,
-        side: THREE.BackSide,
-        transparent: style.transparent,
-        opacity: style.opacity,
-        blending: style.blending
-      });
-    } else {
-      material = new THREE.MeshStandardMaterial({
-        vertexColors: THREE.VertexColors,
-        side: THREE.BackSide,
-        transparent: style.transparent,
-        opacity: style.opacity,
-        blending: style.blending
-      });
-      material.roughness = 1;
-      material.metalness = 0.1;
-      material.envMapIntensity = 3;
-      material.envMap = this._world._environment._skybox.getRenderTarget();
-    }
-
-    var mesh;
-
-    // Pass mesh through callback, if defined
-    if (typeof this._options.onPolygonMesh === 'function') {
-      mesh = this._options.onPolygonMesh(geometry, material);
-    } else {
-      mesh = new THREE.Mesh(geometry, material);
-
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-    }
-
-    if (flat) {
-      material.depthWrite = false;
-      mesh.renderOrder = 1;
-    }
-
-    if (this._options.interactive && this._pickingMesh) {
-      material = new PickingMaterial();
-      material.side = THREE.BackSide;
-
-      var pickingMesh = new THREE.Mesh(geometry, material);
-      this._pickingMesh.add(pickingMesh);
-
-      this.addToPicking(this._pickingMesh);
-    }
-
-    this._polygonMesh = mesh;
+    return PolygonLayer.SetMesh(attributes, attributeLengths, flat, style, this._options, this._world._environment._skybox);
   }
 
   // Set up and re-emit interaction events

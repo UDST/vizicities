@@ -57,34 +57,57 @@ class PolygonLayer extends Layer {
   }
 
   _onAdd(world) {
-    this._setCoordinates();
+    return new Promise((resolve, reject) => {
+      this._setCoordinates();
 
-    if (this._options.interactive) {
-      // Only add to picking mesh if this layer is controlling output
-      //
-      // Otherwise, assume another component will eventually add a mesh to
-      // the picking scene
-      if (this.isOutput()) {
-        this._pickingMesh = new THREE.Object3D();
-        this.addToPicking(this._pickingMesh);
+      if (this._options.interactive) {
+        // Only add to picking mesh if this layer is controlling output
+        //
+        // Otherwise, assume another component will eventually add a mesh to
+        // the picking scene
+        if (this.isOutput()) {
+          this._pickingMesh = new THREE.Object3D();
+          this.addToPicking(this._pickingMesh);
+        }
+
+        this._setPickingId();
+        this._addPickingEvents();
       }
 
-      this._setPickingId();
-      this._addPickingEvents();
-    }
+      PolygonLayer.SetBufferAttributes(this._projectedCoordinates, this._options).then((result) => {
+        this._bufferAttributes = Buffer.mergeAttributes(result.attributes);
+        this._flat = result.flat;
 
-    // Store geometry representation as instances of THREE.BufferAttribute
-    this._setBufferAttributes();
+        var attributeLengths = {
+          positions: 3,
+          normals: 3,
+          colors: 3
+        };
 
-    if (this.isOutput()) {
-      // Set mesh if not merging elsewhere
-      this._setMesh(this._bufferAttributes);
+        if (this._options.interactive) {
+          attributeLengths.pickingIds = 1;
+        }
 
-      // Output mesh
-      this.add(this._mesh);
-    }
+        if (this.isOutput()) {
+          var style = this._options.style;
 
-    return Promise.resolve(this);
+          // Set mesh if not merging elsewhere
+          PolygonLayer.SetMesh(this._bufferAttributes, attributeLengths, this._flat, style, this._options, this._world._environment._skybox).then((result) => {
+            // Output mesh
+            this.add(result.mesh);
+
+            if (result.pickingMesh) {
+              this._pickingMesh.add(pickingMesh);
+            }
+          });
+        }
+
+        result.attributes = null;
+        result = null;
+
+        resolve(this);
+      }).catch(reject);
+    });
   }
 
   // Return center of polygon as a LatLon
@@ -117,122 +140,6 @@ class PolygonLayer extends Layer {
   }
 
   // Create and store reference to THREE.BufferAttribute data for this layer
-  //
-  // TODO: Remove this and instead use the SetBufferAttributes static method
-  _setBufferAttributes() {
-    var attributes;
-
-    // Only use this if you know what you're doing
-    if (typeof this._options.onBufferAttributes === 'function') {
-      // TODO: Probably want to pass something less general as arguments,
-      // though passing the instance will do for now (it's everything)
-      attributes = this._options.onBufferAttributes(this);
-    } else {
-      var height = 0;
-
-      // Convert height into world units
-      if (this._options.style.height && this._options.style.height !== 0) {
-        height = this._world.metresToWorld(this._options.style.height, this._pointScale);
-      }
-
-      var colour = new THREE.Color();
-      colour.set(this._options.style.color);
-
-      // Light and dark colours used for poor-mans AO gradient on object sides
-      var light = new THREE.Color(0xffffff);
-      var shadow  = new THREE.Color(0x666666);
-
-      // For each polygon
-      attributes = this._projectedCoordinates.map(_projectedCoordinates => {
-        // Convert coordinates to earcut format
-        var _earcut = PolygonLayer.ToEarcut(_projectedCoordinates);
-
-        // Triangulate faces using earcut
-        var faces = PolygonLayer.Triangulate(_earcut.vertices, _earcut.holes, _earcut.dimensions);
-
-        var groupedVertices = [];
-        for (i = 0, il = _earcut.vertices.length; i < il; i += _earcut.dimensions) {
-          groupedVertices.push(_earcut.vertices.slice(i, i + _earcut.dimensions));
-        }
-
-        var extruded = extrudePolygon(groupedVertices, faces, {
-          bottom: 0,
-          top: height
-        });
-
-        var topColor = colour.clone().multiply(light);
-        var bottomColor = colour.clone().multiply(shadow);
-
-        var _vertices = extruded.positions;
-        var _faces = [];
-        var _colours = [];
-
-        var _colour;
-        extruded.top.forEach((face, fi) => {
-          _colour = [];
-
-          _colour.push([colour.r, colour.g, colour.b]);
-          _colour.push([colour.r, colour.g, colour.b]);
-          _colour.push([colour.r, colour.g, colour.b]);
-
-          _faces.push(face);
-          _colours.push(_colour);
-        });
-
-        this._flat = true;
-
-        if (extruded.sides) {
-          this._flat = false;
-
-          // Set up colours for every vertex with poor-mans AO on the sides
-          extruded.sides.forEach((face, fi) => {
-            _colour = [];
-
-            // First face is always bottom-bottom-top
-            if (fi % 2 === 0) {
-              _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-              _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-              _colour.push([topColor.r, topColor.g, topColor.b]);
-            // Reverse winding for the second face
-            // top-top-bottom
-            } else {
-              _colour.push([topColor.r, topColor.g, topColor.b]);
-              _colour.push([topColor.r, topColor.g, topColor.b]);
-              _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-            }
-
-            _faces.push(face);
-            _colours.push(_colour);
-          });
-        }
-
-        // Skip bottom as there's no point rendering it
-        // allFaces.push(extruded.faces);
-
-        var polygon = {
-          vertices: _vertices,
-          faces: _faces,
-          colours: _colours,
-          facesCount: _faces.length
-        };
-
-        if (this._options.interactive && this._pickingId) {
-          // Inject picking ID
-          polygon.pickingId = this._pickingId;
-        }
-
-        // Convert polygon representation to proper attribute arrays
-        return PolygonLayer.ToAttributes(polygon);
-      });
-    }
-
-    this._bufferAttributes = Buffer.mergeAttributes(attributes);
-
-    // Original attributes are no longer required so free the memory
-    attributes = null;
-  }
-
-  // TODO: Ensure that this has feature parity with the non-static method
   static SetBufferAttributes(coordinates, options) {
     return new Promise((resolve) => {
       var height = 0;
@@ -365,50 +272,125 @@ class PolygonLayer extends Layer {
   // Create and store mesh from buffer attributes
   //
   // This is only called if the layer is controlling its own output
-  _setMesh(attributes) {
+  //
+  // TODO: Dedupe with code used by workers, perhaps via a static method
+  // _setMesh(attributes) {
+  //   var geometry = new THREE.BufferGeometry();
+
+  //   // itemSize = 3 because there are 3 values (components) per vertex
+  //   geometry.addAttribute('position', new THREE.BufferAttribute(attributes.vertices, 3));
+  //   geometry.addAttribute('normal', new THREE.BufferAttribute(attributes.normals, 3));
+  //   geometry.addAttribute('color', new THREE.BufferAttribute(attributes.colours, 3));
+
+  //   if (attributes.pickingIds) {
+  //     geometry.addAttribute('pickingId', new THREE.BufferAttribute(attributes.pickingIds, 1));
+  //   }
+
+  //   geometry.computeBoundingBox();
+
+  //   var material;
+  //   if (this._options.material && this._options.material instanceof THREE.Material) {
+  //     material = this._options.material;
+  //   } else if (!this._world._environment._skybox) {
+  //     material = new THREE.MeshPhongMaterial({
+  //       vertexColors: THREE.VertexColors,
+  //       side: THREE.BackSide,
+  //       transparent: this._options.style.transparent,
+  //       opacity: this._options.style.opacity,
+  //       blending: this._options.style.blending
+  //     });
+  //   } else {
+  //     material = new THREE.MeshStandardMaterial({
+  //       vertexColors: THREE.VertexColors,
+  //       side: THREE.BackSide,
+  //       transparent: this._options.style.transparent,
+  //       opacity: this._options.style.opacity,
+  //       blending: this._options.style.blending
+  //     });
+  //     material.roughness = 1;
+  //     material.metalness = 0.1;
+  //     material.envMapIntensity = 3;
+  //     material.envMap = this._world._environment._skybox.getRenderTarget();
+  //   }
+
+  //   var mesh;
+
+  //   // Pass mesh through callback, if defined
+  //   if (typeof this._options.onMesh === 'function') {
+  //     mesh = this._options.onMesh(geometry, material);
+  //   } else {
+  //     mesh = new THREE.Mesh(geometry, material);
+
+  //     mesh.castShadow = true;
+  //     mesh.receiveShadow = true;
+  //   }
+
+  //   if (this.isFlat()) {
+  //     material.depthWrite = false;
+  //     mesh.renderOrder = 1;
+  //   }
+
+  //   if (this._options.interactive && this._pickingMesh) {
+  //     material = new PickingMaterial();
+  //     material.side = THREE.BackSide;
+
+  //     var pickingMesh = new THREE.Mesh(geometry, material);
+  //     this._pickingMesh.add(pickingMesh);
+  //   }
+
+  //   this._mesh = mesh;
+  // }
+
+  static SetMesh(attributes, attributeLengths, flat, style, options, skybox) {
     var geometry = new THREE.BufferGeometry();
 
-    // itemSize = 3 because there are 3 values (components) per vertex
-    geometry.addAttribute('position', new THREE.BufferAttribute(attributes.vertices, 3));
-    geometry.addAttribute('normal', new THREE.BufferAttribute(attributes.normals, 3));
-    geometry.addAttribute('color', new THREE.BufferAttribute(attributes.colours, 3));
+    // TODO: Remove
+    // // itemSize = 3 because there are 3 values (components) per vertex
+    // geometry.addAttribute('position', new THREE.BufferAttribute(attributes.positions, 3));
+    // geometry.addAttribute('normal', new THREE.BufferAttribute(attributes.normals, 3));
+    // geometry.addAttribute('color', new THREE.BufferAttribute(attributes.colours, 3));
 
-    if (attributes.pickingIds) {
-      geometry.addAttribute('pickingId', new THREE.BufferAttribute(attributes.pickingIds, 1));
+    // TODO: Remove
+    // if (attributes.pickingIds) {
+    //   geometry.addAttribute('pickingId', new THREE.BufferAttribute(attributes.pickingIds, 1));
+    // }
+
+    for (var key in attributes) {
+      geometry.addAttribute(key.slice(0, -1), new THREE.BufferAttribute(attributes[key], attributeLengths[key]));
     }
 
     geometry.computeBoundingBox();
 
     var material;
-    if (this._options.material && this._options.material instanceof THREE.Material) {
-      material = this._options.material;
-    } else if (!this._world._environment._skybox) {
+    if (options.polygonMaterial && options.polygonMaterial instanceof THREE.Material) {
+      material = options.polygonMaterial;
+    } else if (!skybox) {
       material = new THREE.MeshPhongMaterial({
         vertexColors: THREE.VertexColors,
         side: THREE.BackSide,
-        transparent: this._options.style.transparent,
-        opacity: this._options.style.opacity,
-        blending: this._options.style.blending
+        transparent: style.transparent,
+        opacity: style.opacity,
+        blending: style.blending
       });
     } else {
       material = new THREE.MeshStandardMaterial({
         vertexColors: THREE.VertexColors,
         side: THREE.BackSide,
-        transparent: this._options.style.transparent,
-        opacity: this._options.style.opacity,
-        blending: this._options.style.blending
+        transparent: style.transparent,
+        opacity: style.opacity,
+        blending: style.blending
       });
       material.roughness = 1;
       material.metalness = 0.1;
       material.envMapIntensity = 3;
-      material.envMap = this._world._environment._skybox.getRenderTarget();
+      material.envMap = skybox.getRenderTarget();
     }
 
     var mesh;
 
     // Pass mesh through callback, if defined
-    if (typeof this._options.onMesh === 'function') {
-      mesh = this._options.onMesh(geometry, material);
+    if (typeof options.onPolygonMesh === 'function') {
+      mesh = options.onPolygonMesh(geometry, material);
     } else {
       mesh = new THREE.Mesh(geometry, material);
 
@@ -416,20 +398,25 @@ class PolygonLayer extends Layer {
       mesh.receiveShadow = true;
     }
 
-    if (this.isFlat()) {
+    if (flat) {
       material.depthWrite = false;
       mesh.renderOrder = 1;
     }
 
-    if (this._options.interactive && this._pickingMesh) {
+    if (options.interactive) {
       material = new PickingMaterial();
       material.side = THREE.BackSide;
 
       var pickingMesh = new THREE.Mesh(geometry, material);
-      this._pickingMesh.add(pickingMesh);
+
+      // TODO: Move this to after whatever calls PolygonLayer.SetMesh()
+      // this._pickingMesh.add(pickingMesh);
     }
 
-    this._mesh = mesh;
+    return Promise.resolve({
+      mesh: mesh,
+      pickingMesh: pickingMesh
+    });
   }
 
   // Convert and project coordinates
@@ -531,7 +518,7 @@ class PolygonLayer extends Layer {
   // TODO: Can this be simplified? It's messy and huge
   static ToAttributes(polygon) {
     // Three components per vertex per face (3 x 3 = 9)
-    var vertices = new Float32Array(polygon.facesCount * 9);
+    var positions = new Float32Array(polygon.facesCount * 9);
     var normals = new Float32Array(polygon.facesCount * 9);
     var colours = new Float32Array(polygon.facesCount * 9);
 
@@ -603,9 +590,9 @@ class PolygonLayer extends Layer {
       var ny = cb.y;
       var nz = cb.z;
 
-      vertices[lastIndex * 9 + 0] = ax;
-      vertices[lastIndex * 9 + 1] = ay;
-      vertices[lastIndex * 9 + 2] = az;
+      positions[lastIndex * 9 + 0] = ax;
+      positions[lastIndex * 9 + 1] = ay;
+      positions[lastIndex * 9 + 2] = az;
 
       normals[lastIndex * 9 + 0] = nx;
       normals[lastIndex * 9 + 1] = ny;
@@ -615,9 +602,9 @@ class PolygonLayer extends Layer {
       colours[lastIndex * 9 + 1] = c1[1];
       colours[lastIndex * 9 + 2] = c1[2];
 
-      vertices[lastIndex * 9 + 3] = bx;
-      vertices[lastIndex * 9 + 4] = by;
-      vertices[lastIndex * 9 + 5] = bz;
+      positions[lastIndex * 9 + 3] = bx;
+      positions[lastIndex * 9 + 4] = by;
+      positions[lastIndex * 9 + 5] = bz;
 
       normals[lastIndex * 9 + 3] = nx;
       normals[lastIndex * 9 + 4] = ny;
@@ -627,9 +614,9 @@ class PolygonLayer extends Layer {
       colours[lastIndex * 9 + 4] = c2[1];
       colours[lastIndex * 9 + 5] = c2[2];
 
-      vertices[lastIndex * 9 + 6] = cx;
-      vertices[lastIndex * 9 + 7] = cy;
-      vertices[lastIndex * 9 + 8] = cz;
+      positions[lastIndex * 9 + 6] = cx;
+      positions[lastIndex * 9 + 7] = cy;
+      positions[lastIndex * 9 + 8] = cz;
 
       normals[lastIndex * 9 + 6] = nx;
       normals[lastIndex * 9 + 7] = ny;
@@ -649,9 +636,9 @@ class PolygonLayer extends Layer {
     }
 
     var attributes = {
-      vertices: vertices,
+      positions: positions,
       normals: normals,
-      colours: colours
+      colors: colours
     };
 
     if (pickingIds) {
