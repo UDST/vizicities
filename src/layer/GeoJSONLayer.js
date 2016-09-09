@@ -351,7 +351,7 @@ class GeoJSONLayer extends LayerGroup {
     if (geometry.type === 'Point' || geometry.type === 'MultiPoint') {
       // Get geometry object to use for point, if provided
       if (typeof this._options.pointGeometry === 'function') {
-        options.geometry = this._options.pointGeometry(feature);
+        options.pointGeometry = this._options.pointGeometry(feature);
       }
 
       // Get material instance to use for point, if provided

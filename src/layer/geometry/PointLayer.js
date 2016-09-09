@@ -38,7 +38,7 @@ class PointLayer extends Layer {
       output: true,
       interactive: false,
       // THREE.Geometry or THREE.BufferGeometry to use for point output
-      geometry: null,
+      pointGeometry: null,
       // Custom material override
       //
       // TODO: Should this be in the style object?
@@ -160,7 +160,7 @@ class PointLayer extends Layer {
 
       // Use default geometry if none has been provided or the provided geometry
       // isn't valid
-      if (!options.geometry || (!options.geometry instanceof THREE.Geometry || !options.geometry instanceof THREE.BufferGeometry)) {
+      if (!options.pointGeometry || (!options.pointGeometry instanceof THREE.Geometry || !options.pointGeometry instanceof THREE.BufferGeometry)) {
         // Debug geometry for points is a thin bar
         //
         // TODO: Allow point geometry to be customised / overridden
@@ -175,9 +175,9 @@ class PointLayer extends Layer {
         geometry = new THREE.BufferGeometry().fromGeometry(_geometry);
       } else {
         if (options.geometry instanceof THREE.BufferGeometry) {
-          geometry = options.geometry;
+          geometry = options.pointGeometry;
         } else {
-          geometry = new THREE.BufferGeometry().fromGeometry(options.geometry);
+          geometry = new THREE.BufferGeometry().fromGeometry(options.pointGeometry);
         }
       }
 

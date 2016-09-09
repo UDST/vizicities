@@ -25,6 +25,7 @@ class GeoJSONWorkerLayer extends Layer {
       onEachFeatureWorker: null,
       onAddAttributes: null,
       interactive: false,
+      pointGeometry: null,
       onClick: null,
       headers: {}
     };
@@ -56,8 +57,16 @@ class GeoJSONWorkerLayer extends Layer {
     return new Promise((resolve, reject) => {
       var style = this._options.style;
 
+      // TODO: Convert to buffer and use transferrable objects
       if (typeof this._options.style === 'function') {
         style = Stringify.functionToString(this._options.style);
+      }
+
+      var pointGeometry = this._options.pointGeometry;
+
+      // TODO: Convert to buffer and use transferrable objects
+      if (typeof this._options.pointGeometry === 'function') {
+        pointGeometry = Stringify.functionToString(this._options.pointGeometry);
       }
 
       var geojson = _geojson;
@@ -66,7 +75,7 @@ class GeoJSONWorkerLayer extends Layer {
       if (typeof geojson !== 'string') {
         this._geojson = geojson = Buffer.stringToUint8Array(JSON.stringify(geojson));
         transferrables.push(geojson.buffer);
-        this._execWorker(geojson, this._options.topojson, this._world._originPoint, style, this._options.interactive, transferrables).then(() => {
+        this._execWorker(geojson, this._options.topojson, this._world._originPoint, style, this._options.interactive, pointGeometry, transferrables).then(() => {
           resolve();
         }).catch(reject);
       } else if (typeof this._options.filter === 'function' || typeof this._options.onEachFeature === 'function') {
@@ -90,23 +99,23 @@ class GeoJSONWorkerLayer extends Layer {
           this._geojson = geojson = Buffer.stringToUint8Array(JSON.stringify(fc));
           transferrables.push(geojson.buffer);
 
-          this._execWorker(geojson, false, this._options.headers, this._world._originPoint, style, this._options.interactive, transferrables).then(() => {
+          this._execWorker(geojson, false, this._options.headers, this._world._originPoint, style, this._options.interactive, pointGeometry, transferrables).then(() => {
             resolve();
           }).catch(reject);
         });
       } else {
-        this._execWorker(geojson, this._options.topojson, this._options.headers, this._world._originPoint, style, this._options.interactive, transferrables).then(() => {
+        this._execWorker(geojson, this._options.topojson, this._options.headers, this._world._originPoint, style, this._options.interactive, pointGeometry, transferrables).then(() => {
           resolve();
         }).catch(reject);
       }
     });
   }
 
-  _execWorker(geojson, topojson, headers, originPoint, style, interactive, transferrables) {
+  _execWorker(geojson, topojson, headers, originPoint, style, interactive, pointGeometry, transferrables) {
     return new Promise((resolve, reject) => {
       console.time('Worker round trip');
 
-      Worker.exec('GeoJSONWorkerLayer.Process', [geojson, topojson, headers, originPoint, style, interactive], transferrables).then((results) => {
+      Worker.exec('GeoJSONWorkerLayer.Process', [geojson, topojson, headers, originPoint, style, interactive, pointGeometry], transferrables).then((results) => {
         console.timeEnd('Worker round trip');
 
         if (results.polygons) {
@@ -452,7 +461,7 @@ class GeoJSONWorkerLayer extends Layer {
   // feels a bit messy and against the idea of a static Geo class
   //
   // TODO: Support passing custom geometry for point layers
-  static Process(geojson, topojson, headers, originPoint, _style, _properties) {
+  static Process(geojson, topojson, headers, originPoint, _style, _properties, _pointGeometry) {
     return new Promise((resolve, reject) => {
       GeoJSONWorkerLayer.ProcessGeoJSON(geojson, headers).then((res) => {
         // Collects features into a single FeatureCollection
@@ -478,6 +487,12 @@ class GeoJSONWorkerLayer extends Layer {
 
         // Assume that a style won't be set per feature
         var style = _style;
+
+        var pointGeometry;
+        // Deserialise pointGeometry function if provided
+        if (typeof _pointGeometry === 'string') {
+          pointGeometry = Stringify.stringToFunction(_pointGeometry);
+        }
 
         var feature;
         for (var i = 0; i < features.length; i++) {
@@ -595,6 +610,7 @@ class GeoJSONWorkerLayer extends Layer {
             var point = {
               projected: projected,
               options: {
+                pointGeometry: pointGeometry(feature),
                 pointScale: pointScale,
                 style: style
               }
