@@ -97,7 +97,7 @@ class PolygonLayer extends Layer {
             this.add(result.mesh);
 
             if (result.pickingMesh) {
-              this._pickingMesh.add(pickingMesh);
+              this._pickingMesh.add(result.pickingMesh);
             }
           });
         }
@@ -379,7 +379,7 @@ class PolygonLayer extends Layer {
             this._offset.x = -1 * point.x;
             this._offset.y = -1 * point.y;
 
-            this._pointScale = this._world.pointScale(latlon);
+            this._options.pointScale = this._world.pointScale(latlon);
           }
 
           return point;

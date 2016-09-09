@@ -19,6 +19,7 @@
 import Layer from '../Layer';
 import extend from 'lodash.assign';
 import THREE from 'three';
+import Geo from '../../geo/Geo';
 import {latLon as LatLon} from '../../geo/LatLon';
 import {point as Point} from '../../geo/Point';
 import PickingMaterial from '../../engine/PickingMaterial';
@@ -99,7 +100,7 @@ class PolylineLayer extends Layer {
             this.add(result.mesh);
 
             if (result.pickingMesh) {
-              this._pickingMesh.add(pickingMesh);
+              this._pickingMesh.add(result.pickingMesh);
             }
           });
         }
@@ -147,7 +148,7 @@ class PolylineLayer extends Layer {
 
       // Convert height into world units
       if (options.style.lineHeight) {
-        height = Geo.world.metresToWorld(options.style.lineHeight, options.pointScale);
+        height = Geo.metresToWorld(options.style.lineHeight, options.pointScale);
       }
 
       var colour = new THREE.Color();
@@ -318,7 +319,7 @@ class PolylineLayer extends Layer {
           this._offset.x = -1 * point.x;
           this._offset.y = -1 * point.y;
 
-          this._pointScale = this._world.pointScale(latlon);
+          this._options.pointScale = this._world.pointScale(latlon);
         }
 
         return point;

@@ -212,7 +212,7 @@ class GeoJSONWorkerLayer extends Layer {
         this.add(this._polygonMesh);
 
         if (result.pickingMesh) {
-          this._pickingMesh.add(pickingMesh);
+          this._pickingMesh.add(result.pickingMesh);
         }
       });
     }
@@ -316,7 +316,7 @@ class GeoJSONWorkerLayer extends Layer {
         this.add(this._polylineMesh);
 
         if (result.pickingMesh) {
-          this._pickingMesh.add(pickingMesh);
+          this._pickingMesh.add(result.pickingMesh);
         }
       });
     }

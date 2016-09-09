@@ -219,7 +219,7 @@ class GeoJSONLayer extends LayerGroup {
             this.add(this._polygonMesh);
 
             if (result.pickingMesh) {
-              this._pickingMesh.add(pickingMesh);
+              this._pickingMesh.add(result.pickingMesh);
             }
           });
         }
@@ -231,7 +231,7 @@ class GeoJSONLayer extends LayerGroup {
             this.add(this._polylineMesh);
 
             if (result.pickingMesh) {
-              this._pickingMesh.add(pickingMesh);
+              this._pickingMesh.add(result.pickingMesh);
             }
           });
         }
@@ -273,72 +273,6 @@ class GeoJSONLayer extends LayerGroup {
     style = extend({}, GeoJSON.defaultStyle, style);
 
     return PolylineLayer.SetMesh(attributes, attributeLengths, flat, style, this._options);
-
-    // var geometry = new THREE.BufferGeometry();
-
-    // // itemSize = 3 because there are 3 values (components) per vertex
-    // geometry.addAttribute('position', new THREE.BufferAttribute(attributes.vertices, 3));
-
-    // if (attributes.normals) {
-    //   geometry.addAttribute('normal', new THREE.BufferAttribute(attributes.normals, 3));
-    // }
-
-    // geometry.addAttribute('color', new THREE.BufferAttribute(attributes.colours, 3));
-
-    // if (attributes.pickingIds) {
-    //   geometry.addAttribute('pickingId', new THREE.BufferAttribute(attributes.pickingIds, 1));
-    // }
-
-    // geometry.computeBoundingBox();
-
-    // // TODO: Make this work when style is a function per feature
-    // var style = (typeof this._options.style === 'function') ? this._options.style(this._geojson.features[0]) : this._options.style;
-    // style = extend({}, GeoJSON.defaultStyle, style);
-
-    // var material;
-    // if (this._options.polylineMaterial && this._options.polylineMaterial instanceof THREE.Material) {
-    //   material = this._options.polylineMaterial;
-    // } else {
-    //   material = new THREE.LineBasicMaterial({
-    //     vertexColors: THREE.VertexColors,
-    //     linewidth: style.lineWidth,
-    //     transparent: style.lineTransparent,
-    //     opacity: style.lineOpacity,
-    //     blending: style.lineBlending
-    //   });
-    // }
-
-    // var mesh;
-
-    // // Pass mesh through callback, if defined
-    // if (typeof this._options.onPolylineMesh === 'function') {
-    //   mesh = this._options.onPolylineMesh(geometry, material);
-    // } else {
-    //   mesh = new THREE.LineSegments(geometry, material);
-
-    //   if (style.lineRenderOrder !== undefined) {
-    //     material.depthWrite = false;
-    //     mesh.renderOrder = style.lineRenderOrder;
-    //   }
-
-    //   mesh.castShadow = true;
-    //   // mesh.receiveShadow = true;
-    // }
-
-    // // TODO: Allow this to be overridden, or copy mesh instead of creating a new
-    // // one just for picking
-    // if (this._options.interactive && this._pickingMesh) {
-    //   material = new PickingMaterial();
-    //   // material.side = THREE.BackSide;
-
-    //   // Make the line wider / easier to pick
-    //   material.linewidth = style.lineWidth + material.linePadding;
-
-    //   var pickingMesh = new THREE.LineSegments(geometry, material);
-    //   this._pickingMesh.add(pickingMesh);
-    // }
-
-    // this._polylineMesh = mesh;
   }
 
   _setPointMesh(attributes) {
