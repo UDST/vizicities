@@ -164,8 +164,8 @@ class PointLayer extends Layer {
         // Debug geometry for points is a thin bar
         //
         // TODO: Allow point geometry to be customised / overridden
-        var geometryWidth = Geo.metresToWorld(25, this._pointScale);
-        var geometryHeight = Geo.metresToWorld(200, this._pointScale);
+        var geometryWidth = Geo.metresToWorld(25, options.pointScale);
+        var geometryHeight = Geo.metresToWorld(200, options.pointScale);
         var _geometry = new THREE.BoxGeometry(geometryWidth, geometryHeight, geometryWidth);
 
         // Shift geometry up so it sits on the ground
