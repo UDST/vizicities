@@ -185,6 +185,12 @@ class GeoJSONLayer extends LayerGroup {
         var polylineFlat = true;
 
         var pointAttributes = [];
+        var pointAttributeLengths = {
+          positions: 3,
+          normals: 3,
+          colors: 3
+        };
+        var pointFlat = true;
 
         this._layers.forEach(layer => {
           if (layer instanceof PolygonLayer) {
@@ -209,6 +215,14 @@ class GeoJSONLayer extends LayerGroup {
             }
           } else if (layer instanceof PointLayer) {
             pointAttributes.push(layer.getBufferAttributes());
+
+            if (pointFlat && !layer.isFlat()) {
+              pointFlat = false;
+            }
+
+            if (this._options.interactive) {
+              pointAttributeLengths.pickingIds = 1;
+            }
           }
         });
 
@@ -238,8 +252,14 @@ class GeoJSONLayer extends LayerGroup {
 
         if (pointAttributes.length > 0) {
           var mergedPointAttributes = Buffer.mergeAttributes(pointAttributes);
-          this._setPointMesh(mergedPointAttributes);
-          this.add(this._pointMesh);
+          this._setPointMesh(mergedPointAttributes, pointAttributeLengths, pointFlat).then((result) => {
+            this._pointMesh = result.mesh;
+            this.add(this._pointMesh);
+
+            if (result.pickingMesh) {
+              this._pickingMesh.add(result.pickingMesh);
+            }
+          });
         }
 
         // Clean up layers
@@ -275,60 +295,12 @@ class GeoJSONLayer extends LayerGroup {
     return PolylineLayer.SetMesh(attributes, attributeLengths, flat, style, this._options);
   }
 
-  _setPointMesh(attributes) {
-    var geometry = new THREE.BufferGeometry();
+  _setPointMesh(attributes, attributeLengths, flat) {
+    // TODO: Make this work when style is a function per feature
+    var style = (typeof this._options.style === 'function') ? this._options.style(this._geojson.features[0]) : this._options.style;
+    style = extend({}, GeoJSON.defaultStyle, style);
 
-    // itemSize = 3 because there are 3 values (components) per vertex
-    geometry.addAttribute('position', new THREE.BufferAttribute(attributes.vertices, 3));
-    geometry.addAttribute('normal', new THREE.BufferAttribute(attributes.normals, 3));
-    geometry.addAttribute('color', new THREE.BufferAttribute(attributes.colours, 3));
-
-    if (attributes.pickingIds) {
-      geometry.addAttribute('pickingId', new THREE.BufferAttribute(attributes.pickingIds, 1));
-    }
-
-    geometry.computeBoundingBox();
-
-    var material;
-    if (this._options.pointMaterial && this._options.pointMaterial instanceof THREE.Material) {
-      material = this._options.pointMaterial;
-    } else if (!this._world._environment._skybox) {
-      material = new THREE.MeshPhongMaterial({
-        vertexColors: THREE.VertexColors
-        // side: THREE.BackSide
-      });
-    } else {
-      material = new THREE.MeshStandardMaterial({
-        vertexColors: THREE.VertexColors
-        // side: THREE.BackSide
-      });
-      material.roughness = 1;
-      material.metalness = 0.1;
-      material.envMapIntensity = 3;
-      material.envMap = this._world._environment._skybox.getRenderTarget();
-    }
-
-    var mesh;
-
-    // Pass mesh callback, if defined
-    if (typeof this._options.onPointMesh === 'function') {
-      mesh = this._options.onPointMesh(geometry, material);
-    } else {
-      mesh = new THREE.Mesh(geometry, material);
-
-      mesh.castShadow = true;
-      // mesh.receiveShadow = true;
-    }
-
-    if (this._options.interactive && this._pickingMesh) {
-      material = new PickingMaterial();
-      // material.side = THREE.BackSide;
-
-      var pickingMesh = new THREE.Mesh(geometry, material);
-      this._pickingMesh.add(pickingMesh);
-    }
-
-    this._pointMesh = mesh;
+    return PointLayer.SetMesh(attributes, attributeLengths, flat, style, this._options);
   }
 
   // TODO: Support all GeoJSON geometry types
@@ -343,11 +315,11 @@ class GeoJSONLayer extends LayerGroup {
     if (geometry.type === 'Polygon' || geometry.type === 'MultiPolygon') {
       // Get material instance to use for polygon, if provided
       if (typeof this._options.polygonMaterial === 'function') {
-        options.geometry = this._options.polygonMaterial(feature);
+        options.polygonMaterial = this._options.polygonMaterial(feature);
       }
 
       if (typeof this._options.onPolygonMesh === 'function') {
-        options.onMesh = this._options.onPolygonMesh;
+        options.onPolygonMesh = this._options.onPolygonMesh;
       }
 
       // Pass onBufferAttributes callback, if defined
@@ -361,11 +333,11 @@ class GeoJSONLayer extends LayerGroup {
     if (geometry.type === 'LineString' || geometry.type === 'MultiLineString') {
       // Get material instance to use for line, if provided
       if (typeof this._options.lineMaterial === 'function') {
-        options.geometry = this._options.lineMaterial(feature);
+        options.lineMaterial = this._options.lineMaterial(feature);
       }
 
       if (typeof this._options.onPolylineMesh === 'function') {
-        options.onMesh = this._options.onPolylineMesh;
+        options.onPolylineMesh = this._options.onPolylineMesh;
       }
 
       // Pass onBufferAttributes callback, if defined
@@ -384,11 +356,11 @@ class GeoJSONLayer extends LayerGroup {
 
       // Get material instance to use for point, if provided
       if (typeof this._options.pointMaterial === 'function') {
-        options.geometry = this._options.pointMaterial(feature);
+        options.pointMaterial = this._options.pointMaterial(feature);
       }
 
       if (typeof this._options.onPointMesh === 'function') {
-        options.onMesh = this._options.onPointMesh;
+        options.onPointMesh = this._options.onPointMesh;
       }
 
       return new PointLayer(coordinates, options);
