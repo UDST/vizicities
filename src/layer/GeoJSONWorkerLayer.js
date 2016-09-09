@@ -13,6 +13,9 @@ import {point as Point} from '../geo/Point';
 import Geo from '../geo/Geo';
 import PickingMaterial from '../engine/PickingMaterial';
 
+// TODO: Allow filter method to be run inside a worker to improve performance
+// TODO: Allow onEachFeature method to be run inside a worker to improve performance
+
 class GeoJSONWorkerLayer extends Layer {
   constructor(geojson, options) {
     var defaults = {
@@ -66,16 +69,23 @@ class GeoJSONWorkerLayer extends Layer {
         this._execWorker(geojson, this._options.topojson, this._world._originPoint, style, this._options.interactive, transferrables).then(() => {
           resolve();
         }).catch(reject);
-      } else if (typeof this._options.onEachFeature === 'function') {
+      } else if (typeof this._options.filter === 'function' || typeof this._options.onEachFeature === 'function') {
         GeoJSONWorkerLayer.RequestGeoJSON(geojson).then((res) => {
           var fc = GeoJSON.collectFeatures(res, this._options.topojson);
           var features = fc.features;
 
-          var feature;
-          for (var i = 0; i < features.length; i++) {
-            feature = features[i];
-            this._options.onEachFeature(feature);
-          };
+          // Run filter, if provided
+          if (this._options.filter) {
+            fc.features = features.filter(this._options.filter);
+          }
+
+          if (this._options.onEachFeature) {
+            var feature;
+            for (var i = 0; i < features.length; i++) {
+              feature = features[i];
+              this._options.onEachFeature(feature);
+            };
+          }
 
           this._geojson = geojson = Buffer.stringToUint8Array(JSON.stringify(fc));
           transferrables.push(geojson.buffer);
