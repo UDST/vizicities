@@ -19,6 +19,7 @@
 import Layer from '../Layer';
 import extend from 'lodash.assign';
 import THREE from 'three';
+import Geo from '../../geo/Geo';
 import {latLon as LatLon} from '../../geo/LatLon';
 import {point as Point} from '../../geo/Point';
 import PickingMaterial from '../../engine/PickingMaterial';
@@ -32,8 +33,8 @@ class PolylineLayer extends Layer {
       // Custom material override
       //
       // TODO: Should this be in the style object?
-      material: null,
-      onMesh: null,
+      polylineMaterial: null,
+      onPolylineMesh: null,
       onBufferAttributes: null,
       // This default style is separate to Util.GeoJSON.defaultStyle
       style: {
@@ -59,34 +60,57 @@ class PolylineLayer extends Layer {
   }
 
   _onAdd(world) {
-    this._setCoordinates();
+    return new Promise((resolve, reject) => {
+      this._setCoordinates();
 
-    if (this._options.interactive) {
-      // Only add to picking mesh if this layer is controlling output
-      //
-      // Otherwise, assume another component will eventually add a mesh to
-      // the picking scene
-      if (this.isOutput()) {
-        this._pickingMesh = new THREE.Object3D();
-        this.addToPicking(this._pickingMesh);
+      if (this._options.interactive) {
+        // Only add to picking mesh if this layer is controlling output
+        //
+        // Otherwise, assume another component will eventually add a mesh to
+        // the picking scene
+        if (this.isOutput()) {
+          this._pickingMesh = new THREE.Object3D();
+          this.addToPicking(this._pickingMesh);
+        }
+
+        this._setPickingId();
+        this._addPickingEvents();
       }
 
-      this._setPickingId();
-      this._addPickingEvents();
-    }
+      // Store geometry representation as instances of THREE.BufferAttribute
+      PolylineLayer.SetBufferAttributes(this._projectedCoordinates, this._options).then((result) => {
+        this._bufferAttributes = Buffer.mergeAttributes(result.attributes);
+        this._flat = result.flat;
 
-    // Store geometry representation as instances of THREE.BufferAttribute
-    this._setBufferAttributes();
+        var attributeLengths = {
+          positions: 3,
+          colors: 3
+        };
 
-    if (this.isOutput()) {
-      // Set mesh if not merging elsewhere
-      this._setMesh(this._bufferAttributes);
+        if (this._options.interactive) {
+          attributeLengths.pickingIds = 1;
+        }
 
-      // Output mesh
-      this.add(this._mesh);
-    }
+        if (this.isOutput()) {
+          var style = this._options.style;
 
-    return Promise.resolve(this);
+          // Set mesh if not merging elsewhere
+          PolylineLayer.SetMesh(this._bufferAttributes, attributeLengths, this._flat, style, this._options).then((result) => {
+            // Output mesh
+            this.add(result.mesh);
+
+            if (result.pickingMesh) {
+              this._pickingMesh.add(result.pickingMesh);
+            }
+          });
+        }
+
+        result.attributes = null;
+        result = null;
+
+        resolve(this);
+      });
+    });
   }
 
   // Return center of polyline as a LatLon
@@ -118,28 +142,22 @@ class PolylineLayer extends Layer {
     });
   }
 
-  // Create and store reference to THREE.BufferAttribute data for this layer
-  _setBufferAttributes() {
-    var attributes;
-
-    // Only use this if you know what you're doing
-    if (typeof this._options.onBufferAttributes === 'function') {
-      // TODO: Probably want to pass something less general as arguments,
-      // though passing the instance will do for now (it's everything)
-      attributes = this._options.onBufferAttributes(this);
-    } else {
+  static SetBufferAttributes(coordinates, options) {
+    return new Promise((resolve) => {
       var height = 0;
 
       // Convert height into world units
-      if (this._options.style.lineHeight) {
-        height = this._world.metresToWorld(this._options.style.lineHeight, this._pointScale);
+      if (options.style.lineHeight) {
+        height = Geo.metresToWorld(options.style.lineHeight, options.pointScale);
       }
 
       var colour = new THREE.Color();
-      colour.set(this._options.style.lineColor);
+      colour.set(options.style.lineColor);
+
+      var flat = true;
 
       // For each line
-      attributes = this._projectedCoordinates.map(_projectedCoordinates => {
+      var attributes = coordinates.map(_projectedCoordinates => {
         var _vertices = [];
         var _colours = [];
 
@@ -164,20 +182,20 @@ class PolylineLayer extends Layer {
           verticesCount: _vertices.length
         };
 
-        if (this._options.interactive && this._pickingId) {
+        if (options.interactive && options.pickingId) {
           // Inject picking ID
-          line.pickingId = this._pickingId;
+          line.pickingId = options.pickingId;
         }
 
         // Convert line representation to proper attribute arrays
-        return this._toAttributes(line);
+        return PolylineLayer.ToAttributes(line);
       });
-    }
 
-    this._bufferAttributes = Buffer.mergeAttributes(attributes);
-
-    // Original attributes are no longer required so free the memory
-    attributes = null;
+      resolve({
+        attributes: attributes,
+        flat: flat
+      });
+    });
   }
 
   getBufferAttributes() {
@@ -203,32 +221,18 @@ class PolylineLayer extends Layer {
     this._projectedCoordinates = null;
   }
 
-  // Create and store mesh from buffer attributes
-  //
-  // This is only called if the layer is controlling its own output
-  _setMesh(attributes) {
+  static SetMesh(attributes, attributeLengths, flat, style, options) {
     var geometry = new THREE.BufferGeometry();
 
-    // itemSize = 3 because there are 3 values (components) per vertex
-    geometry.addAttribute('position', new THREE.BufferAttribute(attributes.vertices, 3));
-
-    if (attributes.normals) {
-      geometry.addAttribute('normal', new THREE.BufferAttribute(attributes.normals, 3));
-    }
-
-    geometry.addAttribute('color', new THREE.BufferAttribute(attributes.colours, 3));
-
-    if (attributes.pickingIds) {
-      geometry.addAttribute('pickingId', new THREE.BufferAttribute(attributes.pickingIds, 1));
+    for (var key in attributes) {
+      geometry.addAttribute(key.slice(0, -1), new THREE.BufferAttribute(attributes[key], attributeLengths[key]));
     }
 
     geometry.computeBoundingBox();
 
-    var style = this._options.style;
     var material;
-
-    if (this._options.material && this._options.material instanceof THREE.Material) {
-      material = this._options.material;
+    if (options.polylineMaterial && options.polylineMaterial instanceof THREE.Material) {
+      material = options.polylineMaterial;
     } else {
       material = new THREE.LineBasicMaterial({
         vertexColors: THREE.VertexColors,
@@ -242,8 +246,8 @@ class PolylineLayer extends Layer {
     var mesh;
 
     // Pass mesh through callback, if defined
-    if (typeof this._options.onMesh === 'function') {
-      mesh = this._options.onMesh(geometry, material);
+    if (typeof options.onPolylineMesh === 'function') {
+      mesh = options.onPolylineMesh(geometry, material);
     } else {
       mesh = new THREE.LineSegments(geometry, material);
 
@@ -256,9 +260,7 @@ class PolylineLayer extends Layer {
       // mesh.receiveShadow = true;
     }
 
-    // TODO: Allow this to be overridden, or copy mesh instead of creating a new
-    // one just for picking
-    if (this._options.interactive && this._pickingMesh) {
+    if (options.interactive) {
       material = new PickingMaterial();
       // material.side = THREE.BackSide;
 
@@ -266,10 +268,12 @@ class PolylineLayer extends Layer {
       material.linewidth = style.lineWidth + material.linePadding;
 
       var pickingMesh = new THREE.LineSegments(geometry, material);
-      this._pickingMesh.add(pickingMesh);
     }
 
-    this._mesh = mesh;
+    return Promise.resolve({
+      mesh: mesh,
+      pickingMesh: pickingMesh
+    });
   }
 
   // Convert and project coordinates
@@ -315,7 +319,7 @@ class PolylineLayer extends Layer {
           this._offset.x = -1 * point.x;
           this._offset.y = -1 * point.y;
 
-          this._pointScale = this._world.pointScale(latlon);
+          this._options.pointScale = this._world.pointScale(latlon);
         }
 
         return point;
@@ -323,11 +327,7 @@ class PolylineLayer extends Layer {
     });
   }
 
-  // Transform line representation into attribute arrays that can be used by
-  // THREE.BufferGeometry
-  //
-  // TODO: Can this be simplified? It's messy and huge
-  _toAttributes(line) {
+  static ToAttributes(line) {
     // Three components per vertex
     var vertices = new Float32Array(line.verticesCount * 3);
     var colours = new Float32Array(line.verticesCount * 3);
@@ -341,13 +341,6 @@ class PolylineLayer extends Layer {
     var _vertices = line.vertices;
     var _colour = line.colours;
 
-    var normals;
-    var _normals;
-    if (line.normals) {
-      normals = new Float32Array(line.verticesCount * 3);
-      _normals = line.normals;
-    }
-
     var _pickingId;
     if (pickingIds) {
       _pickingId = line.pickingId;
@@ -360,26 +353,11 @@ class PolylineLayer extends Layer {
       var ay = _vertices[i][1];
       var az = _vertices[i][2];
 
-      var nx;
-      var ny;
-      var nz;
-      if (_normals) {
-        nx = _normals[i][0];
-        ny = _normals[i][1];
-        nz = _normals[i][2];
-      }
-
       var c1 = _colour[i];
 
       vertices[lastIndex * 3 + 0] = ax;
       vertices[lastIndex * 3 + 1] = ay;
       vertices[lastIndex * 3 + 2] = az;
-
-      if (normals) {
-        normals[lastIndex * 3 + 0] = nx;
-        normals[lastIndex * 3 + 1] = ny;
-        normals[lastIndex * 3 + 2] = nz;
-      }
 
       colours[lastIndex * 3 + 0] = c1[0];
       colours[lastIndex * 3 + 1] = c1[1];
@@ -393,13 +371,9 @@ class PolylineLayer extends Layer {
     }
 
     var attributes = {
-      vertices: vertices,
-      colours: colours
+      positions: vertices,
+      colors: colours
     };
-
-    if (normals) {
-      attributes.normals = normals;
-    }
 
     if (pickingIds) {
       attributes.pickingIds = pickingIds;
