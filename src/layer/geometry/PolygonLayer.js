@@ -76,19 +76,24 @@ class PolygonLayer extends Layer {
 
       PolygonLayer.SetBufferAttributes(this._projectedCoordinates, this._options).then((result) => {
         this._bufferAttributes = Buffer.mergeAttributes(result.attributes);
-        this._flat = result.flat;
 
-        var attributeLengths = {
-          positions: 3,
-          normals: 3,
-          colors: 3
-        };
-
-        if (this._options.interactive) {
-          attributeLengths.pickingIds = 1;
+        if (result.outlineAttributes.length > 0) {
+          this._outlineBufferAttributes = Buffer.mergeAttributes(result.outlineAttributes);
         }
 
+        this._flat = result.flat;
+
         if (this.isOutput()) {
+          var attributeLengths = {
+            positions: 3,
+            normals: 3,
+            colors: 3
+          };
+
+          if (this._options.interactive) {
+            attributeLengths.pickingIds = 1;
+          }
+
           var style = this._options.style;
 
           // Set mesh if not merging elsewhere
@@ -103,6 +108,7 @@ class PolygonLayer extends Layer {
         }
 
         result.attributes = null;
+        result.outlineAttributes = null;
         result = null;
 
         resolve(this);
@@ -157,6 +163,8 @@ class PolygonLayer extends Layer {
       var shadow  = new THREE.Color(0x666666);
 
       var flat = true;
+
+      var outlineAttributes = [];
 
       // For each polygon
       var attributes = coordinates.map(_coordinates => {
@@ -230,6 +238,13 @@ class PolygonLayer extends Layer {
           facesCount: _faces.length
         };
 
+        if (options.style.outline) {
+          var outlineColour = new THREE.Color();
+          outlineColour.set(options.style.outlineColor || 0x000000);
+
+          outlineAttributes.push(PolygonLayer.Set2DOutline(_coordinates, outlineColour));
+        }
+
         if (options.interactive && options.pickingId) {
           // Inject picking ID
           polygon.pickingId = options.pickingId;
@@ -241,6 +256,7 @@ class PolygonLayer extends Layer {
 
       resolve({
         attributes: attributes,
+        outlineAttributes: outlineAttributes,
         flat: flat
       });
     });
@@ -250,6 +266,10 @@ class PolygonLayer extends Layer {
     return this._bufferAttributes;
   }
 
+  getOutlineBufferAttributes() {
+    return this._outlineBufferAttributes;
+  }
+
   // Used by external components to clear some memory when the attributes
   // are no longer required to be stored in this layer
   //
@@ -257,6 +277,64 @@ class PolygonLayer extends Layer {
   // using something like the GeoJSONLayer
   clearBufferAttributes() {
     this._bufferAttributes = null;
+    this._outlineBufferAttributes = null;
+  }
+
+  // Threshold angle is currently in rads
+  static Set2DOutline(coordinates, colour) {
+    var _vertices = [];
+
+    coordinates.forEach((ring) => {
+      var _ring = ring.map((coordinate) => {
+        return [coordinate.x, 0, coordinate.y];
+      });
+
+      // Add in duplicate vertices for line segments to work
+      var verticeCount = _ring.length;
+      var first = true;
+      while (--verticeCount) {
+        if (first || verticeCount === 0) {
+          first = false;
+          continue;
+        }
+
+        _ring.splice(verticeCount + 1, 0, _ring[verticeCount]);
+      }
+
+      _vertices = _vertices.concat(_ring);
+    });
+
+    _colour = [colour.r, colour.g, colour.b];
+
+    var vertices = new Float32Array(_vertices.length * 3);
+    var colours = new Float32Array(_vertices.length * 3);
+
+    var lastIndex = 0;
+
+    for (var i = 0; i < _vertices.length; i++) {
+      var ax = _vertices[i][0];
+      var ay = _vertices[i][1];
+      var az = _vertices[i][2];
+
+      var c1 = _colour;
+
+      vertices[lastIndex * 3 + 0] = ax;
+      vertices[lastIndex * 3 + 1] = ay;
+      vertices[lastIndex * 3 + 2] = az;
+
+      colours[lastIndex * 3 + 0] = c1[0];
+      colours[lastIndex * 3 + 1] = c1[1];
+      colours[lastIndex * 3 + 2] = c1[2];
+
+      lastIndex++;
+    }
+
+    var attributes = {
+      positions: vertices,
+      colors: colours
+    };
+
+    return attributes;
   }
 
   // Used by external components to clear some memory when the coordinates

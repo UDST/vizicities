@@ -141,6 +141,14 @@ class GeoJSONWorkerLayer extends Layer {
     var splitNormals = Buffer.splitFloat32Array(results.attributes.normals);
     var splitColors = Buffer.splitFloat32Array(results.attributes.colors);
 
+    var splitOutlinePositions;
+    var splitOutlineColors;
+
+    if (results.outlineAttributes) {
+      splitOutlinePositions = Buffer.splitFloat32Array(results.outlineAttributes.positions);
+      splitOutlineColors = Buffer.splitFloat32Array(results.outlineAttributes.colors);
+    }
+
     var splitProperties;
     if (results.properties) {
       splitProperties = Buffer.splitUint8Array(results.properties);
@@ -149,6 +157,8 @@ class GeoJSONWorkerLayer extends Layer {
     var flats = results.flats;
 
     var objects = [];
+    var outlineObjects = [];
+
     var obj;
     var pickingId;
     var pickingIds;
@@ -157,6 +167,11 @@ class GeoJSONWorkerLayer extends Layer {
     var polygonAttributeLengths = {
       positions: 3,
       normals: 3,
+      colors: 3
+    };
+
+    var polygonOutlineAttributeLengths = {
+      positions: 3,
       colors: 3
     };
 
@@ -208,7 +223,20 @@ class GeoJSONWorkerLayer extends Layer {
       objects.push(obj);
     }
 
+    for (var i = 0; i < splitOutlinePositions.length; i++) {
+      obj = {
+        attributes: [{
+          positions: splitOutlinePositions[i],
+          colors: splitOutlineColors[i]
+        }],
+        flat: true
+      };
+
+      outlineObjects.push(obj);
+    }
+
     var polygonAttributes = [];
+    var polygonOutlineAttributes = [];
 
     var polygonFlat = true;
 
@@ -222,6 +250,13 @@ class GeoJSONWorkerLayer extends Layer {
 
       var bufferAttributes = Buffer.mergeAttributes(obj.attributes);
       polygonAttributes.push(bufferAttributes);
+    };
+
+    for (var i = 0; i < outlineObjects.length; i++) {
+      obj = outlineObjects[i];
+
+      var bufferAttributes = Buffer.mergeAttributes(obj.attributes);
+      polygonOutlineAttributes.push(bufferAttributes);
     };
 
     if (polygonAttributes.length > 0) {
@@ -238,6 +273,17 @@ class GeoJSONWorkerLayer extends Layer {
         if (result.pickingMesh) {
           this._pickingMesh.add(result.pickingMesh);
         }
+      });
+    }
+
+    if (polygonOutlineAttributes.length > 0) {
+      var mergedPolygonOutlineAttributes = Buffer.mergeAttributes(polygonOutlineAttributes);
+
+      var style = (typeof this._options.style === 'function') ? this._options.style(objects[0]) : this._options.style;
+      style = extend({}, GeoJSON.defaultStyle, style);
+
+      this._setPolylineMesh(mergedPolygonOutlineAttributes, polygonOutlineAttributeLengths, style, true).then((result) => {
+        this.add(result.mesh);
       });
     }
   }
@@ -683,6 +729,9 @@ class GeoJSONWorkerLayer extends Layer {
         var normals = [];
         var colors = [];
 
+        var outlinePositions = [];
+        var outlineColors = [];
+
         var properties = [];
 
         var flats = [];
@@ -713,12 +762,25 @@ class GeoJSONWorkerLayer extends Layer {
               properties.push(Buffer.stringToUint8Array(JSON.stringify(polygon.properties)));
             }
           };
+
+          var outlineAttributes;
+          for (var j = 0; j < result.outlineAttributes.length; j++) {
+            outlineAttributes = result.outlineAttributes[j];
+
+            outlinePositions.push(outlineAttributes.positions);
+            outlineColors.push(outlineAttributes.colors);
+          };
         };
 
         var mergedAttributes = {
           positions: Buffer.mergeFloat32Arrays(positions),
           normals: Buffer.mergeFloat32Arrays(normals),
           colors: Buffer.mergeFloat32Arrays(colors)
+        };
+
+        var mergedOutlineAttributes = {
+          positions: Buffer.mergeFloat32Arrays(outlinePositions),
+          colors: Buffer.mergeFloat32Arrays(outlineColors)
         };
 
         transferrables.push(mergedAttributes.positions[0].buffer);
@@ -730,6 +792,12 @@ class GeoJSONWorkerLayer extends Layer {
         transferrables.push(mergedAttributes.colors[0].buffer);
         transferrables.push(mergedAttributes.colors[1].buffer);
 
+        transferrables.push(mergedOutlineAttributes.positions[0].buffer);
+        transferrables.push(mergedOutlineAttributes.positions[1].buffer);
+
+        transferrables.push(mergedOutlineAttributes.colors[0].buffer);
+        transferrables.push(mergedOutlineAttributes.colors[1].buffer);
+
         var mergedProperties;
         if (_properties) {
           mergedProperties = Buffer.mergeUint8Arrays(properties);
@@ -740,6 +808,7 @@ class GeoJSONWorkerLayer extends Layer {
 
         var output = {
           attributes: mergedAttributes,
+          outlineAttributes: mergedOutlineAttributes,
           flats: flats
         };
 
