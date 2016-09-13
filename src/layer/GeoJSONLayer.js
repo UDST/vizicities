@@ -170,6 +170,7 @@ class GeoJSONLayer extends LayerGroup {
         // From here on we can assume that we want to merge the layers
 
         var polygonAttributes = [];
+        var polygonOutlineAttributes = [];
         var polygonAttributeLengths = {
           positions: 3,
           normals: 3,
@@ -195,6 +196,11 @@ class GeoJSONLayer extends LayerGroup {
         this._layers.forEach(layer => {
           if (layer instanceof PolygonLayer) {
             polygonAttributes.push(layer.getBufferAttributes());
+
+            var outlineBufferAttributes = layer.getOutlineBufferAttributes();
+            if (outlineBufferAttributes) {
+              polygonOutlineAttributes.push(outlineBufferAttributes);
+            }
 
             if (polygonFlat && !layer.isFlat()) {
               polygonFlat = false;
@@ -228,9 +234,21 @@ class GeoJSONLayer extends LayerGroup {
 
         if (polygonAttributes.length > 0) {
           var mergedPolygonAttributes = Buffer.mergeAttributes(polygonAttributes);
+
+          var mergedPolygonOutlineAttributes;
+          if (polygonOutlineAttributes.length > 0) {
+            mergedPolygonOutlineAttributes = Buffer.mergeAttributes(polygonOutlineAttributes);
+          }
+
           this._setPolygonMesh(mergedPolygonAttributes, polygonAttributeLengths, polygonFlat).then((result) => {
             this._polygonMesh = result.mesh;
             this.add(this._polygonMesh);
+
+            if (mergedPolygonOutlineAttributes) {
+              this._setPolylineMesh(mergedPolygonOutlineAttributes, polylineAttributeLengths, true).then((result) => {
+                this.add(result.mesh);
+              });
+            }
 
             if (result.pickingMesh) {
               this._pickingMesh.add(result.pickingMesh);

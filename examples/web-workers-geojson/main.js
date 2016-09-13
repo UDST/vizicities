@@ -23,6 +23,8 @@ world.createWorkers(7).then(() => {
     output: true,
     style: {
       color: '#ff0000',
+      outline: true,
+      outlineColor: '#580000',
       lineColor: '#0000ff',
       lineRenderOrder: 1,
       pointColor: '#00cc00'

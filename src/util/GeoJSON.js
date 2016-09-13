@@ -23,6 +23,8 @@ var shadow  = new THREE.Color(0x666666);
 var GeoJSON = (function() {
   var defaultStyle = {
     color: '#ffffff',
+    outline: false,
+    outlineColor: '#000000',
     transparent: false,
     opacity: 1,
     blending: THREE.NormalBlending,

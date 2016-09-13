@@ -19,6 +19,8 @@ VIZI.geoJSONLayer('http://vector.mapzen.com/osm/roads,pois,buildings/14/4824/615
   output: true,
   style: {
     color: '#ff0000',
+    outline: true,
+    outlineColor: '#580000',
     lineColor: '#0000ff',
     lineRenderOrder: 1,
     pointColor: '#00cc00'
