@@ -126,6 +126,9 @@ class TileLayer extends Layer {
         this._tilesPicking.add(tile.getPickingMesh());
       }
     });
+
+    // Emit event notifying of new tiles
+    this.emit('tilesList', this._tileList.map((tile) => tile._tile));
   }
 
   // Works out tiles in the view frustum and stores them in an array
