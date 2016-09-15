@@ -49,14 +49,22 @@ class World extends EventEmitter {
   }
 
   _initAttribution() {
-    var message = '<a href="http://vizicities.com" target="_blank">Powered by ViziCities</a>';
+    var message = '<a href="http://vizicities.com" target="_blank">ViziCities</a> | <a id="show-attr" href="#">Attribution</a>';
 
     var element = document.createElement('div');
     element.classList.add('vizicities-attribution');
 
+    var additionalElem = document.createElement('div');
+    additionalElem.id = 'attribution-container';
+
     element.innerHTML = message;
+    element.appendChild(additionalElem);
 
     this._container.appendChild(element);
+
+    document.getElementById('show-attr').addEventListener('click', function(e) {
+      e.currentTarget.parentNode.classList.toggle('is-visible');
+    });
   }
 
   _initEngine() {
@@ -131,6 +139,21 @@ class World extends EventEmitter {
     this.emit('preUpdate', delta);
     this._engine.update(delta);
     this.emit('postUpdate', delta);
+  }
+
+  _addAttribution(id, message) {
+    var container = document.getElementById('attribution-container');
+
+    var span = document.createElement('p');
+    span.dataset.layer = id;
+    span.innerHTML = message;
+
+    container.appendChild(span);
+  }
+
+  _removeAttribution(id) {
+    var elem = document.querySelectorAll('#attribution-container [data-layer="' + id + '"]')[0];
+    elem.remove();
   }
 
   // Set world view
@@ -230,6 +253,9 @@ class World extends EventEmitter {
 
     return new Promise((resolve, reject) => {
       layer._addToWorld(this).then(() => {
+        if (layer._options.attribution) {
+          this._addAttribution(layer._options.id, layer._options.attribution);
+        }
         this.emit('layerAdded', layer);
         resolve(this);
       }).catch(reject);

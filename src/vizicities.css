@@ -1,4 +1,5 @@
 .vizicities-attribution {
+  position: relative;
   background: rgba(255, 255, 255, 0.9);
   border-radius: 3px 0 0;
   bottom: 0;
@@ -16,7 +17,25 @@
   text-decoration: none;
 }
 
-  .vizicities-attribution a:hover {
-    color: #2bb2ed;
-    text-decoration: underline;
-  }
+.vizicities-attribution a:hover {
+color: #2bb2ed;
+text-decoration: underline;
+}
+
+#attribution-container {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  width: 250px;
+  padding: 4px 7px;
+  padding-right: 120px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 3px 0 0;
+  opacity: 0;
+  transition: opacity 100ms linear;
+}
+
+.is-visible #attribution-container {
+  opacity: 1;
+}

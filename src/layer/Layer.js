@@ -1,5 +1,6 @@
 import EventEmitter from 'eventemitter3';
 import extend from 'lodash.assign';
+import shortid from 'shortid';
 import THREE from 'three';
 import Scene from '../engine/Scene';
 import {CSS3DObject} from '../vendor/CSS3DRenderer';
@@ -23,6 +24,7 @@ class Layer extends EventEmitter {
     super();
 
     var defaults = {
+      id: shortid.generate(),
       output: true,
       outputToScene: true
     };
