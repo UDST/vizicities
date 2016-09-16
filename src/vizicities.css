@@ -30,7 +30,7 @@ text-decoration: underline;
   width: 250px;
   padding: 4px 7px;
   padding-right: 120px;
-  background: rgba(255, 255, 255, 0.9);
+  background: #ffffff;
   border-radius: 3px 0 0;
   opacity: 0;
   transition: opacity 100ms linear;
