@@ -30,7 +30,9 @@ class LayerGroup extends Layer {
     this._world.removeLayer(layer);
   }
 
-  _onAdd(world) {}
+  _onAdd(world) {
+    return Promise.resolve(this);
+  }
 
   // Destroy the layers and remove them from the scene and memory
   destroy() {
