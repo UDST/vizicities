@@ -106,7 +106,10 @@ class GeoJSONTileLayer extends TileLayer {
   }
 
   _createTile(quadcode, layer) {
-    return new GeoJSONTile(quadcode, this._path, layer, this._options);
+    var newOptions = extend({}, defaults, this._options);
+    delete newOptions.attribution;
+
+    return new GeoJSONTile(quadcode, this._path, layer, newOptions);
   }
 
   // Destroys the layer and removes it from the scene and memory
