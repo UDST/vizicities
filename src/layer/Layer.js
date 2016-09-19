@@ -86,7 +86,9 @@ class Layer extends EventEmitter {
   }
 
   // Must return a promise
-  _onAdd(world) {}
+  _onAdd(world) {
+    return Promise.resolve(this);
+  }
 
   getPickingId() {
     if (this._world._engine._picking) {

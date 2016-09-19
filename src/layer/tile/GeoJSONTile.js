@@ -237,7 +237,8 @@ class GeoJSONTile extends Tile {
       this._request = reqwest({
         url: url,
         type: 'json',
-        crossOrigin: true
+        crossOrigin: true,
+        headers: this._options.headers
       }).then(res => {
         // Clear request reference
         this._request = null;
@@ -261,7 +262,7 @@ class GeoJSONTile extends Tile {
     // Using this creates a huge amount of memory due to the quantity of tiles
     this._geojsonLayer = GeoJSONClass(data, this._options);
     this._geojsonLayer.addTo(this._world).then(() => {
-      this._mesh = this._geojsonLayer._object3D;
+      this._mesh.add(this._geojsonLayer._object3D);
       this._pickingMesh = this._geojsonLayer._pickingMesh;
 
       // Free the GeoJSON memory as we don't need it

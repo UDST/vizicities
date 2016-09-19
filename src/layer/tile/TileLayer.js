@@ -128,7 +128,7 @@ class TileLayer extends Layer {
     });
 
     // Emit event notifying of new tiles
-    this.emit('tilesList', this._tileList.map((tile) => tile._tile));
+    this.emit('tilesList', this._tileList.map((tile) => tile));
   }
 
   // Works out tiles in the view frustum and stores them in an array

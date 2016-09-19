@@ -4,10 +4,12 @@ import Controls from './controls/index';
 import Geo from './geo/Geo.js';
 
 import Layer, {layer} from './layer/Layer';
+import LayerGroup, {layerGroup} from './layer/LayerGroup';
 import EnvironmentLayer, {environmentLayer} from './layer/environment/EnvironmentLayer';
 import ImageTileLayer, {imageTileLayer} from './layer/tile/ImageTileLayer';
 import GeoJSONTileLayer, {geoJSONTileLayer} from './layer/tile/GeoJSONTileLayer';
 import TopoJSONTileLayer, {topoJSONTileLayer} from './layer/tile/TopoJSONTileLayer';
+import GeoJSONTile, {geoJSONTile} from './layer/tile/GeoJSONTile';
 import GeoJSONLayer, {geoJSONLayer} from './layer/GeoJSONLayer';
 import TopoJSONLayer, {topoJSONLayer} from './layer/TopoJSONLayer';
 import GeoJSONWorkerLayer, {geoJSONWorkerLayer} from './layer/GeoJSONWorkerLayer';
@@ -39,6 +41,8 @@ const VIZI = {
   imageTileLayer: imageTileLayer,
   GeoJSONTileLayer: GeoJSONTileLayer,
   geoJSONTileLayer: geoJSONTileLayer,
+  GeoJSONTile: GeoJSONTile,
+  geoJSONTile: geoJSONTile,
   TopoJSONTileLayer: TopoJSONTileLayer,
   topoJSONTileLayer: topoJSONTileLayer,
   GeoJSONLayer: GeoJSONLayer,
