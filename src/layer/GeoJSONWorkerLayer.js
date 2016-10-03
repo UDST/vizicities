@@ -140,6 +140,7 @@ class GeoJSONWorkerLayer extends Layer {
     var splitPositions = Buffer.splitFloat32Array(results.attributes.positions);
     var splitNormals = Buffer.splitFloat32Array(results.attributes.normals);
     var splitColors = Buffer.splitFloat32Array(results.attributes.colors);
+    var splitTops = Buffer.splitFloat32Array(results.attributes.tops);
 
     var splitOutlinePositions;
     var splitOutlineColors;
@@ -167,7 +168,8 @@ class GeoJSONWorkerLayer extends Layer {
     var polygonAttributeLengths = {
       positions: 3,
       normals: 3,
-      colors: 3
+      colors: 3,
+      tops: 1
     };
 
     var polygonOutlineAttributeLengths = {
@@ -188,7 +190,8 @@ class GeoJSONWorkerLayer extends Layer {
         attributes: [{
           positions: splitPositions[i],
           normals: splitNormals[i],
-          colors: splitColors[i]
+          colors: splitColors[i],
+          tops: splitTops[i]
         }],
         properties: properties,
         flat: flats[i]
@@ -728,6 +731,7 @@ class GeoJSONWorkerLayer extends Layer {
         var positions = [];
         var normals = [];
         var colors = [];
+        var tops = [];
 
         var outlinePositions = [];
         var outlineColors = [];
@@ -757,6 +761,7 @@ class GeoJSONWorkerLayer extends Layer {
             positions.push(attributes.positions);
             normals.push(attributes.normals);
             colors.push(attributes.colors);
+            tops.push(attributes.tops);
 
             if (_properties) {
               properties.push(Buffer.stringToUint8Array(JSON.stringify(polygon.properties)));
@@ -775,7 +780,8 @@ class GeoJSONWorkerLayer extends Layer {
         var mergedAttributes = {
           positions: Buffer.mergeFloat32Arrays(positions),
           normals: Buffer.mergeFloat32Arrays(normals),
-          colors: Buffer.mergeFloat32Arrays(colors)
+          colors: Buffer.mergeFloat32Arrays(colors),
+          tops: Buffer.mergeFloat32Arrays(tops)
         };
 
         var mergedOutlineAttributes = {
@@ -791,6 +797,9 @@ class GeoJSONWorkerLayer extends Layer {
 
         transferrables.push(mergedAttributes.colors[0].buffer);
         transferrables.push(mergedAttributes.colors[1].buffer);
+
+        transferrables.push(mergedAttributes.tops[0].buffer);
+        transferrables.push(mergedAttributes.tops[1].buffer);
 
         transferrables.push(mergedOutlineAttributes.positions[0].buffer);
         transferrables.push(mergedOutlineAttributes.positions[1].buffer);

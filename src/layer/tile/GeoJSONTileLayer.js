@@ -46,6 +46,8 @@ class GeoJSONTileLayer extends TileLayer {
 
     super(options);
 
+    this.defaults = defaults;
+
     this._path = path;
   }
 
@@ -106,7 +108,7 @@ class GeoJSONTileLayer extends TileLayer {
   }
 
   _createTile(quadcode, layer) {
-    var newOptions = extend({}, defaults, this._options);
+    var newOptions = extend({}, this.defaults, this._options);
     delete newOptions.attribution;
 
     return new GeoJSONTile(quadcode, this._path, layer, newOptions);

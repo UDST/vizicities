@@ -87,7 +87,8 @@ class PolygonLayer extends Layer {
           var attributeLengths = {
             positions: 3,
             normals: 3,
-            colors: 3
+            colors: 3,
+            tops: 1
           };
 
           if (this._options.interactive) {
@@ -190,6 +191,7 @@ class PolygonLayer extends Layer {
         var _vertices = extruded.positions;
         var _faces = [];
         var _colours = [];
+        var _tops = [];
 
         var _colour;
         extruded.top.forEach((face, fi) => {
@@ -198,6 +200,8 @@ class PolygonLayer extends Layer {
           _colour.push([colour.r, colour.g, colour.b]);
           _colour.push([colour.r, colour.g, colour.b]);
           _colour.push([colour.r, colour.g, colour.b]);
+
+          _tops.push([true, true, true]);
 
           _faces.push(face);
           _colours.push(_colour);
@@ -215,12 +219,16 @@ class PolygonLayer extends Layer {
               _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
               _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
               _colour.push([topColor.r, topColor.g, topColor.b]);
+
+              _tops.push([false, false, true]);
             // Reverse winding for the second face
             // top-top-bottom
             } else {
               _colour.push([topColor.r, topColor.g, topColor.b]);
               _colour.push([topColor.r, topColor.g, topColor.b]);
               _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+
+              _tops.push([true, true, false]);
             }
 
             _faces.push(face);
@@ -235,6 +243,7 @@ class PolygonLayer extends Layer {
           vertices: _vertices,
           faces: _faces,
           colours: _colours,
+          tops: _tops,
           facesCount: _faces.length
         };
 
@@ -514,6 +523,9 @@ class PolygonLayer extends Layer {
     var normals = new Float32Array(polygon.facesCount * 9);
     var colours = new Float32Array(polygon.facesCount * 9);
 
+    // One component per vertex per face (1 x 3 = 3)
+    var tops = new Float32Array(polygon.facesCount * 3);
+
     var pickingIds;
     if (polygon.pickingId) {
       // One component per vertex per face (1 x 3 = 3)
@@ -532,6 +544,7 @@ class PolygonLayer extends Layer {
     var _faces = polygon.faces;
     var _vertices = polygon.vertices;
     var _colour = polygon.colours;
+    var _tops = polygon.tops;
 
     var _pickingId;
     if (pickingIds) {
@@ -549,6 +562,7 @@ class PolygonLayer extends Layer {
       var az = _vertices[index][2];
 
       var c1 = _colour[i][0];
+      var t1 = _tops[i][0];
 
       index = _faces[i][1];
 
@@ -557,6 +571,7 @@ class PolygonLayer extends Layer {
       var bz = _vertices[index][2];
 
       var c2 = _colour[i][1];
+      var t2 = _tops[i][1];
 
       index = _faces[i][2];
 
@@ -565,6 +580,7 @@ class PolygonLayer extends Layer {
       var cz = _vertices[index][2];
 
       var c3 = _colour[i][2];
+      var t3 = _tops[i][2];
 
       // Flat face normals
       // From: http://threejs.org/examples/webgl_buffergeometry.html
@@ -618,6 +634,10 @@ class PolygonLayer extends Layer {
       colours[lastIndex * 9 + 7] = c3[1];
       colours[lastIndex * 9 + 8] = c3[2];
 
+      tops[lastIndex * 3 + 0] = t1;
+      tops[lastIndex * 3 + 1] = t2;
+      tops[lastIndex * 3 + 2] = t3;
+
       if (pickingIds) {
         pickingIds[lastIndex * 3 + 0] = _pickingId;
         pickingIds[lastIndex * 3 + 1] = _pickingId;
@@ -630,7 +650,8 @@ class PolygonLayer extends Layer {
     var attributes = {
       positions: positions,
       normals: normals,
-      colors: colours
+      colors: colours,
+      tops: tops
     };
 
     if (pickingIds) {
