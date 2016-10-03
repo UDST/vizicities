@@ -3,7 +3,7 @@
  */
 
 import THREE from 'three';
-import topojson from 'topojson';
+import * as topojson from 'topojson';
 import geojsonMerge from 'geojson-merge';
 import earcut from 'earcut';
 import extrudePolygon from './extrudePolygon';
