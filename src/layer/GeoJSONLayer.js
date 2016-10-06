@@ -232,6 +232,8 @@ class GeoJSONLayer extends LayerGroup {
           }
         });
 
+        var style;
+
         if (polygonAttributes.length > 0) {
           var mergedPolygonAttributes = Buffer.mergeAttributes(polygonAttributes);
 
@@ -240,12 +242,28 @@ class GeoJSONLayer extends LayerGroup {
             mergedPolygonOutlineAttributes = Buffer.mergeAttributes(polygonOutlineAttributes);
           }
 
+          style = (typeof this._options.style === 'function') ? this._options.style(this._geojson.features[0]) : this._options.style;
+          style = extend({}, GeoJSON.defaultStyle, style);
+
           this._setPolygonMesh(mergedPolygonAttributes, polygonAttributeLengths, polygonFlat).then((result) => {
             this._polygonMesh = result.mesh;
             this.add(this._polygonMesh);
 
             if (mergedPolygonOutlineAttributes) {
-              this._setPolylineMesh(mergedPolygonOutlineAttributes, polylineAttributeLengths, true).then((result) => {
+              style = (typeof this._options.style === 'function') ? this._options.style(this._geojson.features[0]) : this._options.style;
+              style = extend({}, GeoJSON.defaultStyle, style);
+
+              if (style.outlineRenderOrder !== undefined) {
+                style.lineRenderOrder = style.outlineRenderOrder;
+              } else {
+                style.lineRenderOrder = (style.renderOrder) ? style.renderOrder + 1 : 2;
+              }
+
+              if (style.outlineWidth) {
+                style.lineWidth = style.outlineWidth;
+              }
+
+              this._setPolylineMesh(mergedPolygonOutlineAttributes, polylineAttributeLengths, style, true).then((result) => {
                 this.add(result.mesh);
               });
             }
@@ -258,7 +276,11 @@ class GeoJSONLayer extends LayerGroup {
 
         if (polylineAttributes.length > 0) {
           var mergedPolylineAttributes = Buffer.mergeAttributes(polylineAttributes);
-          this._setPolylineMesh(mergedPolylineAttributes, polylineAttributeLengths, polylineFlat).then((result) => {
+
+          style = (typeof this._options.style === 'function') ? this._options.style(this._geojson.features[0]) : this._options.style;
+          style = extend({}, GeoJSON.defaultStyle, style);
+
+          this._setPolylineMesh(mergedPolylineAttributes, polylineAttributeLengths, style, polylineFlat).then((result) => {
             this._polylineMesh = result.mesh;
             this.add(this._polylineMesh);
 
@@ -270,7 +292,11 @@ class GeoJSONLayer extends LayerGroup {
 
         if (pointAttributes.length > 0) {
           var mergedPointAttributes = Buffer.mergeAttributes(pointAttributes);
-          this._setPointMesh(mergedPointAttributes, pointAttributeLengths, pointFlat).then((result) => {
+
+          style = (typeof this._options.style === 'function') ? this._options.style(this._geojson.features[0]) : this._options.style;
+          style = extend({}, GeoJSON.defaultStyle, style);
+
+          this._setPointMesh(mergedPointAttributes, pointAttributeLengths, style, pointFlat).then((result) => {
             this._pointMesh = result.mesh;
             this.add(this._pointMesh);
 
@@ -297,27 +323,15 @@ class GeoJSONLayer extends LayerGroup {
   // Create and store mesh from buffer attributes
   //
   // TODO: Probably remove this and call static method directly as it's just a proxy
-  _setPolygonMesh(attributes, attributeLengths, flat) {
-    // TODO: Make this work when style is a function per feature
-    var style = (typeof this._options.style === 'function') ? this._options.style(this._geojson.features[0]) : this._options.style;
-    style = extend({}, GeoJSON.defaultStyle, style);
-
+  _setPolygonMesh(attributes, attributeLengths, style, flat) {
     return PolygonLayer.SetMesh(attributes, attributeLengths, flat, style, this._options, this._world._environment._skybox);
   }
 
-  _setPolylineMesh(attributes, attributeLengths, flat) {
-    // TODO: Make this work when style is a function per feature
-    var style = (typeof this._options.style === 'function') ? this._options.style(this._geojson.features[0]) : this._options.style;
-    style = extend({}, GeoJSON.defaultStyle, style);
-
+  _setPolylineMesh(attributes, attributeLengths, style, flat) {
     return PolylineLayer.SetMesh(attributes, attributeLengths, flat, style, this._options);
   }
 
-  _setPointMesh(attributes, attributeLengths, flat) {
-    // TODO: Make this work when style is a function per feature
-    var style = (typeof this._options.style === 'function') ? this._options.style(this._geojson.features[0]) : this._options.style;
-    style = extend({}, GeoJSON.defaultStyle, style);
-
+  _setPointMesh(attributes, attributeLengths, style, flat) {
     return PointLayer.SetMesh(attributes, attributeLengths, flat, style, this._options);
   }
 

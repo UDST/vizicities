@@ -70,6 +70,8 @@ class ImageTile extends Tile {
 
     localMesh.receiveShadow = true;
 
+    localMesh.renderOrder = -1;
+
     mesh.add(localMesh);
     mesh.renderOrder = 0.1;
 
