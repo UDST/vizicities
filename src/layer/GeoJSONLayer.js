@@ -245,7 +245,7 @@ class GeoJSONLayer extends LayerGroup {
           style = (typeof this._options.style === 'function') ? this._options.style(this._geojson.features[0]) : this._options.style;
           style = extend({}, GeoJSON.defaultStyle, style);
 
-          this._setPolygonMesh(mergedPolygonAttributes, polygonAttributeLengths, polygonFlat).then((result) => {
+          this._setPolygonMesh(mergedPolygonAttributes, polygonAttributeLengths, style, polygonFlat).then((result) => {
             this._polygonMesh = result.mesh;
             this.add(this._polygonMesh);
 

@@ -69,11 +69,10 @@ class ImageTile extends Tile {
     localMesh.rotation.x = -90 * Math.PI / 180;
 
     localMesh.receiveShadow = true;
-
-    localMesh.renderOrder = -1;
+    localMesh.renderOrder = 0;
 
     mesh.add(localMesh);
-    mesh.renderOrder = 0.1;
+    mesh.renderOrder = 0;
 
     mesh.position.x = this._center[0];
     mesh.position.z = this._center[1];
