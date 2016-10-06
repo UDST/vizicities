@@ -291,7 +291,7 @@ class PointLayer extends Layer {
 
     if (flat) {
       material.depthWrite = false;
-      mesh.renderOrder = 3;
+      mesh.renderOrder = 1;
     }
 
     if (options.interactive) {
