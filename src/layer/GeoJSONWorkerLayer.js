@@ -283,11 +283,13 @@ class GeoJSONWorkerLayer extends Layer {
 
       var outputPromises = [];
 
+      var style;
+
       if (polygonAttributes.length > 0) {
         var mergedPolygonAttributes = Buffer.mergeAttributes(polygonAttributes);
 
         // TODO: Make this work when style is a function per feature
-        var style = (typeof this._options.style === 'function') ? this._options.style(objects[0]) : this._options.style;
+        style = (typeof this._options.style === 'function') ? this._options.style(objects[0]) : this._options.style;
         style = extend({}, GeoJSON.defaultStyle, style);
 
         outputPromises.push(this._setPolygonMesh(mergedPolygonAttributes, polygonAttributeLengths, style, polygonFlat));
@@ -296,8 +298,18 @@ class GeoJSONWorkerLayer extends Layer {
       if (polygonOutlineAttributes.length > 0) {
         var mergedPolygonOutlineAttributes = Buffer.mergeAttributes(polygonOutlineAttributes);
 
-        var style = (typeof this._options.style === 'function') ? this._options.style(objects[0]) : this._options.style;
+        style = (typeof this._options.style === 'function') ? this._options.style(objects[0]) : this._options.style;
         style = extend({}, GeoJSON.defaultStyle, style);
+
+        if (style.outlineRenderOrder !== undefined) {
+          style.lineRenderOrder = style.outlineRenderOrder;
+        } else {
+          style.lineRenderOrder = (style.renderOrder) ? style.renderOrder + 1 : 2;
+        }
+
+        if (style.outlineWidth) {
+          style.lineWidth = style.outlineWidth;
+        }
 
         outputPromises.push(this._setPolylineMesh(mergedPolygonOutlineAttributes, polygonOutlineAttributeLengths, style, true));
       }
