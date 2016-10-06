@@ -263,7 +263,6 @@ class GeoJSONWorkerLayer extends Layer {
 
       var polygonFlat = true;
 
-      var obj;
       for (var i = 0; i < objects.length; i++) {
         obj = objects[i];
 
@@ -399,7 +398,6 @@ class GeoJSONWorkerLayer extends Layer {
 
       var polylineFlat = true;
 
-      var obj;
       for (var i = 0; i < objects.length; i++) {
         obj = objects[i];
 
@@ -511,7 +509,6 @@ class GeoJSONWorkerLayer extends Layer {
 
       var pointFlat = true;
 
-      var obj;
       for (var i = 0; i < objects.length; i++) {
         obj = objects[i];
 

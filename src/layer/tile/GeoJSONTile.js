@@ -245,8 +245,6 @@ class GeoJSONTile extends Tile {
         this._request = null;
         this._processTileData(res);
       }).catch(err => {
-        // console.error(err);
-
         // Clear request reference
         this._request = null;
       });
