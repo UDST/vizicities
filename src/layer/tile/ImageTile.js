@@ -15,8 +15,9 @@ class ImageTile extends Tile {
     setTimeout(() => {
       if (!this._mesh) {
         this._mesh = this._createMesh();
-        this._requestTile();
       }
+
+      this._requestTile();
     }, 0);
   }
 
@@ -131,7 +132,13 @@ class ImageTile extends Tile {
 
     var image = document.createElement('img');
 
+    this._aborted = false;
+
     image.addEventListener('load', event => {
+      if (this.isAborted()) {
+        return;
+      }
+
       var texture = new THREE.Texture();
 
       texture.image = image;
@@ -172,9 +179,11 @@ class ImageTile extends Tile {
   }
 
   _abortRequest() {
-    if (!this._image) {
+    if (!this._image || this._ready) {
       return;
     }
+
+    this._aborted = true;
 
     this._image.src = '';
   }

@@ -89,11 +89,10 @@ class GeoJSONTile extends Tile {
     setTimeout(() => {
       if (!this._mesh) {
         this._mesh = this._createMesh();
-
         // this._shadowCanvas = this._createShadowCanvas();
-
-        this._requestTile();
       }
+
+      this._requestTile();
     }, 0);
   }
 
@@ -233,6 +232,8 @@ class GeoJSONTile extends Tile {
 
     var url = this._getTileURL(urlParams);
 
+    this._aborted = false;
+
     if (!this._options.workers) {
       this._request = reqwest({
         url: url,
@@ -244,7 +245,7 @@ class GeoJSONTile extends Tile {
         this._request = null;
         this._processTileData(res);
       }).catch(err => {
-        console.error(err);
+        // console.error(err);
 
         // Clear request reference
         this._request = null;
@@ -255,13 +256,37 @@ class GeoJSONTile extends Tile {
   }
 
   _processTileData(data) {
-    console.time(this._tile);
+    // console.time(this._tile);
 
     var GeoJSONClass = (!this._options.workers) ? GeoJSONLayer : GeoJSONWorkerLayer;
 
     // Using this creates a huge amount of memory due to the quantity of tiles
     this._geojsonLayer = GeoJSONClass(data, this._options);
     this._geojsonLayer.addTo(this._world).then(() => {
+      // TODO: This never seems to be called on worker layers. Find out why.
+      if (this.isAborted()) {
+        // this._geojsonLayer._aborted = true;
+        // this._geojsonLayer = null;
+        return;
+      }
+
+      // TODO: This is a hack to stop old tile meshes hanging around. Fix or
+      // move to somewhere more robust.
+      //
+      // Could potentially just overwrite mesh on first index each time
+      //
+      // This makes some worker tiles to not appear properly – showing the
+      // points mesh but not the polygon mesh, etc.
+      //
+      // Only do this for non-worker layers for now as it seems to cause issues
+      // with worker tiles showing for a moment and then disappearing forever
+      if (!this._options.workers) {
+        this.destroyMesh(this._mesh);
+      }
+
+      // TOSO: Work out if the picking mesh needs destroying here
+      // this.destroyMesh(this._pickingMesh);
+
       this._mesh.add(this._geojsonLayer._object3D);
       this._pickingMesh = this._geojsonLayer._pickingMesh;
 
@@ -325,16 +350,20 @@ class GeoJSONTile extends Tile {
       // this._mesh.add(mesh);
 
       this._ready = true;
-      console.timeEnd(this._tile);
+      // console.timeEnd(this._tile);
     });
   }
 
   _abortRequest() {
-    if (!this._request) {
+    if ((!this._request && !this._options.workers) || this._ready) {
       return;
     }
 
-    this._request.abort();
+    this._aborted = true;
+
+    if (this._request) {
+      this._request.abort();
+    }
   }
 }
 

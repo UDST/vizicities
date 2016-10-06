@@ -242,6 +242,8 @@ class World extends EventEmitter {
   }
 
   addLayer(layer) {
+    // Is is right to assume that there will always be some other layer
+    // managing layers with output set to false?
     this._layers.push(layer);
 
     if (layer.isOutput() && layer.isOutputToScene()) {
@@ -256,7 +258,11 @@ class World extends EventEmitter {
         if (layer._options.attribution) {
           this._addAttribution(layer._options.id, layer._options.attribution);
         }
+
+        // TODO: Consider moving this so it doesn't fire for layers that are
+        // actually managed by a parent layer (eg. tiles)
         this.emit('layerAdded', layer);
+
         resolve(this);
       }).catch(reject);
     });

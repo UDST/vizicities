@@ -18,6 +18,7 @@ class Tile {
     this._path = path;
 
     this._ready = false;
+    this._aborted = false;
 
     this._tile = this._quadcodeToTile(quadcode);
 
@@ -44,6 +45,10 @@ class Tile {
   // Otherwise, returns false
   isReady() {
     return this._ready;
+  }
+
+  isAborted() {
+    return this._aborted;
   }
 
   // Request data for the tile
@@ -78,6 +83,8 @@ class Tile {
   // Ensure that this leaves no trace of the tile – no textures, no meshes,
   // nothing in memory or the GPU
   destroy() {
+    // console.log('Destroying tile', this._quadcode);
+
     // Delete reference to layer and world
     this._layer = null;
     this._world = null;
@@ -88,35 +95,42 @@ class Tile {
     this._center = null;
 
     // Done if no mesh
-    if (!this._mesh) {
+    if (!this._mesh && !this._pickingMesh) {
       return;
     }
 
-    if (this._mesh.children) {
-      // Dispose of mesh and materials
-      this._mesh.children.forEach(child => {
-        child.geometry.dispose();
-        child.geometry = null;
+    this.destroyMesh(this._mesh);
+    this.destroyMesh(this._pickingMesh);
 
-        if (child.material.map) {
-          child.material.map.dispose();
-          child.material.map = null;
-        }
+    this._mesh = null;
+    this._pickingMesh = null;
+  }
 
-        child.material.dispose();
-        child.material = null;
-      });
-    } else {
-      this._mesh.geometry.dispose();
-      this._mesh.geometry = null;
-
-      if (this._mesh.material.map) {
-        this._mesh.material.map.dispose();
-        this._mesh.material.map = null;
+  destroyMesh(mesh, dispose = true) {
+    if (mesh) {
+      if (mesh.children) {
+        mesh.children.forEach((child) => {
+          mesh.remove(child);
+          this.destroyMesh(child);
+        });
       }
 
-      this._mesh.material.dispose();
-      this._mesh.material = null;
+      if (dispose) {
+        if (mesh.geometry) {
+          mesh.geometry.dispose();
+          mesh.geometry = null;
+        }
+
+        if (mesh.material) {
+          if (mesh.material.map) {
+            mesh.material.map.dispose();
+            mesh.material.map = null;
+          }
+
+          mesh.material.dispose();
+          mesh.material = null;
+        }
+      }
     }
   }
 

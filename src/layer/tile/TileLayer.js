@@ -168,7 +168,7 @@ class TileLayer extends Layer {
     });
 
     // 5. Filter the tiles remaining in the check list
-    this._tileList = checkList.filter((tile, index) => {
+    var tileList = checkList.filter((tile, index) => {
       // Skip tile if it's not in the current view frustum
       if (!this._tileInFrustum(tile)) {
         return false;
@@ -189,7 +189,7 @@ class TileLayer extends Layer {
       //
       // If yes, continue
       // If no, generate tile mesh, request texture and skip
-      if (!tile.getMesh()) {
+      if (!tile.getMesh() || tile.isAborted()) {
         tile.requestTileAsync();
       }
 
@@ -206,6 +206,17 @@ class TileLayer extends Layer {
       // // Add tile to layer (and to scene)
       // this._tiles.add(tile.getMesh());
     });
+
+    // Get list of tiles that were in the previous update but not the
+    // current one (for aborting requests, etc)
+    var missingTiles = this._tileList.filter((item) => {
+      return !tileList.includes(item);
+    });
+
+    // Abort tiles that are no longer in view
+    missingTiles.forEach((tile) => tile._abortRequest());
+
+    this._tileList = tileList;
 
     // console.log(performance.now() - start);
   }
