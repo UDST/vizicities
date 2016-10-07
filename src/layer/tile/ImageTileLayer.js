@@ -72,26 +72,33 @@ class ImageTileLayer extends TileLayer {
   _onAdd(world) {
     return new Promise((resolve, reject) => {
       super._onAdd(world).then(() => {
+        // TODO: Removed because it causes depth buffer intersection issues
+        // with layer on top for some reason. Need to work out why and fix.
+        //
         // Add base layer
-        var geom = new THREE.PlaneBufferGeometry(2000000, 2000000, 1);
+        // var geom = new THREE.PlaneBufferGeometry(2000000, 2000000, 1);
 
-        var baseMaterial;
-        if (this._world._environment._skybox) {
-          baseMaterial = ImageTileLayerBaseMaterial('#f5f5f3', this._world._environment._skybox.getRenderTarget());
-        } else {
-          baseMaterial = ImageTileLayerBaseMaterial('#f5f5f3');
-        }
+        // var baseMaterial;
+        // if (this._world._environment._skybox) {
+        //   baseMaterial = ImageTileLayerBaseMaterial('#f5f5f3', this._world._environment._skybox.getRenderTarget());
+        // } else {
+        //   baseMaterial = ImageTileLayerBaseMaterial('#f5f5f3');
+        // }
 
-        var mesh = new THREE.Mesh(geom, baseMaterial);
-        mesh.renderOrder = -2;
-        mesh.rotation.x = -90 * Math.PI / 180;
+        // var mesh = new THREE.Mesh(geom, baseMaterial);
 
-        // TODO: It might be overkill to receive a shadow on the base layer as it's
-        // rarely seen (good to have if performance difference is negligible)
-        mesh.receiveShadow = true;
+        // // Setting this causes a depth-buffer intersection issue on the
+        // // all-the-things example
+        // // mesh.renderOrder = -1;
 
-        this._baseLayer = mesh;
-        this.add(mesh);
+        // mesh.rotation.x = -90 * Math.PI / 180;
+
+        // // TODO: It might be overkill to receive a shadow on the base layer as it's
+        // // rarely seen (good to have if performance difference is negligible)
+        // mesh.receiveShadow = true;
+
+        // this._baseLayer = mesh;
+        // this.add(mesh);
 
         // Trigger initial quadtree calculation on the next frame
         //
@@ -114,7 +121,7 @@ class ImageTileLayer extends TileLayer {
     this._throttledWorldUpdate = throttle(this._onWorldUpdate, 100);
 
     this._world.on('preUpdate', this._throttledWorldUpdate, this);
-    this._world.on('move', this._onWorldMove, this);
+    // this._world.on('move', this._onWorldMove, this);
   }
 
   _onWorldUpdate() {

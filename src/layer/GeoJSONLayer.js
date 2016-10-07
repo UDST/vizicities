@@ -256,7 +256,7 @@ class GeoJSONLayer extends LayerGroup {
               if (style.outlineRenderOrder !== undefined) {
                 style.lineRenderOrder = style.outlineRenderOrder;
               } else {
-                style.lineRenderOrder = (style.renderOrder) ? style.renderOrder + 1 : 2;
+                style.lineRenderOrder = (style.renderOrder) ? style.renderOrder + 1 : 4;
               }
 
               if (style.outlineWidth) {

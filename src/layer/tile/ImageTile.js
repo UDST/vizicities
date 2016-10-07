@@ -69,10 +69,16 @@ class ImageTile extends Tile {
     localMesh.rotation.x = -90 * Math.PI / 180;
 
     localMesh.receiveShadow = true;
-    localMesh.renderOrder = -1;
+
+    // Setting this causes a depth-buffer intersection issue on the
+    // all-the-things example
+    // localMesh.renderOrder = 2;
 
     mesh.add(localMesh);
-    mesh.renderOrder = -1;
+
+    // Setting this causes a depth-buffer intersection issue on the
+    // all-the-things example
+    // mesh.renderOrder = 2;
 
     mesh.position.x = this._center[0];
     mesh.position.z = this._center[1];
