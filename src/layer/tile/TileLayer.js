@@ -347,6 +347,17 @@ class TileLayer extends Layer {
     tile.destroy();
   }
 
+  show() {
+    this._stop = false;
+    this._calculateLOD();
+    super.show();
+  }
+
+  hide() {
+    this._stop = true;
+    super.hide();
+  }
+
   // Destroys the layer and removes it from the scene and memory
   destroy() {
     if (this._tiles.children) {
