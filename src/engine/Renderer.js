@@ -7,6 +7,12 @@ import Scene from './Scene';
 export default function(container, antialias) {
   var renderer = new THREE.WebGLRenderer({
     antialias: antialias
+
+    // Enabling this removes a lot of z-index intersecting but it also removes
+    // shadows due to a bug in three.js
+    //
+    // See: https://github.com/mrdoob/three.js/issues/7815
+    // logarithmicDepthBuffer: true
   });
 
   // TODO: Re-enable when this works with the skybox

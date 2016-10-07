@@ -266,7 +266,9 @@ class GeoJSONWorkerLayer extends Layer {
       for (var i = 0; i < objects.length; i++) {
         obj = objects[i];
 
-        if (polygonFlat && !obj.flat) {
+        // TODO: Work out why obj.flat is rarely set to something other than
+        // true or false. Potentially undefined.
+        if (polygonFlat && obj.flat === false) {
           polygonFlat = false;
         }
 
@@ -304,7 +306,7 @@ class GeoJSONWorkerLayer extends Layer {
         if (style.outlineRenderOrder !== undefined) {
           style.lineRenderOrder = style.outlineRenderOrder;
         } else {
-          style.lineRenderOrder = (style.renderOrder) ? style.renderOrder + 1 : 2;
+          style.lineRenderOrder = (style.renderOrder) ? style.renderOrder + 1 : 4;
         }
 
         if (style.outlineWidth) {
