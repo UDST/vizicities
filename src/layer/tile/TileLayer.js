@@ -349,12 +349,22 @@ class TileLayer extends Layer {
 
   show() {
     this._stop = false;
+
+    if (this._tilesPicking) {
+      this._tilesPicking.visible = true;
+    }
+
     this._calculateLOD();
     super.show();
   }
 
   hide() {
     this._stop = true;
+
+    if (this._tilesPicking) {
+      this._tilesPicking.visible = false;
+    }
+
     super.hide();
   }
 

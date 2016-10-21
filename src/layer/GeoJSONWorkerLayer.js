@@ -1093,11 +1093,11 @@ class GeoJSONWorkerLayer extends Layer {
   // Set up and re-emit interaction events
   _addPicking(pickingId, properties) {
     this._world.on('pick-click-' + pickingId, (pickingId, point2d, point3d, intersects) => {
-      this._world.emit('click', this, properties);
+      this._world.emit('click', this, properties, point2d, point3d);
     });
 
     this._world.on('pick-hover-' + pickingId, (pickingId, point2d, point3d, intersects) => {
-      this._world.emit('hover', this, properties);
+      this._world.emit('hover', this, properties, point2d, point3d);
     });
   }
 
