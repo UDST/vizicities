@@ -126,11 +126,19 @@ class Layer extends EventEmitter {
   // TODO: Also hide any attached DOM layers
   hide() {
     this._object3D.visible = false;
+
+    if (this._pickingMesh) {
+      this._pickingMesh.visible = false;
+    }
   }
 
   // TODO: Also show any attached DOM layers
   show() {
     this._object3D.visible = true;
+
+    if (this._pickingMesh) {
+      this._pickingMesh.visible = true;
+    }
   }
 
   // Destroys the layer and removes it from the scene and memory
