@@ -13,12 +13,12 @@ world._environment._skybox.setInclination(0.3);
 VIZI.Controls.orbit().addTo(world);
 
 // CartoDB basemap
-VIZI.imageTileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
+VIZI.imageTileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
 }).addTo(world);
 
 // Buildings and roads from Mapzen (polygons and linestrings)
-var topoJSONTileLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/buildings,roads/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
+var topoJSONTileLayer = VIZI.topoJSONTileLayer('https://tile.mapzen.com/mapzen/vector/v1/buildings,roads/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
   interactive: false,
   style: function(feature) {
     var height;
