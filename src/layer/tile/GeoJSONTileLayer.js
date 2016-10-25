@@ -117,6 +117,16 @@ class GeoJSONTileLayer extends TileLayer {
     return new GeoJSONTile(quadcode, this._path, layer, newOptions);
   }
 
+  hide() {
+    this._pauseOutput = true;
+    super.hide();
+  }
+
+  show() {
+    this._pauseOutput = false;
+    super.show();
+  }
+
   // Destroys the layer and removes it from the scene and memory
   destroy() {
     this._world.off('preUpdate', this._throttledWorldUpdate);
