@@ -146,7 +146,7 @@ class GeoJSONWorkerLayer extends Layer {
         if (processPromises.length > 0) {
           Promise.all(processPromises).then(() => {
             resolve();
-          });
+          }).catch(reject);
         } else {
           resolve();
         }
@@ -333,7 +333,7 @@ class GeoJSONWorkerLayer extends Layer {
         }
 
         resolve();
-      });
+      }).catch(reject);
     });
   }
 
@@ -439,7 +439,7 @@ class GeoJSONWorkerLayer extends Layer {
           }
 
           resolve();
-        });
+        }).catch(reject);
       } else {
         resolve();
       }
@@ -550,7 +550,7 @@ class GeoJSONWorkerLayer extends Layer {
           }
 
           resolve();
-        });
+        }).catch(reject);
       } else {
         resolve();
       }
@@ -1079,14 +1079,26 @@ class GeoJSONWorkerLayer extends Layer {
   //
   // Could make this an abstract method for each geometry layer
   _setPolygonMesh(attributes, attributeLengths, style, flat) {
+    if (!this._world) {
+      return Promise.reject();
+    }
+
     return PolygonLayer.SetMesh(attributes, attributeLengths, flat, style, this._options, this._world._environment._skybox);
   }
 
   _setPolylineMesh(attributes, attributeLengths, style, flat) {
+    if (!this._world) {
+      return Promise.reject();
+    }
+
     return PolylineLayer.SetMesh(attributes, attributeLengths, flat, style, this._options);
   }
 
   _setPointMesh(attributes, attributeLengths, style, flat) {
+    if (!this._world) {
+      return Promise.reject();
+    }
+
     return PointLayer.SetMesh(attributes, attributeLengths, flat, style, this._options, this._world._environment._skybox);
   }
 
