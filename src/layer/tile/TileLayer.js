@@ -63,6 +63,8 @@ class TileLayer extends Layer {
 
     super(_options);
 
+    this._destroy = false;
+
     this._tileCache = new TileCache(this._options.maxCache, tile => {
       this._destroyTile(tile);
     });
@@ -102,7 +104,7 @@ class TileLayer extends Layer {
 
   // Update and output tiles from the previous LOD checklist
   _outputTiles() {
-    if (!this._tiles) {
+    if (!this._tiles || this._destroy) {
       return;
     }
 
@@ -135,7 +137,7 @@ class TileLayer extends Layer {
   //
   // Does not output the tiles, deferring this to _outputTiles()
   _calculateLOD() {
-    if (this._stop || !this._world) {
+    if (this._stop || !this._world || this._destroy) {
       return;
     }
 
@@ -370,6 +372,8 @@ class TileLayer extends Layer {
 
   // Destroys the layer and removes it from the scene and memory
   destroy() {
+    this._destroy = true;
+
     if (this._tiles.children) {
       // Remove all tiles
       for (var i = this._tiles.children.length - 1; i >= 0; i--) {
