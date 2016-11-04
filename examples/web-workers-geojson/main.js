@@ -19,7 +19,7 @@ world.createWorkers(7).then(() => {
   }).addTo(world);
 
   // Mapzen GeoJSON tile including points, linestrings and polygons
-  VIZI.geoJSONWorkerLayer('http://vector.mapzen.com/osm/roads,pois,buildings/14/4824/6159.json', {
+  VIZI.geoJSONWorkerLayer('https://tile.mapzen.com/mapzen/vector/v1/roads,pois,buildings/14/4824/6159.json', {
     output: true,
     style: {
       color: '#ff0000',

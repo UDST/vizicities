@@ -22,7 +22,7 @@ world.createWorkers(7).then(() => {
   }).addTo(world);
 
   // Buildings and roads from Mapzen (polygons and linestrings)
-  var topoJSONTileLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/buildings,roads/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
+  var topoJSONTileLayer = VIZI.topoJSONTileLayer('https://tile.mapzen.com/mapzen/vector/v1/buildings,roads/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
     workers: true,
     interactive: false,
     style: function(feature) {
