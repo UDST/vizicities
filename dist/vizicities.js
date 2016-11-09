@@ -7,7 +7,7 @@
 		exports["VIZI"] = factory(require("THREE"), require("TweenLite"));
 	else
 		root["VIZI"] = factory(root["THREE"], root["TweenLite"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_10__, __WEBPACK_EXTERNAL_MODULE_41__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_10__, __WEBPACK_EXTERNAL_MODULE_53__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -64,7 +64,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _World2 = _interopRequireDefault(_World);
 	
-	var _controlsIndex = __webpack_require__(37);
+	var _controlsIndex = __webpack_require__(49);
 	
 	var _controlsIndex2 = _interopRequireDefault(_controlsIndex);
 	
@@ -72,43 +72,59 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _geoGeoJs2 = _interopRequireDefault(_geoGeoJs);
 	
-	var _layerLayer = __webpack_require__(32);
+	var _layerLayer = __webpack_require__(34);
 	
 	var _layerLayer2 = _interopRequireDefault(_layerLayer);
 	
-	var _layerEnvironmentEnvironmentLayer = __webpack_require__(31);
+	var _layerLayerGroup = __webpack_require__(54);
+	
+	var _layerLayerGroup2 = _interopRequireDefault(_layerLayerGroup);
+	
+	var _layerEnvironmentEnvironmentLayer = __webpack_require__(33);
 	
 	var _layerEnvironmentEnvironmentLayer2 = _interopRequireDefault(_layerEnvironmentEnvironmentLayer);
 	
-	var _layerTileImageTileLayer = __webpack_require__(42);
+	var _layerTileImageTileLayer = __webpack_require__(55);
 	
 	var _layerTileImageTileLayer2 = _interopRequireDefault(_layerTileImageTileLayer);
 	
-	var _layerTileGeoJSONTileLayer = __webpack_require__(57);
+	var _layerTileGeoJSONTileLayer = __webpack_require__(70);
 	
 	var _layerTileGeoJSONTileLayer2 = _interopRequireDefault(_layerTileGeoJSONTileLayer);
 	
-	var _layerTileTopoJSONTileLayer = __webpack_require__(75);
+	var _layerTileTopoJSONTileLayer = __webpack_require__(89);
 	
 	var _layerTileTopoJSONTileLayer2 = _interopRequireDefault(_layerTileTopoJSONTileLayer);
 	
-	var _layerGeoJSONLayer = __webpack_require__(59);
+	var _layerTileGeoJSONTile = __webpack_require__(71);
+	
+	var _layerTileGeoJSONTile2 = _interopRequireDefault(_layerTileGeoJSONTile);
+	
+	var _layerGeoJSONLayer = __webpack_require__(72);
 	
 	var _layerGeoJSONLayer2 = _interopRequireDefault(_layerGeoJSONLayer);
 	
-	var _layerTopoJSONLayer = __webpack_require__(76);
+	var _layerTopoJSONLayer = __webpack_require__(90);
 	
 	var _layerTopoJSONLayer2 = _interopRequireDefault(_layerTopoJSONLayer);
 	
-	var _layerGeometryPolygonLayer = __webpack_require__(72);
+	var _layerGeoJSONWorkerLayer = __webpack_require__(87);
+	
+	var _layerGeoJSONWorkerLayer2 = _interopRequireDefault(_layerGeoJSONWorkerLayer);
+	
+	var _layerTopoJSONWorkerLayer = __webpack_require__(91);
+	
+	var _layerTopoJSONWorkerLayer2 = _interopRequireDefault(_layerTopoJSONWorkerLayer);
+	
+	var _layerGeometryPolygonLayer = __webpack_require__(84);
 	
 	var _layerGeometryPolygonLayer2 = _interopRequireDefault(_layerGeometryPolygonLayer);
 	
-	var _layerGeometryPolylineLayer = __webpack_require__(73);
+	var _layerGeometryPolylineLayer = __webpack_require__(85);
 	
 	var _layerGeometryPolylineLayer2 = _interopRequireDefault(_layerGeometryPolylineLayer);
 	
-	var _layerGeometryPointLayer = __webpack_require__(74);
+	var _layerGeometryPointLayer = __webpack_require__(86);
 	
 	var _layerGeometryPointLayer2 = _interopRequireDefault(_layerGeometryPointLayer);
 	
@@ -120,11 +136,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _geoLatLon2 = _interopRequireDefault(_geoLatLon);
 	
-	var _enginePickingMaterial = __webpack_require__(70);
+	var _enginePickingMaterial = __webpack_require__(82);
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
-	var _utilIndex = __webpack_require__(77);
+	var _utilIndex = __webpack_require__(92);
 	
 	var _utilIndex2 = _interopRequireDefault(_utilIndex);
 	
@@ -144,12 +160,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  imageTileLayer: _layerTileImageTileLayer.imageTileLayer,
 	  GeoJSONTileLayer: _layerTileGeoJSONTileLayer2['default'],
 	  geoJSONTileLayer: _layerTileGeoJSONTileLayer.geoJSONTileLayer,
+	  GeoJSONTile: _layerTileGeoJSONTile2['default'],
+	  geoJSONTile: _layerTileGeoJSONTile.geoJSONTile,
 	  TopoJSONTileLayer: _layerTileTopoJSONTileLayer2['default'],
 	  topoJSONTileLayer: _layerTileTopoJSONTileLayer.topoJSONTileLayer,
 	  GeoJSONLayer: _layerGeoJSONLayer2['default'],
 	  geoJSONLayer: _layerGeoJSONLayer.geoJSONLayer,
 	  TopoJSONLayer: _layerTopoJSONLayer2['default'],
 	  topoJSONLayer: _layerTopoJSONLayer.topoJSONLayer,
+	  GeoJSONWorkerLayer: _layerGeoJSONWorkerLayer2['default'],
+	  geoJSONWorkerLayer: _layerGeoJSONWorkerLayer.geoJSONWorkerLayer,
+	  TopoJSONWorkerLayer: _layerTopoJSONWorkerLayer2['default'],
+	  topoJSONWorkerLayer: _layerTopoJSONWorkerLayer.topoJSONWorkerLayer,
 	  PolygonLayer: _layerGeometryPolygonLayer2['default'],
 	  polygonLayer: _layerGeometryPolygonLayer.polygonLayer,
 	  PolylineLayer: _layerGeometryPolylineLayer2['default'],
@@ -205,9 +227,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _engineEngine2 = _interopRequireDefault(_engineEngine);
 	
-	var _layerEnvironmentEnvironmentLayer = __webpack_require__(31);
+	var _layerEnvironmentEnvironmentLayer = __webpack_require__(33);
 	
 	var _layerEnvironmentEnvironmentLayer2 = _interopRequireDefault(_layerEnvironmentEnvironmentLayer);
+	
+	var _utilWorker = __webpack_require__(46);
+	
+	var _utilWorker2 = _interopRequireDefault(_utilWorker);
 	
 	// TODO: Make sure nothing is left behind in the heap after calling destroy()
 	
@@ -249,6 +275,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	  _createClass(World, [{
+	    key: 'createWorkers',
+	    value: function createWorkers(maxWorkers, workerScript) {
+	      return _utilWorker2['default'].createWorkers(maxWorkers, workerScript);
+	    }
+	  }, {
 	    key: '_initContainer',
 	    value: function _initContainer(domId) {
 	      this._container = document.getElementById(domId);
@@ -256,14 +287,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_initAttribution',
 	    value: function _initAttribution() {
-	      var message = '<a href="http://vizicities.com" target="_blank">Powered by ViziCities</a>';
+	      var message = '<a href="http://vizicities.com" target="_blank">ViziCities</a> | <a id="show-attr" href="#">Attribution</a>';
 	
 	      var element = document.createElement('div');
 	      element.classList.add('vizicities-attribution');
 	
+	      var additionalElem = document.createElement('div');
+	      additionalElem.id = 'attribution-container';
+	
 	      element.innerHTML = message;
+	      element.appendChild(additionalElem);
 	
 	      this._container.appendChild(element);
+	
+	      document.getElementById('show-attr').addEventListener('click', function (e) {
+	        e.currentTarget.parentNode.classList.toggle('is-visible');
+	      });
 	    }
 	  }, {
 	    key: '_initEngine',
@@ -349,6 +388,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.emit('preUpdate', delta);
 	      this._engine.update(delta);
 	      this.emit('postUpdate', delta);
+	    }
+	  }, {
+	    key: '_addAttribution',
+	    value: function _addAttribution(id, message) {
+	      var container = document.getElementById('attribution-container');
+	
+	      var span = document.createElement('p');
+	      span.dataset.layer = id;
+	      span.innerHTML = message;
+	
+	      container.appendChild(span);
+	    }
+	  }, {
+	    key: '_removeAttribution',
+	    value: function _removeAttribution(id) {
+	      var elem = document.querySelectorAll('#attribution-container [data-layer="' + id + '"]')[0];
+	      elem.remove();
 	    }
 	
 	    // Set world view
@@ -460,6 +516,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function addLayer(layer) {
 	      var _this2 = this;
 	
+	      // Is is right to assume that there will always be some other layer
+	      // managing layers with output set to false?
 	      this._layers.push(layer);
 	
 	      if (layer.isOutput() && layer.isOutputToScene()) {
@@ -471,7 +529,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      return new Promise(function (resolve, reject) {
 	        layer._addToWorld(_this2).then(function () {
+	          if (layer._options.attribution) {
+	            _this2._addAttribution(layer._options.id, layer._options.attribution);
+	          }
+	
+	          // TODO: Consider moving this so it doesn't fire for layers that are
+	          // actually managed by a parent layer (eg. tiles)
 	          _this2.emit('layerAdded', layer);
+	
 	          resolve(_this2);
 	        })['catch'](reject);
 	      });
@@ -2540,31 +2605,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Picking2 = _interopRequireDefault(_Picking);
 	
-	var _EffectComposer = __webpack_require__(22);
+	var _EffectComposer = __webpack_require__(24);
 	
 	var _EffectComposer2 = _interopRequireDefault(_EffectComposer);
 	
-	var _vendorRenderPass = __webpack_require__(27);
+	var _vendorRenderPass = __webpack_require__(29);
 	
 	var _vendorRenderPass2 = _interopRequireDefault(_vendorRenderPass);
 	
-	var _vendorShaderPass = __webpack_require__(25);
+	var _vendorShaderPass = __webpack_require__(27);
 	
 	var _vendorShaderPass2 = _interopRequireDefault(_vendorShaderPass);
 	
-	var _vendorCopyShader = __webpack_require__(24);
+	var _vendorCopyShader = __webpack_require__(26);
 	
 	var _vendorCopyShader2 = _interopRequireDefault(_vendorCopyShader);
 	
-	var _vendorHorizontalTiltShiftShader = __webpack_require__(28);
+	var _vendorHorizontalTiltShiftShader = __webpack_require__(30);
 	
 	var _vendorHorizontalTiltShiftShader2 = _interopRequireDefault(_vendorHorizontalTiltShiftShader);
 	
-	var _vendorVerticalTiltShiftShader = __webpack_require__(29);
+	var _vendorVerticalTiltShiftShader = __webpack_require__(31);
 	
 	var _vendorVerticalTiltShiftShader2 = _interopRequireDefault(_vendorVerticalTiltShiftShader);
 	
-	var _vendorFXAAShader = __webpack_require__(30);
+	var _vendorFXAAShader = __webpack_require__(32);
 	
 	var _vendorFXAAShader2 = _interopRequireDefault(_vendorFXAAShader);
 	
@@ -2861,6 +2926,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports['default'] = function (container, antialias) {
 	  var renderer = new _three2['default'].WebGLRenderer({
 	    antialias: antialias
+	
+	    // Enabling this removes a lot of z-index intersecting but it also removes
+	    // shadows due to a bug in three.js
+	    //
+	    // See: https://github.com/mrdoob/three.js/issues/7815
+	    // logarithmicDepthBuffer: true
 	  });
 	
 	  // TODO: Re-enable when this works with the skybox
@@ -3407,6 +3478,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _PickingScene2 = _interopRequireDefault(_PickingScene);
 	
+	var _lodashThrottle = __webpack_require__(22);
+	
+	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
+	
 	// TODO: Look into a way of setting this up without passing in a renderer and
 	// camera from the engine
 	
@@ -3456,8 +3531,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._resizeHandler = this._resizeTexture.bind(this);
 	      window.addEventListener('resize', this._resizeHandler, false);
 	
+	      this._throttledMouseMoveHandler = (0, _lodashThrottle2['default'])(this._onMouseMove.bind(this), 50);
 	      this._mouseUpHandler = this._onMouseUp.bind(this);
 	      this._world._container.addEventListener('mouseup', this._mouseUpHandler, false);
+	      this._world._container.addEventListener('mousemove', this._throttledMouseMoveHandler, false);
 	
 	      this._world.on('move', this._onWorldMove, this);
 	    }
@@ -3469,13 +3546,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return;
 	      }
 	
-	      var point = (0, _geoPoint.point)(event.clientX, event.clientY);
+	      var point = (0, _geoPoint.point)(event.clientX - this._world._container.offsetLeft, event.clientY - this._world._container.offsetTop);
 	
 	      var normalisedPoint = (0, _geoPoint.point)(0, 0);
 	      normalisedPoint.x = point.x / this._width * 2 - 1;
 	      normalisedPoint.y = -(point.y / this._height) * 2 + 1;
 	
 	      this._pick(point, normalisedPoint);
+	    }
+	  }, {
+	    key: '_onMouseMove',
+	    value: function _onMouseMove(event) {
+	      var point = (0, _geoPoint.point)(event.clientX - this._world._container.offsetLeft, event.clientY - this._world._container.offsetTop);
+	
+	      var normalisedPoint = (0, _geoPoint.point)(0, 0);
+	      normalisedPoint.x = point.x / this._width * 2 - 1;
+	      normalisedPoint.y = -(point.y / this._height) * 2 + 1;
+	
+	      this._pick(point, normalisedPoint, true);
 	    }
 	  }, {
 	    key: '_onWorldMove',
@@ -3522,7 +3610,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }, {
 	    key: '_pick',
-	    value: function _pick(point, normalisedPoint) {
+	    value: function _pick(point, normalisedPoint, hover) {
 	      this._update();
 	
 	      var index = point.x + (this._pickingTexture.height - point.y) * this._pickingTexture.width;
@@ -3532,6 +3620,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // Skip if ID is 16646655 (white) as the background returns this
 	      if (id === 16646655) {
+	        if (hover) {
+	          this._world.emit('pick-hover-reset');
+	        } else {
+	          this._world.emit('pick-click-reset');
+	        }
+	
 	        return;
 	      }
 	
@@ -3553,8 +3647,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // people use the picking API and what the returned data should be
 	      //
 	      // TODO: Look into the leak potential for passing so much by reference here
-	      this._world.emit('pick', id, _point2d, _point3d, intersects);
-	      this._world.emit('pick-' + id, _point2d, _point3d, intersects);
+	      // this._world.emit('pick', id, _point2d, _point3d, intersects);
+	      // this._world.emit('pick-' + id, _point2d, _point3d, intersects);
+	
+	      if (hover) {
+	        this._world.emit('pick-hover', id, _point2d, _point3d, intersects);
+	        this._world.emit('pick-hover-' + id, _point2d, _point3d, intersects);
+	      } else {
+	        this._world.emit('pick-click', id, _point2d, _point3d, intersects);
+	        this._world.emit('pick-click-' + id, _point2d, _point3d, intersects);
+	      }
 	    }
 	
 	    // Add mesh to picking scene
@@ -3588,6 +3690,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // active at the moment
 	      window.removeEventListener('resize', this._resizeHandler, false);
 	      this._world._container.removeEventListener('mouseup', this._mouseUpHandler, false);
+	      this._world._container.removeEventListener('mousemove', this._throttledMouseMoveHandler, false);
 	
 	      this._world.off('move', this._onWorldMove);
 	
@@ -3671,1418 +3774,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _three = __webpack_require__(10);
-	
-	var _three2 = _interopRequireDefault(_three);
-	
-	var _vendorEffectComposer = __webpack_require__(23);
-	
-	var _vendorEffectComposer2 = _interopRequireDefault(_vendorEffectComposer);
-	
-	exports['default'] = function (renderer, container) {
-	  var composer = new _vendorEffectComposer2['default'](renderer);
-	
-	  var updateSize = function updateSize() {
-	    // TODO: Re-enable this when perf issues can be solved
-	    //
-	    // Rendering double the resolution of the screen can be really slow
-	    // var pixelRatio = window.devicePixelRatio;
-	    var pixelRatio = 1;
-	
-	    composer.setSize(container.clientWidth * pixelRatio, container.clientHeight * pixelRatio);
-	  };
-	
-	  window.addEventListener('resize', updateSize, false);
-	  updateSize();
-	
-	  return composer;
-	};
-	
-	;
-	module.exports = exports['default'];
-
-/***/ },
-/* 23 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, '__esModule', {
-		value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	// jscs:disable
-	/* eslint-disable */
-	
-	var _three = __webpack_require__(10);
-	
-	var _three2 = _interopRequireDefault(_three);
-	
-	var _CopyShader = __webpack_require__(24);
-	
-	var _CopyShader2 = _interopRequireDefault(_CopyShader);
-	
-	var _ShaderPass = __webpack_require__(25);
-	
-	var _ShaderPass2 = _interopRequireDefault(_ShaderPass);
-	
-	var _MaskPass = __webpack_require__(26);
-	
-	var _MaskPass2 = _interopRequireDefault(_MaskPass);
-	
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 */
-	
-	var EffectComposer = function EffectComposer(renderer, renderTarget) {
-	
-		this.renderer = renderer;
-	
-		if (renderTarget === undefined) {
-	
-			var pixelRatio = renderer.getPixelRatio();
-	
-			var width = Math.floor(renderer.context.canvas.width / pixelRatio) || 1;
-			var height = Math.floor(renderer.context.canvas.height / pixelRatio) || 1;
-			var parameters = { minFilter: _three2['default'].LinearFilter, magFilter: _three2['default'].LinearFilter, format: _three2['default'].RGBAFormat, stencilBuffer: false };
-	
-			renderTarget = new _three2['default'].WebGLRenderTarget(width, height, parameters);
-		}
-	
-		this.renderTarget1 = renderTarget;
-		this.renderTarget2 = renderTarget.clone();
-	
-		this.writeBuffer = this.renderTarget1;
-		this.readBuffer = this.renderTarget2;
-	
-		this.passes = [];
-	
-		if (_CopyShader2['default'] === undefined) console.error("EffectComposer relies on THREE.CopyShader");
-	
-		this.copyPass = new _ShaderPass2['default'](_CopyShader2['default']);
-	};
-	
-	EffectComposer.prototype = {
-	
-		swapBuffers: function swapBuffers() {
-	
-			var tmp = this.readBuffer;
-			this.readBuffer = this.writeBuffer;
-			this.writeBuffer = tmp;
-		},
-	
-		addPass: function addPass(pass) {
-	
-			this.passes.push(pass);
-		},
-	
-		insertPass: function insertPass(pass, index) {
-	
-			this.passes.splice(index, 0, pass);
-		},
-	
-		render: function render(delta) {
-	
-			this.writeBuffer = this.renderTarget1;
-			this.readBuffer = this.renderTarget2;
-	
-			var maskActive = false;
-	
-			var pass,
-			    i,
-			    il = this.passes.length;
-	
-			for (i = 0; i < il; i++) {
-	
-				pass = this.passes[i];
-	
-				if (!pass.enabled) continue;
-	
-				pass.render(this.renderer, this.writeBuffer, this.readBuffer, delta, maskActive);
-	
-				if (pass.needsSwap) {
-	
-					if (maskActive) {
-	
-						var context = this.renderer.context;
-	
-						context.stencilFunc(context.NOTEQUAL, 1, 0xffffffff);
-	
-						this.copyPass.render(this.renderer, this.writeBuffer, this.readBuffer, delta);
-	
-						context.stencilFunc(context.EQUAL, 1, 0xffffffff);
-					}
-	
-					this.swapBuffers();
-				}
-	
-				if (pass instanceof _MaskPass2['default']) {
-	
-					maskActive = true;
-				} else if (pass instanceof _MaskPass.ClearMaskPass) {
-	
-					maskActive = false;
-				}
-			}
-		},
-	
-		reset: function reset(renderTarget) {
-	
-			if (renderTarget === undefined) {
-	
-				renderTarget = this.renderTarget1.clone();
-	
-				var pixelRatio = this.renderer.getPixelRatio();
-	
-				renderTarget.setSize(Math.floor(this.renderer.context.canvas.width / pixelRatio), Math.floor(this.renderer.context.canvas.height / pixelRatio));
-			}
-	
-			this.renderTarget1.dispose();
-			this.renderTarget1 = renderTarget;
-			this.renderTarget2.dispose();
-			this.renderTarget2 = renderTarget.clone();
-	
-			this.writeBuffer = this.renderTarget1;
-			this.readBuffer = this.renderTarget2;
-		},
-	
-		setSize: function setSize(width, height) {
-	
-			this.renderTarget1.setSize(width, height);
-			this.renderTarget2.setSize(width, height);
-		}
-	
-	};
-	
-	exports['default'] = EffectComposer;
-	
-	_three2['default'].EffectComposer = EffectComposer;
-	module.exports = exports['default'];
-
-/***/ },
-/* 24 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-	
-	// jscs:disable
-	/* eslint-disable */
-	
-	var _three = __webpack_require__(10);
-	
-	var _three2 = _interopRequireDefault(_three);
-	
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 *
-	 * Full-screen textured quad shader
-	 */
-	
-	var CopyShader = {
-	
-		uniforms: {
-	
-			"tDiffuse": { type: "t", value: null },
-			"opacity": { type: "f", value: 1.0 }
-	
-		},
-	
-		vertexShader: ["varying vec2 vUv;", "void main() {", "vUv = uv;", "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );", "}"].join("\n"),
-	
-		fragmentShader: ["uniform float opacity;", "uniform sampler2D tDiffuse;", "varying vec2 vUv;", "void main() {", "vec4 texel = texture2D( tDiffuse, vUv );", "gl_FragColor = opacity * texel;", "}"].join("\n")
-	
-	};
-	
-	exports["default"] = CopyShader;
-	
-	_three2["default"].CopyShader = CopyShader;
-	module.exports = exports["default"];
-
-/***/ },
-/* 25 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-	
-	// jscs:disable
-	/* eslint-disable */
-	
-	var _three = __webpack_require__(10);
-	
-	var _three2 = _interopRequireDefault(_three);
-	
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 */
-	
-	var ShaderPass = function ShaderPass(shader, textureID) {
-	
-		this.textureID = textureID !== undefined ? textureID : "tDiffuse";
-	
-		if (shader instanceof _three2["default"].ShaderMaterial) {
-	
-			this.uniforms = shader.uniforms;
-	
-			this.material = shader;
-		} else if (shader) {
-	
-			this.uniforms = _three2["default"].UniformsUtils.clone(shader.uniforms);
-	
-			this.material = new _three2["default"].ShaderMaterial({
-	
-				defines: shader.defines || {},
-				uniforms: this.uniforms,
-				vertexShader: shader.vertexShader,
-				fragmentShader: shader.fragmentShader
-	
-			});
-		}
-	
-		this.renderToScreen = false;
-	
-		this.enabled = true;
-		this.needsSwap = true;
-		this.clear = false;
-	
-		this.camera = new _three2["default"].OrthographicCamera(-1, 1, 1, -1, 0, 1);
-		this.scene = new _three2["default"].Scene();
-	
-		this.quad = new _three2["default"].Mesh(new _three2["default"].PlaneBufferGeometry(2, 2), null);
-		this.scene.add(this.quad);
-	};
-	
-	ShaderPass.prototype = {
-	
-		render: function render(renderer, writeBuffer, readBuffer, delta) {
-	
-			if (this.uniforms[this.textureID]) {
-	
-				this.uniforms[this.textureID].value = readBuffer;
-			}
-	
-			this.quad.material = this.material;
-	
-			if (this.renderToScreen) {
-	
-				renderer.render(this.scene, this.camera);
-			} else {
-	
-				renderer.render(this.scene, this.camera, writeBuffer, this.clear);
-			}
-		}
-	
-	};
-	
-	exports["default"] = ShaderPass;
-	
-	_three2["default"].ShaderPass = ShaderPass;
-	module.exports = exports["default"];
-
-/***/ },
-/* 26 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, '__esModule', {
-		value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	// jscs:disable
-	/* eslint-disable */
-	
-	var _three = __webpack_require__(10);
-	
-	var _three2 = _interopRequireDefault(_three);
-	
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 */
-	
-	var MaskPass = function MaskPass(scene, camera) {
-	
-		this.scene = scene;
-		this.camera = camera;
-	
-		this.enabled = true;
-		this.clear = true;
-		this.needsSwap = false;
-	
-		this.inverse = false;
-	};
-	
-	MaskPass.prototype = {
-	
-		render: function render(renderer, writeBuffer, readBuffer, delta) {
-	
-			var context = renderer.context;
-	
-			// don't update color or depth
-	
-			context.colorMask(false, false, false, false);
-			context.depthMask(false);
-	
-			// set up stencil
-	
-			var writeValue, clearValue;
-	
-			if (this.inverse) {
-	
-				writeValue = 0;
-				clearValue = 1;
-			} else {
-	
-				writeValue = 1;
-				clearValue = 0;
-			}
-	
-			context.enable(context.STENCIL_TEST);
-			context.stencilOp(context.REPLACE, context.REPLACE, context.REPLACE);
-			context.stencilFunc(context.ALWAYS, writeValue, 0xffffffff);
-			context.clearStencil(clearValue);
-	
-			// draw into the stencil buffer
-	
-			renderer.render(this.scene, this.camera, readBuffer, this.clear);
-			renderer.render(this.scene, this.camera, writeBuffer, this.clear);
-	
-			// re-enable update of color and depth
-	
-			context.colorMask(true, true, true, true);
-			context.depthMask(true);
-	
-			// only render where stencil is set to 1
-	
-			context.stencilFunc(context.EQUAL, 1, 0xffffffff); // draw if == 1
-			context.stencilOp(context.KEEP, context.KEEP, context.KEEP);
-		}
-	
-	};
-	
-	var ClearMaskPass = function ClearMaskPass() {
-	
-		this.enabled = true;
-	};
-	
-	ClearMaskPass.prototype = {
-	
-		render: function render(renderer, writeBuffer, readBuffer, delta) {
-	
-			var context = renderer.context;
-	
-			context.disable(context.STENCIL_TEST);
-		}
-	
-	};
-	
-	exports['default'] = MaskPass;
-	exports.ClearMaskPass = ClearMaskPass;
-	
-	_three2['default'].MaskPass = MaskPass;
-	_three2['default'].ClearMaskPass = ClearMaskPass;
-
-/***/ },
-/* 27 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, '__esModule', {
-		value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	// jscs:disable
-	/* eslint-disable */
-	
-	var _three = __webpack_require__(10);
-	
-	var _three2 = _interopRequireDefault(_three);
-	
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 */
-	
-	var RenderPass = function RenderPass(scene, camera, overrideMaterial, clearColor, clearAlpha) {
-	
-		this.scene = scene;
-		this.camera = camera;
-	
-		this.overrideMaterial = overrideMaterial;
-	
-		this.clearColor = clearColor;
-		this.clearAlpha = clearAlpha !== undefined ? clearAlpha : 1;
-	
-		this.oldClearColor = new _three2['default'].Color();
-		this.oldClearAlpha = 1;
-	
-		this.enabled = true;
-		this.clear = true;
-		this.needsSwap = false;
-	};
-	
-	RenderPass.prototype = {
-	
-		render: function render(renderer, writeBuffer, readBuffer, delta) {
-	
-			this.scene.overrideMaterial = this.overrideMaterial;
-	
-			if (this.clearColor) {
-	
-				this.oldClearColor.copy(renderer.getClearColor());
-				this.oldClearAlpha = renderer.getClearAlpha();
-	
-				renderer.setClearColor(this.clearColor, this.clearAlpha);
-			}
-	
-			renderer.render(this.scene, this.camera, readBuffer, this.clear);
-	
-			if (this.clearColor) {
-	
-				renderer.setClearColor(this.oldClearColor, this.oldClearAlpha);
-			}
-	
-			this.scene.overrideMaterial = null;
-		}
-	
-	};
-	
-	exports['default'] = RenderPass;
-	
-	_three2['default'].RenderPass = RenderPass;
-	module.exports = exports['default'];
-
-/***/ },
-/* 28 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-	
-	// jscs:disable
-	/* eslint-disable */
-	
-	var _three = __webpack_require__(10);
-	
-	var _three2 = _interopRequireDefault(_three);
-	
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 *
-	 * Simple fake tilt-shift effect, modulating two pass Gaussian blur (see above) by vertical position
-	 *
-	 * - 9 samples per pass
-	 * - standard deviation 2.7
-	 * - "h" and "v" parameters should be set to "1 / width" and "1 / height"
-	 * - "r" parameter control where "focused" horizontal line lies
-	 */
-	
-	var HorizontalTiltShiftShader = {
-	
-		uniforms: {
-	
-			"tDiffuse": { type: "t", value: null },
-			"h": { type: "f", value: 1.0 / 512.0 },
-			"r": { type: "f", value: 0.35 }
-	
-		},
-	
-		vertexShader: ["varying vec2 vUv;", "void main() {", "vUv = uv;", "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );", "}"].join("\n"),
-	
-		fragmentShader: ["uniform sampler2D tDiffuse;", "uniform float h;", "uniform float r;", "varying vec2 vUv;", "void main() {", "vec4 sum = vec4( 0.0 );", "float hh = h * abs( r - vUv.y );", "sum += texture2D( tDiffuse, vec2( vUv.x - 4.0 * hh, vUv.y ) ) * 0.051;", "sum += texture2D( tDiffuse, vec2( vUv.x - 3.0 * hh, vUv.y ) ) * 0.0918;", "sum += texture2D( tDiffuse, vec2( vUv.x - 2.0 * hh, vUv.y ) ) * 0.12245;", "sum += texture2D( tDiffuse, vec2( vUv.x - 1.0 * hh, vUv.y ) ) * 0.1531;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y ) ) * 0.1633;", "sum += texture2D( tDiffuse, vec2( vUv.x + 1.0 * hh, vUv.y ) ) * 0.1531;", "sum += texture2D( tDiffuse, vec2( vUv.x + 2.0 * hh, vUv.y ) ) * 0.12245;", "sum += texture2D( tDiffuse, vec2( vUv.x + 3.0 * hh, vUv.y ) ) * 0.0918;", "sum += texture2D( tDiffuse, vec2( vUv.x + 4.0 * hh, vUv.y ) ) * 0.051;", "gl_FragColor = sum;", "}"].join("\n")
-	
-	};
-	
-	exports["default"] = HorizontalTiltShiftShader;
-	
-	_three2["default"].HorizontalTiltShiftShader = HorizontalTiltShiftShader;
-	module.exports = exports["default"];
-
-/***/ },
-/* 29 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-	
-	// jscs:disable
-	/* eslint-disable */
-	
-	var _three = __webpack_require__(10);
-	
-	var _three2 = _interopRequireDefault(_three);
-	
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 *
-	 * Simple fake tilt-shift effect, modulating two pass Gaussian blur (see above) by vertical position
-	 *
-	 * - 9 samples per pass
-	 * - standard deviation 2.7
-	 * - "h" and "v" parameters should be set to "1 / width" and "1 / height"
-	 * - "r" parameter control where "focused" horizontal line lies
-	 */
-	
-	var VerticalTiltShiftShader = {
-	
-		uniforms: {
-	
-			"tDiffuse": { type: "t", value: null },
-			"v": { type: "f", value: 1.0 / 512.0 },
-			"r": { type: "f", value: 0.35 }
-	
-		},
-	
-		vertexShader: ["varying vec2 vUv;", "void main() {", "vUv = uv;", "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );", "}"].join("\n"),
-	
-		fragmentShader: ["uniform sampler2D tDiffuse;", "uniform float v;", "uniform float r;", "varying vec2 vUv;", "void main() {", "vec4 sum = vec4( 0.0 );", "float vv = v * abs( r - vUv.y );", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y - 4.0 * vv ) ) * 0.051;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y - 3.0 * vv ) ) * 0.0918;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y - 2.0 * vv ) ) * 0.12245;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y - 1.0 * vv ) ) * 0.1531;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y ) ) * 0.1633;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y + 1.0 * vv ) ) * 0.1531;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y + 2.0 * vv ) ) * 0.12245;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y + 3.0 * vv ) ) * 0.0918;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y + 4.0 * vv ) ) * 0.051;", "gl_FragColor = sum;", "}"].join("\n")
-	
-	};
-	
-	exports["default"] = VerticalTiltShiftShader;
-	
-	_three2["default"].VerticalTiltShiftShader = VerticalTiltShiftShader;
-	module.exports = exports["default"];
-
-/***/ },
-/* 30 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-	
-	// jscs:disable
-	/* eslint-disable */
-	
-	var _three = __webpack_require__(10);
-	
-	var _three2 = _interopRequireDefault(_three);
-	
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author davidedc / http://www.sketchpatch.net/
-	 *
-	 * NVIDIA FXAA by Timothy Lottes
-	 * http://timothylottes.blogspot.com/2011/06/fxaa3-source-released.html
-	 * - WebGL port by @supereggbert
-	 * http://www.glge.org/demos/fxaa/
-	 */
-	
-	var FXAAShader = {
-	
-		uniforms: {
-	
-			"tDiffuse": { type: "t", value: null },
-			"resolution": { type: "v2", value: new _three2["default"].Vector2(1 / 1024, 1 / 512) }
-	
-		},
-	
-		vertexShader: ["void main() {", "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );", "}"].join("\n"),
-	
-		fragmentShader: ["uniform sampler2D tDiffuse;", "uniform vec2 resolution;", "#define FXAA_REDUCE_MIN   (1.0/128.0)", "#define FXAA_REDUCE_MUL   (1.0/8.0)", "#define FXAA_SPAN_MAX     8.0", "void main() {", "vec3 rgbNW = texture2D( tDiffuse, ( gl_FragCoord.xy + vec2( -1.0, -1.0 ) ) * resolution ).xyz;", "vec3 rgbNE = texture2D( tDiffuse, ( gl_FragCoord.xy + vec2( 1.0, -1.0 ) ) * resolution ).xyz;", "vec3 rgbSW = texture2D( tDiffuse, ( gl_FragCoord.xy + vec2( -1.0, 1.0 ) ) * resolution ).xyz;", "vec3 rgbSE = texture2D( tDiffuse, ( gl_FragCoord.xy + vec2( 1.0, 1.0 ) ) * resolution ).xyz;", "vec4 rgbaM  = texture2D( tDiffuse,  gl_FragCoord.xy  * resolution );", "vec3 rgbM  = rgbaM.xyz;", "vec3 luma = vec3( 0.299, 0.587, 0.114 );", "float lumaNW = dot( rgbNW, luma );", "float lumaNE = dot( rgbNE, luma );", "float lumaSW = dot( rgbSW, luma );", "float lumaSE = dot( rgbSE, luma );", "float lumaM  = dot( rgbM,  luma );", "float lumaMin = min( lumaM, min( min( lumaNW, lumaNE ), min( lumaSW, lumaSE ) ) );", "float lumaMax = max( lumaM, max( max( lumaNW, lumaNE) , max( lumaSW, lumaSE ) ) );", "vec2 dir;", "dir.x = -((lumaNW + lumaNE) - (lumaSW + lumaSE));", "dir.y =  ((lumaNW + lumaSW) - (lumaNE + lumaSE));", "float dirReduce = max( ( lumaNW + lumaNE + lumaSW + lumaSE ) * ( 0.25 * FXAA_REDUCE_MUL ), FXAA_REDUCE_MIN );", "float rcpDirMin = 1.0 / ( min( abs( dir.x ), abs( dir.y ) ) + dirReduce );", "dir = min( vec2( FXAA_SPAN_MAX,  FXAA_SPAN_MAX),", "max( vec2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX),", "dir * rcpDirMin)) * resolution;", "vec4 rgbA = (1.0/2.0) * (", "texture2D(tDiffuse,  gl_FragCoord.xy  * resolution + dir * (1.0/3.0 - 0.5)) +", "texture2D(tDiffuse,  gl_FragCoord.xy  * resolution + dir * (2.0/3.0 - 0.5)));", "vec4 rgbB = rgbA * (1.0/2.0) + (1.0/4.0) * (", "texture2D(tDiffuse,  gl_FragCoord.xy  * resolution + dir * (0.0/3.0 - 0.5)) +", "texture2D(tDiffuse,  gl_FragCoord.xy  * resolution + dir * (3.0/3.0 - 0.5)));", "float lumaB = dot(rgbB, vec4(luma, 0.0));", "if ( ( lumaB < lumaMin ) || ( lumaB > lumaMax ) ) {", "gl_FragColor = rgbA;", "} else {", "gl_FragColor = rgbB;", "}", "}"].join("\n")
-	
-	};
-	
-	exports["default"] = FXAAShader;
-	
-	_three2["default"].FXAAShader = FXAAShader;
-	module.exports = exports["default"];
-
-/***/ },
-/* 31 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var _Layer2 = __webpack_require__(32);
-	
-	var _Layer3 = _interopRequireDefault(_Layer2);
-	
-	var _lodashAssign = __webpack_require__(3);
-	
-	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
-	
-	var _three = __webpack_require__(10);
-	
-	var _three2 = _interopRequireDefault(_three);
-	
-	var _Skybox = __webpack_require__(33);
-	
-	var _Skybox2 = _interopRequireDefault(_Skybox);
-	
-	// TODO: Make sure nothing is left behind in the heap after calling destroy()
-	
-	var EnvironmentLayer = (function (_Layer) {
-	  _inherits(EnvironmentLayer, _Layer);
-	
-	  function EnvironmentLayer(options) {
-	    _classCallCheck(this, EnvironmentLayer);
-	
-	    var defaults = {
-	      skybox: false
-	    };
-	
-	    var _options = (0, _lodashAssign2['default'])({}, defaults, options);
-	
-	    _get(Object.getPrototypeOf(EnvironmentLayer.prototype), 'constructor', this).call(this, _options);
-	  }
-	
-	  _createClass(EnvironmentLayer, [{
-	    key: '_onAdd',
-	    value: function _onAdd() {
-	      this._initLights();
-	
-	      if (this._options.skybox) {
-	        this._initSkybox();
-	      }
-	
-	      // this._initGrid();
-	
-	      return Promise.resolve(this);
-	    }
-	
-	    // Not fleshed out or thought through yet
-	    //
-	    // Lights could potentially be put it their own 'layer' to keep this class
-	    // much simpler and less messy
-	  }, {
-	    key: '_initLights',
-	    value: function _initLights() {
-	      // Position doesn't really matter (the angle is important), however it's
-	      // used here so the helpers look more natural.
-	
-	      if (!this._options.skybox) {
-	        var directionalLight = new _three2['default'].DirectionalLight(0xffffff, 1);
-	        directionalLight.position.x = 10000;
-	        directionalLight.position.y = 10000;
-	        directionalLight.position.z = 10000;
-	
-	        // TODO: Get shadows working in non-PBR scenes
-	
-	        // directionalLight.castShadow = true;
-	        //
-	        // var d = 100;
-	        // directionalLight.shadow.camera.left = -d;
-	        // directionalLight.shadow.camera.right = d;
-	        // directionalLight.shadow.camera.top = d;
-	        // directionalLight.shadow.camera.bottom = -d;
-	        //
-	        // directionalLight.shadow.camera.near = 10;
-	        // directionalLight.shadow.camera.far = 100;
-	        //
-	        // // TODO: Need to dial in on a good shadowmap size
-	        // directionalLight.shadow.mapSize.width = 2048;
-	        // directionalLight.shadow.mapSize.height = 2048;
-	        //
-	        // // directionalLight.shadowBias = -0.0010;
-	        // // directionalLight.shadow.darkness = 0.15;
-	
-	        var directionalLight2 = new _three2['default'].DirectionalLight(0xffffff, 0.5);
-	        directionalLight2.position.x = -10000;
-	        directionalLight2.position.y = 10000;
-	        directionalLight2.position.z = 0;
-	
-	        var directionalLight3 = new _three2['default'].DirectionalLight(0xffffff, 0.5);
-	        directionalLight3.position.x = 10000;
-	        directionalLight3.position.y = 10000;
-	        directionalLight3.position.z = -10000;
-	
-	        this.add(directionalLight);
-	        this.add(directionalLight2);
-	        this.add(directionalLight3);
-	
-	        // var helper = new THREE.DirectionalLightHelper(directionalLight, 10);
-	        // var helper2 = new THREE.DirectionalLightHelper(directionalLight2, 10);
-	        // var helper3 = new THREE.DirectionalLightHelper(directionalLight3, 10);
-	        //
-	        // this.add(helper);
-	        // this.add(helper2);
-	        // this.add(helper3);
-	      } else {
-	          // Directional light that will be projected from the sun
-	          this._skyboxLight = new _three2['default'].DirectionalLight(0xffffff, 1);
-	
-	          this._skyboxLight.castShadow = true;
-	
-	          var d = 10000;
-	          this._skyboxLight.shadow.camera.left = -d;
-	          this._skyboxLight.shadow.camera.right = d;
-	          this._skyboxLight.shadow.camera.top = d;
-	          this._skyboxLight.shadow.camera.bottom = -d;
-	
-	          this._skyboxLight.shadow.camera.near = 10000;
-	          this._skyboxLight.shadow.camera.far = 70000;
-	
-	          // TODO: Need to dial in on a good shadowmap size
-	          this._skyboxLight.shadow.mapSize.width = 2048;
-	          this._skyboxLight.shadow.mapSize.height = 2048;
-	
-	          // this._skyboxLight.shadowBias = -0.0010;
-	          // this._skyboxLight.shadow.darkness = 0.15;
-	
-	          // this._object3D.add(new THREE.CameraHelper(this._skyboxLight.shadow.camera));
-	
-	          this.add(this._skyboxLight);
-	        }
-	    }
-	  }, {
-	    key: '_initSkybox',
-	    value: function _initSkybox() {
-	      this._skybox = new _Skybox2['default'](this._world, this._skyboxLight);
-	      this.add(this._skybox._mesh);
-	    }
-	
-	    // Add grid helper for context during initial development
-	  }, {
-	    key: '_initGrid',
-	    value: function _initGrid() {
-	      var size = 4000;
-	      var step = 100;
-	
-	      var gridHelper = new _three2['default'].GridHelper(size, step);
-	      this.add(gridHelper);
-	    }
-	
-	    // Clean up environment
-	  }, {
-	    key: 'destroy',
-	    value: function destroy() {
-	      this._skyboxLight = null;
-	
-	      this.remove(this._skybox._mesh);
-	      this._skybox.destroy();
-	      this._skybox = null;
-	
-	      _get(Object.getPrototypeOf(EnvironmentLayer.prototype), 'destroy', this).call(this);
-	    }
-	  }]);
-	
-	  return EnvironmentLayer;
-	})(_Layer3['default']);
-	
-	exports['default'] = EnvironmentLayer;
-	
-	var noNew = function noNew(options) {
-	  return new EnvironmentLayer(options);
-	};
-	
-	// Initialise without requiring new keyword
-	exports.environmentLayer = noNew;
-
-/***/ },
-/* 32 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var _eventemitter3 = __webpack_require__(2);
-	
-	var _eventemitter32 = _interopRequireDefault(_eventemitter3);
-	
-	var _lodashAssign = __webpack_require__(3);
-	
-	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
-	
-	var _three = __webpack_require__(10);
-	
-	var _three2 = _interopRequireDefault(_three);
-	
-	var _engineScene = __webpack_require__(11);
-	
-	var _engineScene2 = _interopRequireDefault(_engineScene);
-	
-	var _vendorCSS3DRenderer = __webpack_require__(16);
-	
-	var _vendorCSS2DRenderer = __webpack_require__(18);
-	
-	// TODO: Make sure nothing is left behind in the heap after calling destroy()
-	
-	// TODO: Need a single move method that handles moving all the various object
-	// layers so that the DOM layers stay in sync with the 3D layer
-	
-	// TODO: Double check that objects within the _object3D Object3D parent are frustum
-	// culled even if the layer position stays at the default (0,0,0) and the child
-	// objects are positioned much further away
-	//
-	// Or does the layer being at (0,0,0) prevent the child objects from being
-	// culled because the layer parent is effectively always in view even if the
-	// child is actually out of camera
-	
-	var Layer = (function (_EventEmitter) {
-	  _inherits(Layer, _EventEmitter);
-	
-	  function Layer(options) {
-	    _classCallCheck(this, Layer);
-	
-	    _get(Object.getPrototypeOf(Layer.prototype), 'constructor', this).call(this);
-	
-	    var defaults = {
-	      output: true,
-	      outputToScene: true
-	    };
-	
-	    this._options = (0, _lodashAssign2['default'])({}, defaults, options);
-	
-	    if (this.isOutput()) {
-	      this._object3D = new _three2['default'].Object3D();
-	
-	      this._dom3D = document.createElement('div');
-	      this._domObject3D = new _vendorCSS3DRenderer.CSS3DObject(this._dom3D);
-	
-	      this._dom2D = document.createElement('div');
-	      this._domObject2D = new _vendorCSS2DRenderer.CSS2DObject(this._dom2D);
-	    }
-	  }
-	
-	  // Add THREE object directly to layer
-	
-	  _createClass(Layer, [{
-	    key: 'add',
-	    value: function add(object) {
-	      this._object3D.add(object);
-	    }
-	
-	    // Remove THREE object from to layer
-	  }, {
-	    key: 'remove',
-	    value: function remove(object) {
-	      this._object3D.remove(object);
-	    }
-	  }, {
-	    key: 'addDOM3D',
-	    value: function addDOM3D(object) {
-	      this._domObject3D.add(object);
-	    }
-	  }, {
-	    key: 'removeDOM3D',
-	    value: function removeDOM3D(object) {
-	      this._domObject3D.remove(object);
-	    }
-	  }, {
-	    key: 'addDOM2D',
-	    value: function addDOM2D(object) {
-	      this._domObject2D.add(object);
-	    }
-	  }, {
-	    key: 'removeDOM2D',
-	    value: function removeDOM2D(object) {
-	      this._domObject2D.remove(object);
-	    }
-	
-	    // Add layer to world instance and store world reference
-	  }, {
-	    key: 'addTo',
-	    value: function addTo(world) {
-	      return world.addLayer(this);
-	    }
-	
-	    // Internal method called by World.addLayer to actually add the layer
-	  }, {
-	    key: '_addToWorld',
-	    value: function _addToWorld(world) {
-	      var _this = this;
-	
-	      this._world = world;
-	
-	      return new Promise(function (resolve, reject) {
-	        _this._onAdd(world).then(function () {
-	          _this.emit('added');
-	          resolve(_this);
-	        })['catch'](reject);
-	      });
-	    }
-	
-	    // Must return a promise
-	  }, {
-	    key: '_onAdd',
-	    value: function _onAdd(world) {}
-	  }, {
-	    key: 'getPickingId',
-	    value: function getPickingId() {
-	      if (this._world._engine._picking) {
-	        return this._world._engine._picking.getNextId();
-	      }
-	
-	      return false;
-	    }
-	
-	    // TODO: Tidy this up and don't access so many private properties to work
-	  }, {
-	    key: 'addToPicking',
-	    value: function addToPicking(object) {
-	      if (!this._world._engine._picking) {
-	        return;
-	      }
-	
-	      this._world._engine._picking.add(object);
-	    }
-	  }, {
-	    key: 'removeFromPicking',
-	    value: function removeFromPicking(object) {
-	      if (!this._world._engine._picking) {
-	        return;
-	      }
-	
-	      this._world._engine._picking.remove(object);
-	    }
-	  }, {
-	    key: 'isOutput',
-	    value: function isOutput() {
-	      return this._options.output;
-	    }
-	  }, {
-	    key: 'isOutputToScene',
-	    value: function isOutputToScene() {
-	      return this._options.outputToScene;
-	    }
-	
-	    // Destroys the layer and removes it from the scene and memory
-	  }, {
-	    key: 'destroy',
-	    value: function destroy() {
-	      if (this._object3D && this._object3D.children) {
-	        // Remove everything else in the layer
-	        var child;
-	        for (var i = this._object3D.children.length - 1; i >= 0; i--) {
-	          child = this._object3D.children[i];
-	
-	          if (!child) {
-	            continue;
-	          }
-	
-	          this.remove(child);
-	
-	          if (child.geometry) {
-	            // Dispose of mesh and materials
-	            child.geometry.dispose();
-	            child.geometry = null;
-	          }
-	
-	          if (child.material) {
-	            if (child.material.map) {
-	              child.material.map.dispose();
-	              child.material.map = null;
-	            }
-	
-	            child.material.dispose();
-	            child.material = null;
-	          }
-	        }
-	      }
-	
-	      if (this._domObject3D && this._domObject3D.children) {
-	        // Remove everything else in the layer
-	        var child;
-	        for (var i = this._domObject3D.children.length - 1; i >= 0; i--) {
-	          child = this._domObject3D.children[i];
-	
-	          if (!child) {
-	            continue;
-	          }
-	
-	          this.removeDOM3D(child);
-	        }
-	      }
-	
-	      if (this._domObject2D && this._domObject2D.children) {
-	        // Remove everything else in the layer
-	        var child;
-	        for (var i = this._domObject2D.children.length - 1; i >= 0; i--) {
-	          child = this._domObject2D.children[i];
-	
-	          if (!child) {
-	            continue;
-	          }
-	
-	          this.removeDOM2D(child);
-	        }
-	      }
-	
-	      this._domObject3D = null;
-	      this._domObject2D = null;
-	
-	      this._world = null;
-	      this._object3D = null;
-	    }
-	  }]);
-	
-	  return Layer;
-	})(_eventemitter32['default']);
-	
-	exports['default'] = Layer;
-	
-	var noNew = function noNew(options) {
-	  return new Layer(options);
-	};
-	
-	exports.layer = noNew;
-
-/***/ },
-/* 33 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-	
-	var _three = __webpack_require__(10);
-	
-	var _three2 = _interopRequireDefault(_three);
-	
-	var _Sky = __webpack_require__(34);
-	
-	var _Sky2 = _interopRequireDefault(_Sky);
-	
-	var _lodashThrottle = __webpack_require__(35);
-	
-	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
-	
-	// TODO: Make sure nothing is left behind in the heap after calling destroy()
-	
-	var cubemap = {
-	  vertexShader: ['varying vec3 vPosition;', 'void main() {', 'vPosition = position;', 'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );', '}'].join('\n'),
-	
-	  fragmentShader: ['uniform samplerCube cubemap;', 'varying vec3 vPosition;', 'void main() {', 'gl_FragColor = textureCube(cubemap, normalize(vPosition));', '}'].join('\n')
-	};
-	
-	var Skybox = (function () {
-	  function Skybox(world, light) {
-	    _classCallCheck(this, Skybox);
-	
-	    this._world = world;
-	    this._light = light;
-	
-	    this._settings = {
-	      distance: 38000,
-	      turbidity: 10,
-	      reileigh: 2,
-	      mieCoefficient: 0.005,
-	      mieDirectionalG: 0.8,
-	      luminance: 1,
-	      // 0.48 is a cracking dusk / sunset
-	      // 0.4 is a beautiful early-morning / late-afternoon
-	      // 0.2 is a nice day time
-	      inclination: 0.48, // Elevation / inclination
-	      azimuth: 0.25 };
-	
-	    // Facing front
-	    this._initSkybox();
-	    this._updateUniforms();
-	    this._initEvents();
-	  }
-	
-	  _createClass(Skybox, [{
-	    key: '_initEvents',
-	    value: function _initEvents() {
-	      // Throttled to 1 per 100ms
-	      this._throttledWorldUpdate = (0, _lodashThrottle2['default'])(this._update, 100);
-	      this._world.on('preUpdate', this._throttledWorldUpdate, this);
-	    }
-	  }, {
-	    key: '_initSkybox',
-	    value: function _initSkybox() {
-	      // Cube camera for skybox
-	      this._cubeCamera = new _three2['default'].CubeCamera(1, 20000000, 128);
-	
-	      // Cube material
-	      var cubeTarget = this._cubeCamera.renderTarget;
-	
-	      // Add Sky Mesh
-	      this._sky = new _Sky2['default']();
-	      this._skyScene = new _three2['default'].Scene();
-	      this._skyScene.add(this._sky.mesh);
-	
-	      // Add Sun Helper
-	      this._sunSphere = new _three2['default'].Mesh(new _three2['default'].SphereBufferGeometry(2000, 16, 8), new _three2['default'].MeshBasicMaterial({
-	        color: 0xffffff
-	      }));
-	
-	      // TODO: This isn't actually visible because it's not added to the layer
-	      // this._sunSphere.visible = true;
-	
-	      var skyboxUniforms = {
-	        cubemap: { type: 't', value: cubeTarget }
-	      };
-	
-	      var skyboxMat = new _three2['default'].ShaderMaterial({
-	        uniforms: skyboxUniforms,
-	        vertexShader: cubemap.vertexShader,
-	        fragmentShader: cubemap.fragmentShader,
-	        side: _three2['default'].BackSide
-	      });
-	
-	      this._mesh = new _three2['default'].Mesh(new _three2['default'].BoxGeometry(1900000, 1900000, 1900000), skyboxMat);
-	
-	      this._updateSkybox = true;
-	    }
-	  }, {
-	    key: '_updateUniforms',
-	    value: function _updateUniforms() {
-	      var settings = this._settings;
-	      var uniforms = this._sky.uniforms;
-	      uniforms.turbidity.value = settings.turbidity;
-	      uniforms.reileigh.value = settings.reileigh;
-	      uniforms.luminance.value = settings.luminance;
-	      uniforms.mieCoefficient.value = settings.mieCoefficient;
-	      uniforms.mieDirectionalG.value = settings.mieDirectionalG;
-	
-	      var theta = Math.PI * (settings.inclination - 0.5);
-	      var phi = 2 * Math.PI * (settings.azimuth - 0.5);
-	
-	      this._sunSphere.position.x = settings.distance * Math.cos(phi);
-	      this._sunSphere.position.y = settings.distance * Math.sin(phi) * Math.sin(theta);
-	      this._sunSphere.position.z = settings.distance * Math.sin(phi) * Math.cos(theta);
-	
-	      // Move directional light to sun position
-	      this._light.position.copy(this._sunSphere.position);
-	
-	      this._sky.uniforms.sunPosition.value.copy(this._sunSphere.position);
-	    }
-	  }, {
-	    key: '_update',
-	    value: function _update(delta) {
-	      if (this._updateSkybox) {
-	        this._updateSkybox = false;
-	      } else {
-	        return;
-	      }
-	
-	      // if (!this._angle) {
-	      //   this._angle = 0;
-	      // }
-	      //
-	      // // Animate inclination
-	      // this._angle += Math.PI * delta;
-	      // this._settings.inclination = 0.5 * (Math.sin(this._angle) / 2 + 0.5);
-	
-	      // Update light intensity depending on elevation of sun (day to night)
-	      this._light.intensity = 1 - 0.95 * (this._settings.inclination / 0.5);
-	
-	      // // console.log(delta, this._angle, this._settings.inclination);
-	      //
-	      // TODO: Only do this when the uniforms have been changed
-	      this._updateUniforms();
-	
-	      // TODO: Only do this when the cubemap has actually changed
-	      this._cubeCamera.updateCubeMap(this._world._engine._renderer, this._skyScene);
-	    }
-	  }, {
-	    key: 'getRenderTarget',
-	    value: function getRenderTarget() {
-	      return this._cubeCamera.renderTarget;
-	    }
-	  }, {
-	    key: 'setInclination',
-	    value: function setInclination(inclination) {
-	      this._settings.inclination = inclination;
-	      this._updateSkybox = true;
-	    }
-	
-	    // Destroy the skybox and remove it from memory
-	  }, {
-	    key: 'destroy',
-	    value: function destroy() {
-	      this._world.off('preUpdate', this._throttledWorldUpdate);
-	      this._throttledWorldUpdate = null;
-	
-	      this._world = null;
-	      this._light = null;
-	
-	      this._cubeCamera = null;
-	
-	      this._sky.mesh.geometry.dispose();
-	      this._sky.mesh.geometry = null;
-	
-	      if (this._sky.mesh.material.map) {
-	        this._sky.mesh.material.map.dispose();
-	        this._sky.mesh.material.map = null;
-	      }
-	
-	      this._sky.mesh.material.dispose();
-	      this._sky.mesh.material = null;
-	
-	      this._sky.mesh = null;
-	      this._sky = null;
-	
-	      this._skyScene = null;
-	
-	      this._sunSphere.geometry.dispose();
-	      this._sunSphere.geometry = null;
-	
-	      if (this._sunSphere.material.map) {
-	        this._sunSphere.material.map.dispose();
-	        this._sunSphere.material.map = null;
-	      }
-	
-	      this._sunSphere.material.dispose();
-	      this._sunSphere.material = null;
-	
-	      this._sunSphere = null;
-	
-	      this._mesh.geometry.dispose();
-	      this._mesh.geometry = null;
-	
-	      if (this._mesh.material.map) {
-	        this._mesh.material.map.dispose();
-	        this._mesh.material.map = null;
-	      }
-	
-	      this._mesh.material.dispose();
-	      this._mesh.material = null;
-	    }
-	  }]);
-	
-	  return Skybox;
-	})();
-	
-	exports['default'] = Skybox;
-	
-	var noNew = function noNew(world, light) {
-	  return new Skybox(world, light);
-	};
-	
-	// Initialise without requiring new keyword
-	exports.skybox = noNew;
-
-/***/ },
-/* 34 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, '__esModule', {
-		value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	// jscs:disable
-	/*eslint eqeqeq:0*/
-	
-	/**
-	 * @author zz85 / https://github.com/zz85
-	 *
-	 * Based on 'A Practical Analytic Model for Daylight'
-	 * aka The Preetham Model, the de facto standard analytic skydome model
-	 * http://www.cs.utah.edu/~shirley/papers/sunsky/sunsky.pdf
-	 *
-	 * First implemented by Simon Wallner
-	 * http://www.simonwallner.at/projects/atmospheric-scattering
-	 *
-	 * Improved by Martin Upitis
-	 * http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR
-	 *
-	 * Three.js integration by zz85 http://twitter.com/blurspline
-	*/
-	
-	var _three = __webpack_require__(10);
-	
-	var _three2 = _interopRequireDefault(_three);
-	
-	_three2['default'].ShaderLib['sky'] = {
-	
-		uniforms: {
-	
-			luminance: { type: 'f', value: 1 },
-			turbidity: { type: 'f', value: 2 },
-			reileigh: { type: 'f', value: 1 },
-			mieCoefficient: { type: 'f', value: 0.005 },
-			mieDirectionalG: { type: 'f', value: 0.8 },
-			sunPosition: { type: 'v3', value: new _three2['default'].Vector3() }
-	
-		},
-	
-		vertexShader: ['varying vec3 vWorldPosition;', 'void main() {', 'vec4 worldPosition = modelMatrix * vec4( position, 1.0 );', 'vWorldPosition = worldPosition.xyz;', 'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );', '}'].join('\n'),
-	
-		fragmentShader: ['uniform sampler2D skySampler;', 'uniform vec3 sunPosition;', 'varying vec3 vWorldPosition;', 'vec3 cameraPos = vec3(0., 0., 0.);', '// uniform sampler2D sDiffuse;', '// const float turbidity = 10.0; //', '// const float reileigh = 2.; //', '// const float luminance = 1.0; //', '// const float mieCoefficient = 0.005;', '// const float mieDirectionalG = 0.8;', 'uniform float luminance;', 'uniform float turbidity;', 'uniform float reileigh;', 'uniform float mieCoefficient;', 'uniform float mieDirectionalG;', '// constants for atmospheric scattering', 'const float e = 2.71828182845904523536028747135266249775724709369995957;', 'const float pi = 3.141592653589793238462643383279502884197169;', 'const float n = 1.0003; // refractive index of air', 'const float N = 2.545E25; // number of molecules per unit volume for air at', '// 288.15K and 1013mb (sea level -45 celsius)', 'const float pn = 0.035;	// depolatization factor for standard air', '// wavelength of used primaries, according to preetham', 'const vec3 lambda = vec3(680E-9, 550E-9, 450E-9);', '// mie stuff', '// K coefficient for the primaries', 'const vec3 K = vec3(0.686, 0.678, 0.666);', 'const float v = 4.0;', '// optical length at zenith for molecules', 'const float rayleighZenithLength = 8.4E3;', 'const float mieZenithLength = 1.25E3;', 'const vec3 up = vec3(0.0, 1.0, 0.0);', 'const float EE = 1000.0;', 'const float sunAngularDiameterCos = 0.999956676946448443553574619906976478926848692873900859324;', '// 66 arc seconds -> degrees, and the cosine of that', '// earth shadow hack', 'const float cutoffAngle = pi/1.95;', 'const float steepness = 1.5;', 'vec3 totalRayleigh(vec3 lambda)', '{', 'return (8.0 * pow(pi, 3.0) * pow(pow(n, 2.0) - 1.0, 2.0) * (6.0 + 3.0 * pn)) / (3.0 * N * pow(lambda, vec3(4.0)) * (6.0 - 7.0 * pn));', '}',
-	
-		// see http://blenderartists.org/forum/showthread.php?321110-Shaders-and-Skybox-madness
-		'// A simplied version of the total Reayleigh scattering to works on browsers that use ANGLE', 'vec3 simplifiedRayleigh()', '{', 'return 0.0005 / vec3(94, 40, 18);',
-		// return 0.00054532832366 / (3.0 * 2.545E25 * pow(vec3(680E-9, 550E-9, 450E-9), vec3(4.0)) * 6.245);
-		'}', 'float rayleighPhase(float cosTheta)', '{	 ', 'return (3.0 / (16.0*pi)) * (1.0 + pow(cosTheta, 2.0));', '//	return (1.0 / (3.0*pi)) * (1.0 + pow(cosTheta, 2.0));', '//	return (3.0 / 4.0) * (1.0 + pow(cosTheta, 2.0));', '}', 'vec3 totalMie(vec3 lambda, vec3 K, float T)', '{', 'float c = (0.2 * T ) * 10E-18;', 'return 0.434 * c * pi * pow((2.0 * pi) / lambda, vec3(v - 2.0)) * K;', '}', 'float hgPhase(float cosTheta, float g)', '{', 'return (1.0 / (4.0*pi)) * ((1.0 - pow(g, 2.0)) / pow(1.0 - 2.0*g*cosTheta + pow(g, 2.0), 1.5));', '}', 'float sunIntensity(float zenithAngleCos)', '{', 'return EE * max(0.0, 1.0 - exp(-((cutoffAngle - acos(zenithAngleCos))/steepness)));', '}', '// float logLuminance(vec3 c)', '// {', '// 	return log(c.r * 0.2126 + c.g * 0.7152 + c.b * 0.0722);', '// }', '// Filmic ToneMapping http://filmicgames.com/archives/75', 'float A = 0.15;', 'float B = 0.50;', 'float C = 0.10;', 'float D = 0.20;', 'float E = 0.02;', 'float F = 0.30;', 'float W = 1000.0;', 'vec3 Uncharted2Tonemap(vec3 x)', '{', 'return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;', '}', 'void main() ', '{', 'float sunfade = 1.0-clamp(1.0-exp((sunPosition.y/450000.0)),0.0,1.0);', '// luminance =  1.0 ;// vWorldPosition.y / 450000. + 0.5; //sunPosition.y / 450000. * 1. + 0.5;', '// gl_FragColor = vec4(sunfade, sunfade, sunfade, 1.0);', 'float reileighCoefficient = reileigh - (1.0* (1.0-sunfade));', 'vec3 sunDirection = normalize(sunPosition);', 'float sunE = sunIntensity(dot(sunDirection, up));', '// extinction (absorbtion + out scattering) ', '// rayleigh coefficients',
-	
-		// 'vec3 betaR = totalRayleigh(lambda) * reileighCoefficient;',
-		'vec3 betaR = simplifiedRayleigh() * reileighCoefficient;', '// mie coefficients', 'vec3 betaM = totalMie(lambda, K, turbidity) * mieCoefficient;', '// optical length', '// cutoff angle at 90 to avoid singularity in next formula.', 'float zenithAngle = acos(max(0.0, dot(up, normalize(vWorldPosition - cameraPos))));', 'float sR = rayleighZenithLength / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));', 'float sM = mieZenithLength / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));', '// combined extinction factor	', 'vec3 Fex = exp(-(betaR * sR + betaM * sM));', '// in scattering', 'float cosTheta = dot(normalize(vWorldPosition - cameraPos), sunDirection);', 'float rPhase = rayleighPhase(cosTheta*0.5+0.5);', 'vec3 betaRTheta = betaR * rPhase;', 'float mPhase = hgPhase(cosTheta, mieDirectionalG);', 'vec3 betaMTheta = betaM * mPhase;', 'vec3 Lin = pow(sunE * ((betaRTheta + betaMTheta) / (betaR + betaM)) * (1.0 - Fex),vec3(1.5));', 'Lin *= mix(vec3(1.0),pow(sunE * ((betaRTheta + betaMTheta) / (betaR + betaM)) * Fex,vec3(1.0/2.0)),clamp(pow(1.0-dot(up, sunDirection),5.0),0.0,1.0));', '//nightsky', 'vec3 direction = normalize(vWorldPosition - cameraPos);', 'float theta = acos(direction.y); // elevation --> y-axis, [-pi/2, pi/2]', 'float phi = atan(direction.z, direction.x); // azimuth --> x-axis [-pi/2, pi/2]', 'vec2 uv = vec2(phi, theta) / vec2(2.0*pi, pi) + vec2(0.5, 0.0);', '// vec3 L0 = texture2D(skySampler, uv).rgb+0.1 * Fex;', 'vec3 L0 = vec3(0.1) * Fex;', '// composition + solar disc', '//if (cosTheta > sunAngularDiameterCos)', 'float sundisk = smoothstep(sunAngularDiameterCos,sunAngularDiameterCos+0.00002,cosTheta);', '// if (normalize(vWorldPosition - cameraPos).y>0.0)', 'L0 += (sunE * 19000.0 * Fex)*sundisk;', 'vec3 whiteScale = 1.0/Uncharted2Tonemap(vec3(W));', 'vec3 texColor = (Lin+L0);   ', 'texColor *= 0.04 ;', 'texColor += vec3(0.0,0.001,0.0025)*0.3;', 'float g_fMaxLuminance = 1.0;', 'float fLumScaled = 0.1 / luminance;     ', 'float fLumCompressed = (fLumScaled * (1.0 + (fLumScaled / (g_fMaxLuminance * g_fMaxLuminance)))) / (1.0 + fLumScaled); ', 'float ExposureBias = fLumCompressed;', 'vec3 curr = Uncharted2Tonemap((log2(2.0/pow(luminance,4.0)))*texColor);', 'vec3 color = curr*whiteScale;', 'vec3 retColor = pow(color,vec3(1.0/(1.2+(1.2*sunfade))));', 'gl_FragColor.rgb = retColor;', 'gl_FragColor.a = 1.0;', '}'].join('\n')
-	
-	};
-	
-	var Sky = function Sky() {
-	
-		var skyShader = _three2['default'].ShaderLib['sky'];
-		var skyUniforms = _three2['default'].UniformsUtils.clone(skyShader.uniforms);
-	
-		var skyMat = new _three2['default'].ShaderMaterial({
-			fragmentShader: skyShader.fragmentShader,
-			vertexShader: skyShader.vertexShader,
-			uniforms: skyUniforms,
-			side: _three2['default'].BackSide
-		});
-	
-		var skyGeo = new _three2['default'].SphereBufferGeometry(450000, 32, 15);
-		var skyMesh = new _three2['default'].Mesh(skyGeo, skyMat);
-	
-		// Expose variables
-		this.mesh = skyMesh;
-		this.uniforms = skyUniforms;
-	};
-	
-	exports['default'] = Sky;
-	module.exports = exports['default'];
-
-/***/ },
-/* 35 */
-/***/ function(module, exports, __webpack_require__) {
-
 	/**
 	 * lodash 4.0.1 (Custom Build) <https://lodash.com/>
 	 * Build: `lodash modularize exports="npm" -o ./`
@@ -5091,7 +3782,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2016 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <https://lodash.com/license>
 	 */
-	var debounce = __webpack_require__(36);
+	var debounce = __webpack_require__(23);
 	
 	/** Used as the `TypeError` message for "Functions" methods. */
 	var FUNC_ERROR_TEXT = 'Expected a function';
@@ -5186,7 +3877,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 36 */
+/* 23 */
 /***/ function(module, exports) {
 
 	/**
@@ -5586,7 +4277,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 37 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -5595,7 +4286,2110 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _ControlsOrbit = __webpack_require__(38);
+	var _three = __webpack_require__(10);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var _vendorEffectComposer = __webpack_require__(25);
+	
+	var _vendorEffectComposer2 = _interopRequireDefault(_vendorEffectComposer);
+	
+	exports['default'] = function (renderer, container) {
+	  var composer = new _vendorEffectComposer2['default'](renderer);
+	
+	  var updateSize = function updateSize() {
+	    // TODO: Re-enable this when perf issues can be solved
+	    //
+	    // Rendering double the resolution of the screen can be really slow
+	    // var pixelRatio = window.devicePixelRatio;
+	    var pixelRatio = 1;
+	
+	    composer.setSize(container.clientWidth * pixelRatio, container.clientHeight * pixelRatio);
+	  };
+	
+	  window.addEventListener('resize', updateSize, false);
+	  updateSize();
+	
+	  return composer;
+	};
+	
+	;
+	module.exports = exports['default'];
+
+/***/ },
+/* 25 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+		value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	// jscs:disable
+	/* eslint-disable */
+	
+	var _three = __webpack_require__(10);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var _CopyShader = __webpack_require__(26);
+	
+	var _CopyShader2 = _interopRequireDefault(_CopyShader);
+	
+	var _ShaderPass = __webpack_require__(27);
+	
+	var _ShaderPass2 = _interopRequireDefault(_ShaderPass);
+	
+	var _MaskPass = __webpack_require__(28);
+	
+	var _MaskPass2 = _interopRequireDefault(_MaskPass);
+	
+	/**
+	 * @author alteredq / http://alteredqualia.com/
+	 */
+	
+	var EffectComposer = function EffectComposer(renderer, renderTarget) {
+	
+		this.renderer = renderer;
+	
+		if (renderTarget === undefined) {
+	
+			var pixelRatio = renderer.getPixelRatio();
+	
+			var width = Math.floor(renderer.context.canvas.width / pixelRatio) || 1;
+			var height = Math.floor(renderer.context.canvas.height / pixelRatio) || 1;
+			var parameters = { minFilter: _three2['default'].LinearFilter, magFilter: _three2['default'].LinearFilter, format: _three2['default'].RGBAFormat, stencilBuffer: false };
+	
+			renderTarget = new _three2['default'].WebGLRenderTarget(width, height, parameters);
+		}
+	
+		this.renderTarget1 = renderTarget;
+		this.renderTarget2 = renderTarget.clone();
+	
+		this.writeBuffer = this.renderTarget1;
+		this.readBuffer = this.renderTarget2;
+	
+		this.passes = [];
+	
+		if (_CopyShader2['default'] === undefined) console.error("EffectComposer relies on THREE.CopyShader");
+	
+		this.copyPass = new _ShaderPass2['default'](_CopyShader2['default']);
+	};
+	
+	EffectComposer.prototype = {
+	
+		swapBuffers: function swapBuffers() {
+	
+			var tmp = this.readBuffer;
+			this.readBuffer = this.writeBuffer;
+			this.writeBuffer = tmp;
+		},
+	
+		addPass: function addPass(pass) {
+	
+			this.passes.push(pass);
+		},
+	
+		insertPass: function insertPass(pass, index) {
+	
+			this.passes.splice(index, 0, pass);
+		},
+	
+		render: function render(delta) {
+	
+			this.writeBuffer = this.renderTarget1;
+			this.readBuffer = this.renderTarget2;
+	
+			var maskActive = false;
+	
+			var pass,
+			    i,
+			    il = this.passes.length;
+	
+			for (i = 0; i < il; i++) {
+	
+				pass = this.passes[i];
+	
+				if (!pass.enabled) continue;
+	
+				pass.render(this.renderer, this.writeBuffer, this.readBuffer, delta, maskActive);
+	
+				if (pass.needsSwap) {
+	
+					if (maskActive) {
+	
+						var context = this.renderer.context;
+	
+						context.stencilFunc(context.NOTEQUAL, 1, 0xffffffff);
+	
+						this.copyPass.render(this.renderer, this.writeBuffer, this.readBuffer, delta);
+	
+						context.stencilFunc(context.EQUAL, 1, 0xffffffff);
+					}
+	
+					this.swapBuffers();
+				}
+	
+				if (pass instanceof _MaskPass2['default']) {
+	
+					maskActive = true;
+				} else if (pass instanceof _MaskPass.ClearMaskPass) {
+	
+					maskActive = false;
+				}
+			}
+		},
+	
+		reset: function reset(renderTarget) {
+	
+			if (renderTarget === undefined) {
+	
+				renderTarget = this.renderTarget1.clone();
+	
+				var pixelRatio = this.renderer.getPixelRatio();
+	
+				renderTarget.setSize(Math.floor(this.renderer.context.canvas.width / pixelRatio), Math.floor(this.renderer.context.canvas.height / pixelRatio));
+			}
+	
+			this.renderTarget1.dispose();
+			this.renderTarget1 = renderTarget;
+			this.renderTarget2.dispose();
+			this.renderTarget2 = renderTarget.clone();
+	
+			this.writeBuffer = this.renderTarget1;
+			this.readBuffer = this.renderTarget2;
+		},
+	
+		setSize: function setSize(width, height) {
+	
+			this.renderTarget1.setSize(width, height);
+			this.renderTarget2.setSize(width, height);
+		}
+	
+	};
+	
+	exports['default'] = EffectComposer;
+	
+	_three2['default'].EffectComposer = EffectComposer;
+	module.exports = exports['default'];
+
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	// jscs:disable
+	/* eslint-disable */
+	
+	var _three = __webpack_require__(10);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	/**
+	 * @author alteredq / http://alteredqualia.com/
+	 *
+	 * Full-screen textured quad shader
+	 */
+	
+	var CopyShader = {
+	
+		uniforms: {
+	
+			"tDiffuse": { type: "t", value: null },
+			"opacity": { type: "f", value: 1.0 }
+	
+		},
+	
+		vertexShader: ["varying vec2 vUv;", "void main() {", "vUv = uv;", "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );", "}"].join("\n"),
+	
+		fragmentShader: ["uniform float opacity;", "uniform sampler2D tDiffuse;", "varying vec2 vUv;", "void main() {", "vec4 texel = texture2D( tDiffuse, vUv );", "gl_FragColor = opacity * texel;", "}"].join("\n")
+	
+	};
+	
+	exports["default"] = CopyShader;
+	
+	_three2["default"].CopyShader = CopyShader;
+	module.exports = exports["default"];
+
+/***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	// jscs:disable
+	/* eslint-disable */
+	
+	var _three = __webpack_require__(10);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	/**
+	 * @author alteredq / http://alteredqualia.com/
+	 */
+	
+	var ShaderPass = function ShaderPass(shader, textureID) {
+	
+		this.textureID = textureID !== undefined ? textureID : "tDiffuse";
+	
+		if (shader instanceof _three2["default"].ShaderMaterial) {
+	
+			this.uniforms = shader.uniforms;
+	
+			this.material = shader;
+		} else if (shader) {
+	
+			this.uniforms = _three2["default"].UniformsUtils.clone(shader.uniforms);
+	
+			this.material = new _three2["default"].ShaderMaterial({
+	
+				defines: shader.defines || {},
+				uniforms: this.uniforms,
+				vertexShader: shader.vertexShader,
+				fragmentShader: shader.fragmentShader
+	
+			});
+		}
+	
+		this.renderToScreen = false;
+	
+		this.enabled = true;
+		this.needsSwap = true;
+		this.clear = false;
+	
+		this.camera = new _three2["default"].OrthographicCamera(-1, 1, 1, -1, 0, 1);
+		this.scene = new _three2["default"].Scene();
+	
+		this.quad = new _three2["default"].Mesh(new _three2["default"].PlaneBufferGeometry(2, 2), null);
+		this.scene.add(this.quad);
+	};
+	
+	ShaderPass.prototype = {
+	
+		render: function render(renderer, writeBuffer, readBuffer, delta) {
+	
+			if (this.uniforms[this.textureID]) {
+	
+				this.uniforms[this.textureID].value = readBuffer;
+			}
+	
+			this.quad.material = this.material;
+	
+			if (this.renderToScreen) {
+	
+				renderer.render(this.scene, this.camera);
+			} else {
+	
+				renderer.render(this.scene, this.camera, writeBuffer, this.clear);
+			}
+		}
+	
+	};
+	
+	exports["default"] = ShaderPass;
+	
+	_three2["default"].ShaderPass = ShaderPass;
+	module.exports = exports["default"];
+
+/***/ },
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+		value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	// jscs:disable
+	/* eslint-disable */
+	
+	var _three = __webpack_require__(10);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	/**
+	 * @author alteredq / http://alteredqualia.com/
+	 */
+	
+	var MaskPass = function MaskPass(scene, camera) {
+	
+		this.scene = scene;
+		this.camera = camera;
+	
+		this.enabled = true;
+		this.clear = true;
+		this.needsSwap = false;
+	
+		this.inverse = false;
+	};
+	
+	MaskPass.prototype = {
+	
+		render: function render(renderer, writeBuffer, readBuffer, delta) {
+	
+			var context = renderer.context;
+	
+			// don't update color or depth
+	
+			context.colorMask(false, false, false, false);
+			context.depthMask(false);
+	
+			// set up stencil
+	
+			var writeValue, clearValue;
+	
+			if (this.inverse) {
+	
+				writeValue = 0;
+				clearValue = 1;
+			} else {
+	
+				writeValue = 1;
+				clearValue = 0;
+			}
+	
+			context.enable(context.STENCIL_TEST);
+			context.stencilOp(context.REPLACE, context.REPLACE, context.REPLACE);
+			context.stencilFunc(context.ALWAYS, writeValue, 0xffffffff);
+			context.clearStencil(clearValue);
+	
+			// draw into the stencil buffer
+	
+			renderer.render(this.scene, this.camera, readBuffer, this.clear);
+			renderer.render(this.scene, this.camera, writeBuffer, this.clear);
+	
+			// re-enable update of color and depth
+	
+			context.colorMask(true, true, true, true);
+			context.depthMask(true);
+	
+			// only render where stencil is set to 1
+	
+			context.stencilFunc(context.EQUAL, 1, 0xffffffff); // draw if == 1
+			context.stencilOp(context.KEEP, context.KEEP, context.KEEP);
+		}
+	
+	};
+	
+	var ClearMaskPass = function ClearMaskPass() {
+	
+		this.enabled = true;
+	};
+	
+	ClearMaskPass.prototype = {
+	
+		render: function render(renderer, writeBuffer, readBuffer, delta) {
+	
+			var context = renderer.context;
+	
+			context.disable(context.STENCIL_TEST);
+		}
+	
+	};
+	
+	exports['default'] = MaskPass;
+	exports.ClearMaskPass = ClearMaskPass;
+	
+	_three2['default'].MaskPass = MaskPass;
+	_three2['default'].ClearMaskPass = ClearMaskPass;
+
+/***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+		value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	// jscs:disable
+	/* eslint-disable */
+	
+	var _three = __webpack_require__(10);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	/**
+	 * @author alteredq / http://alteredqualia.com/
+	 */
+	
+	var RenderPass = function RenderPass(scene, camera, overrideMaterial, clearColor, clearAlpha) {
+	
+		this.scene = scene;
+		this.camera = camera;
+	
+		this.overrideMaterial = overrideMaterial;
+	
+		this.clearColor = clearColor;
+		this.clearAlpha = clearAlpha !== undefined ? clearAlpha : 1;
+	
+		this.oldClearColor = new _three2['default'].Color();
+		this.oldClearAlpha = 1;
+	
+		this.enabled = true;
+		this.clear = true;
+		this.needsSwap = false;
+	};
+	
+	RenderPass.prototype = {
+	
+		render: function render(renderer, writeBuffer, readBuffer, delta) {
+	
+			this.scene.overrideMaterial = this.overrideMaterial;
+	
+			if (this.clearColor) {
+	
+				this.oldClearColor.copy(renderer.getClearColor());
+				this.oldClearAlpha = renderer.getClearAlpha();
+	
+				renderer.setClearColor(this.clearColor, this.clearAlpha);
+			}
+	
+			renderer.render(this.scene, this.camera, readBuffer, this.clear);
+	
+			if (this.clearColor) {
+	
+				renderer.setClearColor(this.oldClearColor, this.oldClearAlpha);
+			}
+	
+			this.scene.overrideMaterial = null;
+		}
+	
+	};
+	
+	exports['default'] = RenderPass;
+	
+	_three2['default'].RenderPass = RenderPass;
+	module.exports = exports['default'];
+
+/***/ },
+/* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	// jscs:disable
+	/* eslint-disable */
+	
+	var _three = __webpack_require__(10);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	/**
+	 * @author alteredq / http://alteredqualia.com/
+	 *
+	 * Simple fake tilt-shift effect, modulating two pass Gaussian blur (see above) by vertical position
+	 *
+	 * - 9 samples per pass
+	 * - standard deviation 2.7
+	 * - "h" and "v" parameters should be set to "1 / width" and "1 / height"
+	 * - "r" parameter control where "focused" horizontal line lies
+	 */
+	
+	var HorizontalTiltShiftShader = {
+	
+		uniforms: {
+	
+			"tDiffuse": { type: "t", value: null },
+			"h": { type: "f", value: 1.0 / 512.0 },
+			"r": { type: "f", value: 0.35 }
+	
+		},
+	
+		vertexShader: ["varying vec2 vUv;", "void main() {", "vUv = uv;", "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );", "}"].join("\n"),
+	
+		fragmentShader: ["uniform sampler2D tDiffuse;", "uniform float h;", "uniform float r;", "varying vec2 vUv;", "void main() {", "vec4 sum = vec4( 0.0 );", "float hh = h * abs( r - vUv.y );", "sum += texture2D( tDiffuse, vec2( vUv.x - 4.0 * hh, vUv.y ) ) * 0.051;", "sum += texture2D( tDiffuse, vec2( vUv.x - 3.0 * hh, vUv.y ) ) * 0.0918;", "sum += texture2D( tDiffuse, vec2( vUv.x - 2.0 * hh, vUv.y ) ) * 0.12245;", "sum += texture2D( tDiffuse, vec2( vUv.x - 1.0 * hh, vUv.y ) ) * 0.1531;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y ) ) * 0.1633;", "sum += texture2D( tDiffuse, vec2( vUv.x + 1.0 * hh, vUv.y ) ) * 0.1531;", "sum += texture2D( tDiffuse, vec2( vUv.x + 2.0 * hh, vUv.y ) ) * 0.12245;", "sum += texture2D( tDiffuse, vec2( vUv.x + 3.0 * hh, vUv.y ) ) * 0.0918;", "sum += texture2D( tDiffuse, vec2( vUv.x + 4.0 * hh, vUv.y ) ) * 0.051;", "gl_FragColor = sum;", "}"].join("\n")
+	
+	};
+	
+	exports["default"] = HorizontalTiltShiftShader;
+	
+	_three2["default"].HorizontalTiltShiftShader = HorizontalTiltShiftShader;
+	module.exports = exports["default"];
+
+/***/ },
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	// jscs:disable
+	/* eslint-disable */
+	
+	var _three = __webpack_require__(10);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	/**
+	 * @author alteredq / http://alteredqualia.com/
+	 *
+	 * Simple fake tilt-shift effect, modulating two pass Gaussian blur (see above) by vertical position
+	 *
+	 * - 9 samples per pass
+	 * - standard deviation 2.7
+	 * - "h" and "v" parameters should be set to "1 / width" and "1 / height"
+	 * - "r" parameter control where "focused" horizontal line lies
+	 */
+	
+	var VerticalTiltShiftShader = {
+	
+		uniforms: {
+	
+			"tDiffuse": { type: "t", value: null },
+			"v": { type: "f", value: 1.0 / 512.0 },
+			"r": { type: "f", value: 0.35 }
+	
+		},
+	
+		vertexShader: ["varying vec2 vUv;", "void main() {", "vUv = uv;", "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );", "}"].join("\n"),
+	
+		fragmentShader: ["uniform sampler2D tDiffuse;", "uniform float v;", "uniform float r;", "varying vec2 vUv;", "void main() {", "vec4 sum = vec4( 0.0 );", "float vv = v * abs( r - vUv.y );", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y - 4.0 * vv ) ) * 0.051;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y - 3.0 * vv ) ) * 0.0918;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y - 2.0 * vv ) ) * 0.12245;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y - 1.0 * vv ) ) * 0.1531;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y ) ) * 0.1633;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y + 1.0 * vv ) ) * 0.1531;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y + 2.0 * vv ) ) * 0.12245;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y + 3.0 * vv ) ) * 0.0918;", "sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y + 4.0 * vv ) ) * 0.051;", "gl_FragColor = sum;", "}"].join("\n")
+	
+	};
+	
+	exports["default"] = VerticalTiltShiftShader;
+	
+	_three2["default"].VerticalTiltShiftShader = VerticalTiltShiftShader;
+	module.exports = exports["default"];
+
+/***/ },
+/* 32 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	// jscs:disable
+	/* eslint-disable */
+	
+	var _three = __webpack_require__(10);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	/**
+	 * @author alteredq / http://alteredqualia.com/
+	 * @author davidedc / http://www.sketchpatch.net/
+	 *
+	 * NVIDIA FXAA by Timothy Lottes
+	 * http://timothylottes.blogspot.com/2011/06/fxaa3-source-released.html
+	 * - WebGL port by @supereggbert
+	 * http://www.glge.org/demos/fxaa/
+	 */
+	
+	var FXAAShader = {
+	
+		uniforms: {
+	
+			"tDiffuse": { type: "t", value: null },
+			"resolution": { type: "v2", value: new _three2["default"].Vector2(1 / 1024, 1 / 512) }
+	
+		},
+	
+		vertexShader: ["void main() {", "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );", "}"].join("\n"),
+	
+		fragmentShader: ["uniform sampler2D tDiffuse;", "uniform vec2 resolution;", "#define FXAA_REDUCE_MIN   (1.0/128.0)", "#define FXAA_REDUCE_MUL   (1.0/8.0)", "#define FXAA_SPAN_MAX     8.0", "void main() {", "vec3 rgbNW = texture2D( tDiffuse, ( gl_FragCoord.xy + vec2( -1.0, -1.0 ) ) * resolution ).xyz;", "vec3 rgbNE = texture2D( tDiffuse, ( gl_FragCoord.xy + vec2( 1.0, -1.0 ) ) * resolution ).xyz;", "vec3 rgbSW = texture2D( tDiffuse, ( gl_FragCoord.xy + vec2( -1.0, 1.0 ) ) * resolution ).xyz;", "vec3 rgbSE = texture2D( tDiffuse, ( gl_FragCoord.xy + vec2( 1.0, 1.0 ) ) * resolution ).xyz;", "vec4 rgbaM  = texture2D( tDiffuse,  gl_FragCoord.xy  * resolution );", "vec3 rgbM  = rgbaM.xyz;", "vec3 luma = vec3( 0.299, 0.587, 0.114 );", "float lumaNW = dot( rgbNW, luma );", "float lumaNE = dot( rgbNE, luma );", "float lumaSW = dot( rgbSW, luma );", "float lumaSE = dot( rgbSE, luma );", "float lumaM  = dot( rgbM,  luma );", "float lumaMin = min( lumaM, min( min( lumaNW, lumaNE ), min( lumaSW, lumaSE ) ) );", "float lumaMax = max( lumaM, max( max( lumaNW, lumaNE) , max( lumaSW, lumaSE ) ) );", "vec2 dir;", "dir.x = -((lumaNW + lumaNE) - (lumaSW + lumaSE));", "dir.y =  ((lumaNW + lumaSW) - (lumaNE + lumaSE));", "float dirReduce = max( ( lumaNW + lumaNE + lumaSW + lumaSE ) * ( 0.25 * FXAA_REDUCE_MUL ), FXAA_REDUCE_MIN );", "float rcpDirMin = 1.0 / ( min( abs( dir.x ), abs( dir.y ) ) + dirReduce );", "dir = min( vec2( FXAA_SPAN_MAX,  FXAA_SPAN_MAX),", "max( vec2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX),", "dir * rcpDirMin)) * resolution;", "vec4 rgbA = (1.0/2.0) * (", "texture2D(tDiffuse,  gl_FragCoord.xy  * resolution + dir * (1.0/3.0 - 0.5)) +", "texture2D(tDiffuse,  gl_FragCoord.xy  * resolution + dir * (2.0/3.0 - 0.5)));", "vec4 rgbB = rgbA * (1.0/2.0) + (1.0/4.0) * (", "texture2D(tDiffuse,  gl_FragCoord.xy  * resolution + dir * (0.0/3.0 - 0.5)) +", "texture2D(tDiffuse,  gl_FragCoord.xy  * resolution + dir * (3.0/3.0 - 0.5)));", "float lumaB = dot(rgbB, vec4(luma, 0.0));", "if ( ( lumaB < lumaMin ) || ( lumaB > lumaMax ) ) {", "gl_FragColor = rgbA;", "} else {", "gl_FragColor = rgbB;", "}", "}"].join("\n")
+	
+	};
+	
+	exports["default"] = FXAAShader;
+	
+	_three2["default"].FXAAShader = FXAAShader;
+	module.exports = exports["default"];
+
+/***/ },
+/* 33 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var _Layer2 = __webpack_require__(34);
+	
+	var _Layer3 = _interopRequireDefault(_Layer2);
+	
+	var _lodashAssign = __webpack_require__(3);
+	
+	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
+	
+	var _three = __webpack_require__(10);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var _Skybox = __webpack_require__(44);
+	
+	var _Skybox2 = _interopRequireDefault(_Skybox);
+	
+	// TODO: Make sure nothing is left behind in the heap after calling destroy()
+	
+	var EnvironmentLayer = (function (_Layer) {
+	  _inherits(EnvironmentLayer, _Layer);
+	
+	  function EnvironmentLayer(options) {
+	    _classCallCheck(this, EnvironmentLayer);
+	
+	    var defaults = {
+	      skybox: false
+	    };
+	
+	    var _options = (0, _lodashAssign2['default'])({}, defaults, options);
+	
+	    _get(Object.getPrototypeOf(EnvironmentLayer.prototype), 'constructor', this).call(this, _options);
+	  }
+	
+	  _createClass(EnvironmentLayer, [{
+	    key: '_onAdd',
+	    value: function _onAdd() {
+	      this._initLights();
+	
+	      if (this._options.skybox) {
+	        this._initSkybox();
+	      }
+	
+	      // this._initGrid();
+	
+	      return Promise.resolve(this);
+	    }
+	
+	    // Not fleshed out or thought through yet
+	    //
+	    // Lights could potentially be put it their own 'layer' to keep this class
+	    // much simpler and less messy
+	  }, {
+	    key: '_initLights',
+	    value: function _initLights() {
+	      // Position doesn't really matter (the angle is important), however it's
+	      // used here so the helpers look more natural.
+	
+	      if (!this._options.skybox) {
+	        var directionalLight = new _three2['default'].DirectionalLight(0xffffff, 1);
+	        directionalLight.position.x = 10000;
+	        directionalLight.position.y = 10000;
+	        directionalLight.position.z = 10000;
+	
+	        // TODO: Get shadows working in non-PBR scenes
+	
+	        // directionalLight.castShadow = true;
+	        //
+	        // var d = 100;
+	        // directionalLight.shadow.camera.left = -d;
+	        // directionalLight.shadow.camera.right = d;
+	        // directionalLight.shadow.camera.top = d;
+	        // directionalLight.shadow.camera.bottom = -d;
+	        //
+	        // directionalLight.shadow.camera.near = 10;
+	        // directionalLight.shadow.camera.far = 100;
+	        //
+	        // // TODO: Need to dial in on a good shadowmap size
+	        // directionalLight.shadow.mapSize.width = 2048;
+	        // directionalLight.shadow.mapSize.height = 2048;
+	        //
+	        // // directionalLight.shadowBias = -0.0010;
+	        // // directionalLight.shadow.darkness = 0.15;
+	
+	        var directionalLight2 = new _three2['default'].DirectionalLight(0xffffff, 0.5);
+	        directionalLight2.position.x = -10000;
+	        directionalLight2.position.y = 10000;
+	        directionalLight2.position.z = 0;
+	
+	        var directionalLight3 = new _three2['default'].DirectionalLight(0xffffff, 0.5);
+	        directionalLight3.position.x = 10000;
+	        directionalLight3.position.y = 10000;
+	        directionalLight3.position.z = -10000;
+	
+	        this.add(directionalLight);
+	        this.add(directionalLight2);
+	        this.add(directionalLight3);
+	
+	        // var helper = new THREE.DirectionalLightHelper(directionalLight, 10);
+	        // var helper2 = new THREE.DirectionalLightHelper(directionalLight2, 10);
+	        // var helper3 = new THREE.DirectionalLightHelper(directionalLight3, 10);
+	        //
+	        // this.add(helper);
+	        // this.add(helper2);
+	        // this.add(helper3);
+	      } else {
+	          // Directional light that will be projected from the sun
+	          this._skyboxLight = new _three2['default'].DirectionalLight(0xffffff, 1);
+	
+	          this._skyboxLight.castShadow = true;
+	
+	          var d = 10000;
+	          this._skyboxLight.shadow.camera.left = -d;
+	          this._skyboxLight.shadow.camera.right = d;
+	          this._skyboxLight.shadow.camera.top = d;
+	          this._skyboxLight.shadow.camera.bottom = -d;
+	
+	          this._skyboxLight.shadow.camera.near = 10000;
+	          this._skyboxLight.shadow.camera.far = 70000;
+	
+	          // TODO: Need to dial in on a good shadowmap size
+	          this._skyboxLight.shadow.mapSize.width = 2048;
+	          this._skyboxLight.shadow.mapSize.height = 2048;
+	
+	          // this._skyboxLight.shadowBias = -0.0010;
+	          // this._skyboxLight.shadow.darkness = 0.15;
+	
+	          // this._object3D.add(new THREE.CameraHelper(this._skyboxLight.shadow.camera));
+	
+	          this.add(this._skyboxLight);
+	        }
+	    }
+	  }, {
+	    key: '_initSkybox',
+	    value: function _initSkybox() {
+	      this._skybox = new _Skybox2['default'](this._world, this._skyboxLight);
+	      this.add(this._skybox._mesh);
+	    }
+	
+	    // Add grid helper for context during initial development
+	  }, {
+	    key: '_initGrid',
+	    value: function _initGrid() {
+	      var size = 4000;
+	      var step = 100;
+	
+	      var gridHelper = new _three2['default'].GridHelper(size, step);
+	      this.add(gridHelper);
+	    }
+	
+	    // Clean up environment
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {
+	      this._skyboxLight = null;
+	
+	      this.remove(this._skybox._mesh);
+	      this._skybox.destroy();
+	      this._skybox = null;
+	
+	      _get(Object.getPrototypeOf(EnvironmentLayer.prototype), 'destroy', this).call(this);
+	    }
+	  }]);
+	
+	  return EnvironmentLayer;
+	})(_Layer3['default']);
+	
+	exports['default'] = EnvironmentLayer;
+	
+	var noNew = function noNew(options) {
+	  return new EnvironmentLayer(options);
+	};
+	
+	// Initialise without requiring new keyword
+	exports.environmentLayer = noNew;
+
+/***/ },
+/* 34 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var _eventemitter3 = __webpack_require__(2);
+	
+	var _eventemitter32 = _interopRequireDefault(_eventemitter3);
+	
+	var _lodashAssign = __webpack_require__(3);
+	
+	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
+	
+	var _shortid = __webpack_require__(35);
+	
+	var _shortid2 = _interopRequireDefault(_shortid);
+	
+	var _three = __webpack_require__(10);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var _engineScene = __webpack_require__(11);
+	
+	var _engineScene2 = _interopRequireDefault(_engineScene);
+	
+	var _vendorCSS3DRenderer = __webpack_require__(16);
+	
+	var _vendorCSS2DRenderer = __webpack_require__(18);
+	
+	// TODO: Make sure nothing is left behind in the heap after calling destroy()
+	
+	// TODO: Need a single move method that handles moving all the various object
+	// layers so that the DOM layers stay in sync with the 3D layer
+	
+	// TODO: Double check that objects within the _object3D Object3D parent are frustum
+	// culled even if the layer position stays at the default (0,0,0) and the child
+	// objects are positioned much further away
+	//
+	// Or does the layer being at (0,0,0) prevent the child objects from being
+	// culled because the layer parent is effectively always in view even if the
+	// child is actually out of camera
+	
+	var Layer = (function (_EventEmitter) {
+	  _inherits(Layer, _EventEmitter);
+	
+	  function Layer(options) {
+	    _classCallCheck(this, Layer);
+	
+	    _get(Object.getPrototypeOf(Layer.prototype), 'constructor', this).call(this);
+	
+	    var defaults = {
+	      id: _shortid2['default'].generate(),
+	      output: true,
+	      outputToScene: true
+	    };
+	
+	    this._options = (0, _lodashAssign2['default'])({}, defaults, options);
+	
+	    if (this.isOutput()) {
+	      this._object3D = new _three2['default'].Object3D();
+	
+	      this._dom3D = document.createElement('div');
+	      this._domObject3D = new _vendorCSS3DRenderer.CSS3DObject(this._dom3D);
+	
+	      this._dom2D = document.createElement('div');
+	      this._domObject2D = new _vendorCSS2DRenderer.CSS2DObject(this._dom2D);
+	    }
+	  }
+	
+	  // Add THREE object directly to layer
+	
+	  _createClass(Layer, [{
+	    key: 'add',
+	    value: function add(object) {
+	      this._object3D.add(object);
+	    }
+	
+	    // Remove THREE object from to layer
+	  }, {
+	    key: 'remove',
+	    value: function remove(object) {
+	      this._object3D.remove(object);
+	    }
+	  }, {
+	    key: 'addDOM3D',
+	    value: function addDOM3D(object) {
+	      this._domObject3D.add(object);
+	    }
+	  }, {
+	    key: 'removeDOM3D',
+	    value: function removeDOM3D(object) {
+	      this._domObject3D.remove(object);
+	    }
+	  }, {
+	    key: 'addDOM2D',
+	    value: function addDOM2D(object) {
+	      this._domObject2D.add(object);
+	    }
+	  }, {
+	    key: 'removeDOM2D',
+	    value: function removeDOM2D(object) {
+	      this._domObject2D.remove(object);
+	    }
+	
+	    // Add layer to world instance and store world reference
+	  }, {
+	    key: 'addTo',
+	    value: function addTo(world) {
+	      return world.addLayer(this);
+	    }
+	
+	    // Internal method called by World.addLayer to actually add the layer
+	  }, {
+	    key: '_addToWorld',
+	    value: function _addToWorld(world) {
+	      var _this = this;
+	
+	      this._world = world;
+	
+	      return new Promise(function (resolve, reject) {
+	        _this._onAdd(world).then(function () {
+	          _this.emit('added');
+	          resolve(_this);
+	        })['catch'](reject);
+	      });
+	    }
+	
+	    // Must return a promise
+	  }, {
+	    key: '_onAdd',
+	    value: function _onAdd(world) {
+	      return Promise.resolve(this);
+	    }
+	  }, {
+	    key: 'getPickingId',
+	    value: function getPickingId() {
+	      if (this._world._engine._picking) {
+	        return this._world._engine._picking.getNextId();
+	      }
+	
+	      return false;
+	    }
+	
+	    // TODO: Tidy this up and don't access so many private properties to work
+	  }, {
+	    key: 'addToPicking',
+	    value: function addToPicking(object) {
+	      if (!this._world._engine._picking) {
+	        return;
+	      }
+	
+	      this._world._engine._picking.add(object);
+	    }
+	  }, {
+	    key: 'removeFromPicking',
+	    value: function removeFromPicking(object) {
+	      if (!this._world._engine._picking) {
+	        return;
+	      }
+	
+	      this._world._engine._picking.remove(object);
+	    }
+	  }, {
+	    key: 'isOutput',
+	    value: function isOutput() {
+	      return this._options.output;
+	    }
+	  }, {
+	    key: 'isOutputToScene',
+	    value: function isOutputToScene() {
+	      return this._options.outputToScene;
+	    }
+	
+	    // TODO: Also hide any attached DOM layers
+	  }, {
+	    key: 'hide',
+	    value: function hide() {
+	      this._object3D.visible = false;
+	
+	      if (this._pickingMesh) {
+	        this._pickingMesh.visible = false;
+	      }
+	    }
+	
+	    // TODO: Also show any attached DOM layers
+	  }, {
+	    key: 'show',
+	    value: function show() {
+	      this._object3D.visible = true;
+	
+	      if (this._pickingMesh) {
+	        this._pickingMesh.visible = true;
+	      }
+	    }
+	
+	    // Destroys the layer and removes it from the scene and memory
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {
+	      if (this._object3D && this._object3D.children) {
+	        // Remove everything else in the layer
+	        var child;
+	        for (var i = this._object3D.children.length - 1; i >= 0; i--) {
+	          child = this._object3D.children[i];
+	
+	          if (!child) {
+	            continue;
+	          }
+	
+	          this.remove(child);
+	
+	          if (child.geometry) {
+	            // Dispose of mesh and materials
+	            child.geometry.dispose();
+	            child.geometry = null;
+	          }
+	
+	          if (child.material) {
+	            if (child.material.map) {
+	              child.material.map.dispose();
+	              child.material.map = null;
+	            }
+	
+	            child.material.dispose();
+	            child.material = null;
+	          }
+	        }
+	      }
+	
+	      if (this._domObject3D && this._domObject3D.children) {
+	        // Remove everything else in the layer
+	        var child;
+	        for (var i = this._domObject3D.children.length - 1; i >= 0; i--) {
+	          child = this._domObject3D.children[i];
+	
+	          if (!child) {
+	            continue;
+	          }
+	
+	          this.removeDOM3D(child);
+	        }
+	      }
+	
+	      if (this._domObject2D && this._domObject2D.children) {
+	        // Remove everything else in the layer
+	        var child;
+	        for (var i = this._domObject2D.children.length - 1; i >= 0; i--) {
+	          child = this._domObject2D.children[i];
+	
+	          if (!child) {
+	            continue;
+	          }
+	
+	          this.removeDOM2D(child);
+	        }
+	      }
+	
+	      this._domObject3D = null;
+	      this._domObject2D = null;
+	
+	      this._world = null;
+	      this._object3D = null;
+	    }
+	  }]);
+	
+	  return Layer;
+	})(_eventemitter32['default']);
+	
+	exports['default'] = Layer;
+	
+	var noNew = function noNew(options) {
+	  return new Layer(options);
+	};
+	
+	exports.layer = noNew;
+
+/***/ },
+/* 35 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	module.exports = __webpack_require__(36);
+
+
+/***/ },
+/* 36 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var alphabet = __webpack_require__(37);
+	var encode = __webpack_require__(39);
+	var decode = __webpack_require__(41);
+	var isValid = __webpack_require__(42);
+	
+	// Ignore all milliseconds before a certain time to reduce the size of the date entropy without sacrificing uniqueness.
+	// This number should be updated every year or so to keep the generated id short.
+	// To regenerate `new Date() - 0` and bump the version. Always bump the version!
+	var REDUCE_TIME = 1459707606518;
+	
+	// don't change unless we change the algos or REDUCE_TIME
+	// must be an integer and less than 16
+	var version = 6;
+	
+	// if you are using cluster or multiple servers use this to make each instance
+	// has a unique value for worker
+	// Note: I don't know if this is automatically set when using third
+	// party cluster solutions such as pm2.
+	var clusterWorkerId = __webpack_require__(43) || 0;
+	
+	// Counter is used when shortid is called multiple times in one second.
+	var counter;
+	
+	// Remember the last time shortid was called in case counter is needed.
+	var previousSeconds;
+	
+	/**
+	 * Generate unique id
+	 * Returns string id
+	 */
+	function generate() {
+	
+	    var str = '';
+	
+	    var seconds = Math.floor((Date.now() - REDUCE_TIME) * 0.001);
+	
+	    if (seconds === previousSeconds) {
+	        counter++;
+	    } else {
+	        counter = 0;
+	        previousSeconds = seconds;
+	    }
+	
+	    str = str + encode(alphabet.lookup, version);
+	    str = str + encode(alphabet.lookup, clusterWorkerId);
+	    if (counter > 0) {
+	        str = str + encode(alphabet.lookup, counter);
+	    }
+	    str = str + encode(alphabet.lookup, seconds);
+	
+	    return str;
+	}
+	
+	
+	/**
+	 * Set the seed.
+	 * Highly recommended if you don't want people to try to figure out your id schema.
+	 * exposed as shortid.seed(int)
+	 * @param seed Integer value to seed the random alphabet.  ALWAYS USE THE SAME SEED or you might get overlaps.
+	 */
+	function seed(seedValue) {
+	    alphabet.seed(seedValue);
+	    return module.exports;
+	}
+	
+	/**
+	 * Set the cluster worker or machine id
+	 * exposed as shortid.worker(int)
+	 * @param workerId worker must be positive integer.  Number less than 16 is recommended.
+	 * returns shortid module so it can be chained.
+	 */
+	function worker(workerId) {
+	    clusterWorkerId = workerId;
+	    return module.exports;
+	}
+	
+	/**
+	 *
+	 * sets new characters to use in the alphabet
+	 * returns the shuffled alphabet
+	 */
+	function characters(newCharacters) {
+	    if (newCharacters !== undefined) {
+	        alphabet.characters(newCharacters);
+	    }
+	
+	    return alphabet.shuffled();
+	}
+	
+	
+	// Export all other functions as properties of the generate function
+	module.exports = generate;
+	module.exports.generate = generate;
+	module.exports.seed = seed;
+	module.exports.worker = worker;
+	module.exports.characters = characters;
+	module.exports.decode = decode;
+	module.exports.isValid = isValid;
+
+
+/***/ },
+/* 37 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var randomFromSeed = __webpack_require__(38);
+	
+	var ORIGINAL = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-';
+	var alphabet;
+	var previousSeed;
+	
+	var shuffled;
+	
+	function reset() {
+	    shuffled = false;
+	}
+	
+	function setCharacters(_alphabet_) {
+	    if (!_alphabet_) {
+	        if (alphabet !== ORIGINAL) {
+	            alphabet = ORIGINAL;
+	            reset();
+	        }
+	        return;
+	    }
+	
+	    if (_alphabet_ === alphabet) {
+	        return;
+	    }
+	
+	    if (_alphabet_.length !== ORIGINAL.length) {
+	        throw new Error('Custom alphabet for shortid must be ' + ORIGINAL.length + ' unique characters. You submitted ' + _alphabet_.length + ' characters: ' + _alphabet_);
+	    }
+	
+	    var unique = _alphabet_.split('').filter(function(item, ind, arr){
+	       return ind !== arr.lastIndexOf(item);
+	    });
+	
+	    if (unique.length) {
+	        throw new Error('Custom alphabet for shortid must be ' + ORIGINAL.length + ' unique characters. These characters were not unique: ' + unique.join(', '));
+	    }
+	
+	    alphabet = _alphabet_;
+	    reset();
+	}
+	
+	function characters(_alphabet_) {
+	    setCharacters(_alphabet_);
+	    return alphabet;
+	}
+	
+	function setSeed(seed) {
+	    randomFromSeed.seed(seed);
+	    if (previousSeed !== seed) {
+	        reset();
+	        previousSeed = seed;
+	    }
+	}
+	
+	function shuffle() {
+	    if (!alphabet) {
+	        setCharacters(ORIGINAL);
+	    }
+	
+	    var sourceArray = alphabet.split('');
+	    var targetArray = [];
+	    var r = randomFromSeed.nextValue();
+	    var characterIndex;
+	
+	    while (sourceArray.length > 0) {
+	        r = randomFromSeed.nextValue();
+	        characterIndex = Math.floor(r * sourceArray.length);
+	        targetArray.push(sourceArray.splice(characterIndex, 1)[0]);
+	    }
+	    return targetArray.join('');
+	}
+	
+	function getShuffled() {
+	    if (shuffled) {
+	        return shuffled;
+	    }
+	    shuffled = shuffle();
+	    return shuffled;
+	}
+	
+	/**
+	 * lookup shuffled letter
+	 * @param index
+	 * @returns {string}
+	 */
+	function lookup(index) {
+	    var alphabetShuffled = getShuffled();
+	    return alphabetShuffled[index];
+	}
+	
+	module.exports = {
+	    characters: characters,
+	    seed: setSeed,
+	    lookup: lookup,
+	    shuffled: getShuffled
+	};
+
+
+/***/ },
+/* 38 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	// Found this seed-based random generator somewhere
+	// Based on The Central Randomizer 1.3 (C) 1997 by Paul Houle (houle@msc.cornell.edu)
+	
+	var seed = 1;
+	
+	/**
+	 * return a random number based on a seed
+	 * @param seed
+	 * @returns {number}
+	 */
+	function getNextValue() {
+	    seed = (seed * 9301 + 49297) % 233280;
+	    return seed/(233280.0);
+	}
+	
+	function setSeed(_seed_) {
+	    seed = _seed_;
+	}
+	
+	module.exports = {
+	    nextValue: getNextValue,
+	    seed: setSeed
+	};
+
+
+/***/ },
+/* 39 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var randomByte = __webpack_require__(40);
+	
+	function encode(lookup, number) {
+	    var loopCounter = 0;
+	    var done;
+	
+	    var str = '';
+	
+	    while (!done) {
+	        str = str + lookup( ( (number >> (4 * loopCounter)) & 0x0f ) | randomByte() );
+	        done = number < (Math.pow(16, loopCounter + 1 ) );
+	        loopCounter++;
+	    }
+	    return str;
+	}
+	
+	module.exports = encode;
+
+
+/***/ },
+/* 40 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	var crypto = typeof window === 'object' && (window.crypto || window.msCrypto); // IE 11 uses window.msCrypto
+	
+	function randomByte() {
+	    if (!crypto || !crypto.getRandomValues) {
+	        return Math.floor(Math.random() * 256) & 0x30;
+	    }
+	    var dest = new Uint8Array(1);
+	    crypto.getRandomValues(dest);
+	    return dest[0] & 0x30;
+	}
+	
+	module.exports = randomByte;
+
+
+/***/ },
+/* 41 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var alphabet = __webpack_require__(37);
+	
+	/**
+	 * Decode the id to get the version and worker
+	 * Mainly for debugging and testing.
+	 * @param id - the shortid-generated id.
+	 */
+	function decode(id) {
+	    var characters = alphabet.shuffled();
+	    return {
+	        version: characters.indexOf(id.substr(0, 1)) & 0x0f,
+	        worker: characters.indexOf(id.substr(1, 1)) & 0x0f
+	    };
+	}
+	
+	module.exports = decode;
+
+
+/***/ },
+/* 42 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var alphabet = __webpack_require__(37);
+	
+	function isShortId(id) {
+	    if (!id || typeof id !== 'string' || id.length < 6 ) {
+	        return false;
+	    }
+	
+	    var characters = alphabet.characters();
+	    var len = id.length;
+	    for(var i = 0; i < len;i++) {
+	        if (characters.indexOf(id[i]) === -1) {
+	            return false;
+	        }
+	    }
+	    return true;
+	}
+	
+	module.exports = isShortId;
+
+
+/***/ },
+/* 43 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	module.exports = 0;
+
+
+/***/ },
+/* 44 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	var _three = __webpack_require__(10);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var _Sky = __webpack_require__(45);
+	
+	var _Sky2 = _interopRequireDefault(_Sky);
+	
+	var _lodashThrottle = __webpack_require__(22);
+	
+	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
+	
+	// TODO: Make sure nothing is left behind in the heap after calling destroy()
+	
+	var cubemap = {
+	  vertexShader: ['varying vec3 vPosition;', 'void main() {', 'vPosition = position;', 'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );', '}'].join('\n'),
+	
+	  fragmentShader: ['uniform samplerCube cubemap;', 'varying vec3 vPosition;', 'void main() {', 'gl_FragColor = textureCube(cubemap, normalize(vPosition));', '}'].join('\n')
+	};
+	
+	var Skybox = (function () {
+	  function Skybox(world, light) {
+	    _classCallCheck(this, Skybox);
+	
+	    this._world = world;
+	    this._light = light;
+	
+	    this._settings = {
+	      distance: 38000,
+	      turbidity: 10,
+	      reileigh: 2,
+	      mieCoefficient: 0.005,
+	      mieDirectionalG: 0.8,
+	      luminance: 1,
+	      // 0.48 is a cracking dusk / sunset
+	      // 0.4 is a beautiful early-morning / late-afternoon
+	      // 0.2 is a nice day time
+	      inclination: 0.48, // Elevation / inclination
+	      azimuth: 0.25 };
+	
+	    // Facing front
+	    this._initSkybox();
+	    this._updateUniforms();
+	    this._initEvents();
+	  }
+	
+	  _createClass(Skybox, [{
+	    key: '_initEvents',
+	    value: function _initEvents() {
+	      // Throttled to 1 per 100ms
+	      this._throttledWorldUpdate = (0, _lodashThrottle2['default'])(this._update, 100);
+	      this._world.on('preUpdate', this._throttledWorldUpdate, this);
+	    }
+	  }, {
+	    key: '_initSkybox',
+	    value: function _initSkybox() {
+	      // Cube camera for skybox
+	      this._cubeCamera = new _three2['default'].CubeCamera(1, 20000000, 128);
+	
+	      // Cube material
+	      var cubeTarget = this._cubeCamera.renderTarget;
+	
+	      // Add Sky Mesh
+	      this._sky = new _Sky2['default']();
+	      this._skyScene = new _three2['default'].Scene();
+	      this._skyScene.add(this._sky.mesh);
+	
+	      // Add Sun Helper
+	      this._sunSphere = new _three2['default'].Mesh(new _three2['default'].SphereBufferGeometry(2000, 16, 8), new _three2['default'].MeshBasicMaterial({
+	        color: 0xffffff
+	      }));
+	
+	      // TODO: This isn't actually visible because it's not added to the layer
+	      // this._sunSphere.visible = true;
+	
+	      var skyboxUniforms = {
+	        cubemap: { type: 't', value: cubeTarget }
+	      };
+	
+	      var skyboxMat = new _three2['default'].ShaderMaterial({
+	        uniforms: skyboxUniforms,
+	        vertexShader: cubemap.vertexShader,
+	        fragmentShader: cubemap.fragmentShader,
+	        side: _three2['default'].BackSide
+	      });
+	
+	      this._mesh = new _three2['default'].Mesh(new _three2['default'].BoxGeometry(1900000, 1900000, 1900000), skyboxMat);
+	
+	      this._updateSkybox = true;
+	    }
+	  }, {
+	    key: '_updateUniforms',
+	    value: function _updateUniforms() {
+	      var settings = this._settings;
+	      var uniforms = this._sky.uniforms;
+	      uniforms.turbidity.value = settings.turbidity;
+	      uniforms.reileigh.value = settings.reileigh;
+	      uniforms.luminance.value = settings.luminance;
+	      uniforms.mieCoefficient.value = settings.mieCoefficient;
+	      uniforms.mieDirectionalG.value = settings.mieDirectionalG;
+	
+	      var theta = Math.PI * (settings.inclination - 0.5);
+	      var phi = 2 * Math.PI * (settings.azimuth - 0.5);
+	
+	      this._sunSphere.position.x = settings.distance * Math.cos(phi);
+	      this._sunSphere.position.y = settings.distance * Math.sin(phi) * Math.sin(theta);
+	      this._sunSphere.position.z = settings.distance * Math.sin(phi) * Math.cos(theta);
+	
+	      // Move directional light to sun position
+	      this._light.position.copy(this._sunSphere.position);
+	
+	      this._sky.uniforms.sunPosition.value.copy(this._sunSphere.position);
+	    }
+	  }, {
+	    key: '_update',
+	    value: function _update(delta) {
+	      if (this._updateSkybox) {
+	        this._updateSkybox = false;
+	      } else {
+	        return;
+	      }
+	
+	      // if (!this._angle) {
+	      //   this._angle = 0;
+	      // }
+	      //
+	      // // Animate inclination
+	      // this._angle += Math.PI * delta;
+	      // this._settings.inclination = 0.5 * (Math.sin(this._angle) / 2 + 0.5);
+	
+	      // Update light intensity depending on elevation of sun (day to night)
+	      this._light.intensity = 1 - 0.95 * (this._settings.inclination / 0.5);
+	
+	      // // console.log(delta, this._angle, this._settings.inclination);
+	      //
+	      // TODO: Only do this when the uniforms have been changed
+	      this._updateUniforms();
+	
+	      // TODO: Only do this when the cubemap has actually changed
+	      this._cubeCamera.updateCubeMap(this._world._engine._renderer, this._skyScene);
+	    }
+	  }, {
+	    key: 'getRenderTarget',
+	    value: function getRenderTarget() {
+	      return this._cubeCamera.renderTarget;
+	    }
+	  }, {
+	    key: 'setInclination',
+	    value: function setInclination(inclination) {
+	      this._settings.inclination = inclination;
+	      this._updateSkybox = true;
+	    }
+	
+	    // Destroy the skybox and remove it from memory
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {
+	      this._world.off('preUpdate', this._throttledWorldUpdate);
+	      this._throttledWorldUpdate = null;
+	
+	      this._world = null;
+	      this._light = null;
+	
+	      this._cubeCamera = null;
+	
+	      this._sky.mesh.geometry.dispose();
+	      this._sky.mesh.geometry = null;
+	
+	      if (this._sky.mesh.material.map) {
+	        this._sky.mesh.material.map.dispose();
+	        this._sky.mesh.material.map = null;
+	      }
+	
+	      this._sky.mesh.material.dispose();
+	      this._sky.mesh.material = null;
+	
+	      this._sky.mesh = null;
+	      this._sky = null;
+	
+	      this._skyScene = null;
+	
+	      this._sunSphere.geometry.dispose();
+	      this._sunSphere.geometry = null;
+	
+	      if (this._sunSphere.material.map) {
+	        this._sunSphere.material.map.dispose();
+	        this._sunSphere.material.map = null;
+	      }
+	
+	      this._sunSphere.material.dispose();
+	      this._sunSphere.material = null;
+	
+	      this._sunSphere = null;
+	
+	      this._mesh.geometry.dispose();
+	      this._mesh.geometry = null;
+	
+	      if (this._mesh.material.map) {
+	        this._mesh.material.map.dispose();
+	        this._mesh.material.map = null;
+	      }
+	
+	      this._mesh.material.dispose();
+	      this._mesh.material = null;
+	    }
+	  }]);
+	
+	  return Skybox;
+	})();
+	
+	exports['default'] = Skybox;
+	
+	var noNew = function noNew(world, light) {
+	  return new Skybox(world, light);
+	};
+	
+	// Initialise without requiring new keyword
+	exports.skybox = noNew;
+
+/***/ },
+/* 45 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+		value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	// jscs:disable
+	/*eslint eqeqeq:0*/
+	
+	/**
+	 * @author zz85 / https://github.com/zz85
+	 *
+	 * Based on 'A Practical Analytic Model for Daylight'
+	 * aka The Preetham Model, the de facto standard analytic skydome model
+	 * http://www.cs.utah.edu/~shirley/papers/sunsky/sunsky.pdf
+	 *
+	 * First implemented by Simon Wallner
+	 * http://www.simonwallner.at/projects/atmospheric-scattering
+	 *
+	 * Improved by Martin Upitis
+	 * http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR
+	 *
+	 * Three.js integration by zz85 http://twitter.com/blurspline
+	*/
+	
+	var _three = __webpack_require__(10);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	_three2['default'].ShaderLib['sky'] = {
+	
+		uniforms: {
+	
+			luminance: { type: 'f', value: 1 },
+			turbidity: { type: 'f', value: 2 },
+			reileigh: { type: 'f', value: 1 },
+			mieCoefficient: { type: 'f', value: 0.005 },
+			mieDirectionalG: { type: 'f', value: 0.8 },
+			sunPosition: { type: 'v3', value: new _three2['default'].Vector3() }
+	
+		},
+	
+		vertexShader: ['varying vec3 vWorldPosition;', 'void main() {', 'vec4 worldPosition = modelMatrix * vec4( position, 1.0 );', 'vWorldPosition = worldPosition.xyz;', 'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );', '}'].join('\n'),
+	
+		fragmentShader: ['uniform sampler2D skySampler;', 'uniform vec3 sunPosition;', 'varying vec3 vWorldPosition;', 'vec3 cameraPos = vec3(0., 0., 0.);', '// uniform sampler2D sDiffuse;', '// const float turbidity = 10.0; //', '// const float reileigh = 2.; //', '// const float luminance = 1.0; //', '// const float mieCoefficient = 0.005;', '// const float mieDirectionalG = 0.8;', 'uniform float luminance;', 'uniform float turbidity;', 'uniform float reileigh;', 'uniform float mieCoefficient;', 'uniform float mieDirectionalG;', '// constants for atmospheric scattering', 'const float e = 2.71828182845904523536028747135266249775724709369995957;', 'const float pi = 3.141592653589793238462643383279502884197169;', 'const float n = 1.0003; // refractive index of air', 'const float N = 2.545E25; // number of molecules per unit volume for air at', '// 288.15K and 1013mb (sea level -45 celsius)', 'const float pn = 0.035;	// depolatization factor for standard air', '// wavelength of used primaries, according to preetham', 'const vec3 lambda = vec3(680E-9, 550E-9, 450E-9);', '// mie stuff', '// K coefficient for the primaries', 'const vec3 K = vec3(0.686, 0.678, 0.666);', 'const float v = 4.0;', '// optical length at zenith for molecules', 'const float rayleighZenithLength = 8.4E3;', 'const float mieZenithLength = 1.25E3;', 'const vec3 up = vec3(0.0, 1.0, 0.0);', 'const float EE = 1000.0;', 'const float sunAngularDiameterCos = 0.999956676946448443553574619906976478926848692873900859324;', '// 66 arc seconds -> degrees, and the cosine of that', '// earth shadow hack', 'const float cutoffAngle = pi/1.95;', 'const float steepness = 1.5;', 'vec3 totalRayleigh(vec3 lambda)', '{', 'return (8.0 * pow(pi, 3.0) * pow(pow(n, 2.0) - 1.0, 2.0) * (6.0 + 3.0 * pn)) / (3.0 * N * pow(lambda, vec3(4.0)) * (6.0 - 7.0 * pn));', '}',
+	
+		// see http://blenderartists.org/forum/showthread.php?321110-Shaders-and-Skybox-madness
+		'// A simplied version of the total Reayleigh scattering to works on browsers that use ANGLE', 'vec3 simplifiedRayleigh()', '{', 'return 0.0005 / vec3(94, 40, 18);',
+		// return 0.00054532832366 / (3.0 * 2.545E25 * pow(vec3(680E-9, 550E-9, 450E-9), vec3(4.0)) * 6.245);
+		'}', 'float rayleighPhase(float cosTheta)', '{	 ', 'return (3.0 / (16.0*pi)) * (1.0 + pow(cosTheta, 2.0));', '//	return (1.0 / (3.0*pi)) * (1.0 + pow(cosTheta, 2.0));', '//	return (3.0 / 4.0) * (1.0 + pow(cosTheta, 2.0));', '}', 'vec3 totalMie(vec3 lambda, vec3 K, float T)', '{', 'float c = (0.2 * T ) * 10E-18;', 'return 0.434 * c * pi * pow((2.0 * pi) / lambda, vec3(v - 2.0)) * K;', '}', 'float hgPhase(float cosTheta, float g)', '{', 'return (1.0 / (4.0*pi)) * ((1.0 - pow(g, 2.0)) / pow(1.0 - 2.0*g*cosTheta + pow(g, 2.0), 1.5));', '}', 'float sunIntensity(float zenithAngleCos)', '{', 'return EE * max(0.0, 1.0 - exp(-((cutoffAngle - acos(zenithAngleCos))/steepness)));', '}', '// float logLuminance(vec3 c)', '// {', '// 	return log(c.r * 0.2126 + c.g * 0.7152 + c.b * 0.0722);', '// }', '// Filmic ToneMapping http://filmicgames.com/archives/75', 'float A = 0.15;', 'float B = 0.50;', 'float C = 0.10;', 'float D = 0.20;', 'float E = 0.02;', 'float F = 0.30;', 'float W = 1000.0;', 'vec3 Uncharted2Tonemap(vec3 x)', '{', 'return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;', '}', 'void main() ', '{', 'float sunfade = 1.0-clamp(1.0-exp((sunPosition.y/450000.0)),0.0,1.0);', '// luminance =  1.0 ;// vWorldPosition.y / 450000. + 0.5; //sunPosition.y / 450000. * 1. + 0.5;', '// gl_FragColor = vec4(sunfade, sunfade, sunfade, 1.0);', 'float reileighCoefficient = reileigh - (1.0* (1.0-sunfade));', 'vec3 sunDirection = normalize(sunPosition);', 'float sunE = sunIntensity(dot(sunDirection, up));', '// extinction (absorbtion + out scattering) ', '// rayleigh coefficients',
+	
+		// 'vec3 betaR = totalRayleigh(lambda) * reileighCoefficient;',
+		'vec3 betaR = simplifiedRayleigh() * reileighCoefficient;', '// mie coefficients', 'vec3 betaM = totalMie(lambda, K, turbidity) * mieCoefficient;', '// optical length', '// cutoff angle at 90 to avoid singularity in next formula.', 'float zenithAngle = acos(max(0.0, dot(up, normalize(vWorldPosition - cameraPos))));', 'float sR = rayleighZenithLength / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));', 'float sM = mieZenithLength / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));', '// combined extinction factor	', 'vec3 Fex = exp(-(betaR * sR + betaM * sM));', '// in scattering', 'float cosTheta = dot(normalize(vWorldPosition - cameraPos), sunDirection);', 'float rPhase = rayleighPhase(cosTheta*0.5+0.5);', 'vec3 betaRTheta = betaR * rPhase;', 'float mPhase = hgPhase(cosTheta, mieDirectionalG);', 'vec3 betaMTheta = betaM * mPhase;', 'vec3 Lin = pow(sunE * ((betaRTheta + betaMTheta) / (betaR + betaM)) * (1.0 - Fex),vec3(1.5));', 'Lin *= mix(vec3(1.0),pow(sunE * ((betaRTheta + betaMTheta) / (betaR + betaM)) * Fex,vec3(1.0/2.0)),clamp(pow(1.0-dot(up, sunDirection),5.0),0.0,1.0));', '//nightsky', 'vec3 direction = normalize(vWorldPosition - cameraPos);', 'float theta = acos(direction.y); // elevation --> y-axis, [-pi/2, pi/2]', 'float phi = atan(direction.z, direction.x); // azimuth --> x-axis [-pi/2, pi/2]', 'vec2 uv = vec2(phi, theta) / vec2(2.0*pi, pi) + vec2(0.5, 0.0);', '// vec3 L0 = texture2D(skySampler, uv).rgb+0.1 * Fex;', 'vec3 L0 = vec3(0.1) * Fex;', '// composition + solar disc', '//if (cosTheta > sunAngularDiameterCos)', 'float sundisk = smoothstep(sunAngularDiameterCos,sunAngularDiameterCos+0.00002,cosTheta);', '// if (normalize(vWorldPosition - cameraPos).y>0.0)', 'L0 += (sunE * 19000.0 * Fex)*sundisk;', 'vec3 whiteScale = 1.0/Uncharted2Tonemap(vec3(W));', 'vec3 texColor = (Lin+L0);   ', 'texColor *= 0.04 ;', 'texColor += vec3(0.0,0.001,0.0025)*0.3;', 'float g_fMaxLuminance = 1.0;', 'float fLumScaled = 0.1 / luminance;     ', 'float fLumCompressed = (fLumScaled * (1.0 + (fLumScaled / (g_fMaxLuminance * g_fMaxLuminance)))) / (1.0 + fLumScaled); ', 'float ExposureBias = fLumCompressed;', 'vec3 curr = Uncharted2Tonemap((log2(2.0/pow(luminance,4.0)))*texColor);', 'vec3 color = curr*whiteScale;', 'vec3 retColor = pow(color,vec3(1.0/(1.2+(1.2*sunfade))));', 'gl_FragColor.rgb = retColor;', 'gl_FragColor.a = 1.0;', '}'].join('\n')
+	
+	};
+	
+	var Sky = function Sky() {
+	
+		var skyShader = _three2['default'].ShaderLib['sky'];
+		var skyUniforms = _three2['default'].UniformsUtils.clone(skyShader.uniforms);
+	
+		var skyMat = new _three2['default'].ShaderMaterial({
+			fragmentShader: skyShader.fragmentShader,
+			vertexShader: skyShader.vertexShader,
+			uniforms: skyUniforms,
+			side: _three2['default'].BackSide
+		});
+	
+		var skyGeo = new _three2['default'].SphereBufferGeometry(450000, 32, 15);
+		var skyMesh = new _three2['default'].Mesh(skyGeo, skyMat);
+	
+		// Expose variables
+		this.mesh = skyMesh;
+		this.uniforms = skyUniforms;
+	};
+	
+	exports['default'] = Sky;
+	module.exports = exports['default'];
+
+/***/ },
+/* 46 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _WorkerPool = __webpack_require__(47);
+	
+	var _WorkerPool2 = _interopRequireDefault(_WorkerPool);
+	
+	var Worker = (function () {
+	  var _maxWorkers = 2;
+	  var pool;
+	
+	  var createWorkers = function createWorkers(maxWorkers, workerScript) {
+	    pool = new _WorkerPool2['default']({
+	      numThreads: maxWorkers ? maxWorkers : _maxWorkers,
+	      workerScript: workerScript ? workerScript : 'vizicities-worker.js'
+	    });
+	
+	    return pool.createWorkers();
+	  };
+	
+	  var exec = function exec(method, args, transferrables) {
+	    return pool.exec(method, args, transferrables);
+	  };
+	
+	  return {
+	    createWorkers: createWorkers,
+	    exec: exec
+	  };
+	})();
+	
+	exports['default'] = Worker;
+	module.exports = exports['default'];
+
+/***/ },
+/* 47 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	var _WorkerPoolWorker = __webpack_require__(48);
+	
+	var _WorkerPoolWorker2 = _interopRequireDefault(_WorkerPoolWorker);
+	
+	var DEBUG = false;
+	
+	var WorkerPool = (function () {
+	  function WorkerPool(options) {
+	    _classCallCheck(this, WorkerPool);
+	
+	    this.numThreads = options.numThreads || 2;
+	    this.workerScript = options.workerScript;
+	
+	    this.workers = [];
+	    this.tasks = [];
+	  }
+	
+	  _createClass(WorkerPool, [{
+	    key: 'createWorkers',
+	    value: function createWorkers() {
+	      var _this = this;
+	
+	      return new Promise(function (resolve, reject) {
+	        var workerPromises = [];
+	
+	        for (var i = 0; i < _this.numThreads; i++) {
+	          workerPromises.push(_this.createWorker());
+	        }
+	
+	        Promise.all(workerPromises).then(function () {
+	          if (DEBUG) {
+	            console.log('All workers ready', performance.now());
+	          }
+	          resolve();
+	        })['catch'](reject);
+	      });
+	    }
+	  }, {
+	    key: 'createWorker',
+	    value: function createWorker() {
+	      var _this2 = this;
+	
+	      return new Promise(function (resolve, reject) {
+	        // Initialise worker
+	        var worker = new _WorkerPoolWorker2['default']({
+	          workerScript: _this2.workerScript
+	        });
+	
+	        // Start worker and wait for it to be ready
+	        return worker.start().then(function () {
+	          if (DEBUG) {
+	            console.log('Worker ready', performance.now());
+	          }
+	
+	          // Add worker to pool
+	          _this2.workers.push(worker);
+	
+	          resolve();
+	        })['catch'](reject);
+	      });
+	    }
+	  }, {
+	    key: 'getFreeWorker',
+	    value: function getFreeWorker() {
+	      return this.workers.find(function (worker) {
+	        return !worker.busy;
+	      });
+	    }
+	
+	    // Execute task on a worker
+	  }, {
+	    key: 'exec',
+	    value: function exec(method, args, transferrables) {
+	      var deferred = Promise.deferred();
+	
+	      // Create task
+	      var task = {
+	        method: method,
+	        args: args,
+	        transferrables: transferrables,
+	        deferred: deferred
+	      };
+	
+	      // Add task to queue
+	      this.tasks.push(task);
+	
+	      // Trigger task processing
+	      this.processTasks();
+	
+	      // Return task promise
+	      return task.deferred.promise;
+	    }
+	  }, {
+	    key: 'processTasks',
+	    value: function processTasks() {
+	      var _this3 = this;
+	
+	      if (DEBUG) {
+	        console.log('Processing tasks');
+	      }
+	
+	      if (this.tasks.length === 0) {
+	        return;
+	      }
+	
+	      // Find free worker
+	      var worker = this.getFreeWorker();
+	
+	      if (!worker) {
+	        if (DEBUG) {
+	          console.log('No workers free');
+	        }
+	        return;
+	      }
+	
+	      // Get oldest task
+	      var task = this.tasks.shift();
+	
+	      // Execute task on worker
+	      worker.exec(task.method, task.args, task.transferrables).then(function (result) {
+	        // Trigger task processing
+	        _this3.processTasks();
+	
+	        // Return result in deferred task promise
+	        task.deferred.resolve(result);
+	      });
+	    }
+	  }]);
+	
+	  return WorkerPool;
+	})();
+	
+	exports['default'] = WorkerPool;
+	
+	// Quick shim to create deferred native promises
+	Promise.deferred = function () {
+	  var result = {};
+	
+	  result.promise = new Promise(function (resolve, reject) {
+	    result.resolve = resolve;
+	    result.reject = reject;
+	  });
+	
+	  return result;
+	};
+	module.exports = exports['default'];
+
+/***/ },
+/* 48 */
+/***/ function(module, exports) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	var DEBUG = false;
+	
+	var WorkerPoolWorker = (function () {
+	  function WorkerPoolWorker(options) {
+	    _classCallCheck(this, WorkerPoolWorker);
+	
+	    this.workerScript = options.workerScript;
+	
+	    this.ready = false;
+	    this.busy = false;
+	    this.deferred = null;
+	  }
+	
+	  _createClass(WorkerPoolWorker, [{
+	    key: 'start',
+	    value: function start() {
+	      var _this = this;
+	
+	      return new Promise(function (resolve, reject) {
+	        _this.worker = new Worker(_this.workerScript);
+	
+	        var onStartup = function onStartup(event) {
+	          if (!event.data || event.data.type !== 'startup') {
+	            reject();
+	            return;
+	          }
+	
+	          _this.ready = true;
+	
+	          // Remove temporary message handler
+	          _this.worker.removeEventListener('message', onStartup);
+	
+	          // Set up listener to respond to normal events now
+	          _this.worker.addEventListener('message', function (event) {
+	            _this.onMessage(event);
+	          });
+	
+	          // Resolve once worker is ready
+	          resolve();
+	        };
+	
+	        // Set up temporary event listener for warmup
+	        _this.worker.addEventListener('message', onStartup);
+	      });
+	    }
+	  }, {
+	    key: 'exec',
+	    value: function exec(method, args, transferrables) {
+	      if (DEBUG) {
+	        console.log('Execute', method, args, transferrables);
+	      }
+	
+	      var deferred = Promise.deferred();
+	
+	      this.busy = true;
+	      this.deferred = deferred;
+	
+	      this.worker.postMessage({
+	        method: method,
+	        args: args
+	      }, transferrables);
+	
+	      return deferred.promise;
+	    }
+	  }, {
+	    key: 'onMessage',
+	    value: function onMessage(event) {
+	      console.log('Message received from worker', performance.now());
+	
+	      this.busy = false;
+	
+	      if (!event.data || event.data.type === 'error' || event.data.type !== 'result') {
+	        this.deferred.reject(event.data.payload);
+	        return;
+	      }
+	
+	      this.deferred.resolve(event.data.payload);
+	    }
+	  }]);
+	
+	  return WorkerPoolWorker;
+	})();
+	
+	exports['default'] = WorkerPoolWorker;
+	
+	// Quick shim to create deferred native promises
+	Promise.deferred = function () {
+	  var result = {};
+	
+	  result.promise = new Promise(function (resolve, reject) {
+	    result.resolve = resolve;
+	    result.reject = reject;
+	  });
+	
+	  return result;
+	};
+	module.exports = exports['default'];
+
+/***/ },
+/* 49 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _ControlsOrbit = __webpack_require__(50);
 	
 	var _ControlsOrbit2 = _interopRequireDefault(_ControlsOrbit);
 	
@@ -5608,7 +6402,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 38 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -5633,11 +6427,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _vendorOrbitControls = __webpack_require__(39);
+	var _vendorOrbitControls = __webpack_require__(51);
 	
 	var _vendorOrbitControls2 = _interopRequireDefault(_vendorOrbitControls);
 	
-	var _TweenLite = __webpack_require__(41);
+	var _TweenLite = __webpack_require__(53);
 	
 	var _TweenLite2 = _interopRequireDefault(_TweenLite);
 	
@@ -5871,8 +6665,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'addTo',
 	    value: function addTo(world) {
-	      world.addControls(this);
-	      return Promise.resolve(this);
+	      return world.addControls(this);
 	    }
 	
 	    // Internal method called by World.addControls to actually add the controls
@@ -5928,7 +6721,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.orbit = noNew;
 
 /***/ },
-/* 39 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -5944,7 +6737,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _hammerjs = __webpack_require__(40);
+	var _hammerjs = __webpack_require__(52);
 	
 	var _hammerjs2 = _interopRequireDefault(_hammerjs);
 	
@@ -7116,7 +7909,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 40 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*! Hammer.JS - v2.0.7 - 2016-04-22
@@ -9765,13 +10558,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 41 */
+/* 53 */
 /***/ function(module, exports) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_41__;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_53__;
 
 /***/ },
-/* 42 */
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -9788,19 +10581,114 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _TileLayer2 = __webpack_require__(43);
+	var _Layer2 = __webpack_require__(34);
+	
+	var _Layer3 = _interopRequireDefault(_Layer2);
+	
+	var _lodashAssign = __webpack_require__(3);
+	
+	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
+	
+	var LayerGroup = (function (_Layer) {
+	  _inherits(LayerGroup, _Layer);
+	
+	  function LayerGroup(options) {
+	    _classCallCheck(this, LayerGroup);
+	
+	    var defaults = {
+	      output: false
+	    };
+	
+	    var _options = (0, _lodashAssign2['default'])({}, defaults, options);
+	
+	    _get(Object.getPrototypeOf(LayerGroup.prototype), 'constructor', this).call(this, _options);
+	
+	    this._layers = [];
+	  }
+	
+	  _createClass(LayerGroup, [{
+	    key: 'addLayer',
+	    value: function addLayer(layer) {
+	      this._layers.push(layer);
+	      return this._world.addLayer(layer);
+	    }
+	  }, {
+	    key: 'removeLayer',
+	    value: function removeLayer(layer) {
+	      var layerIndex = this._layers.indexOf(layer);
+	
+	      if (layerIndex > -1) {
+	        // Remove from this._layers
+	        this._layers.splice(layerIndex, 1);
+	      };
+	
+	      this._world.removeLayer(layer);
+	    }
+	  }, {
+	    key: '_onAdd',
+	    value: function _onAdd(world) {
+	      return Promise.resolve(this);
+	    }
+	
+	    // Destroy the layers and remove them from the scene and memory
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {
+	      // TODO: Sometimes this is already null, find out why
+	      if (this._layers) {
+	        for (var i = 0; i < this._layers.length; i++) {
+	          this._layers[i].destroy();
+	        }
+	
+	        this._layers = null;
+	      }
+	
+	      _get(Object.getPrototypeOf(LayerGroup.prototype), 'destroy', this).call(this);
+	    }
+	  }]);
+	
+	  return LayerGroup;
+	})(_Layer3['default']);
+	
+	exports['default'] = LayerGroup;
+	
+	var noNew = function noNew(options) {
+	  return new LayerGroup(options);
+	};
+	
+	exports.layerGroup = noNew;
+
+/***/ },
+/* 55 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var _TileLayer2 = __webpack_require__(56);
 	
 	var _TileLayer3 = _interopRequireDefault(_TileLayer2);
 	
-	var _ImageTile = __webpack_require__(53);
+	var _ImageTile = __webpack_require__(66);
 	
 	var _ImageTile2 = _interopRequireDefault(_ImageTile);
 	
-	var _ImageTileLayerBaseMaterial = __webpack_require__(56);
+	var _ImageTileLayerBaseMaterial = __webpack_require__(69);
 	
 	var _ImageTileLayerBaseMaterial2 = _interopRequireDefault(_ImageTileLayerBaseMaterial);
 	
-	var _lodashThrottle = __webpack_require__(35);
+	var _lodashThrottle = __webpack_require__(22);
 	
 	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
 	
@@ -9887,26 +10775,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      return new Promise(function (resolve, reject) {
 	        _get(Object.getPrototypeOf(ImageTileLayer.prototype), '_onAdd', _this).call(_this, world).then(function () {
+	          // TODO: Removed because it causes depth buffer intersection issues
+	          // with layer on top for some reason. Need to work out why and fix.
+	          //
 	          // Add base layer
-	          var geom = new _three2['default'].PlaneBufferGeometry(2000000, 2000000, 1);
+	          // var geom = new THREE.PlaneBufferGeometry(2000000, 2000000, 1);
 	
-	          var baseMaterial;
-	          if (_this._world._environment._skybox) {
-	            baseMaterial = (0, _ImageTileLayerBaseMaterial2['default'])('#f5f5f3', _this._world._environment._skybox.getRenderTarget());
-	          } else {
-	            baseMaterial = (0, _ImageTileLayerBaseMaterial2['default'])('#f5f5f3');
-	          }
+	          // var baseMaterial;
+	          // if (this._world._environment._skybox) {
+	          //   baseMaterial = ImageTileLayerBaseMaterial('#f5f5f3', this._world._environment._skybox.getRenderTarget());
+	          // } else {
+	          //   baseMaterial = ImageTileLayerBaseMaterial('#f5f5f3');
+	          // }
 	
-	          var mesh = new _three2['default'].Mesh(geom, baseMaterial);
-	          mesh.renderOrder = 0;
-	          mesh.rotation.x = -90 * Math.PI / 180;
+	          // var mesh = new THREE.Mesh(geom, baseMaterial);
 	
-	          // TODO: It might be overkill to receive a shadow on the base layer as it's
-	          // rarely seen (good to have if performance difference is negligible)
-	          mesh.receiveShadow = true;
+	          // // Setting this causes a depth-buffer intersection issue on the
+	          // // all-the-things example
+	          // // mesh.renderOrder = -1;
 	
-	          _this._baseLayer = mesh;
-	          _this.add(mesh);
+	          // mesh.rotation.x = -90 * Math.PI / 180;
+	
+	          // // TODO: It might be overkill to receive a shadow on the base layer as it's
+	          // // rarely seen (good to have if performance difference is negligible)
+	          // mesh.receiveShadow = true;
+	
+	          // this._baseLayer = mesh;
+	          // this.add(mesh);
 	
 	          // Trigger initial quadtree calculation on the next frame
 	          //
@@ -9930,7 +10825,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._throttledWorldUpdate = (0, _lodashThrottle2['default'])(this._onWorldUpdate, 100);
 	
 	      this._world.on('preUpdate', this._throttledWorldUpdate, this);
-	      this._world.on('move', this._onWorldMove, this);
+	      // this._world.on('move', this._onWorldMove, this);
 	    }
 	  }, {
 	    key: '_onWorldUpdate',
@@ -9996,7 +10891,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.imageTileLayer = noNew;
 
 /***/ },
-/* 43 */
+/* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -10013,7 +10908,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Layer2 = __webpack_require__(32);
+	var _Layer2 = __webpack_require__(34);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -10021,7 +10916,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _TileCache = __webpack_require__(44);
+	var _TileCache = __webpack_require__(57);
 	
 	var _TileCache2 = _interopRequireDefault(_TileCache);
 	
@@ -10095,6 +10990,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    _get(Object.getPrototypeOf(TileLayer.prototype), 'constructor', this).call(this, _options);
 	
+	    this._destroy = false;
+	
 	    this._tileCache = new _TileCache2['default'](this._options.maxCache, function (tile) {
 	      _this._destroyTile(tile);
 	    });
@@ -10142,7 +11039,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _outputTiles() {
 	      var _this2 = this;
 	
-	      if (!this._tiles) {
+	      if (!this._tiles || this._destroy) {
 	        return;
 	      }
 	
@@ -10166,6 +11063,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	          _this2._tilesPicking.add(tile.getPickingMesh());
 	        }
 	      });
+	
+	      // Emit event notifying of new tiles
+	      this.emit('tilesList', this._tileList.map(function (tile) {
+	        return tile;
+	      }));
 	    }
 	
 	    // Works out tiles in the view frustum and stores them in an array
@@ -10176,7 +11078,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _calculateLOD() {
 	      var _this3 = this;
 	
-	      if (this._stop || !this._world) {
+	      if (this._stop || !this._world || this._destroy) {
 	        return;
 	      }
 	
@@ -10209,7 +11111,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	
 	      // 5. Filter the tiles remaining in the check list
-	      this._tileList = checkList.filter(function (tile, index) {
+	      var tileList = checkList.filter(function (tile, index) {
 	        // Skip tile if it's not in the current view frustum
 	        if (!_this3._tileInFrustum(tile)) {
 	          return false;
@@ -10230,7 +11132,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        //
 	        // If yes, continue
 	        // If no, generate tile mesh, request texture and skip
-	        if (!tile.getMesh()) {
+	        if (!tile.getMesh() || tile.isAborted()) {
 	          tile.requestTileAsync();
 	        }
 	
@@ -10247,6 +11149,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // // Add tile to layer (and to scene)
 	        // this._tiles.add(tile.getMesh());
 	      });
+	
+	      // Get list of tiles that were in the previous update but not the
+	      // current one (for aborting requests, etc)
+	      var missingTiles = this._tileList.filter(function (item) {
+	        return !tileList.includes(item);
+	      });
+	
+	      // Abort tiles that are no longer in view
+	      missingTiles.forEach(function (tile) {
+	        return tile._abortRequest();
+	      });
+	
+	      this._tileList = tileList;
 	
 	      // console.log(performance.now() - start);
 	    }
@@ -10384,11 +11299,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Call destory on tile instance
 	      tile.destroy();
 	    }
+	  }, {
+	    key: 'show',
+	    value: function show() {
+	      this._stop = false;
+	
+	      if (this._tilesPicking) {
+	        this._tilesPicking.visible = true;
+	      }
+	
+	      this._calculateLOD();
+	      _get(Object.getPrototypeOf(TileLayer.prototype), 'show', this).call(this);
+	    }
+	  }, {
+	    key: 'hide',
+	    value: function hide() {
+	      this._stop = true;
+	
+	      if (this._tilesPicking) {
+	        this._tilesPicking.visible = false;
+	      }
+	
+	      _get(Object.getPrototypeOf(TileLayer.prototype), 'hide', this).call(this);
+	    }
 	
 	    // Destroys the layer and removes it from the scene and memory
 	  }, {
 	    key: 'destroy',
 	    value: function destroy() {
+	      this._destroy = true;
+	
 	      if (this._tiles.children) {
 	        // Remove all tiles
 	        for (var i = this._tiles.children.length - 1; i >= 0; i--) {
@@ -10424,7 +11364,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 44 */
+/* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -10437,7 +11377,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var _lruCache = __webpack_require__(45);
+	var _lruCache = __webpack_require__(58);
 	
 	var _lruCache2 = _interopRequireDefault(_lruCache);
 	
@@ -10505,18 +11445,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.tileCache = noNew;
 
 /***/ },
-/* 45 */
+/* 58 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = LRUCache
 	
 	// This will be a proper iterable 'Map' in engines that support it,
 	// or a fakey-fake PseudoMap in older versions.
-	var Map = __webpack_require__(46)
-	var util = __webpack_require__(49)
+	var Map = __webpack_require__(59)
+	var util = __webpack_require__(62)
 	
 	// A linked list to keep track of recently-used-ness
-	var Yallist = __webpack_require__(52)
+	var Yallist = __webpack_require__(65)
 	
 	// use symbols if possible, otherwise just _props
 	var symbols = {}
@@ -10980,7 +11920,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 46 */
+/* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {if (process.env.npm_package_name === 'pseudomap' &&
@@ -10990,13 +11930,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	if (typeof Map === 'function' && !process.env.TEST_PSEUDOMAP) {
 	  module.exports = Map
 	} else {
-	  module.exports = __webpack_require__(48)
+	  module.exports = __webpack_require__(61)
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(47)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(60)))
 
 /***/ },
-/* 47 */
+/* 60 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -11121,7 +12061,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 48 */
+/* 61 */
 /***/ function(module, exports) {
 
 	var hasOwnProperty = Object.prototype.hasOwnProperty
@@ -11240,7 +12180,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 49 */
+/* 62 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -11768,7 +12708,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.isPrimitive = isPrimitive;
 	
-	exports.isBuffer = __webpack_require__(50);
+	exports.isBuffer = __webpack_require__(63);
 	
 	function objectToString(o) {
 	  return Object.prototype.toString.call(o);
@@ -11812,7 +12752,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *     prototype.
 	 * @param {function} superCtor Constructor function to inherit prototype from.
 	 */
-	exports.inherits = __webpack_require__(51);
+	exports.inherits = __webpack_require__(64);
 	
 	exports._extend = function(origin, add) {
 	  // Don't do anything if add isn't an object
@@ -11830,10 +12770,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return Object.prototype.hasOwnProperty.call(obj, prop);
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(47)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(60)))
 
 /***/ },
-/* 50 */
+/* 63 */
 /***/ function(module, exports) {
 
 	module.exports = function isBuffer(arg) {
@@ -11844,7 +12784,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 51 */
+/* 64 */
 /***/ function(module, exports) {
 
 	if (typeof Object.create === 'function') {
@@ -11873,7 +12813,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 52 */
+/* 65 */
 /***/ function(module, exports) {
 
 	module.exports = Yallist
@@ -12239,7 +13179,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 53 */
+/* 66 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -12256,11 +13196,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Tile2 = __webpack_require__(54);
+	var _Tile2 = __webpack_require__(67);
 	
 	var _Tile3 = _interopRequireDefault(_Tile2);
 	
-	var _vendorBoxHelper = __webpack_require__(55);
+	var _vendorBoxHelper = __webpack_require__(68);
 	
 	var _vendorBoxHelper2 = _interopRequireDefault(_vendorBoxHelper);
 	
@@ -12290,8 +13230,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      setTimeout(function () {
 	        if (!_this._mesh) {
 	          _this._mesh = _this._createMesh();
-	          _this._requestTile();
 	        }
+	
+	        _this._requestTile();
 	      }, 0);
 	    }
 	  }, {
@@ -12346,8 +13287,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      localMesh.receiveShadow = true;
 	
+	      // Setting this causes a depth-buffer intersection issue on the
+	      // all-the-things example
+	      // localMesh.renderOrder = 2;
+	
 	      mesh.add(localMesh);
-	      mesh.renderOrder = 0.1;
+	
+	      // Setting this causes a depth-buffer intersection issue on the
+	      // all-the-things example
+	      // mesh.renderOrder = 2;
 	
 	      mesh.position.x = this._center[0];
 	      mesh.position.z = this._center[1];
@@ -12412,7 +13360,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      var image = document.createElement('img');
 	
+	      this._aborted = false;
+	
 	      image.addEventListener('load', function (event) {
+	        if (_this2.isAborted()) {
+	          return;
+	        }
+	
 	        var texture = new _three2['default'].Texture();
 	
 	        texture.image = image;
@@ -12454,9 +13408,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_abortRequest',
 	    value: function _abortRequest() {
-	      if (!this._image) {
+	      if (!this._image || this._ready) {
 	        return;
 	      }
+	
+	      this._aborted = true;
 	
 	      this._image.src = '';
 	    }
@@ -12475,7 +13431,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.imageTile = noNew;
 
 /***/ },
-/* 54 */
+/* 67 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -12514,6 +13470,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._path = path;
 	
 	    this._ready = false;
+	    this._aborted = false;
 	
 	    this._tile = this._quadcodeToTile(quadcode);
 	
@@ -12543,6 +13500,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'isReady',
 	    value: function isReady() {
 	      return this._ready;
+	    }
+	  }, {
+	    key: 'isAborted',
+	    value: function isAborted() {
+	      return this._aborted;
 	    }
 	
 	    // Request data for the tile
@@ -12587,6 +13549,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'destroy',
 	    value: function destroy() {
+	      // console.log('Destroying tile', this._quadcode);
+	
 	      // Delete reference to layer and world
 	      this._layer = null;
 	      this._world = null;
@@ -12597,35 +13561,47 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._center = null;
 	
 	      // Done if no mesh
-	      if (!this._mesh) {
+	      if (!this._mesh && !this._pickingMesh) {
 	        return;
 	      }
 	
-	      if (this._mesh.children) {
-	        // Dispose of mesh and materials
-	        this._mesh.children.forEach(function (child) {
-	          child.geometry.dispose();
-	          child.geometry = null;
+	      this.destroyMesh(this._mesh);
+	      this.destroyMesh(this._pickingMesh);
 	
-	          if (child.material.map) {
-	            child.material.map.dispose();
-	            child.material.map = null;
-	          }
+	      this._mesh = null;
+	      this._pickingMesh = null;
+	    }
+	  }, {
+	    key: 'destroyMesh',
+	    value: function destroyMesh(mesh) {
+	      var _this = this;
 	
-	          child.material.dispose();
-	          child.material = null;
-	        });
-	      } else {
-	        this._mesh.geometry.dispose();
-	        this._mesh.geometry = null;
+	      var dispose = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
 	
-	        if (this._mesh.material.map) {
-	          this._mesh.material.map.dispose();
-	          this._mesh.material.map = null;
+	      if (mesh) {
+	        if (mesh.children) {
+	          mesh.children.forEach(function (child) {
+	            mesh.remove(child);
+	            _this.destroyMesh(child);
+	          });
 	        }
 	
-	        this._mesh.material.dispose();
-	        this._mesh.material = null;
+	        if (dispose) {
+	          if (mesh.geometry) {
+	            mesh.geometry.dispose();
+	            mesh.geometry = null;
+	          }
+	
+	          if (mesh.material) {
+	            if (mesh.material.map) {
+	              mesh.material.map.dispose();
+	              mesh.material.map = null;
+	            }
+	
+	            mesh.material.dispose();
+	            mesh.material = null;
+	          }
+	        }
 	      }
 	    }
 	  }, {
@@ -12728,7 +13704,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 55 */
+/* 68 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -12818,7 +13794,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 56 */
+/* 69 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -12881,7 +13857,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 57 */
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -12898,7 +13874,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _TileLayer2 = __webpack_require__(43);
+	var _TileLayer2 = __webpack_require__(56);
 	
 	var _TileLayer3 = _interopRequireDefault(_TileLayer2);
 	
@@ -12906,11 +13882,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _GeoJSONTile = __webpack_require__(58);
+	var _GeoJSONTile = __webpack_require__(71);
 	
 	var _GeoJSONTile2 = _interopRequireDefault(_GeoJSONTile);
 	
-	var _lodashThrottle = __webpack_require__(35);
+	var _lodashThrottle = __webpack_require__(22);
 	
 	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
 	
@@ -12956,12 +13932,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var defaults = {
 	      maxLOD: 14,
-	      distance: 30000
+	      distance: 30000,
+	      workers: false
 	    };
 	
 	    options = (0, _lodashAssign2['default'])({}, defaults, options);
 	
 	    _get(Object.getPrototypeOf(GeoJSONTileLayer.prototype), 'constructor', this).call(this, options);
+	
+	    this.defaults = defaults;
 	
 	    this._path = path;
 	  }
@@ -13003,7 +13982,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_onWorldUpdate',
 	    value: function _onWorldUpdate() {
-	      if (this._pauseOutput) {
+	      if (this._pauseOutput || this._disableOutput) {
 	        return;
 	      }
 	
@@ -13014,6 +13993,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_onWorldMove',
 	    value: function _onWorldMove(latlon, point) {
+	      if (this._disableOutput) {
+	        return;
+	      }
+	
 	      this._pauseOutput = false;
 	      this._calculateLOD();
 	    }
@@ -13022,34 +14005,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_onControlsMove',
 	    value: function _onControlsMove() {
+	      if (this._disableOutput) {
+	        return;
+	      }
+	
 	      this._pauseOutput = true;
 	    }
 	  }, {
 	    key: '_createTile',
 	    value: function _createTile(quadcode, layer) {
-	      var options = {};
+	      var newOptions = (0, _lodashAssign2['default'])({}, this.defaults, this._options, {
+	        outputToScene: false
+	      });
 	
-	      // if (this._options.filter) {
-	      //   options.filter = this._options.filter;
-	      // }
-	      //
-	      // if (this._options.style) {
-	      //   options.style = this._options.style;
-	      // }
-	      //
-	      // if (this._options.topojson) {
-	      //   options.topojson = true;
-	      // }
-	      //
-	      // if (this._options.interactive) {
-	      //   options.interactive = true;
-	      // }
-	      //
-	      // if (this._options.onClick) {
-	      //   options.onClick = this._options.onClick;
-	      // }
+	      delete newOptions.attribution;
 	
-	      return new _GeoJSONTile2['default'](quadcode, this._path, layer, this._options);
+	      return new _GeoJSONTile2['default'](quadcode, this._path, layer, newOptions);
+	    }
+	  }, {
+	    key: 'hide',
+	    value: function hide() {
+	      this._pauseOutput = true;
+	      _get(Object.getPrototypeOf(GeoJSONTileLayer.prototype), 'hide', this).call(this);
+	    }
+	  }, {
+	    key: 'show',
+	    value: function show() {
+	      this._pauseOutput = false;
+	      _get(Object.getPrototypeOf(GeoJSONTileLayer.prototype), 'show', this).call(this);
 	    }
 	
 	    // Destroys the layer and removes it from the scene and memory
@@ -13079,7 +14062,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.geoJSONTileLayer = noNew;
 
 /***/ },
-/* 58 */
+/* 71 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -13096,13 +14079,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Tile2 = __webpack_require__(54);
+	var _Tile2 = __webpack_require__(67);
 	
 	var _Tile3 = _interopRequireDefault(_Tile2);
 	
-	var _GeoJSONLayer = __webpack_require__(59);
+	var _GeoJSONLayer = __webpack_require__(72);
 	
-	var _vendorBoxHelper = __webpack_require__(55);
+	var _GeoJSONWorkerLayer = __webpack_require__(87);
+	
+	var _vendorBoxHelper = __webpack_require__(68);
 	
 	var _vendorBoxHelper2 = _interopRequireDefault(_vendorBoxHelper);
 	
@@ -13110,7 +14095,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _reqwest = __webpack_require__(61);
+	var _reqwest = __webpack_require__(73);
 	
 	var _reqwest2 = _interopRequireDefault(_reqwest);
 	
@@ -13124,15 +14109,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// import Offset from 'polygon-offset';
 	
-	var _utilGeoJSON = __webpack_require__(63);
+	var _utilGeoJSON = __webpack_require__(75);
 	
 	var _utilGeoJSON2 = _interopRequireDefault(_utilGeoJSON);
 	
-	var _utilBuffer = __webpack_require__(69);
+	var _utilBuffer = __webpack_require__(81);
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
-	var _enginePickingMaterial = __webpack_require__(70);
+	var _enginePickingMaterial = __webpack_require__(82);
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
@@ -13180,6 +14165,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._defaultStyle = _utilGeoJSON2['default'].defaultStyle;
 	
 	    var defaults = {
+	      workers: false,
 	      output: true,
 	      outputToScene: false,
 	      interactive: false,
@@ -13221,11 +14207,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      setTimeout(function () {
 	        if (!_this._mesh) {
 	          _this._mesh = _this._createMesh();
-	
 	          // this._shadowCanvas = this._createShadowCanvas();
-	
-	          _this._requestTile();
 	        }
+	
+	        _this._requestTile();
 	      }, 0);
 	    }
 	
@@ -13373,38 +14358,71 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      var url = this._getTileURL(urlParams);
 	
-	      this._request = (0, _reqwest2['default'])({
-	        url: url,
-	        type: 'json',
-	        crossOrigin: true
-	      }).then(function (res) {
-	        // Clear request reference
-	        _this2._request = null;
-	        _this2._processTileData(res);
-	      })['catch'](function (err) {
-	        console.error(err);
+	      this._aborted = false;
 	
-	        // Clear request reference
-	        _this2._request = null;
-	      });
+	      if (!this._options.workers) {
+	        this._request = (0, _reqwest2['default'])({
+	          url: url,
+	          type: 'json',
+	          crossOrigin: true,
+	          headers: this._options.headers
+	        }).then(function (res) {
+	          // Clear request reference
+	          _this2._request = null;
+	          _this2._processTileData(res);
+	        })['catch'](function (err) {
+	          // Clear request reference
+	          _this2._request = null;
+	        });
+	      } else {
+	        this._processTileData(url);
+	      }
 	    }
 	  }, {
 	    key: '_processTileData',
 	    value: function _processTileData(data) {
 	      var _this3 = this;
 	
-	      console.time(this._tile);
+	      // console.time(this._tile);
+	
+	      var GeoJSONClass = !this._options.workers ? _GeoJSONLayer.geoJSONLayer : _GeoJSONWorkerLayer.geoJSONWorkerLayer;
 	
 	      // Using this creates a huge amount of memory due to the quantity of tiles
-	      this._geojsonLayer = (0, _GeoJSONLayer.geoJSONLayer)(data, this._options);
+	      this._geojsonLayer = GeoJSONClass(data, this._options);
 	      this._geojsonLayer.addTo(this._world).then(function () {
-	        _this3._mesh = _this3._geojsonLayer._object3D;
+	        // TODO: This never seems to be called on worker layers. Find out why.
+	        if (_this3.isAborted()) {
+	          // this._geojsonLayer._aborted = true;
+	          // this._geojsonLayer = null;
+	          return;
+	        }
+	
+	        // TODO: This is a hack to stop old tile meshes hanging around. Fix or
+	        // move to somewhere more robust.
+	        //
+	        // Could potentially just overwrite mesh on first index each time
+	        //
+	        // This makes some worker tiles to not appear properly – showing the
+	        // points mesh but not the polygon mesh, etc.
+	        //
+	        // Only do this for non-worker layers for now as it seems to cause issues
+	        // with worker tiles showing for a moment and then disappearing forever
+	        if (!_this3._options.workers) {
+	          _this3.destroyMesh(_this3._mesh);
+	        }
+	
+	        // TOSO: Work out if the picking mesh needs destroying here
+	        // this.destroyMesh(this._pickingMesh);
+	
+	        _this3._mesh.add(_this3._geojsonLayer._object3D);
 	        _this3._pickingMesh = _this3._geojsonLayer._pickingMesh;
 	
 	        // Free the GeoJSON memory as we don't need it
 	        //
 	        // TODO: This should probably be a method within GeoJSONLayer
-	        _this3._geojsonLayer._geojson = null;
+	        if (_this3._geojsonLayer._geojson) {
+	          _this3._geojsonLayer._geojson = null;
+	        }
 	
 	        // TODO: Fix or store shadow canvas stuff and get rid of this code
 	        // Draw footprint on shadow canvas
@@ -13459,17 +14477,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // this._mesh.add(mesh);
 	
 	        _this3._ready = true;
-	        console.timeEnd(_this3._tile);
-	      });
+	        // console.timeEnd(this._tile);
+	      })['catch'](function () {});
 	    }
 	  }, {
 	    key: '_abortRequest',
 	    value: function _abortRequest() {
-	      if (!this._request) {
+	      if (!this._request && !this._options.workers || this._ready) {
 	        return;
 	      }
 	
-	      this._request.abort();
+	      this._aborted = true;
+	
+	      if (this._request) {
+	        this._request.abort();
+	      }
 	    }
 	  }]);
 	
@@ -13486,7 +14508,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.geoJSONTile = noNew;
 
 /***/ },
-/* 59 */
+/* 72 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -13511,7 +14533,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// For example, only allow polygons to be interactive via a polygonInteractive
 	// option
 	
-	var _LayerGroup2 = __webpack_require__(60);
+	var _LayerGroup2 = __webpack_require__(54);
 	
 	var _LayerGroup3 = _interopRequireDefault(_LayerGroup2);
 	
@@ -13519,31 +14541,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _reqwest = __webpack_require__(61);
+	var _reqwest = __webpack_require__(73);
 	
 	var _reqwest2 = _interopRequireDefault(_reqwest);
 	
-	var _utilGeoJSON = __webpack_require__(63);
+	var _utilGeoJSON = __webpack_require__(75);
 	
 	var _utilGeoJSON2 = _interopRequireDefault(_utilGeoJSON);
 	
-	var _utilBuffer = __webpack_require__(69);
+	var _utilBuffer = __webpack_require__(81);
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
-	var _enginePickingMaterial = __webpack_require__(70);
+	var _enginePickingMaterial = __webpack_require__(82);
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
-	var _geometryPolygonLayer = __webpack_require__(72);
+	var _geometryPolygonLayer = __webpack_require__(84);
 	
 	var _geometryPolygonLayer2 = _interopRequireDefault(_geometryPolygonLayer);
 	
-	var _geometryPolylineLayer = __webpack_require__(73);
+	var _geometryPolylineLayer = __webpack_require__(85);
 	
 	var _geometryPolylineLayer2 = _interopRequireDefault(_geometryPolylineLayer);
 	
-	var _geometryPointLayer = __webpack_require__(74);
+	var _geometryPointLayer = __webpack_require__(86);
 	
 	var _geometryPointLayer2 = _interopRequireDefault(_geometryPointLayer);
 	
@@ -13626,6 +14648,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	          // Clear request reference
 	          _this._request = null;
+	
+	          reject(err);
 	        });
 	      });
 	    }
@@ -13640,325 +14664,245 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _processData(data) {
 	      var _this2 = this;
 	
-	      // Collects features into a single FeatureCollection
-	      //
-	      // Also converts TopoJSON to GeoJSON if instructed
-	      this._geojson = _utilGeoJSON2['default'].collectFeatures(data, this._options.topojson);
+	      return new Promise(function (resolve) {
+	        // Collects features into a single FeatureCollection
+	        //
+	        // Also converts TopoJSON to GeoJSON if instructed
+	        _this2._geojson = _utilGeoJSON2['default'].collectFeatures(data, _this2._options.topojson);
 	
-	      // TODO: Check that GeoJSON is valid / usable
+	        // TODO: Check that GeoJSON is valid / usable
 	
-	      var features = this._geojson.features;
+	        var features = _this2._geojson.features;
 	
-	      // Run filter, if provided
-	      if (this._options.filter) {
-	        features = this._geojson.features.filter(this._options.filter);
-	      }
-	
-	      var defaults = {};
-	
-	      // Assume that a style won't be set per feature
-	      var style = this._options.style;
-	
-	      var options;
-	      features.forEach(function (feature) {
-	        // Get per-feature style object, if provided
-	        if (typeof _this2._options.style === 'function') {
-	          style = (0, _lodashAssign2['default'])({}, _utilGeoJSON2['default'].defaultStyle, _this2._options.style(feature));
+	        // Run filter, if provided
+	        if (_this2._options.filter) {
+	          features = _this2._geojson.features.filter(_this2._options.filter);
 	        }
 	
-	        options = (0, _lodashAssign2['default'])({}, defaults, {
-	          // If merging feature layers, stop them outputting themselves
-	          // If not, let feature layers output themselves to the world
-	          output: !_this2.isOutput(),
-	          interactive: _this2._options.interactive,
-	          style: style
+	        var defaults = {};
+	
+	        // Assume that a style won't be set per feature
+	        var style = _this2._options.style;
+	
+	        var layerPromises = [];
+	
+	        var options;
+	        features.forEach(function (feature) {
+	          // Get per-feature style object, if provided
+	          if (typeof _this2._options.style === 'function') {
+	            style = (0, _lodashAssign2['default'])({}, _utilGeoJSON2['default'].defaultStyle, _this2._options.style(feature));
+	          }
+	
+	          options = (0, _lodashAssign2['default'])({}, defaults, {
+	            // If merging feature layers, stop them outputting themselves
+	            // If not, let feature layers output themselves to the world
+	            output: !_this2.isOutput(),
+	            interactive: _this2._options.interactive,
+	            style: style
+	          });
+	
+	          var layer = _this2._featureToLayer(feature, options);
+	
+	          if (!layer) {
+	            return;
+	          }
+	
+	          // Sometimes you don't want to store a reference to the feature
+	          //
+	          // For example, to save memory when being used by tile layers
+	          if (_this2._options.keepFeatures) {
+	            layer.feature = feature;
+	          }
+	
+	          // If defined, call a function for each feature
+	          //
+	          // This is commonly used for adding event listeners from the user script
+	          if (_this2._options.onEachFeature) {
+	            _this2._options.onEachFeature(feature, layer);
+	          }
+	
+	          // TODO: Make this a promise array and only continue on completion
+	          layerPromises.push(_this2.addLayer(layer));
 	        });
 	
-	        var layer = _this2._featureToLayer(feature, options);
-	
-	        if (!layer) {
-	          return;
-	        }
-	
-	        // Sometimes you don't want to store a reference to the feature
-	        //
-	        // For example, to save memory when being used by tile layers
-	        if (_this2._options.keepFeatures) {
-	          layer.feature = feature;
-	        }
-	
-	        // If defined, call a function for each feature
-	        //
-	        // This is commonly used for adding event listeners from the user script
-	        if (_this2._options.onEachFeature) {
-	          _this2._options.onEachFeature(feature, layer);
-	        }
-	
-	        // TODO: Make this a promise array and only continue on completion
-	        _this2.addLayer(layer);
-	      });
-	
-	      // If merging layers do that now, otherwise skip as the geometry layers
-	      // should have already outputted themselves
-	      if (!this.isOutput()) {
-	        return;
-	      }
-	
-	      // From here on we can assume that we want to merge the layers
-	
-	      var polygonAttributes = [];
-	      var polygonFlat = true;
-	
-	      var polylineAttributes = [];
-	      var pointAttributes = [];
-	
-	      this._layers.forEach(function (layer) {
-	        if (layer instanceof _geometryPolygonLayer2['default']) {
-	          polygonAttributes.push(layer.getBufferAttributes());
-	
-	          if (polygonFlat && !layer.isFlat()) {
-	            polygonFlat = false;
+	        Promise.all(layerPromises).then(function (results) {
+	          // If merging layers do that now, otherwise skip as the geometry layers
+	          // should have already outputted themselves
+	          if (!_this2.isOutput()) {
+	            resolve();
+	            return;
 	          }
-	        } else if (layer instanceof _geometryPolylineLayer2['default']) {
-	          polylineAttributes.push(layer.getBufferAttributes());
-	        } else if (layer instanceof _geometryPointLayer2['default']) {
-	          pointAttributes.push(layer.getBufferAttributes());
-	        }
+	
+	          // From here on we can assume that we want to merge the layers
+	
+	          var polygonAttributes = [];
+	          var polygonOutlineAttributes = [];
+	          var polygonAttributeLengths = {
+	            positions: 3,
+	            normals: 3,
+	            colors: 3
+	          };
+	          var polygonFlat = true;
+	
+	          var polylineAttributes = [];
+	          var polylineAttributeLengths = {
+	            positions: 3,
+	            colors: 3
+	          };
+	          var polylineFlat = true;
+	
+	          var pointAttributes = [];
+	          var pointAttributeLengths = {
+	            positions: 3,
+	            normals: 3,
+	            colors: 3
+	          };
+	          var pointFlat = true;
+	
+	          _this2._layers.forEach(function (layer) {
+	            if (layer instanceof _geometryPolygonLayer2['default']) {
+	              polygonAttributes.push(layer.getBufferAttributes());
+	
+	              var outlineBufferAttributes = layer.getOutlineBufferAttributes();
+	              if (outlineBufferAttributes) {
+	                polygonOutlineAttributes.push(outlineBufferAttributes);
+	              }
+	
+	              if (polygonFlat && !layer.isFlat()) {
+	                polygonFlat = false;
+	              }
+	
+	              if (_this2._options.interactive) {
+	                polygonAttributeLengths.pickingIds = 1;
+	              }
+	            } else if (layer instanceof _geometryPolylineLayer2['default']) {
+	              polylineAttributes.push(layer.getBufferAttributes());
+	
+	              if (polylineFlat && !layer.isFlat()) {
+	                polylineFlat = false;
+	              }
+	
+	              if (_this2._options.interactive) {
+	                polylineAttributeLengths.pickingIds = 1;
+	              }
+	            } else if (layer instanceof _geometryPointLayer2['default']) {
+	              pointAttributes.push(layer.getBufferAttributes());
+	
+	              if (pointFlat && !layer.isFlat()) {
+	                pointFlat = false;
+	              }
+	
+	              if (_this2._options.interactive) {
+	                pointAttributeLengths.pickingIds = 1;
+	              }
+	            }
+	          });
+	
+	          var style;
+	
+	          if (polygonAttributes.length > 0) {
+	            var mergedPolygonAttributes = _utilBuffer2['default'].mergeAttributes(polygonAttributes);
+	
+	            var mergedPolygonOutlineAttributes;
+	            if (polygonOutlineAttributes.length > 0) {
+	              mergedPolygonOutlineAttributes = _utilBuffer2['default'].mergeAttributes(polygonOutlineAttributes);
+	            }
+	
+	            style = typeof _this2._options.style === 'function' ? _this2._options.style(_this2._geojson.features[0]) : _this2._options.style;
+	            style = (0, _lodashAssign2['default'])({}, _utilGeoJSON2['default'].defaultStyle, style);
+	
+	            _this2._setPolygonMesh(mergedPolygonAttributes, polygonAttributeLengths, style, polygonFlat).then(function (result) {
+	              _this2._polygonMesh = result.mesh;
+	              _this2.add(_this2._polygonMesh);
+	
+	              if (mergedPolygonOutlineAttributes) {
+	                style = typeof _this2._options.style === 'function' ? _this2._options.style(_this2._geojson.features[0]) : _this2._options.style;
+	                style = (0, _lodashAssign2['default'])({}, _utilGeoJSON2['default'].defaultStyle, style);
+	
+	                if (style.outlineRenderOrder !== undefined) {
+	                  style.lineRenderOrder = style.outlineRenderOrder;
+	                } else {
+	                  style.lineRenderOrder = style.renderOrder ? style.renderOrder + 1 : 4;
+	                }
+	
+	                if (style.outlineWidth) {
+	                  style.lineWidth = style.outlineWidth;
+	                }
+	
+	                _this2._setPolylineMesh(mergedPolygonOutlineAttributes, polylineAttributeLengths, style, true).then(function (result) {
+	                  _this2.add(result.mesh);
+	                });
+	              }
+	
+	              if (result.pickingMesh) {
+	                _this2._pickingMesh.add(result.pickingMesh);
+	              }
+	            });
+	          }
+	
+	          if (polylineAttributes.length > 0) {
+	            var mergedPolylineAttributes = _utilBuffer2['default'].mergeAttributes(polylineAttributes);
+	
+	            style = typeof _this2._options.style === 'function' ? _this2._options.style(_this2._geojson.features[0]) : _this2._options.style;
+	            style = (0, _lodashAssign2['default'])({}, _utilGeoJSON2['default'].defaultStyle, style);
+	
+	            _this2._setPolylineMesh(mergedPolylineAttributes, polylineAttributeLengths, style, polylineFlat).then(function (result) {
+	              _this2._polylineMesh = result.mesh;
+	              _this2.add(_this2._polylineMesh);
+	
+	              if (result.pickingMesh) {
+	                _this2._pickingMesh.add(result.pickingMesh);
+	              }
+	            });
+	          }
+	
+	          if (pointAttributes.length > 0) {
+	            var mergedPointAttributes = _utilBuffer2['default'].mergeAttributes(pointAttributes);
+	
+	            style = typeof _this2._options.style === 'function' ? _this2._options.style(_this2._geojson.features[0]) : _this2._options.style;
+	            style = (0, _lodashAssign2['default'])({}, _utilGeoJSON2['default'].defaultStyle, style);
+	
+	            _this2._setPointMesh(mergedPointAttributes, pointAttributeLengths, style, pointFlat).then(function (result) {
+	              _this2._pointMesh = result.mesh;
+	              _this2.add(_this2._pointMesh);
+	
+	              if (result.pickingMesh) {
+	                _this2._pickingMesh.add(result.pickingMesh);
+	              }
+	            });
+	          }
+	
+	          // Clean up layers
+	          //
+	          // TODO: Are there ever situations where the unmerged buffer attributes
+	          // and coordinates would still be required?
+	          _this2._layers.forEach(function (layer) {
+	            layer.clearBufferAttributes();
+	            layer.clearCoordinates();
+	          });
+	
+	          resolve();
+	        });
 	      });
-	
-	      if (polygonAttributes.length > 0) {
-	        var mergedPolygonAttributes = _utilBuffer2['default'].mergeAttributes(polygonAttributes);
-	        this._setPolygonMesh(mergedPolygonAttributes, polygonFlat);
-	        this.add(this._polygonMesh);
-	      }
-	
-	      if (polylineAttributes.length > 0) {
-	        var mergedPolylineAttributes = _utilBuffer2['default'].mergeAttributes(polylineAttributes);
-	        this._setPolylineMesh(mergedPolylineAttributes);
-	        this.add(this._polylineMesh);
-	      }
-	
-	      if (pointAttributes.length > 0) {
-	        var mergedPointAttributes = _utilBuffer2['default'].mergeAttributes(pointAttributes);
-	        this._setPointMesh(mergedPointAttributes);
-	        this.add(this._pointMesh);
-	      }
-	
-	      // Clean up layers
-	      //
-	      // TODO: Are there ever situations where the unmerged buffer attributes
-	      // and coordinates would still be required?
-	      this._layers.forEach(function (layer) {
-	        layer.clearBufferAttributes();
-	        layer.clearCoordinates();
-	      });
-	
-	      return Promise.resolve();
 	    }
 	
 	    // Create and store mesh from buffer attributes
 	    //
-	    // TODO: De-dupe this from the individual mesh creation logic within each
-	    // geometry layer (materials, settings, etc)
-	    //
-	    // Could make this an abstract method for each geometry layer
+	    // TODO: Probably remove this and call static method directly as it's just a proxy
 	  }, {
 	    key: '_setPolygonMesh',
-	    value: function _setPolygonMesh(attributes, flat) {
-	      var geometry = new THREE.BufferGeometry();
-	
-	      // itemSize = 3 because there are 3 values (components) per vertex
-	      geometry.addAttribute('position', new THREE.BufferAttribute(attributes.vertices, 3));
-	      geometry.addAttribute('normal', new THREE.BufferAttribute(attributes.normals, 3));
-	      geometry.addAttribute('color', new THREE.BufferAttribute(attributes.colours, 3));
-	
-	      if (attributes.pickingIds) {
-	        geometry.addAttribute('pickingId', new THREE.BufferAttribute(attributes.pickingIds, 1));
-	      }
-	
-	      geometry.computeBoundingBox();
-	
-	      // TODO: Make this work when style is a function per feature
-	      var style = typeof this._options.style === 'function' ? this._options.style(this._geojson.features[0]) : this._options.style;
-	      style = (0, _lodashAssign2['default'])({}, _utilGeoJSON2['default'].defaultStyle, style);
-	
-	      var material;
-	      if (this._options.polygonMaterial && this._options.polygonMaterial instanceof THREE.Material) {
-	        material = this._options.polygonMaterial;
-	      } else if (!this._world._environment._skybox) {
-	        material = new THREE.MeshPhongMaterial({
-	          vertexColors: THREE.VertexColors,
-	          side: THREE.BackSide,
-	          transparent: style.transparent,
-	          opacity: style.opacity,
-	          blending: style.blending
-	        });
-	      } else {
-	        material = new THREE.MeshStandardMaterial({
-	          vertexColors: THREE.VertexColors,
-	          side: THREE.BackSide,
-	          transparent: style.transparent,
-	          opacity: style.opacity,
-	          blending: style.blending
-	        });
-	        material.roughness = 1;
-	        material.metalness = 0.1;
-	        material.envMapIntensity = 3;
-	        material.envMap = this._world._environment._skybox.getRenderTarget();
-	      }
-	
-	      var mesh;
-	
-	      // Pass mesh through callback, if defined
-	      if (typeof this._options.onPolygonMesh === 'function') {
-	        mesh = this._options.onPolygonMesh(geometry, material);
-	      } else {
-	        mesh = new THREE.Mesh(geometry, material);
-	
-	        mesh.castShadow = true;
-	        mesh.receiveShadow = true;
-	      }
-	
-	      if (flat) {
-	        material.depthWrite = false;
-	        mesh.renderOrder = 1;
-	      }
-	
-	      if (this._options.interactive && this._pickingMesh) {
-	        material = new _enginePickingMaterial2['default']();
-	        material.side = THREE.BackSide;
-	
-	        var pickingMesh = new THREE.Mesh(geometry, material);
-	        this._pickingMesh.add(pickingMesh);
-	      }
-	
-	      this._polygonMesh = mesh;
+	    value: function _setPolygonMesh(attributes, attributeLengths, style, flat) {
+	      return _geometryPolygonLayer2['default'].SetMesh(attributes, attributeLengths, flat, style, this._options, this._world._environment._skybox);
 	    }
 	  }, {
 	    key: '_setPolylineMesh',
-	    value: function _setPolylineMesh(attributes) {
-	      var geometry = new THREE.BufferGeometry();
-	
-	      // itemSize = 3 because there are 3 values (components) per vertex
-	      geometry.addAttribute('position', new THREE.BufferAttribute(attributes.vertices, 3));
-	
-	      if (attributes.normals) {
-	        geometry.addAttribute('normal', new THREE.BufferAttribute(attributes.normals, 3));
-	      }
-	
-	      geometry.addAttribute('color', new THREE.BufferAttribute(attributes.colours, 3));
-	
-	      if (attributes.pickingIds) {
-	        geometry.addAttribute('pickingId', new THREE.BufferAttribute(attributes.pickingIds, 1));
-	      }
-	
-	      geometry.computeBoundingBox();
-	
-	      // TODO: Make this work when style is a function per feature
-	      var style = typeof this._options.style === 'function' ? this._options.style(this._geojson.features[0]) : this._options.style;
-	      style = (0, _lodashAssign2['default'])({}, _utilGeoJSON2['default'].defaultStyle, style);
-	
-	      var material;
-	      if (this._options.polylineMaterial && this._options.polylineMaterial instanceof THREE.Material) {
-	        material = this._options.polylineMaterial;
-	      } else {
-	        material = new THREE.LineBasicMaterial({
-	          vertexColors: THREE.VertexColors,
-	          linewidth: style.lineWidth,
-	          transparent: style.lineTransparent,
-	          opacity: style.lineOpacity,
-	          blending: style.lineBlending
-	        });
-	      }
-	
-	      var mesh;
-	
-	      // Pass mesh through callback, if defined
-	      if (typeof this._options.onPolylineMesh === 'function') {
-	        mesh = this._options.onPolylineMesh(geometry, material);
-	      } else {
-	        mesh = new THREE.LineSegments(geometry, material);
-	
-	        if (style.lineRenderOrder !== undefined) {
-	          material.depthWrite = false;
-	          mesh.renderOrder = style.lineRenderOrder;
-	        }
-	
-	        mesh.castShadow = true;
-	        // mesh.receiveShadow = true;
-	      }
-	
-	      // TODO: Allow this to be overridden, or copy mesh instead of creating a new
-	      // one just for picking
-	      if (this._options.interactive && this._pickingMesh) {
-	        material = new _enginePickingMaterial2['default']();
-	        // material.side = THREE.BackSide;
-	
-	        // Make the line wider / easier to pick
-	        material.linewidth = style.lineWidth + material.linePadding;
-	
-	        var pickingMesh = new THREE.LineSegments(geometry, material);
-	        this._pickingMesh.add(pickingMesh);
-	      }
-	
-	      this._polylineMesh = mesh;
+	    value: function _setPolylineMesh(attributes, attributeLengths, style, flat) {
+	      return _geometryPolylineLayer2['default'].SetMesh(attributes, attributeLengths, flat, style, this._options);
 	    }
 	  }, {
 	    key: '_setPointMesh',
-	    value: function _setPointMesh(attributes) {
-	      var geometry = new THREE.BufferGeometry();
-	
-	      // itemSize = 3 because there are 3 values (components) per vertex
-	      geometry.addAttribute('position', new THREE.BufferAttribute(attributes.vertices, 3));
-	      geometry.addAttribute('normal', new THREE.BufferAttribute(attributes.normals, 3));
-	      geometry.addAttribute('color', new THREE.BufferAttribute(attributes.colours, 3));
-	
-	      if (attributes.pickingIds) {
-	        geometry.addAttribute('pickingId', new THREE.BufferAttribute(attributes.pickingIds, 1));
-	      }
-	
-	      geometry.computeBoundingBox();
-	
-	      var material;
-	      if (this._options.pointMaterial && this._options.pointMaterial instanceof THREE.Material) {
-	        material = this._options.pointMaterial;
-	      } else if (!this._world._environment._skybox) {
-	        material = new THREE.MeshPhongMaterial({
-	          vertexColors: THREE.VertexColors
-	          // side: THREE.BackSide
-	        });
-	      } else {
-	          material = new THREE.MeshStandardMaterial({
-	            vertexColors: THREE.VertexColors
-	            // side: THREE.BackSide
-	          });
-	          material.roughness = 1;
-	          material.metalness = 0.1;
-	          material.envMapIntensity = 3;
-	          material.envMap = this._world._environment._skybox.getRenderTarget();
-	        }
-	
-	      var mesh;
-	
-	      // Pass mesh callback, if defined
-	      if (typeof this._options.onPointMesh === 'function') {
-	        mesh = this._options.onPointMesh(geometry, material);
-	      } else {
-	        mesh = new THREE.Mesh(geometry, material);
-	
-	        mesh.castShadow = true;
-	        // mesh.receiveShadow = true;
-	      }
-	
-	      if (this._options.interactive && this._pickingMesh) {
-	        material = new _enginePickingMaterial2['default']();
-	        // material.side = THREE.BackSide;
-	
-	        var pickingMesh = new THREE.Mesh(geometry, material);
-	        this._pickingMesh.add(pickingMesh);
-	      }
-	
-	      this._pointMesh = mesh;
+	    value: function _setPointMesh(attributes, attributeLengths, style, flat) {
+	      return _geometryPointLayer2['default'].SetMesh(attributes, attributeLengths, flat, style, this._options);
 	    }
 	
 	    // TODO: Support all GeoJSON geometry types
@@ -13975,11 +14919,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (geometry.type === 'Polygon' || geometry.type === 'MultiPolygon') {
 	        // Get material instance to use for polygon, if provided
 	        if (typeof this._options.polygonMaterial === 'function') {
-	          options.geometry = this._options.polygonMaterial(feature);
+	          options.polygonMaterial = this._options.polygonMaterial(feature);
 	        }
 	
 	        if (typeof this._options.onPolygonMesh === 'function') {
-	          options.onMesh = this._options.onPolygonMesh;
+	          options.onPolygonMesh = this._options.onPolygonMesh;
 	        }
 	
 	        // Pass onBufferAttributes callback, if defined
@@ -13993,11 +14937,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (geometry.type === 'LineString' || geometry.type === 'MultiLineString') {
 	        // Get material instance to use for line, if provided
 	        if (typeof this._options.lineMaterial === 'function') {
-	          options.geometry = this._options.lineMaterial(feature);
+	          options.lineMaterial = this._options.lineMaterial(feature);
 	        }
 	
 	        if (typeof this._options.onPolylineMesh === 'function') {
-	          options.onMesh = this._options.onPolylineMesh;
+	          options.onPolylineMesh = this._options.onPolylineMesh;
 	        }
 	
 	        // Pass onBufferAttributes callback, if defined
@@ -14011,16 +14955,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (geometry.type === 'Point' || geometry.type === 'MultiPoint') {
 	        // Get geometry object to use for point, if provided
 	        if (typeof this._options.pointGeometry === 'function') {
-	          options.geometry = this._options.pointGeometry(feature);
+	          options.pointGeometry = this._options.pointGeometry(feature);
 	        }
 	
 	        // Get material instance to use for point, if provided
 	        if (typeof this._options.pointMaterial === 'function') {
-	          options.geometry = this._options.pointMaterial(feature);
+	          options.pointMaterial = this._options.pointMaterial(feature);
 	        }
 	
 	        if (typeof this._options.onPointMesh === 'function') {
-	          options.onMesh = this._options.onPointMesh;
+	          options.onPointMesh = this._options.onPointMesh;
 	        }
 	
 	        return new _geometryPointLayer2['default'](coordinates, options);
@@ -14082,100 +15026,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.geoJSONLayer = noNew;
 
 /***/ },
-/* 60 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var _Layer2 = __webpack_require__(32);
-	
-	var _Layer3 = _interopRequireDefault(_Layer2);
-	
-	var _lodashAssign = __webpack_require__(3);
-	
-	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
-	
-	var LayerGroup = (function (_Layer) {
-	  _inherits(LayerGroup, _Layer);
-	
-	  function LayerGroup(options) {
-	    _classCallCheck(this, LayerGroup);
-	
-	    var defaults = {
-	      output: false
-	    };
-	
-	    var _options = (0, _lodashAssign2['default'])({}, defaults, options);
-	
-	    _get(Object.getPrototypeOf(LayerGroup.prototype), 'constructor', this).call(this, _options);
-	
-	    this._layers = [];
-	  }
-	
-	  _createClass(LayerGroup, [{
-	    key: 'addLayer',
-	    value: function addLayer(layer) {
-	      this._layers.push(layer);
-	      return this._world.addLayer(layer);
-	    }
-	  }, {
-	    key: 'removeLayer',
-	    value: function removeLayer(layer) {
-	      var layerIndex = this._layers.indexOf(layer);
-	
-	      if (layerIndex > -1) {
-	        // Remove from this._layers
-	        this._layers.splice(layerIndex, 1);
-	      };
-	
-	      this._world.removeLayer(layer);
-	    }
-	  }, {
-	    key: '_onAdd',
-	    value: function _onAdd(world) {}
-	
-	    // Destroy the layers and remove them from the scene and memory
-	  }, {
-	    key: 'destroy',
-	    value: function destroy() {
-	      // TODO: Sometimes this is already null, find out why
-	      if (this._layers) {
-	        for (var i = 0; i < this._layers.length; i++) {
-	          this._layers[i].destroy();
-	        }
-	
-	        this._layers = null;
-	      }
-	
-	      _get(Object.getPrototypeOf(LayerGroup.prototype), 'destroy', this).call(this);
-	    }
-	  }]);
-	
-	  return LayerGroup;
-	})(_Layer3['default']);
-	
-	exports['default'] = LayerGroup;
-	
-	var noNew = function noNew(options) {
-	  return new LayerGroup(options);
-	};
-	
-	exports.layerGroup = noNew;
-
-/***/ },
-/* 61 */
+/* 73 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -14199,7 +15050,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  } else {
 	    var XHR2
 	    try {
-	      XHR2 = __webpack_require__(62)
+	      XHR2 = __webpack_require__(74)
 	    } catch (ex) {
 	      throw new Error('Peer dependency `xhr2` required! Please npm install xhr2')
 	    }
@@ -14811,18 +15662,20 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 62 */
+/* 74 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 63 */
+/* 75 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
@@ -14834,19 +15687,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _topojson2 = __webpack_require__(64);
+	var _topojson2 = __webpack_require__(76);
 	
-	var _topojson3 = _interopRequireDefault(_topojson2);
+	var topojson = _interopRequireWildcard(_topojson2);
 	
-	var _geojsonMerge = __webpack_require__(65);
+	var _geojsonMerge = __webpack_require__(77);
 	
 	var _geojsonMerge2 = _interopRequireDefault(_geojsonMerge);
 	
-	var _earcut = __webpack_require__(67);
+	var _earcut = __webpack_require__(79);
 	
 	var _earcut2 = _interopRequireDefault(_earcut);
 	
-	var _extrudePolygon = __webpack_require__(68);
+	var _extrudePolygon = __webpack_require__(80);
 	
 	var _extrudePolygon2 = _interopRequireDefault(_extrudePolygon);
 	
@@ -14865,6 +15718,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var GeoJSON = (function () {
 	  var defaultStyle = {
 	    color: '#ffffff',
+	    outline: false,
+	    outlineColor: '#000000',
 	    transparent: false,
 	    opacity: 1,
 	    blending: _three2['default'].NormalBlending,
@@ -14886,7 +15741,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // If not overridden, merge all features from all objects
 	      for (var tk in data.objects) {
-	        collections.push(_topojson3['default'].feature(data, data.objects[tk]));
+	        collections.push(topojson.feature(data, data.objects[tk]));
 	      }
 	
 	      return (0, _geojsonMerge2['default'])(collections);
@@ -15095,560 +15950,562 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 64 */
+/* 76 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(function (global, factory) {
 	   true ? factory(exports) :
 	  typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	  (factory((global.topojson = global.topojson || {})));
-	}(this, function (exports) { 'use strict';
+	}(this, (function (exports) { 'use strict';
 	
-	  function noop() {}
+	function noop() {}
 	
-	  function transformAbsolute(transform) {
-	    if (!transform) return noop;
-	    var x0,
-	        y0,
-	        kx = transform.scale[0],
-	        ky = transform.scale[1],
-	        dx = transform.translate[0],
-	        dy = transform.translate[1];
-	    return function(point, i) {
-	      if (!i) x0 = y0 = 0;
-	      point[0] = (x0 += point[0]) * kx + dx;
-	      point[1] = (y0 += point[1]) * ky + dy;
-	    };
+	function transformAbsolute(transform) {
+	  if (!transform) return noop;
+	  var x0,
+	      y0,
+	      kx = transform.scale[0],
+	      ky = transform.scale[1],
+	      dx = transform.translate[0],
+	      dy = transform.translate[1];
+	  return function(point, i) {
+	    if (!i) x0 = y0 = 0;
+	    point[0] = (x0 += point[0]) * kx + dx;
+	    point[1] = (y0 += point[1]) * ky + dy;
+	  };
+	}
+	
+	function transformRelative(transform) {
+	  if (!transform) return noop;
+	  var x0,
+	      y0,
+	      kx = transform.scale[0],
+	      ky = transform.scale[1],
+	      dx = transform.translate[0],
+	      dy = transform.translate[1];
+	  return function(point, i) {
+	    if (!i) x0 = y0 = 0;
+	    var x1 = Math.round((point[0] - dx) / kx),
+	        y1 = Math.round((point[1] - dy) / ky);
+	    point[0] = x1 - x0;
+	    point[1] = y1 - y0;
+	    x0 = x1;
+	    y0 = y1;
+	  };
+	}
+	
+	function reverse(array, n) {
+	  var t, j = array.length, i = j - n;
+	  while (i < --j) t = array[i], array[i++] = array[j], array[j] = t;
+	}
+	
+	function bisect(a, x) {
+	  var lo = 0, hi = a.length;
+	  while (lo < hi) {
+	    var mid = lo + hi >>> 1;
+	    if (a[mid] < x) lo = mid + 1;
+	    else hi = mid;
+	  }
+	  return lo;
+	}
+	
+	function feature(topology, o) {
+	  return o.type === "GeometryCollection" ? {
+	    type: "FeatureCollection",
+	    features: o.geometries.map(function(o) { return feature$1(topology, o); })
+	  } : feature$1(topology, o);
+	}
+	
+	function feature$1(topology, o) {
+	  var f = {
+	    type: "Feature",
+	    id: o.id,
+	    properties: o.properties || {},
+	    geometry: object(topology, o)
+	  };
+	  if (o.id == null) delete f.id;
+	  return f;
+	}
+	
+	function object(topology, o) {
+	  var absolute = transformAbsolute(topology.transform),
+	      arcs = topology.arcs;
+	
+	  function arc(i, points) {
+	    if (points.length) points.pop();
+	    for (var a = arcs[i < 0 ? ~i : i], k = 0, n = a.length, p; k < n; ++k) {
+	      points.push(p = a[k].slice());
+	      absolute(p, k);
+	    }
+	    if (i < 0) reverse(points, n);
 	  }
 	
-	  function transformRelative(transform) {
-	    if (!transform) return noop;
-	    var x0,
-	        y0,
-	        kx = transform.scale[0],
-	        ky = transform.scale[1],
-	        dx = transform.translate[0],
-	        dy = transform.translate[1];
-	    return function(point, i) {
-	      if (!i) x0 = y0 = 0;
-	      var x1 = Math.round((point[0] - dx) / kx),
-	          y1 = Math.round((point[1] - dy) / ky);
-	      point[0] = x1 - x0;
-	      point[1] = y1 - y0;
-	      x0 = x1;
-	      y0 = y1;
-	    };
+	  function point(p) {
+	    p = p.slice();
+	    absolute(p, 0);
+	    return p;
 	  }
 	
-	  function reverse(array, n) {
-	    var t, j = array.length, i = j - n;
-	    while (i < --j) t = array[i], array[i++] = array[j], array[j] = t;
+	  function line(arcs) {
+	    var points = [];
+	    for (var i = 0, n = arcs.length; i < n; ++i) arc(arcs[i], points);
+	    if (points.length < 2) points.push(points[0].slice());
+	    return points;
 	  }
 	
-	  function bisect(a, x) {
-	    var lo = 0, hi = a.length;
-	    while (lo < hi) {
-	      var mid = lo + hi >>> 1;
-	      if (a[mid] < x) lo = mid + 1;
-	      else hi = mid;
-	    }
-	    return lo;
+	  function ring(arcs) {
+	    var points = line(arcs);
+	    while (points.length < 4) points.push(points[0].slice());
+	    return points;
 	  }
 	
-	  function feature(topology, o) {
-	    return o.type === "GeometryCollection" ? {
-	      type: "FeatureCollection",
-	      features: o.geometries.map(function(o) { return feature$1(topology, o); })
-	    } : feature$1(topology, o);
+	  function polygon(arcs) {
+	    return arcs.map(ring);
 	  }
 	
-	  function feature$1(topology, o) {
-	    var f = {
-	      type: "Feature",
-	      id: o.id,
-	      properties: o.properties || {},
-	      geometry: object(topology, o)
-	    };
-	    if (o.id == null) delete f.id;
-	    return f;
+	  function geometry(o) {
+	    var t = o.type;
+	    return t === "GeometryCollection" ? {type: t, geometries: o.geometries.map(geometry)}
+	        : t in geometryType ? {type: t, coordinates: geometryType[t](o)}
+	        : null;
 	  }
 	
-	  function object(topology, o) {
-	    var absolute = transformAbsolute(topology.transform),
-	        arcs = topology.arcs;
+	  var geometryType = {
+	    Point: function(o) { return point(o.coordinates); },
+	    MultiPoint: function(o) { return o.coordinates.map(point); },
+	    LineString: function(o) { return line(o.arcs); },
+	    MultiLineString: function(o) { return o.arcs.map(line); },
+	    Polygon: function(o) { return polygon(o.arcs); },
+	    MultiPolygon: function(o) { return o.arcs.map(polygon); }
+	  };
 	
-	    function arc(i, points) {
-	      if (points.length) points.pop();
-	      for (var a = arcs[i < 0 ? ~i : i], k = 0, n = a.length, p; k < n; ++k) {
-	        points.push(p = a[k].slice());
-	        absolute(p, k);
-	      }
-	      if (i < 0) reverse(points, n);
+	  return geometry(o);
+	}
+	
+	function stitchArcs(topology, arcs) {
+	  var stitchedArcs = {},
+	      fragmentByStart = {},
+	      fragmentByEnd = {},
+	      fragments = [],
+	      emptyIndex = -1;
+	
+	  // Stitch empty arcs first, since they may be subsumed by other arcs.
+	  arcs.forEach(function(i, j) {
+	    var arc = topology.arcs[i < 0 ? ~i : i], t;
+	    if (arc.length < 3 && !arc[1][0] && !arc[1][1]) {
+	      t = arcs[++emptyIndex], arcs[emptyIndex] = i, arcs[j] = t;
 	    }
+	  });
 	
-	    function point(p) {
-	      p = p.slice();
-	      absolute(p, 0);
-	      return p;
-	    }
+	  arcs.forEach(function(i) {
+	    var e = ends(i),
+	        start = e[0],
+	        end = e[1],
+	        f, g;
 	
-	    function line(arcs) {
-	      var points = [];
-	      for (var i = 0, n = arcs.length; i < n; ++i) arc(arcs[i], points);
-	      if (points.length < 2) points.push(points[0].slice());
-	      return points;
-	    }
-	
-	    function ring(arcs) {
-	      var points = line(arcs);
-	      while (points.length < 4) points.push(points[0].slice());
-	      return points;
-	    }
-	
-	    function polygon(arcs) {
-	      return arcs.map(ring);
-	    }
-	
-	    function geometry(o) {
-	      var t = o.type;
-	      return t === "GeometryCollection" ? {type: t, geometries: o.geometries.map(geometry)}
-	          : t in geometryType ? {type: t, coordinates: geometryType[t](o)}
-	          : null;
-	    }
-	
-	    var geometryType = {
-	      Point: function(o) { return point(o.coordinates); },
-	      MultiPoint: function(o) { return o.coordinates.map(point); },
-	      LineString: function(o) { return line(o.arcs); },
-	      MultiLineString: function(o) { return o.arcs.map(line); },
-	      Polygon: function(o) { return polygon(o.arcs); },
-	      MultiPolygon: function(o) { return o.arcs.map(polygon); }
-	    };
-	
-	    return geometry(o);
-	  }
-	
-	  function stitchArcs(topology, arcs) {
-	    var stitchedArcs = {},
-	        fragmentByStart = {},
-	        fragmentByEnd = {},
-	        fragments = [],
-	        emptyIndex = -1;
-	
-	    // Stitch empty arcs first, since they may be subsumed by other arcs.
-	    arcs.forEach(function(i, j) {
-	      var arc = topology.arcs[i < 0 ? ~i : i], t;
-	      if (arc.length < 3 && !arc[1][0] && !arc[1][1]) {
-	        t = arcs[++emptyIndex], arcs[emptyIndex] = i, arcs[j] = t;
-	      }
-	    });
-	
-	    arcs.forEach(function(i) {
-	      var e = ends(i),
-	          start = e[0],
-	          end = e[1],
-	          f, g;
-	
-	      if (f = fragmentByEnd[start]) {
-	        delete fragmentByEnd[f.end];
-	        f.push(i);
-	        f.end = end;
-	        if (g = fragmentByStart[end]) {
-	          delete fragmentByStart[g.start];
-	          var fg = g === f ? f : f.concat(g);
-	          fragmentByStart[fg.start = f.start] = fragmentByEnd[fg.end = g.end] = fg;
-	        } else {
-	          fragmentByStart[f.start] = fragmentByEnd[f.end] = f;
-	        }
-	      } else if (f = fragmentByStart[end]) {
-	        delete fragmentByStart[f.start];
-	        f.unshift(i);
-	        f.start = start;
-	        if (g = fragmentByEnd[start]) {
-	          delete fragmentByEnd[g.end];
-	          var gf = g === f ? f : g.concat(f);
-	          fragmentByStart[gf.start = g.start] = fragmentByEnd[gf.end = f.end] = gf;
-	        } else {
-	          fragmentByStart[f.start] = fragmentByEnd[f.end] = f;
-	        }
+	    if (f = fragmentByEnd[start]) {
+	      delete fragmentByEnd[f.end];
+	      f.push(i);
+	      f.end = end;
+	      if (g = fragmentByStart[end]) {
+	        delete fragmentByStart[g.start];
+	        var fg = g === f ? f : f.concat(g);
+	        fragmentByStart[fg.start = f.start] = fragmentByEnd[fg.end = g.end] = fg;
 	      } else {
-	        f = [i];
-	        fragmentByStart[f.start = start] = fragmentByEnd[f.end = end] = f;
+	        fragmentByStart[f.start] = fragmentByEnd[f.end] = f;
 	      }
-	    });
-	
-	    function ends(i) {
-	      var arc = topology.arcs[i < 0 ? ~i : i], p0 = arc[0], p1;
-	      if (topology.transform) p1 = [0, 0], arc.forEach(function(dp) { p1[0] += dp[0], p1[1] += dp[1]; });
-	      else p1 = arc[arc.length - 1];
-	      return i < 0 ? [p1, p0] : [p0, p1];
-	    }
-	
-	    function flush(fragmentByEnd, fragmentByStart) {
-	      for (var k in fragmentByEnd) {
-	        var f = fragmentByEnd[k];
-	        delete fragmentByStart[f.start];
-	        delete f.start;
-	        delete f.end;
-	        f.forEach(function(i) { stitchedArcs[i < 0 ? ~i : i] = 1; });
-	        fragments.push(f);
+	    } else if (f = fragmentByStart[end]) {
+	      delete fragmentByStart[f.start];
+	      f.unshift(i);
+	      f.start = start;
+	      if (g = fragmentByEnd[start]) {
+	        delete fragmentByEnd[g.end];
+	        var gf = g === f ? f : g.concat(f);
+	        fragmentByStart[gf.start = g.start] = fragmentByEnd[gf.end = f.end] = gf;
+	      } else {
+	        fragmentByStart[f.start] = fragmentByEnd[f.end] = f;
 	      }
-	    }
-	
-	    flush(fragmentByEnd, fragmentByStart);
-	    flush(fragmentByStart, fragmentByEnd);
-	    arcs.forEach(function(i) { if (!stitchedArcs[i < 0 ? ~i : i]) fragments.push([i]); });
-	
-	    return fragments;
-	  }
-	
-	  function mesh(topology) {
-	    return object(topology, meshArcs.apply(this, arguments));
-	  }
-	
-	  function meshArcs(topology, o, filter) {
-	    var arcs = [];
-	
-	    function arc(i) {
-	      var j = i < 0 ? ~i : i;
-	      (geomsByArc[j] || (geomsByArc[j] = [])).push({i: i, g: geom});
-	    }
-	
-	    function line(arcs) {
-	      arcs.forEach(arc);
-	    }
-	
-	    function polygon(arcs) {
-	      arcs.forEach(line);
-	    }
-	
-	    function geometry(o) {
-	      if (o.type === "GeometryCollection") o.geometries.forEach(geometry);
-	      else if (o.type in geometryType) geom = o, geometryType[o.type](o.arcs);
-	    }
-	
-	    if (arguments.length > 1) {
-	      var geomsByArc = [],
-	          geom;
-	
-	      var geometryType = {
-	        LineString: line,
-	        MultiLineString: polygon,
-	        Polygon: polygon,
-	        MultiPolygon: function(arcs) { arcs.forEach(polygon); }
-	      };
-	
-	      geometry(o);
-	
-	      geomsByArc.forEach(arguments.length < 3
-	          ? function(geoms) { arcs.push(geoms[0].i); }
-	          : function(geoms) { if (filter(geoms[0].g, geoms[geoms.length - 1].g)) arcs.push(geoms[0].i); });
 	    } else {
-	      for (var i = 0, n = topology.arcs.length; i < n; ++i) arcs.push(i);
+	      f = [i];
+	      fragmentByStart[f.start = start] = fragmentByEnd[f.end = end] = f;
 	    }
+	  });
 	
-	    return {type: "MultiLineString", arcs: stitchArcs(topology, arcs)};
+	  function ends(i) {
+	    var arc = topology.arcs[i < 0 ? ~i : i], p0 = arc[0], p1;
+	    if (topology.transform) p1 = [0, 0], arc.forEach(function(dp) { p1[0] += dp[0], p1[1] += dp[1]; });
+	    else p1 = arc[arc.length - 1];
+	    return i < 0 ? [p1, p0] : [p0, p1];
 	  }
 	
-	  function cartesianTriangleArea(triangle) {
-	    var a = triangle[0], b = triangle[1], c = triangle[2];
-	    return Math.abs((a[0] - c[0]) * (b[1] - a[1]) - (a[0] - b[0]) * (c[1] - a[1]));
+	  function flush(fragmentByEnd, fragmentByStart) {
+	    for (var k in fragmentByEnd) {
+	      var f = fragmentByEnd[k];
+	      delete fragmentByStart[f.start];
+	      delete f.start;
+	      delete f.end;
+	      f.forEach(function(i) { stitchedArcs[i < 0 ? ~i : i] = 1; });
+	      fragments.push(f);
+	    }
 	  }
 	
-	  function ring(ring) {
-	    var i = -1,
-	        n = ring.length,
-	        a,
-	        b = ring[n - 1],
-	        area = 0;
+	  flush(fragmentByEnd, fragmentByStart);
+	  flush(fragmentByStart, fragmentByEnd);
+	  arcs.forEach(function(i) { if (!stitchedArcs[i < 0 ? ~i : i]) fragments.push([i]); });
 	
-	    while (++i < n) {
-	      a = b;
-	      b = ring[i];
-	      area += a[0] * b[1] - a[1] * b[0];
-	    }
+	  return fragments;
+	}
 	
-	    return area / 2;
+	function mesh(topology) {
+	  return object(topology, meshArcs.apply(this, arguments));
+	}
+	
+	function meshArcs(topology, o, filter) {
+	  var arcs = [];
+	
+	  function arc(i) {
+	    var j = i < 0 ? ~i : i;
+	    (geomsByArc[j] || (geomsByArc[j] = [])).push({i: i, g: geom});
 	  }
 	
-	  function merge(topology) {
-	    return object(topology, mergeArcs.apply(this, arguments));
+	  function line(arcs) {
+	    arcs.forEach(arc);
 	  }
 	
-	  function mergeArcs(topology, objects) {
-	    var polygonsByArc = {},
-	        polygons = [],
-	        components = [];
-	
-	    objects.forEach(function(o) {
-	      if (o.type === "Polygon") register(o.arcs);
-	      else if (o.type === "MultiPolygon") o.arcs.forEach(register);
-	    });
-	
-	    function register(polygon) {
-	      polygon.forEach(function(ring$$) {
-	        ring$$.forEach(function(arc) {
-	          (polygonsByArc[arc = arc < 0 ? ~arc : arc] || (polygonsByArc[arc] = [])).push(polygon);
-	        });
-	      });
-	      polygons.push(polygon);
-	    }
-	
-	    function area(ring$$) {
-	      return Math.abs(ring(object(topology, {type: "Polygon", arcs: [ring$$]}).coordinates[0]));
-	    }
-	
-	    polygons.forEach(function(polygon) {
-	      if (!polygon._) {
-	        var component = [],
-	            neighbors = [polygon];
-	        polygon._ = 1;
-	        components.push(component);
-	        while (polygon = neighbors.pop()) {
-	          component.push(polygon);
-	          polygon.forEach(function(ring$$) {
-	            ring$$.forEach(function(arc) {
-	              polygonsByArc[arc < 0 ? ~arc : arc].forEach(function(polygon) {
-	                if (!polygon._) {
-	                  polygon._ = 1;
-	                  neighbors.push(polygon);
-	                }
-	              });
-	            });
-	          });
-	        }
-	      }
-	    });
-	
-	    polygons.forEach(function(polygon) {
-	      delete polygon._;
-	    });
-	
-	    return {
-	      type: "MultiPolygon",
-	      arcs: components.map(function(polygons) {
-	        var arcs = [], n;
-	
-	        // Extract the exterior (unique) arcs.
-	        polygons.forEach(function(polygon) {
-	          polygon.forEach(function(ring$$) {
-	            ring$$.forEach(function(arc) {
-	              if (polygonsByArc[arc < 0 ? ~arc : arc].length < 2) {
-	                arcs.push(arc);
-	              }
-	            });
-	          });
-	        });
-	
-	        // Stitch the arcs into one or more rings.
-	        arcs = stitchArcs(topology, arcs);
-	
-	        // If more than one ring is returned,
-	        // at most one of these rings can be the exterior;
-	        // choose the one with the greatest absolute area.
-	        if ((n = arcs.length) > 1) {
-	          for (var i = 1, k = area(arcs[0]), ki, t; i < n; ++i) {
-	            if ((ki = area(arcs[i])) > k) {
-	              t = arcs[0], arcs[0] = arcs[i], arcs[i] = t, k = ki;
-	            }
-	          }
-	        }
-	
-	        return arcs;
-	      })
-	    };
+	  function polygon(arcs) {
+	    arcs.forEach(line);
 	  }
 	
-	  function neighbors(objects) {
-	    var indexesByArc = {}, // arc index -> array of object indexes
-	        neighbors = objects.map(function() { return []; });
+	  function geometry(o) {
+	    if (o.type === "GeometryCollection") o.geometries.forEach(geometry);
+	    else if (o.type in geometryType) geom = o, geometryType[o.type](o.arcs);
+	  }
 	
-	    function line(arcs, i) {
-	      arcs.forEach(function(a) {
-	        if (a < 0) a = ~a;
-	        var o = indexesByArc[a];
-	        if (o) o.push(i);
-	        else indexesByArc[a] = [i];
-	      });
-	    }
-	
-	    function polygon(arcs, i) {
-	      arcs.forEach(function(arc) { line(arc, i); });
-	    }
-	
-	    function geometry(o, i) {
-	      if (o.type === "GeometryCollection") o.geometries.forEach(function(o) { geometry(o, i); });
-	      else if (o.type in geometryType) geometryType[o.type](o.arcs, i);
-	    }
+	  if (arguments.length > 1) {
+	    var geomsByArc = [],
+	        geom;
 	
 	    var geometryType = {
 	      LineString: line,
 	      MultiLineString: polygon,
 	      Polygon: polygon,
-	      MultiPolygon: function(arcs, i) { arcs.forEach(function(arc) { polygon(arc, i); }); }
+	      MultiPolygon: function(arcs) { arcs.forEach(polygon); }
 	    };
 	
-	    objects.forEach(geometry);
+	    geometry(o);
 	
-	    for (var i in indexesByArc) {
-	      for (var indexes = indexesByArc[i], m = indexes.length, j = 0; j < m; ++j) {
-	        for (var k = j + 1; k < m; ++k) {
-	          var ij = indexes[j], ik = indexes[k], n;
-	          if ((n = neighbors[ij])[i = bisect(n, ik)] !== ik) n.splice(i, 0, ik);
-	          if ((n = neighbors[ik])[i = bisect(n, ij)] !== ij) n.splice(i, 0, ij);
-	        }
-	      }
-	    }
-	
-	    return neighbors;
+	    geomsByArc.forEach(arguments.length < 3
+	        ? function(geoms) { arcs.push(geoms[0].i); }
+	        : function(geoms) { if (filter(geoms[0].g, geoms[geoms.length - 1].g)) arcs.push(geoms[0].i); });
+	  } else {
+	    for (var i = 0, n = topology.arcs.length; i < n; ++i) arcs.push(i);
 	  }
 	
-	  function compareArea(a, b) {
-	    return a[1][2] - b[1][2];
+	  return {type: "MultiLineString", arcs: stitchArcs(topology, arcs)};
+	}
+	
+	function cartesianTriangleArea(triangle) {
+	  var a = triangle[0], b = triangle[1], c = triangle[2];
+	  return Math.abs((a[0] - c[0]) * (b[1] - a[1]) - (a[0] - b[0]) * (c[1] - a[1]));
+	}
+	
+	function ring(ring) {
+	  var i = -1,
+	      n = ring.length,
+	      a,
+	      b = ring[n - 1],
+	      area = 0;
+	
+	  while (++i < n) {
+	    a = b;
+	    b = ring[i];
+	    area += a[0] * b[1] - a[1] * b[0];
 	  }
 	
-	  function minAreaHeap() {
-	    var heap = {},
-	        array = [],
-	        size = 0;
+	  return area / 2;
+	}
 	
-	    heap.push = function(object) {
-	      up(array[object._ = size] = object, size++);
-	      return size;
-	    };
+	function merge(topology) {
+	  return object(topology, mergeArcs.apply(this, arguments));
+	}
 	
-	    heap.pop = function() {
-	      if (size <= 0) return;
-	      var removed = array[0], object;
-	      if (--size > 0) object = array[size], down(array[object._ = 0] = object, 0);
-	      return removed;
-	    };
+	function mergeArcs(topology, objects) {
+	  var polygonsByArc = {},
+	      polygons = [],
+	      components = [];
 	
-	    heap.remove = function(removed) {
-	      var i = removed._, object;
-	      if (array[i] !== removed) return; // invalid request
-	      if (i !== --size) object = array[size], (compareArea(object, removed) < 0 ? up : down)(array[object._ = i] = object, i);
-	      return i;
-	    };
+	  objects.forEach(function(o) {
+	    if (o.type === "Polygon") register(o.arcs);
+	    else if (o.type === "MultiPolygon") o.arcs.forEach(register);
+	  });
 	
-	    function up(object, i) {
-	      while (i > 0) {
-	        var j = ((i + 1) >> 1) - 1,
-	            parent = array[j];
-	        if (compareArea(object, parent) >= 0) break;
-	        array[parent._ = i] = parent;
-	        array[object._ = i = j] = object;
-	      }
-	    }
-	
-	    function down(object, i) {
-	      while (true) {
-	        var r = (i + 1) << 1,
-	            l = r - 1,
-	            j = i,
-	            child = array[j];
-	        if (l < size && compareArea(array[l], child) < 0) child = array[j = l];
-	        if (r < size && compareArea(array[r], child) < 0) child = array[j = r];
-	        if (j === i) break;
-	        array[child._ = i] = child;
-	        array[object._ = i = j] = object;
-	      }
-	    }
-	
-	    return heap;
-	  }
-	
-	  function presimplify(topology, triangleArea) {
-	    var absolute = transformAbsolute(topology.transform),
-	        relative = transformRelative(topology.transform),
-	        heap = minAreaHeap();
-	
-	    if (!triangleArea) triangleArea = cartesianTriangleArea;
-	
-	    topology.arcs.forEach(function(arc) {
-	      var triangles = [],
-	          maxArea = 0,
-	          triangle,
-	          i,
-	          n,
-	          p;
-	
-	      // To store each point’s effective area, we create a new array rather than
-	      // extending the passed-in point to workaround a Chrome/V8 bug (getting
-	      // stuck in smi mode). For midpoints, the initial effective area of
-	      // Infinity will be computed in the next step.
-	      for (i = 0, n = arc.length; i < n; ++i) {
-	        p = arc[i];
-	        absolute(arc[i] = [p[0], p[1], Infinity], i);
-	      }
-	
-	      for (i = 1, n = arc.length - 1; i < n; ++i) {
-	        triangle = arc.slice(i - 1, i + 2);
-	        triangle[1][2] = triangleArea(triangle);
-	        triangles.push(triangle);
-	        heap.push(triangle);
-	      }
-	
-	      for (i = 0, n = triangles.length; i < n; ++i) {
-	        triangle = triangles[i];
-	        triangle.previous = triangles[i - 1];
-	        triangle.next = triangles[i + 1];
-	      }
-	
-	      while (triangle = heap.pop()) {
-	        var previous = triangle.previous,
-	            next = triangle.next;
-	
-	        // If the area of the current point is less than that of the previous point
-	        // to be eliminated, use the latter's area instead. This ensures that the
-	        // current point cannot be eliminated without eliminating previously-
-	        // eliminated points.
-	        if (triangle[1][2] < maxArea) triangle[1][2] = maxArea;
-	        else maxArea = triangle[1][2];
-	
-	        if (previous) {
-	          previous.next = next;
-	          previous[2] = triangle[2];
-	          update(previous);
-	        }
-	
-	        if (next) {
-	          next.previous = previous;
-	          next[0] = triangle[0];
-	          update(next);
-	        }
-	      }
-	
-	      arc.forEach(relative);
+	  function register(polygon) {
+	    polygon.forEach(function(ring$$) {
+	      ring$$.forEach(function(arc) {
+	        (polygonsByArc[arc = arc < 0 ? ~arc : arc] || (polygonsByArc[arc] = [])).push(polygon);
+	      });
 	    });
+	    polygons.push(polygon);
+	  }
 	
-	    function update(triangle) {
-	      heap.remove(triangle);
+	  function area(ring$$) {
+	    return Math.abs(ring(object(topology, {type: "Polygon", arcs: [ring$$]}).coordinates[0]));
+	  }
+	
+	  polygons.forEach(function(polygon) {
+	    if (!polygon._) {
+	      var component = [],
+	          neighbors = [polygon];
+	      polygon._ = 1;
+	      components.push(component);
+	      while (polygon = neighbors.pop()) {
+	        component.push(polygon);
+	        polygon.forEach(function(ring$$) {
+	          ring$$.forEach(function(arc) {
+	            polygonsByArc[arc < 0 ? ~arc : arc].forEach(function(polygon) {
+	              if (!polygon._) {
+	                polygon._ = 1;
+	                neighbors.push(polygon);
+	              }
+	            });
+	          });
+	        });
+	      }
+	    }
+	  });
+	
+	  polygons.forEach(function(polygon) {
+	    delete polygon._;
+	  });
+	
+	  return {
+	    type: "MultiPolygon",
+	    arcs: components.map(function(polygons) {
+	      var arcs = [], n;
+	
+	      // Extract the exterior (unique) arcs.
+	      polygons.forEach(function(polygon) {
+	        polygon.forEach(function(ring$$) {
+	          ring$$.forEach(function(arc) {
+	            if (polygonsByArc[arc < 0 ? ~arc : arc].length < 2) {
+	              arcs.push(arc);
+	            }
+	          });
+	        });
+	      });
+	
+	      // Stitch the arcs into one or more rings.
+	      arcs = stitchArcs(topology, arcs);
+	
+	      // If more than one ring is returned,
+	      // at most one of these rings can be the exterior;
+	      // choose the one with the greatest absolute area.
+	      if ((n = arcs.length) > 1) {
+	        for (var i = 1, k = area(arcs[0]), ki, t; i < n; ++i) {
+	          if ((ki = area(arcs[i])) > k) {
+	            t = arcs[0], arcs[0] = arcs[i], arcs[i] = t, k = ki;
+	          }
+	        }
+	      }
+	
+	      return arcs;
+	    })
+	  };
+	}
+	
+	function neighbors(objects) {
+	  var indexesByArc = {}, // arc index -> array of object indexes
+	      neighbors = objects.map(function() { return []; });
+	
+	  function line(arcs, i) {
+	    arcs.forEach(function(a) {
+	      if (a < 0) a = ~a;
+	      var o = indexesByArc[a];
+	      if (o) o.push(i);
+	      else indexesByArc[a] = [i];
+	    });
+	  }
+	
+	  function polygon(arcs, i) {
+	    arcs.forEach(function(arc) { line(arc, i); });
+	  }
+	
+	  function geometry(o, i) {
+	    if (o.type === "GeometryCollection") o.geometries.forEach(function(o) { geometry(o, i); });
+	    else if (o.type in geometryType) geometryType[o.type](o.arcs, i);
+	  }
+	
+	  var geometryType = {
+	    LineString: line,
+	    MultiLineString: polygon,
+	    Polygon: polygon,
+	    MultiPolygon: function(arcs, i) { arcs.forEach(function(arc) { polygon(arc, i); }); }
+	  };
+	
+	  objects.forEach(geometry);
+	
+	  for (var i in indexesByArc) {
+	    for (var indexes = indexesByArc[i], m = indexes.length, j = 0; j < m; ++j) {
+	      for (var k = j + 1; k < m; ++k) {
+	        var ij = indexes[j], ik = indexes[k], n;
+	        if ((n = neighbors[ij])[i = bisect(n, ik)] !== ik) n.splice(i, 0, ik);
+	        if ((n = neighbors[ik])[i = bisect(n, ij)] !== ij) n.splice(i, 0, ij);
+	      }
+	    }
+	  }
+	
+	  return neighbors;
+	}
+	
+	function compareArea(a, b) {
+	  return a[1][2] - b[1][2];
+	}
+	
+	function minAreaHeap() {
+	  var heap = {},
+	      array = [],
+	      size = 0;
+	
+	  heap.push = function(object) {
+	    up(array[object._ = size] = object, size++);
+	    return size;
+	  };
+	
+	  heap.pop = function() {
+	    if (size <= 0) return;
+	    var removed = array[0], object;
+	    if (--size > 0) object = array[size], down(array[object._ = 0] = object, 0);
+	    return removed;
+	  };
+	
+	  heap.remove = function(removed) {
+	    var i = removed._, object;
+	    if (array[i] !== removed) return; // invalid request
+	    if (i !== --size) object = array[size], (compareArea(object, removed) < 0 ? up : down)(array[object._ = i] = object, i);
+	    return i;
+	  };
+	
+	  function up(object, i) {
+	    while (i > 0) {
+	      var j = ((i + 1) >> 1) - 1,
+	          parent = array[j];
+	      if (compareArea(object, parent) >= 0) break;
+	      array[parent._ = i] = parent;
+	      array[object._ = i = j] = object;
+	    }
+	  }
+	
+	  function down(object, i) {
+	    while (true) {
+	      var r = (i + 1) << 1,
+	          l = r - 1,
+	          j = i,
+	          child = array[j];
+	      if (l < size && compareArea(array[l], child) < 0) child = array[j = l];
+	      if (r < size && compareArea(array[r], child) < 0) child = array[j = r];
+	      if (j === i) break;
+	      array[child._ = i] = child;
+	      array[object._ = i = j] = object;
+	    }
+	  }
+	
+	  return heap;
+	}
+	
+	function presimplify(topology, triangleArea) {
+	  var absolute = transformAbsolute(topology.transform),
+	      relative = transformRelative(topology.transform),
+	      heap = minAreaHeap();
+	
+	  if (!triangleArea) triangleArea = cartesianTriangleArea;
+	
+	  topology.arcs.forEach(function(arc) {
+	    var triangles = [],
+	        maxArea = 0,
+	        triangle,
+	        i,
+	        n,
+	        p;
+	
+	    // To store each point’s effective area, we create a new array rather than
+	    // extending the passed-in point to workaround a Chrome/V8 bug (getting
+	    // stuck in smi mode). For midpoints, the initial effective area of
+	    // Infinity will be computed in the next step.
+	    for (i = 0, n = arc.length; i < n; ++i) {
+	      p = arc[i];
+	      absolute(arc[i] = [p[0], p[1], Infinity], i);
+	    }
+	
+	    for (i = 1, n = arc.length - 1; i < n; ++i) {
+	      triangle = arc.slice(i - 1, i + 2);
 	      triangle[1][2] = triangleArea(triangle);
+	      triangles.push(triangle);
 	      heap.push(triangle);
 	    }
 	
-	    return topology;
+	    for (i = 0, n = triangles.length; i < n; ++i) {
+	      triangle = triangles[i];
+	      triangle.previous = triangles[i - 1];
+	      triangle.next = triangles[i + 1];
+	    }
+	
+	    while (triangle = heap.pop()) {
+	      var previous = triangle.previous,
+	          next = triangle.next;
+	
+	      // If the area of the current point is less than that of the previous point
+	      // to be eliminated, use the latter's area instead. This ensures that the
+	      // current point cannot be eliminated without eliminating previously-
+	      // eliminated points.
+	      if (triangle[1][2] < maxArea) triangle[1][2] = maxArea;
+	      else maxArea = triangle[1][2];
+	
+	      if (previous) {
+	        previous.next = next;
+	        previous[2] = triangle[2];
+	        update(previous);
+	      }
+	
+	      if (next) {
+	        next.previous = previous;
+	        next[0] = triangle[0];
+	        update(next);
+	      }
+	    }
+	
+	    arc.forEach(relative);
+	  });
+	
+	  function update(triangle) {
+	    heap.remove(triangle);
+	    triangle[1][2] = triangleArea(triangle);
+	    heap.push(triangle);
 	  }
 	
-	  var version = "1.6.26";
+	  return topology;
+	}
 	
-	  exports.version = version;
-	  exports.mesh = mesh;
-	  exports.meshArcs = meshArcs;
-	  exports.merge = merge;
-	  exports.mergeArcs = mergeArcs;
-	  exports.feature = feature;
-	  exports.neighbors = neighbors;
-	  exports.presimplify = presimplify;
+	var version = "1.6.27";
 	
-	}));
+	exports.version = version;
+	exports.mesh = mesh;
+	exports.meshArcs = meshArcs;
+	exports.merge = merge;
+	exports.mergeArcs = mergeArcs;
+	exports.feature = feature;
+	exports.neighbors = neighbors;
+	exports.presimplify = presimplify;
+	
+	Object.defineProperty(exports, '__esModule', { value: true });
+	
+	})));
 
 /***/ },
-/* 65 */
+/* 77 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var normalize = __webpack_require__(66);
+	var normalize = __webpack_require__(78);
 	
 	module.exports = function(inputs) {
 	    return {
@@ -15661,7 +16518,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 66 */
+/* 78 */
 /***/ function(module, exports) {
 
 	module.exports = normalize;
@@ -15710,7 +16567,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 67 */
+/* 79 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -16360,7 +17217,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 68 */
+/* 80 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -16459,7 +17316,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 69 */
+/* 81 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -16477,6 +17334,94 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _three2 = _interopRequireDefault(_three);
 	
 	var Buffer = (function () {
+	  // Merge TypedArrays of the same type
+	  // Returns merged array as well as indexes for splitting the array
+	  var mergeFloat32Arrays = function mergeFloat32Arrays(arrays) {
+	    var size = 0;
+	    var map = new Int32Array(arrays.length * 2);
+	
+	    var lastIndex = 0;
+	    var length;
+	
+	    // Find size of each array
+	    arrays.forEach(function (_array, index) {
+	      length = _array.length;
+	      size += length;
+	      map.set([lastIndex, lastIndex + length], index * 2);
+	      lastIndex += length;
+	    });
+	
+	    // Create a new array of total size
+	    var mergedArray = new Float32Array(size);
+	
+	    // Add each array to the new array
+	    arrays.forEach(function (_array, index) {
+	      mergedArray.set(_array, map[index * 2]);
+	    });
+	
+	    return [mergedArray, map];
+	  };
+	
+	  var splitFloat32Array = function splitFloat32Array(data) {
+	    var arr = data[0];
+	    var map = data[1];
+	
+	    var start;
+	    var arrays = [];
+	
+	    // Iterate over map
+	    for (var i = 0; i < map.length / 2; i++) {
+	      start = i * 2;
+	      arrays.push(arr.subarray(map[start], map[start + 1]));
+	    }
+	
+	    return arrays;
+	  };
+	
+	  // TODO: Create a generic method that can work for any typed array
+	  var mergeUint8Arrays = function mergeUint8Arrays(arrays) {
+	    var size = 0;
+	    var map = new Int32Array(arrays.length * 2);
+	
+	    var lastIndex = 0;
+	    var length;
+	
+	    // Find size of each array
+	    arrays.forEach(function (_array, index) {
+	      length = _array.length;
+	      size += length;
+	      map.set([lastIndex, lastIndex + length], index * 2);
+	      lastIndex += length;
+	    });
+	
+	    // Create a new array of total size
+	    var mergedArray = new Uint8Array(size);
+	
+	    // Add each array to the new array
+	    arrays.forEach(function (_array, index) {
+	      mergedArray.set(_array, map[index * 2]);
+	    });
+	
+	    return [mergedArray, map];
+	  };
+	
+	  // TODO: Dedupe with splitFloat32Array
+	  var splitUint8Array = function splitUint8Array(data) {
+	    var arr = data[0];
+	    var map = data[1];
+	
+	    var start;
+	    var arrays = [];
+	
+	    // Iterate over map
+	    for (var i = 0; i < map.length / 2; i++) {
+	      start = i * 2;
+	      arrays.push(arr.subarray(map[start], map[start + 1]));
+	    }
+	
+	    return arrays;
+	  };
+	
 	  // Merge multiple attribute objects into a single attribute object
 	  //
 	  // Attribute objects must all use the same attribute keys
@@ -16719,10 +17664,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return geometry;
 	  };
 	
+	  var textEncoder = new TextEncoder('utf-8');
+	  var textDecoder = new TextDecoder('utf-8');
+	
+	  var stringToUint8Array = function stringToUint8Array(str) {
+	    return textEncoder.encode(str);
+	  };
+	
+	  var uint8ArrayToString = function uint8ArrayToString(ab) {
+	    return textDecoder.decode(ab);
+	  };
+	
 	  return {
+	    mergeFloat32Arrays: mergeFloat32Arrays,
+	    splitFloat32Array: splitFloat32Array,
+	    mergeUint8Arrays: mergeUint8Arrays,
+	    splitUint8Array: splitUint8Array,
 	    mergeAttributes: mergeAttributes,
 	    createLineGeometry: createLineGeometry,
-	    createGeometry: createGeometry
+	    createGeometry: createGeometry,
+	    stringToUint8Array: stringToUint8Array,
+	    uint8ArrayToString: uint8ArrayToString
 	  };
 	})();
 	
@@ -16730,7 +17692,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 70 */
+/* 82 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -16743,7 +17705,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _PickingShader = __webpack_require__(71);
+	var _PickingShader = __webpack_require__(83);
 	
 	var _PickingShader2 = _interopRequireDefault(_PickingShader);
 	
@@ -16785,7 +17747,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 71 */
+/* 83 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -16809,7 +17771,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 72 */
+/* 84 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -16842,7 +17804,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// TODO: Allow _setBufferAttributes to use a custom function passed in to
 	// generate a custom mesh
 	
-	var _Layer2 = __webpack_require__(32);
+	var _Layer2 = __webpack_require__(34);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -16854,23 +17816,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
+	var _geoGeo = __webpack_require__(6);
+	
+	var _geoGeo2 = _interopRequireDefault(_geoGeo);
+	
 	var _geoLatLon = __webpack_require__(7);
 	
 	var _geoPoint = __webpack_require__(8);
 	
-	var _earcut2 = __webpack_require__(67);
+	var _earcut2 = __webpack_require__(79);
 	
 	var _earcut3 = _interopRequireDefault(_earcut2);
 	
-	var _utilExtrudePolygon = __webpack_require__(68);
+	var _utilExtrudePolygon = __webpack_require__(80);
 	
 	var _utilExtrudePolygon2 = _interopRequireDefault(_utilExtrudePolygon);
 	
-	var _enginePickingMaterial = __webpack_require__(70);
+	var _enginePickingMaterial = __webpack_require__(82);
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
-	var _utilBuffer = __webpack_require__(69);
+	var _utilBuffer = __webpack_require__(81);
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
@@ -16886,8 +17852,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Custom material override
 	      //
 	      // TODO: Should this be in the style object?
-	      material: null,
-	      onMesh: null,
+	      polygonMaterial: null,
+	      onPolygonMesh: null,
 	      onBufferAttributes: null,
 	      // This default style is separate to Util.GeoJSON.defaultStyle
 	      style: {
@@ -16912,34 +17878,66 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(PolygonLayer, [{
 	    key: '_onAdd',
 	    value: function _onAdd(world) {
-	      this._setCoordinates();
+	      var _this = this;
 	
-	      if (this._options.interactive) {
-	        // Only add to picking mesh if this layer is controlling output
-	        //
-	        // Otherwise, assume another component will eventually add a mesh to
-	        // the picking scene
-	        if (this.isOutput()) {
-	          this._pickingMesh = new _three2['default'].Object3D();
-	          this.addToPicking(this._pickingMesh);
+	      return new Promise(function (resolve, reject) {
+	        _this._setCoordinates();
+	
+	        if (_this._options.interactive) {
+	          // Only add to picking mesh if this layer is controlling output
+	          //
+	          // Otherwise, assume another component will eventually add a mesh to
+	          // the picking scene
+	          if (_this.isOutput()) {
+	            _this._pickingMesh = new _three2['default'].Object3D();
+	            _this.addToPicking(_this._pickingMesh);
+	          }
+	
+	          _this._setPickingId();
+	          _this._addPickingEvents();
 	        }
 	
-	        this._setPickingId();
-	        this._addPickingEvents();
-	      }
+	        PolygonLayer.SetBufferAttributes(_this._projectedCoordinates, _this._options).then(function (result) {
+	          _this._bufferAttributes = _utilBuffer2['default'].mergeAttributes(result.attributes);
 	
-	      // Store geometry representation as instances of THREE.BufferAttribute
-	      this._setBufferAttributes();
+	          if (result.outlineAttributes.length > 0) {
+	            _this._outlineBufferAttributes = _utilBuffer2['default'].mergeAttributes(result.outlineAttributes);
+	          }
 	
-	      if (this.isOutput()) {
-	        // Set mesh if not merging elsewhere
-	        this._setMesh(this._bufferAttributes);
+	          _this._flat = result.flat;
 	
-	        // Output mesh
-	        this.add(this._mesh);
-	      }
+	          if (_this.isOutput()) {
+	            var attributeLengths = {
+	              positions: 3,
+	              normals: 3,
+	              colors: 3,
+	              tops: 1
+	            };
 	
-	      return Promise.resolve(this);
+	            if (_this._options.interactive) {
+	              attributeLengths.pickingIds = 1;
+	            }
+	
+	            var style = _this._options.style;
+	
+	            // Set mesh if not merging elsewhere
+	            PolygonLayer.SetMesh(_this._bufferAttributes, attributeLengths, _this._flat, style, _this._options, _this._world._environment._skybox).then(function (result) {
+	              // Output mesh
+	              _this.add(result.mesh);
+	
+	              if (result.pickingMesh) {
+	                _this._pickingMesh.add(result.pickingMesh);
+	              }
+	            });
+	          }
+	
+	          result.attributes = null;
+	          result.outlineAttributes = null;
+	          result = null;
+	
+	          resolve(_this);
+	        })['catch'](reject);
+	      });
 	    }
 	
 	    // Return center of polygon as a LatLon
@@ -16972,136 +17970,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_addPickingEvents',
 	    value: function _addPickingEvents() {
-	      var _this = this;
+	      var _this2 = this;
 	
 	      // TODO: Find a way to properly remove this listener on destroy
 	      this._world.on('pick-' + this._pickingId, function (point2d, point3d, intersects) {
 	        // Re-emit click event from the layer
-	        _this.emit('click', _this, point2d, point3d, intersects);
+	        _this2.emit('click', _this2, point2d, point3d, intersects);
 	      });
 	    }
 	
 	    // Create and store reference to THREE.BufferAttribute data for this layer
 	  }, {
-	    key: '_setBufferAttributes',
-	    value: function _setBufferAttributes() {
-	      var _this2 = this;
-	
-	      var attributes;
-	
-	      // Only use this if you know what you're doing
-	      if (typeof this._options.onBufferAttributes === 'function') {
-	        // TODO: Probably want to pass something less general as arguments,
-	        // though passing the instance will do for now (it's everything)
-	        attributes = this._options.onBufferAttributes(this);
-	      } else {
-	        var height = 0;
-	
-	        // Convert height into world units
-	        if (this._options.style.height && this._options.style.height !== 0) {
-	          height = this._world.metresToWorld(this._options.style.height, this._pointScale);
-	        }
-	
-	        var colour = new _three2['default'].Color();
-	        colour.set(this._options.style.color);
-	
-	        // Light and dark colours used for poor-mans AO gradient on object sides
-	        var light = new _three2['default'].Color(0xffffff);
-	        var shadow = new _three2['default'].Color(0x666666);
-	
-	        // For each polygon
-	        attributes = this._projectedCoordinates.map(function (_projectedCoordinates) {
-	          // Convert coordinates to earcut format
-	          var _earcut = _this2._toEarcut(_projectedCoordinates);
-	
-	          // Triangulate faces using earcut
-	          var faces = _this2._triangulate(_earcut.vertices, _earcut.holes, _earcut.dimensions);
-	
-	          var groupedVertices = [];
-	          for (i = 0, il = _earcut.vertices.length; i < il; i += _earcut.dimensions) {
-	            groupedVertices.push(_earcut.vertices.slice(i, i + _earcut.dimensions));
-	          }
-	
-	          var extruded = (0, _utilExtrudePolygon2['default'])(groupedVertices, faces, {
-	            bottom: 0,
-	            top: height
-	          });
-	
-	          var topColor = colour.clone().multiply(light);
-	          var bottomColor = colour.clone().multiply(shadow);
-	
-	          var _vertices = extruded.positions;
-	          var _faces = [];
-	          var _colours = [];
-	
-	          var _colour;
-	          extruded.top.forEach(function (face, fi) {
-	            _colour = [];
-	
-	            _colour.push([colour.r, colour.g, colour.b]);
-	            _colour.push([colour.r, colour.g, colour.b]);
-	            _colour.push([colour.r, colour.g, colour.b]);
-	
-	            _faces.push(face);
-	            _colours.push(_colour);
-	          });
-	
-	          _this2._flat = true;
-	
-	          if (extruded.sides) {
-	            _this2._flat = false;
-	
-	            // Set up colours for every vertex with poor-mans AO on the sides
-	            extruded.sides.forEach(function (face, fi) {
-	              _colour = [];
-	
-	              // First face is always bottom-bottom-top
-	              if (fi % 2 === 0) {
-	                _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-	                _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-	                _colour.push([topColor.r, topColor.g, topColor.b]);
-	                // Reverse winding for the second face
-	                // top-top-bottom
-	              } else {
-	                  _colour.push([topColor.r, topColor.g, topColor.b]);
-	                  _colour.push([topColor.r, topColor.g, topColor.b]);
-	                  _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
-	                }
-	
-	              _faces.push(face);
-	              _colours.push(_colour);
-	            });
-	          }
-	
-	          // Skip bottom as there's no point rendering it
-	          // allFaces.push(extruded.faces);
-	
-	          var polygon = {
-	            vertices: _vertices,
-	            faces: _faces,
-	            colours: _colours,
-	            facesCount: _faces.length
-	          };
-	
-	          if (_this2._options.interactive && _this2._pickingId) {
-	            // Inject picking ID
-	            polygon.pickingId = _this2._pickingId;
-	          }
-	
-	          // Convert polygon representation to proper attribute arrays
-	          return _this2._toAttributes(polygon);
-	        });
-	      }
-	
-	      this._bufferAttributes = _utilBuffer2['default'].mergeAttributes(attributes);
-	
-	      // Original attributes are no longer required so free the memory
-	      attributes = null;
-	    }
-	  }, {
 	    key: 'getBufferAttributes',
 	    value: function getBufferAttributes() {
 	      return this._bufferAttributes;
+	    }
+	  }, {
+	    key: 'getOutlineBufferAttributes',
+	    value: function getOutlineBufferAttributes() {
+	      return this._outlineBufferAttributes;
 	    }
 	
 	    // Used by external components to clear some memory when the attributes
@@ -17113,97 +18000,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'clearBufferAttributes',
 	    value: function clearBufferAttributes() {
 	      this._bufferAttributes = null;
+	      this._outlineBufferAttributes = null;
 	    }
+	
+	    // Threshold angle is currently in rads
+	  }, {
+	    key: 'clearCoordinates',
 	
 	    // Used by external components to clear some memory when the coordinates
 	    // are no longer required to be stored in this layer
 	    //
 	    // For example, you would want to clear the coordinates here after this
 	    // layer is merged in something like the GeoJSONLayer
-	  }, {
-	    key: 'clearCoordinates',
 	    value: function clearCoordinates() {
 	      this._coordinates = null;
 	      this._projectedCoordinates = null;
 	    }
-	
-	    // Create and store mesh from buffer attributes
-	    //
-	    // This is only called if the layer is controlling its own output
 	  }, {
-	    key: '_setMesh',
-	    value: function _setMesh(attributes) {
-	      var geometry = new _three2['default'].BufferGeometry();
-	
-	      // itemSize = 3 because there are 3 values (components) per vertex
-	      geometry.addAttribute('position', new _three2['default'].BufferAttribute(attributes.vertices, 3));
-	      geometry.addAttribute('normal', new _three2['default'].BufferAttribute(attributes.normals, 3));
-	      geometry.addAttribute('color', new _three2['default'].BufferAttribute(attributes.colours, 3));
-	
-	      if (attributes.pickingIds) {
-	        geometry.addAttribute('pickingId', new _three2['default'].BufferAttribute(attributes.pickingIds, 1));
-	      }
-	
-	      geometry.computeBoundingBox();
-	
-	      var material;
-	      if (this._options.material && this._options.material instanceof _three2['default'].Material) {
-	        material = this._options.material;
-	      } else if (!this._world._environment._skybox) {
-	        material = new _three2['default'].MeshPhongMaterial({
-	          vertexColors: _three2['default'].VertexColors,
-	          side: _three2['default'].BackSide,
-	          transparent: this._options.style.transparent,
-	          opacity: this._options.style.opacity,
-	          blending: this._options.style.blending
-	        });
-	      } else {
-	        material = new _three2['default'].MeshStandardMaterial({
-	          vertexColors: _three2['default'].VertexColors,
-	          side: _three2['default'].BackSide,
-	          transparent: this._options.style.transparent,
-	          opacity: this._options.style.opacity,
-	          blending: this._options.style.blending
-	        });
-	        material.roughness = 1;
-	        material.metalness = 0.1;
-	        material.envMapIntensity = 3;
-	        material.envMap = this._world._environment._skybox.getRenderTarget();
-	      }
-	
-	      var mesh;
-	
-	      // Pass mesh through callback, if defined
-	      if (typeof this._options.onMesh === 'function') {
-	        mesh = this._options.onMesh(geometry, material);
-	      } else {
-	        mesh = new _three2['default'].Mesh(geometry, material);
-	
-	        mesh.castShadow = true;
-	        mesh.receiveShadow = true;
-	      }
-	
-	      if (this.isFlat()) {
-	        material.depthWrite = false;
-	        mesh.renderOrder = 1;
-	      }
-	
-	      if (this._options.interactive && this._pickingMesh) {
-	        material = new _enginePickingMaterial2['default']();
-	        material.side = _three2['default'].BackSide;
-	
-	        var pickingMesh = new _three2['default'].Mesh(geometry, material);
-	        this._pickingMesh.add(pickingMesh);
-	      }
-	
-	      this._mesh = mesh;
-	    }
+	    key: '_setCoordinates',
 	
 	    // Convert and project coordinates
 	    //
 	    // TODO: Calculate bounds
-	  }, {
-	    key: '_setCoordinates',
 	    value: function _setCoordinates() {
 	      this._bounds = [];
 	      this._coordinates = this._convertCoordinates(this._coordinates);
@@ -17253,7 +18071,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              _this3._offset.x = -1 * point.x;
 	              _this3._offset.y = -1 * point.y;
 	
-	              _this3._pointScale = _this3._world.pointScale(latlon);
+	              _this3._options.pointScale = _this3._world.pointScale(latlon);
 	            }
 	
 	            return point;
@@ -17264,187 +18082,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // Convert coordinates array to something earcut can understand
 	  }, {
-	    key: '_toEarcut',
-	    value: function _toEarcut(coordinates) {
-	      var dim = 2;
-	      var result = { vertices: [], holes: [], dimensions: dim };
-	      var holeIndex = 0;
-	
-	      for (var i = 0; i < coordinates.length; i++) {
-	        for (var j = 0; j < coordinates[i].length; j++) {
-	          // for (var d = 0; d < dim; d++) {
-	          result.vertices.push(coordinates[i][j].x);
-	          result.vertices.push(coordinates[i][j].y);
-	          // }
-	        }
-	        if (i > 0) {
-	          holeIndex += coordinates[i - 1].length;
-	          result.holes.push(holeIndex);
-	        }
-	      }
-	
-	      return result;
-	    }
-	
-	    // Triangulate earcut-based input using earcut
-	  }, {
-	    key: '_triangulate',
-	    value: function _triangulate(contour, holes, dim) {
-	      // console.time('earcut');
-	
-	      var faces = (0, _earcut3['default'])(contour, holes, dim);
-	      var result = [];
-	
-	      for (i = 0, il = faces.length; i < il; i += 3) {
-	        result.push(faces.slice(i, i + 3));
-	      }
-	
-	      // console.timeEnd('earcut');
-	
-	      return result;
-	    }
-	
-	    // Transform polygon representation into attribute arrays that can be used by
-	    // THREE.BufferGeometry
-	    //
-	    // TODO: Can this be simplified? It's messy and huge
-	  }, {
-	    key: '_toAttributes',
-	    value: function _toAttributes(polygon) {
-	      // Three components per vertex per face (3 x 3 = 9)
-	      var vertices = new Float32Array(polygon.facesCount * 9);
-	      var normals = new Float32Array(polygon.facesCount * 9);
-	      var colours = new Float32Array(polygon.facesCount * 9);
-	
-	      var pickingIds;
-	      if (polygon.pickingId) {
-	        // One component per vertex per face (1 x 3 = 3)
-	        pickingIds = new Float32Array(polygon.facesCount * 3);
-	      }
-	
-	      var pA = new _three2['default'].Vector3();
-	      var pB = new _three2['default'].Vector3();
-	      var pC = new _three2['default'].Vector3();
-	
-	      var cb = new _three2['default'].Vector3();
-	      var ab = new _three2['default'].Vector3();
-	
-	      var index;
-	
-	      var _faces = polygon.faces;
-	      var _vertices = polygon.vertices;
-	      var _colour = polygon.colours;
-	
-	      var _pickingId;
-	      if (pickingIds) {
-	        _pickingId = polygon.pickingId;
-	      }
-	
-	      var lastIndex = 0;
-	
-	      for (var i = 0; i < _faces.length; i++) {
-	        // Array of vertex indexes for the face
-	        index = _faces[i][0];
-	
-	        var ax = _vertices[index][0];
-	        var ay = _vertices[index][1];
-	        var az = _vertices[index][2];
-	
-	        var c1 = _colour[i][0];
-	
-	        index = _faces[i][1];
-	
-	        var bx = _vertices[index][0];
-	        var by = _vertices[index][1];
-	        var bz = _vertices[index][2];
-	
-	        var c2 = _colour[i][1];
-	
-	        index = _faces[i][2];
-	
-	        var cx = _vertices[index][0];
-	        var cy = _vertices[index][1];
-	        var cz = _vertices[index][2];
-	
-	        var c3 = _colour[i][2];
-	
-	        // Flat face normals
-	        // From: http://threejs.org/examples/webgl_buffergeometry.html
-	        pA.set(ax, ay, az);
-	        pB.set(bx, by, bz);
-	        pC.set(cx, cy, cz);
-	
-	        cb.subVectors(pC, pB);
-	        ab.subVectors(pA, pB);
-	        cb.cross(ab);
-	
-	        cb.normalize();
-	
-	        var nx = cb.x;
-	        var ny = cb.y;
-	        var nz = cb.z;
-	
-	        vertices[lastIndex * 9 + 0] = ax;
-	        vertices[lastIndex * 9 + 1] = ay;
-	        vertices[lastIndex * 9 + 2] = az;
-	
-	        normals[lastIndex * 9 + 0] = nx;
-	        normals[lastIndex * 9 + 1] = ny;
-	        normals[lastIndex * 9 + 2] = nz;
-	
-	        colours[lastIndex * 9 + 0] = c1[0];
-	        colours[lastIndex * 9 + 1] = c1[1];
-	        colours[lastIndex * 9 + 2] = c1[2];
-	
-	        vertices[lastIndex * 9 + 3] = bx;
-	        vertices[lastIndex * 9 + 4] = by;
-	        vertices[lastIndex * 9 + 5] = bz;
-	
-	        normals[lastIndex * 9 + 3] = nx;
-	        normals[lastIndex * 9 + 4] = ny;
-	        normals[lastIndex * 9 + 5] = nz;
-	
-	        colours[lastIndex * 9 + 3] = c2[0];
-	        colours[lastIndex * 9 + 4] = c2[1];
-	        colours[lastIndex * 9 + 5] = c2[2];
-	
-	        vertices[lastIndex * 9 + 6] = cx;
-	        vertices[lastIndex * 9 + 7] = cy;
-	        vertices[lastIndex * 9 + 8] = cz;
-	
-	        normals[lastIndex * 9 + 6] = nx;
-	        normals[lastIndex * 9 + 7] = ny;
-	        normals[lastIndex * 9 + 8] = nz;
-	
-	        colours[lastIndex * 9 + 6] = c3[0];
-	        colours[lastIndex * 9 + 7] = c3[1];
-	        colours[lastIndex * 9 + 8] = c3[2];
-	
-	        if (pickingIds) {
-	          pickingIds[lastIndex * 3 + 0] = _pickingId;
-	          pickingIds[lastIndex * 3 + 1] = _pickingId;
-	          pickingIds[lastIndex * 3 + 2] = _pickingId;
-	        }
-	
-	        lastIndex++;
-	      }
-	
-	      var attributes = {
-	        vertices: vertices,
-	        normals: normals,
-	        colours: colours
-	      };
-	
-	      if (pickingIds) {
-	        attributes.pickingIds = pickingIds;
-	      }
-	
-	      return attributes;
-	    }
+	    key: 'isFlat',
 	
 	    // Returns true if the polygon is flat (has no height)
-	  }, {
-	    key: 'isFlat',
 	    value: function isFlat() {
 	      return this._flat;
 	    }
@@ -17469,6 +18109,445 @@ return /******/ (function(modules) { // webpackBootstrap
 	      _get(Object.getPrototypeOf(PolygonLayer.prototype), 'destroy', this).call(this);
 	    }
 	  }], [{
+	    key: 'SetBufferAttributes',
+	    value: function SetBufferAttributes(coordinates, options) {
+	      return new Promise(function (resolve) {
+	        var height = 0;
+	
+	        // Convert height into world units
+	        if (options.style.height && options.style.height !== 0) {
+	          height = _geoGeo2['default'].metresToWorld(options.style.height, options.pointScale);
+	        }
+	
+	        var colour = new _three2['default'].Color();
+	        colour.set(options.style.color);
+	
+	        // Light and dark colours used for poor-mans AO gradient on object sides
+	        var light = new _three2['default'].Color(0xffffff);
+	        var shadow = new _three2['default'].Color(0x666666);
+	
+	        var flat = true;
+	
+	        var outlineAttributes = [];
+	
+	        // For each polygon
+	        var attributes = coordinates.map(function (_coordinates) {
+	          // Convert coordinates to earcut format
+	          var _earcut = PolygonLayer.ToEarcut(_coordinates);
+	
+	          // Triangulate faces using earcut
+	          var faces = PolygonLayer.Triangulate(_earcut.vertices, _earcut.holes, _earcut.dimensions);
+	
+	          var groupedVertices = [];
+	          for (i = 0, il = _earcut.vertices.length; i < il; i += _earcut.dimensions) {
+	            groupedVertices.push(_earcut.vertices.slice(i, i + _earcut.dimensions));
+	          }
+	
+	          var extruded = (0, _utilExtrudePolygon2['default'])(groupedVertices, faces, {
+	            bottom: 0,
+	            top: height
+	          });
+	
+	          var topColor = colour.clone().multiply(light);
+	          var bottomColor = colour.clone().multiply(shadow);
+	
+	          var _vertices = extruded.positions;
+	          var _faces = [];
+	          var _colours = [];
+	          var _tops = [];
+	
+	          var _colour;
+	          extruded.top.forEach(function (face, fi) {
+	            _colour = [];
+	
+	            _colour.push([colour.r, colour.g, colour.b]);
+	            _colour.push([colour.r, colour.g, colour.b]);
+	            _colour.push([colour.r, colour.g, colour.b]);
+	
+	            _tops.push([true, true, true]);
+	
+	            _faces.push(face);
+	            _colours.push(_colour);
+	          });
+	
+	          if (extruded.sides) {
+	            flat = false;
+	
+	            // Set up colours for every vertex with poor-mans AO on the sides
+	            extruded.sides.forEach(function (face, fi) {
+	              _colour = [];
+	
+	              // First face is always bottom-bottom-top
+	              if (fi % 2 === 0) {
+	                _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+	                _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+	                _colour.push([topColor.r, topColor.g, topColor.b]);
+	
+	                _tops.push([false, false, true]);
+	                // Reverse winding for the second face
+	                // top-top-bottom
+	              } else {
+	                  _colour.push([topColor.r, topColor.g, topColor.b]);
+	                  _colour.push([topColor.r, topColor.g, topColor.b]);
+	                  _colour.push([bottomColor.r, bottomColor.g, bottomColor.b]);
+	
+	                  _tops.push([true, true, false]);
+	                }
+	
+	              _faces.push(face);
+	              _colours.push(_colour);
+	            });
+	          }
+	
+	          // Skip bottom as there's no point rendering it
+	          // allFaces.push(extruded.faces);
+	
+	          var polygon = {
+	            vertices: _vertices,
+	            faces: _faces,
+	            colours: _colours,
+	            tops: _tops,
+	            facesCount: _faces.length
+	          };
+	
+	          if (options.style.outline) {
+	            var outlineColour = new _three2['default'].Color();
+	            outlineColour.set(options.style.outlineColor || 0x000000);
+	
+	            outlineAttributes.push(PolygonLayer.Set2DOutline(_coordinates, outlineColour));
+	          }
+	
+	          if (options.interactive && options.pickingId) {
+	            // Inject picking ID
+	            polygon.pickingId = options.pickingId;
+	          }
+	
+	          // Convert polygon representation to proper attribute arrays
+	          return PolygonLayer.ToAttributes(polygon);
+	        });
+	
+	        resolve({
+	          attributes: attributes,
+	          outlineAttributes: outlineAttributes,
+	          flat: flat
+	        });
+	      });
+	    }
+	  }, {
+	    key: 'Set2DOutline',
+	    value: function Set2DOutline(coordinates, colour) {
+	      var _vertices = [];
+	
+	      coordinates.forEach(function (ring) {
+	        var _ring = ring.map(function (coordinate) {
+	          return [coordinate.x, 0, coordinate.y];
+	        });
+	
+	        // Add in duplicate vertices for line segments to work
+	        var verticeCount = _ring.length;
+	        var first = true;
+	        while (--verticeCount) {
+	          if (first || verticeCount === 0) {
+	            first = false;
+	            continue;
+	          }
+	
+	          _ring.splice(verticeCount + 1, 0, _ring[verticeCount]);
+	        }
+	
+	        _vertices = _vertices.concat(_ring);
+	      });
+	
+	      _colour = [colour.r, colour.g, colour.b];
+	
+	      var vertices = new Float32Array(_vertices.length * 3);
+	      var colours = new Float32Array(_vertices.length * 3);
+	
+	      var lastIndex = 0;
+	
+	      for (var i = 0; i < _vertices.length; i++) {
+	        var ax = _vertices[i][0];
+	        var ay = _vertices[i][1];
+	        var az = _vertices[i][2];
+	
+	        var c1 = _colour;
+	
+	        vertices[lastIndex * 3 + 0] = ax;
+	        vertices[lastIndex * 3 + 1] = ay;
+	        vertices[lastIndex * 3 + 2] = az;
+	
+	        colours[lastIndex * 3 + 0] = c1[0];
+	        colours[lastIndex * 3 + 1] = c1[1];
+	        colours[lastIndex * 3 + 2] = c1[2];
+	
+	        lastIndex++;
+	      }
+	
+	      var attributes = {
+	        positions: vertices,
+	        colors: colours
+	      };
+	
+	      return attributes;
+	    }
+	  }, {
+	    key: 'SetMesh',
+	    value: function SetMesh(attributes, attributeLengths, flat, style, options, skybox) {
+	      var geometry = new _three2['default'].BufferGeometry();
+	
+	      for (var key in attributes) {
+	        geometry.addAttribute(key.slice(0, -1), new _three2['default'].BufferAttribute(attributes[key], attributeLengths[key]));
+	      }
+	
+	      geometry.computeBoundingBox();
+	
+	      var material;
+	      if (options.polygonMaterial && options.polygonMaterial instanceof _three2['default'].Material) {
+	        material = options.polygonMaterial;
+	      } else if (!skybox) {
+	        material = new _three2['default'].MeshPhongMaterial({
+	          vertexColors: _three2['default'].VertexColors,
+	          side: _three2['default'].BackSide,
+	          transparent: style.transparent,
+	          opacity: style.opacity,
+	          blending: style.blending
+	        });
+	      } else {
+	        material = new _three2['default'].MeshStandardMaterial({
+	          vertexColors: _three2['default'].VertexColors,
+	          side: _three2['default'].BackSide,
+	          transparent: style.transparent,
+	          opacity: style.opacity,
+	          blending: style.blending
+	        });
+	        material.roughness = 1;
+	        material.metalness = 0.1;
+	        material.envMapIntensity = 3;
+	        material.envMap = skybox.getRenderTarget();
+	      }
+	
+	      var mesh;
+	
+	      // Pass mesh through callback, if defined
+	      if (typeof options.onPolygonMesh === 'function') {
+	        mesh = options.onPolygonMesh(geometry, material);
+	      } else {
+	        mesh = new _three2['default'].Mesh(geometry, material);
+	
+	        mesh.castShadow = true;
+	        mesh.receiveShadow = true;
+	      }
+	
+	      if (flat) {
+	        material.depthWrite = false;
+	
+	        var renderOrder = style.renderOrder !== undefined ? style.renderOrder : 3;
+	        mesh.renderOrder = renderOrder;
+	      }
+	
+	      if (options.interactive) {
+	        material = new _enginePickingMaterial2['default']();
+	        material.side = _three2['default'].BackSide;
+	
+	        var pickingMesh = new _three2['default'].Mesh(geometry, material);
+	      }
+	
+	      return Promise.resolve({
+	        mesh: mesh,
+	        pickingMesh: pickingMesh
+	      });
+	    }
+	  }, {
+	    key: 'ToEarcut',
+	    value: function ToEarcut(coordinates) {
+	      var dim = 2;
+	      var result = { vertices: [], holes: [], dimensions: dim };
+	      var holeIndex = 0;
+	
+	      for (var i = 0; i < coordinates.length; i++) {
+	        for (var j = 0; j < coordinates[i].length; j++) {
+	          // for (var d = 0; d < dim; d++) {
+	          result.vertices.push(coordinates[i][j].x);
+	          result.vertices.push(coordinates[i][j].y);
+	          // }
+	        }
+	        if (i > 0) {
+	          holeIndex += coordinates[i - 1].length;
+	          result.holes.push(holeIndex);
+	        }
+	      }
+	
+	      return result;
+	    }
+	
+	    // Triangulate earcut-based input using earcut
+	  }, {
+	    key: 'Triangulate',
+	    value: function Triangulate(contour, holes, dim) {
+	      // console.time('earcut');
+	
+	      var faces = (0, _earcut3['default'])(contour, holes, dim);
+	      var result = [];
+	
+	      for (i = 0, il = faces.length; i < il; i += 3) {
+	        result.push(faces.slice(i, i + 3));
+	      }
+	
+	      // console.timeEnd('earcut');
+	
+	      return result;
+	    }
+	
+	    // Transform polygon representation into attribute arrays that can be used by
+	    // THREE.BufferGeometry
+	    //
+	    // TODO: Can this be simplified? It's messy and huge
+	  }, {
+	    key: 'ToAttributes',
+	    value: function ToAttributes(polygon) {
+	      // Three components per vertex per face (3 x 3 = 9)
+	      var positions = new Float32Array(polygon.facesCount * 9);
+	      var normals = new Float32Array(polygon.facesCount * 9);
+	      var colours = new Float32Array(polygon.facesCount * 9);
+	
+	      // One component per vertex per face (1 x 3 = 3)
+	      var tops = new Float32Array(polygon.facesCount * 3);
+	
+	      var pickingIds;
+	      if (polygon.pickingId) {
+	        // One component per vertex per face (1 x 3 = 3)
+	        pickingIds = new Float32Array(polygon.facesCount * 3);
+	      }
+	
+	      var pA = new _three2['default'].Vector3();
+	      var pB = new _three2['default'].Vector3();
+	      var pC = new _three2['default'].Vector3();
+	
+	      var cb = new _three2['default'].Vector3();
+	      var ab = new _three2['default'].Vector3();
+	
+	      var index;
+	
+	      var _faces = polygon.faces;
+	      var _vertices = polygon.vertices;
+	      var _colour = polygon.colours;
+	      var _tops = polygon.tops;
+	
+	      var _pickingId;
+	      if (pickingIds) {
+	        _pickingId = polygon.pickingId;
+	      }
+	
+	      var lastIndex = 0;
+	
+	      for (var i = 0; i < _faces.length; i++) {
+	        // Array of vertex indexes for the face
+	        index = _faces[i][0];
+	
+	        var ax = _vertices[index][0];
+	        var ay = _vertices[index][1];
+	        var az = _vertices[index][2];
+	
+	        var c1 = _colour[i][0];
+	        var t1 = _tops[i][0];
+	
+	        index = _faces[i][1];
+	
+	        var bx = _vertices[index][0];
+	        var by = _vertices[index][1];
+	        var bz = _vertices[index][2];
+	
+	        var c2 = _colour[i][1];
+	        var t2 = _tops[i][1];
+	
+	        index = _faces[i][2];
+	
+	        var cx = _vertices[index][0];
+	        var cy = _vertices[index][1];
+	        var cz = _vertices[index][2];
+	
+	        var c3 = _colour[i][2];
+	        var t3 = _tops[i][2];
+	
+	        // Flat face normals
+	        // From: http://threejs.org/examples/webgl_buffergeometry.html
+	        pA.set(ax, ay, az);
+	        pB.set(bx, by, bz);
+	        pC.set(cx, cy, cz);
+	
+	        cb.subVectors(pC, pB);
+	        ab.subVectors(pA, pB);
+	        cb.cross(ab);
+	
+	        cb.normalize();
+	
+	        var nx = cb.x;
+	        var ny = cb.y;
+	        var nz = cb.z;
+	
+	        positions[lastIndex * 9 + 0] = ax;
+	        positions[lastIndex * 9 + 1] = ay;
+	        positions[lastIndex * 9 + 2] = az;
+	
+	        normals[lastIndex * 9 + 0] = nx;
+	        normals[lastIndex * 9 + 1] = ny;
+	        normals[lastIndex * 9 + 2] = nz;
+	
+	        colours[lastIndex * 9 + 0] = c1[0];
+	        colours[lastIndex * 9 + 1] = c1[1];
+	        colours[lastIndex * 9 + 2] = c1[2];
+	
+	        positions[lastIndex * 9 + 3] = bx;
+	        positions[lastIndex * 9 + 4] = by;
+	        positions[lastIndex * 9 + 5] = bz;
+	
+	        normals[lastIndex * 9 + 3] = nx;
+	        normals[lastIndex * 9 + 4] = ny;
+	        normals[lastIndex * 9 + 5] = nz;
+	
+	        colours[lastIndex * 9 + 3] = c2[0];
+	        colours[lastIndex * 9 + 4] = c2[1];
+	        colours[lastIndex * 9 + 5] = c2[2];
+	
+	        positions[lastIndex * 9 + 6] = cx;
+	        positions[lastIndex * 9 + 7] = cy;
+	        positions[lastIndex * 9 + 8] = cz;
+	
+	        normals[lastIndex * 9 + 6] = nx;
+	        normals[lastIndex * 9 + 7] = ny;
+	        normals[lastIndex * 9 + 8] = nz;
+	
+	        colours[lastIndex * 9 + 6] = c3[0];
+	        colours[lastIndex * 9 + 7] = c3[1];
+	        colours[lastIndex * 9 + 8] = c3[2];
+	
+	        tops[lastIndex * 3 + 0] = t1;
+	        tops[lastIndex * 3 + 1] = t2;
+	        tops[lastIndex * 3 + 2] = t3;
+	
+	        if (pickingIds) {
+	          pickingIds[lastIndex * 3 + 0] = _pickingId;
+	          pickingIds[lastIndex * 3 + 1] = _pickingId;
+	          pickingIds[lastIndex * 3 + 2] = _pickingId;
+	        }
+	
+	        lastIndex++;
+	      }
+	
+	      var attributes = {
+	        positions: positions,
+	        normals: normals,
+	        colors: colours,
+	        tops: tops
+	      };
+	
+	      if (pickingIds) {
+	        attributes.pickingIds = pickingIds;
+	      }
+	
+	      return attributes;
+	    }
+	  }, {
 	    key: 'isSingle',
 	    value: function isSingle(coordinates) {
 	      return !Array.isArray(coordinates[0][0][0]);
@@ -17487,7 +18566,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.polygonLayer = noNew;
 
 /***/ },
-/* 73 */
+/* 85 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -17522,7 +18601,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// TODO: Allow _setBufferAttributes to use a custom function passed in to
 	// generate a custom mesh
 	
-	var _Layer2 = __webpack_require__(32);
+	var _Layer2 = __webpack_require__(34);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -17534,15 +18613,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
+	var _geoGeo = __webpack_require__(6);
+	
+	var _geoGeo2 = _interopRequireDefault(_geoGeo);
+	
 	var _geoLatLon = __webpack_require__(7);
 	
 	var _geoPoint = __webpack_require__(8);
 	
-	var _enginePickingMaterial = __webpack_require__(70);
+	var _enginePickingMaterial = __webpack_require__(82);
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
-	var _utilBuffer = __webpack_require__(69);
+	var _utilBuffer = __webpack_require__(81);
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
@@ -17558,8 +18641,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Custom material override
 	      //
 	      // TODO: Should this be in the style object?
-	      material: null,
-	      onMesh: null,
+	      polylineMaterial: null,
+	      onPolylineMesh: null,
 	      onBufferAttributes: null,
 	      // This default style is separate to Util.GeoJSON.defaultStyle
 	      style: {
@@ -17587,34 +18670,59 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(PolylineLayer, [{
 	    key: '_onAdd',
 	    value: function _onAdd(world) {
-	      this._setCoordinates();
+	      var _this = this;
 	
-	      if (this._options.interactive) {
-	        // Only add to picking mesh if this layer is controlling output
-	        //
-	        // Otherwise, assume another component will eventually add a mesh to
-	        // the picking scene
-	        if (this.isOutput()) {
-	          this._pickingMesh = new _three2['default'].Object3D();
-	          this.addToPicking(this._pickingMesh);
+	      return new Promise(function (resolve, reject) {
+	        _this._setCoordinates();
+	
+	        if (_this._options.interactive) {
+	          // Only add to picking mesh if this layer is controlling output
+	          //
+	          // Otherwise, assume another component will eventually add a mesh to
+	          // the picking scene
+	          if (_this.isOutput()) {
+	            _this._pickingMesh = new _three2['default'].Object3D();
+	            _this.addToPicking(_this._pickingMesh);
+	          }
+	
+	          _this._setPickingId();
+	          _this._addPickingEvents();
 	        }
 	
-	        this._setPickingId();
-	        this._addPickingEvents();
-	      }
+	        // Store geometry representation as instances of THREE.BufferAttribute
+	        PolylineLayer.SetBufferAttributes(_this._projectedCoordinates, _this._options).then(function (result) {
+	          _this._bufferAttributes = _utilBuffer2['default'].mergeAttributes(result.attributes);
+	          _this._flat = result.flat;
 	
-	      // Store geometry representation as instances of THREE.BufferAttribute
-	      this._setBufferAttributes();
+	          var attributeLengths = {
+	            positions: 3,
+	            colors: 3
+	          };
 	
-	      if (this.isOutput()) {
-	        // Set mesh if not merging elsewhere
-	        this._setMesh(this._bufferAttributes);
+	          if (_this._options.interactive) {
+	            attributeLengths.pickingIds = 1;
+	          }
 	
-	        // Output mesh
-	        this.add(this._mesh);
-	      }
+	          if (_this.isOutput()) {
+	            var style = _this._options.style;
 	
-	      return Promise.resolve(this);
+	            // Set mesh if not merging elsewhere
+	            PolylineLayer.SetMesh(_this._bufferAttributes, attributeLengths, _this._flat, style, _this._options).then(function (result) {
+	              // Output mesh
+	              _this.add(result.mesh);
+	
+	              if (result.pickingMesh) {
+	                _this._pickingMesh.add(result.pickingMesh);
+	              }
+	            });
+	          }
+	
+	          result.attributes = null;
+	          result = null;
+	
+	          resolve(_this);
+	        });
+	      });
 	    }
 	
 	    // Return center of polyline as a LatLon
@@ -17647,79 +18755,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_addPickingEvents',
 	    value: function _addPickingEvents() {
-	      var _this = this;
+	      var _this2 = this;
 	
 	      // TODO: Find a way to properly remove this listener on destroy
 	      this._world.on('pick-' + this._pickingId, function (point2d, point3d, intersects) {
 	        // Re-emit click event from the layer
-	        _this.emit('click', _this, point2d, point3d, intersects);
+	        _this2.emit('click', _this2, point2d, point3d, intersects);
 	      });
-	    }
-	
-	    // Create and store reference to THREE.BufferAttribute data for this layer
-	  }, {
-	    key: '_setBufferAttributes',
-	    value: function _setBufferAttributes() {
-	      var _this2 = this;
-	
-	      var attributes;
-	
-	      // Only use this if you know what you're doing
-	      if (typeof this._options.onBufferAttributes === 'function') {
-	        // TODO: Probably want to pass something less general as arguments,
-	        // though passing the instance will do for now (it's everything)
-	        attributes = this._options.onBufferAttributes(this);
-	      } else {
-	        var height = 0;
-	
-	        // Convert height into world units
-	        if (this._options.style.lineHeight) {
-	          height = this._world.metresToWorld(this._options.style.lineHeight, this._pointScale);
-	        }
-	
-	        var colour = new _three2['default'].Color();
-	        colour.set(this._options.style.lineColor);
-	
-	        // For each line
-	        attributes = this._projectedCoordinates.map(function (_projectedCoordinates) {
-	          var _vertices = [];
-	          var _colours = [];
-	
-	          // Connect coordinate with the next to make a pair
-	          //
-	          // LineSegments requires pairs of vertices so repeat the last point if
-	          // there's an odd number of vertices
-	          var nextCoord;
-	          _projectedCoordinates.forEach(function (coordinate, index) {
-	            _colours.push([colour.r, colour.g, colour.b]);
-	            _vertices.push([coordinate.x, height, coordinate.y]);
-	
-	            nextCoord = _projectedCoordinates[index + 1] ? _projectedCoordinates[index + 1] : coordinate;
-	
-	            _colours.push([colour.r, colour.g, colour.b]);
-	            _vertices.push([nextCoord.x, height, nextCoord.y]);
-	          });
-	
-	          var line = {
-	            vertices: _vertices,
-	            colours: _colours,
-	            verticesCount: _vertices.length
-	          };
-	
-	          if (_this2._options.interactive && _this2._pickingId) {
-	            // Inject picking ID
-	            line.pickingId = _this2._pickingId;
-	          }
-	
-	          // Convert line representation to proper attribute arrays
-	          return _this2._toAttributes(line);
-	        });
-	      }
-	
-	      this._bufferAttributes = _utilBuffer2['default'].mergeAttributes(attributes);
-	
-	      // Original attributes are no longer required so free the memory
-	      attributes = null;
 	    }
 	  }, {
 	    key: 'getBufferAttributes',
@@ -17749,83 +18791,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._coordinates = null;
 	      this._projectedCoordinates = null;
 	    }
-	
-	    // Create and store mesh from buffer attributes
-	    //
-	    // This is only called if the layer is controlling its own output
 	  }, {
-	    key: '_setMesh',
-	    value: function _setMesh(attributes) {
-	      var geometry = new _three2['default'].BufferGeometry();
-	
-	      // itemSize = 3 because there are 3 values (components) per vertex
-	      geometry.addAttribute('position', new _three2['default'].BufferAttribute(attributes.vertices, 3));
-	
-	      if (attributes.normals) {
-	        geometry.addAttribute('normal', new _three2['default'].BufferAttribute(attributes.normals, 3));
-	      }
-	
-	      geometry.addAttribute('color', new _three2['default'].BufferAttribute(attributes.colours, 3));
-	
-	      if (attributes.pickingIds) {
-	        geometry.addAttribute('pickingId', new _three2['default'].BufferAttribute(attributes.pickingIds, 1));
-	      }
-	
-	      geometry.computeBoundingBox();
-	
-	      var style = this._options.style;
-	      var material;
-	
-	      if (this._options.material && this._options.material instanceof _three2['default'].Material) {
-	        material = this._options.material;
-	      } else {
-	        material = new _three2['default'].LineBasicMaterial({
-	          vertexColors: _three2['default'].VertexColors,
-	          linewidth: style.lineWidth,
-	          transparent: style.lineTransparent,
-	          opacity: style.lineOpacity,
-	          blending: style.lineBlending
-	        });
-	      }
-	
-	      var mesh;
-	
-	      // Pass mesh through callback, if defined
-	      if (typeof this._options.onMesh === 'function') {
-	        mesh = this._options.onMesh(geometry, material);
-	      } else {
-	        mesh = new _three2['default'].LineSegments(geometry, material);
-	
-	        if (style.lineRenderOrder !== undefined) {
-	          material.depthWrite = false;
-	          mesh.renderOrder = style.lineRenderOrder;
-	        }
-	
-	        mesh.castShadow = true;
-	        // mesh.receiveShadow = true;
-	      }
-	
-	      // TODO: Allow this to be overridden, or copy mesh instead of creating a new
-	      // one just for picking
-	      if (this._options.interactive && this._pickingMesh) {
-	        material = new _enginePickingMaterial2['default']();
-	        // material.side = THREE.BackSide;
-	
-	        // Make the line wider / easier to pick
-	        material.linewidth = style.lineWidth + material.linePadding;
-	
-	        var pickingMesh = new _three2['default'].LineSegments(geometry, material);
-	        this._pickingMesh.add(pickingMesh);
-	      }
-	
-	      this._mesh = mesh;
-	    }
+	    key: '_setCoordinates',
 	
 	    // Convert and project coordinates
 	    //
 	    // TODO: Calculate bounds
-	  }, {
-	    key: '_setCoordinates',
 	    value: function _setCoordinates() {
 	      this._bounds = [];
 	      this._coordinates = this._convertCoordinates(this._coordinates);
@@ -17872,104 +18843,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	            _this3._offset.x = -1 * point.x;
 	            _this3._offset.y = -1 * point.y;
 	
-	            _this3._pointScale = _this3._world.pointScale(latlon);
+	            _this3._options.pointScale = _this3._world.pointScale(latlon);
 	          }
 	
 	          return point;
 	        });
 	      });
 	    }
-	
-	    // Transform line representation into attribute arrays that can be used by
-	    // THREE.BufferGeometry
-	    //
-	    // TODO: Can this be simplified? It's messy and huge
-	  }, {
-	    key: '_toAttributes',
-	    value: function _toAttributes(line) {
-	      // Three components per vertex
-	      var vertices = new Float32Array(line.verticesCount * 3);
-	      var colours = new Float32Array(line.verticesCount * 3);
-	
-	      var pickingIds;
-	      if (line.pickingId) {
-	        // One component per vertex
-	        pickingIds = new Float32Array(line.verticesCount);
-	      }
-	
-	      var _vertices = line.vertices;
-	      var _colour = line.colours;
-	
-	      var normals;
-	      var _normals;
-	      if (line.normals) {
-	        normals = new Float32Array(line.verticesCount * 3);
-	        _normals = line.normals;
-	      }
-	
-	      var _pickingId;
-	      if (pickingIds) {
-	        _pickingId = line.pickingId;
-	      }
-	
-	      var lastIndex = 0;
-	
-	      for (var i = 0; i < _vertices.length; i++) {
-	        var ax = _vertices[i][0];
-	        var ay = _vertices[i][1];
-	        var az = _vertices[i][2];
-	
-	        var nx;
-	        var ny;
-	        var nz;
-	        if (_normals) {
-	          nx = _normals[i][0];
-	          ny = _normals[i][1];
-	          nz = _normals[i][2];
-	        }
-	
-	        var c1 = _colour[i];
-	
-	        vertices[lastIndex * 3 + 0] = ax;
-	        vertices[lastIndex * 3 + 1] = ay;
-	        vertices[lastIndex * 3 + 2] = az;
-	
-	        if (normals) {
-	          normals[lastIndex * 3 + 0] = nx;
-	          normals[lastIndex * 3 + 1] = ny;
-	          normals[lastIndex * 3 + 2] = nz;
-	        }
-	
-	        colours[lastIndex * 3 + 0] = c1[0];
-	        colours[lastIndex * 3 + 1] = c1[1];
-	        colours[lastIndex * 3 + 2] = c1[2];
-	
-	        if (pickingIds) {
-	          pickingIds[lastIndex] = _pickingId;
-	        }
-	
-	        lastIndex++;
-	      }
-	
-	      var attributes = {
-	        vertices: vertices,
-	        colours: colours
-	      };
-	
-	      if (normals) {
-	        attributes.normals = normals;
-	      }
-	
-	      if (pickingIds) {
-	        attributes.pickingIds = pickingIds;
-	      }
-	
-	      return attributes;
-	    }
-	
-	    // Returns true if the line is flat (has no height)
 	  }, {
 	    key: 'isFlat',
+	
+	    // Returns true if the line is flat (has no height)
 	    value: function isFlat() {
 	      return this._flat;
 	    }
@@ -17992,6 +18876,175 @@ return /******/ (function(modules) { // webpackBootstrap
 	      _get(Object.getPrototypeOf(PolylineLayer.prototype), 'destroy', this).call(this);
 	    }
 	  }], [{
+	    key: 'SetBufferAttributes',
+	    value: function SetBufferAttributes(coordinates, options) {
+	      return new Promise(function (resolve) {
+	        var height = 0;
+	
+	        // Convert height into world units
+	        if (options.style.lineHeight) {
+	          height = _geoGeo2['default'].metresToWorld(options.style.lineHeight, options.pointScale);
+	        }
+	
+	        var colour = new _three2['default'].Color();
+	        colour.set(options.style.lineColor);
+	
+	        var flat = true;
+	
+	        // For each line
+	        var attributes = coordinates.map(function (_projectedCoordinates) {
+	          var _vertices = [];
+	          var _colours = [];
+	
+	          // Connect coordinate with the next to make a pair
+	          //
+	          // LineSegments requires pairs of vertices so repeat the last point if
+	          // there's an odd number of vertices
+	          var nextCoord;
+	          _projectedCoordinates.forEach(function (coordinate, index) {
+	            _colours.push([colour.r, colour.g, colour.b]);
+	            _vertices.push([coordinate.x, height, coordinate.y]);
+	
+	            nextCoord = _projectedCoordinates[index + 1] ? _projectedCoordinates[index + 1] : coordinate;
+	
+	            _colours.push([colour.r, colour.g, colour.b]);
+	            _vertices.push([nextCoord.x, height, nextCoord.y]);
+	          });
+	
+	          var line = {
+	            vertices: _vertices,
+	            colours: _colours,
+	            verticesCount: _vertices.length
+	          };
+	
+	          if (options.interactive && options.pickingId) {
+	            // Inject picking ID
+	            line.pickingId = options.pickingId;
+	          }
+	
+	          // Convert line representation to proper attribute arrays
+	          return PolylineLayer.ToAttributes(line);
+	        });
+	
+	        resolve({
+	          attributes: attributes,
+	          flat: flat
+	        });
+	      });
+	    }
+	  }, {
+	    key: 'SetMesh',
+	    value: function SetMesh(attributes, attributeLengths, flat, style, options) {
+	      var geometry = new _three2['default'].BufferGeometry();
+	
+	      for (var key in attributes) {
+	        geometry.addAttribute(key.slice(0, -1), new _three2['default'].BufferAttribute(attributes[key], attributeLengths[key]));
+	      }
+	
+	      geometry.computeBoundingBox();
+	
+	      var material;
+	      if (options.polylineMaterial && options.polylineMaterial instanceof _three2['default'].Material) {
+	        material = options.polylineMaterial;
+	      } else {
+	        material = new _three2['default'].LineBasicMaterial({
+	          vertexColors: _three2['default'].VertexColors,
+	          linewidth: style.lineWidth,
+	          transparent: style.lineTransparent,
+	          opacity: style.lineOpacity,
+	          blending: style.lineBlending
+	        });
+	      }
+	
+	      var mesh;
+	
+	      // Pass mesh through callback, if defined
+	      if (typeof options.onPolylineMesh === 'function') {
+	        mesh = options.onPolylineMesh(geometry, material);
+	      } else {
+	        mesh = new _three2['default'].LineSegments(geometry, material);
+	
+	        if (style.lineRenderOrder !== undefined) {
+	          material.depthWrite = false;
+	          mesh.renderOrder = style.lineRenderOrder;
+	        }
+	
+	        mesh.castShadow = true;
+	        // mesh.receiveShadow = true;
+	      }
+	
+	      if (options.interactive) {
+	        material = new _enginePickingMaterial2['default']();
+	        // material.side = THREE.BackSide;
+	
+	        // Make the line wider / easier to pick
+	        material.linewidth = style.lineWidth + material.linePadding;
+	
+	        var pickingMesh = new _three2['default'].LineSegments(geometry, material);
+	      }
+	
+	      return Promise.resolve({
+	        mesh: mesh,
+	        pickingMesh: pickingMesh
+	      });
+	    }
+	  }, {
+	    key: 'ToAttributes',
+	    value: function ToAttributes(line) {
+	      // Three components per vertex
+	      var vertices = new Float32Array(line.verticesCount * 3);
+	      var colours = new Float32Array(line.verticesCount * 3);
+	
+	      var pickingIds;
+	      if (line.pickingId) {
+	        // One component per vertex
+	        pickingIds = new Float32Array(line.verticesCount);
+	      }
+	
+	      var _vertices = line.vertices;
+	      var _colour = line.colours;
+	
+	      var _pickingId;
+	      if (pickingIds) {
+	        _pickingId = line.pickingId;
+	      }
+	
+	      var lastIndex = 0;
+	
+	      for (var i = 0; i < _vertices.length; i++) {
+	        var ax = _vertices[i][0];
+	        var ay = _vertices[i][1];
+	        var az = _vertices[i][2];
+	
+	        var c1 = _colour[i];
+	
+	        vertices[lastIndex * 3 + 0] = ax;
+	        vertices[lastIndex * 3 + 1] = ay;
+	        vertices[lastIndex * 3 + 2] = az;
+	
+	        colours[lastIndex * 3 + 0] = c1[0];
+	        colours[lastIndex * 3 + 1] = c1[1];
+	        colours[lastIndex * 3 + 2] = c1[2];
+	
+	        if (pickingIds) {
+	          pickingIds[lastIndex] = _pickingId;
+	        }
+	
+	        lastIndex++;
+	      }
+	
+	      var attributes = {
+	        positions: vertices,
+	        colors: colours
+	      };
+	
+	      if (pickingIds) {
+	        attributes.pickingIds = pickingIds;
+	      }
+	
+	      return attributes;
+	    }
+	  }, {
 	    key: 'isSingle',
 	    value: function isSingle(coordinates) {
 	      return !Array.isArray(coordinates[0][0]);
@@ -18010,7 +19063,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.polylineLayer = noNew;
 
 /***/ },
-/* 74 */
+/* 86 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -18051,7 +19104,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// How much control should this layer support? Perhaps a different or custom
 	// layer would be better suited for animation, for example.
 	
-	var _Layer2 = __webpack_require__(32);
+	var _Layer2 = __webpack_require__(34);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -18063,17 +19116,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
+	var _geoGeo = __webpack_require__(6);
+	
+	var _geoGeo2 = _interopRequireDefault(_geoGeo);
+	
 	var _geoLatLon = __webpack_require__(7);
 	
 	var _geoPoint = __webpack_require__(8);
 	
-	var _enginePickingMaterial = __webpack_require__(70);
+	var _enginePickingMaterial = __webpack_require__(82);
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
-	var _utilBuffer = __webpack_require__(69);
+	var _utilBuffer = __webpack_require__(81);
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
+	
+	var _PolygonLayer = __webpack_require__(84);
+	
+	var _PolygonLayer2 = _interopRequireDefault(_PolygonLayer);
 	
 	var PointLayer = (function (_Layer) {
 	  _inherits(PointLayer, _Layer);
@@ -18085,12 +19146,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      output: true,
 	      interactive: false,
 	      // THREE.Geometry or THREE.BufferGeometry to use for point output
-	      geometry: null,
+	      pointGeometry: null,
 	      // Custom material override
 	      //
 	      // TODO: Should this be in the style object?
-	      material: null,
-	      onMesh: null,
+	      pointMaterial: null,
+	      onPointMesh: null,
 	      // This default style is separate to Util.GeoJSON.defaultStyle
 	      style: {
 	        pointColor: '#ff0000'
@@ -18106,44 +19167,67 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // single point in the array)
 	    this._coordinates = PointLayer.isSingle(coordinates) ? [coordinates] : coordinates;
 	
-	    // Point features are always flat (for now at least)
-	    //
-	    // This won't always be the case once custom point objects / meshes are
-	    // added
-	    this._flat = true;
+	    this._flat = false;
 	  }
 	
 	  _createClass(PointLayer, [{
 	    key: '_onAdd',
 	    value: function _onAdd(world) {
-	      this._setCoordinates();
+	      var _this = this;
 	
-	      if (this._options.interactive) {
-	        // Only add to picking mesh if this layer is controlling output
-	        //
-	        // Otherwise, assume another component will eventually add a mesh to
-	        // the picking scene
-	        if (this.isOutput()) {
-	          this._pickingMesh = new _three2['default'].Object3D();
-	          this.addToPicking(this._pickingMesh);
+	      return new Promise(function (resolve, reject) {
+	        _this._setCoordinates();
+	
+	        if (_this._options.interactive) {
+	          // Only add to picking mesh if this layer is controlling output
+	          //
+	          // Otherwise, assume another component will eventually add a mesh to
+	          // the picking scene
+	          if (_this.isOutput()) {
+	            _this._pickingMesh = new _three2['default'].Object3D();
+	            _this.addToPicking(_this._pickingMesh);
+	          }
+	
+	          _this._setPickingId();
+	          _this._addPickingEvents();
 	        }
 	
-	        this._setPickingId();
-	        this._addPickingEvents();
-	      }
+	        // Store geometry representation as instances of THREE.BufferAttribute
+	        PointLayer.SetBufferAttributes(_this._projectedCoordinates, _this._options).then(function (result) {
+	          _this._bufferAttributes = _utilBuffer2['default'].mergeAttributes(result.attributes);
+	          _this._flat = result.flat;
 	
-	      // Store geometry representation as instances of THREE.BufferAttribute
-	      this._setBufferAttributes();
+	          var attributeLengths = {
+	            positions: 3,
+	            normals: 3,
+	            colors: 3
+	          };
 	
-	      if (this.isOutput()) {
-	        // Set mesh if not merging elsewhere
-	        this._setMesh(this._bufferAttributes);
+	          if (_this._options.interactive) {
+	            attributeLengths.pickingIds = 1;
+	          }
 	
-	        // Output mesh
-	        this.add(this._mesh);
-	      }
+	          if (_this.isOutput()) {
+	            var style = _this._options.style;
 	
-	      return Promise.resolve(this);
+	            // Set mesh if not merging elsewhere
+	            // TODO: Dedupe with PolygonLayer as they are identical
+	            PointLayer.SetMesh(_this._bufferAttributes, attributeLengths, _this._flat, style, _this._options, _this._world._environment._skybox).then(function (result) {
+	              // Output mesh
+	              _this.add(result.mesh);
+	
+	              if (result.pickingMesh) {
+	                _this._pickingMesh.add(result.pickingMesh);
+	              }
+	            });
+	          }
+	
+	          result.attributes = null;
+	          result = null;
+	
+	          resolve(_this);
+	        })['catch'](reject);
+	      });
 	    }
 	
 	    // Return center of point as a LatLon
@@ -18175,100 +19259,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_addPickingEvents',
 	    value: function _addPickingEvents() {
-	      var _this = this;
+	      var _this2 = this;
 	
 	      // TODO: Find a way to properly remove this listener on destroy
 	      this._world.on('pick-' + this._pickingId, function (point2d, point3d, intersects) {
 	        // Re-emit click event from the layer
-	        _this.emit('click', _this, point2d, point3d, intersects);
+	        _this2.emit('click', _this2, point2d, point3d, intersects);
 	      });
-	    }
-	
-	    // Create and store reference to THREE.BufferAttribute data for this layer
-	  }, {
-	    key: '_setBufferAttributes',
-	    value: function _setBufferAttributes() {
-	      var _this2 = this;
-	
-	      var height = 0;
-	
-	      // Convert height into world units
-	      if (this._options.style.pointHeight) {
-	        height = this._world.metresToWorld(this._options.style.pointHeight, this._pointScale);
-	      }
-	
-	      var colour = new _three2['default'].Color();
-	      colour.set(this._options.style.pointColor);
-	
-	      var geometry;
-	
-	      // Use default geometry if none has been provided or the provided geometry
-	      // isn't valid
-	      if (!this._options.geometry || !this._options.geometry instanceof _three2['default'].Geometry || !this._options.geometry instanceof _three2['default'].BufferGeometry) {
-	        // Debug geometry for points is a thin bar
-	        //
-	        // TODO: Allow point geometry to be customised / overridden
-	        var geometryWidth = this._world.metresToWorld(25, this._pointScale);
-	        var geometryHeight = this._world.metresToWorld(200, this._pointScale);
-	        var _geometry = new _three2['default'].BoxGeometry(geometryWidth, geometryHeight, geometryWidth);
-	
-	        // Shift geometry up so it sits on the ground
-	        _geometry.translate(0, geometryHeight * 0.5, 0);
-	
-	        // Pull attributes out of debug geometry
-	        geometry = new _three2['default'].BufferGeometry().fromGeometry(_geometry);
-	      } else {
-	        if (this._options.geometry instanceof _three2['default'].BufferGeometry) {
-	          geometry = this._options.geometry;
-	        } else {
-	          geometry = new _three2['default'].BufferGeometry().fromGeometry(this._options.geometry);
-	        }
-	      }
-	
-	      // For each point
-	      var attributes = this._projectedCoordinates.map(function (coordinate) {
-	        var _vertices = [];
-	        var _normals = [];
-	        var _colours = [];
-	
-	        var _geometry = geometry.clone();
-	
-	        _geometry.translate(coordinate.x, height, coordinate.y);
-	
-	        var _vertices = _geometry.attributes.position.clone().array;
-	        var _normals = _geometry.attributes.normal.clone().array;
-	        var _colours = _geometry.attributes.color.clone().array;
-	
-	        for (var i = 0; i < _colours.length; i += 3) {
-	          _colours[i] = colour.r;
-	          _colours[i + 1] = colour.g;
-	          _colours[i + 2] = colour.b;
-	        }
-	
-	        var _point = {
-	          vertices: _vertices,
-	          normals: _normals,
-	          colours: _colours
-	        };
-	
-	        if (_this2._options.interactive && _this2._pickingId) {
-	          // Inject picking ID
-	          // point.pickingId = this._pickingId;
-	          _point.pickingIds = new Float32Array(_vertices.length / 3);
-	          for (var i = 0; i < _point.pickingIds.length; i++) {
-	            _point.pickingIds[i] = _this2._pickingId;
-	          }
-	        }
-	
-	        // Convert point representation to proper attribute arrays
-	        // return this._toAttributes(_point);
-	        return _point;
-	      });
-	
-	      this._bufferAttributes = _utilBuffer2['default'].mergeAttributes(attributes);
-	
-	      // Original attributes are no longer required so free the memory
-	      attributes = null;
 	    }
 	  }, {
 	    key: 'getBufferAttributes',
@@ -18298,74 +19295,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._coordinates = null;
 	      this._projectedCoordinates = null;
 	    }
-	
-	    // Create and store mesh from buffer attributes
-	    //
-	    // This is only called if the layer is controlling its own output
 	  }, {
-	    key: '_setMesh',
-	    value: function _setMesh(attributes) {
-	      var geometry = new _three2['default'].BufferGeometry();
-	
-	      // itemSize = 3 because there are 3 values (components) per vertex
-	      geometry.addAttribute('position', new _three2['default'].BufferAttribute(attributes.vertices, 3));
-	      geometry.addAttribute('normal', new _three2['default'].BufferAttribute(attributes.normals, 3));
-	      geometry.addAttribute('color', new _three2['default'].BufferAttribute(attributes.colours, 3));
-	
-	      if (attributes.pickingIds) {
-	        geometry.addAttribute('pickingId', new _three2['default'].BufferAttribute(attributes.pickingIds, 1));
-	      }
-	
-	      geometry.computeBoundingBox();
-	
-	      var material;
-	
-	      if (this._options.material && this._options.material instanceof _three2['default'].Material) {
-	        material = this._options.material;
-	      } else if (!this._world._environment._skybox) {
-	        material = new _three2['default'].MeshBasicMaterial({
-	          vertexColors: _three2['default'].VertexColors
-	          // side: THREE.BackSide
-	        });
-	      } else {
-	          material = new _three2['default'].MeshStandardMaterial({
-	            vertexColors: _three2['default'].VertexColors
-	            // side: THREE.BackSide
-	          });
-	          material.roughness = 1;
-	          material.metalness = 0.1;
-	          material.envMapIntensity = 3;
-	          material.envMap = this._world._environment._skybox.getRenderTarget();
-	        }
-	
-	      var mesh;
-	
-	      // Pass mesh through callback, if defined
-	      if (typeof this._options.onMesh === 'function') {
-	        mesh = this._options.onMesh(geometry, material);
-	      } else {
-	        mesh = new _three2['default'].Mesh(geometry, material);
-	
-	        mesh.castShadow = true;
-	        // mesh.receiveShadow = true;
-	      }
-	
-	      if (this._options.interactive && this._pickingMesh) {
-	        material = new _enginePickingMaterial2['default']();
-	        // material.side = THREE.BackSide;
-	
-	        var pickingMesh = new _three2['default'].Mesh(geometry, material);
-	        this._pickingMesh.add(pickingMesh);
-	      }
-	
-	      this._mesh = mesh;
-	    }
+	    key: '_setCoordinates',
 	
 	    // Convert and project coordinates
 	    //
 	    // TODO: Calculate bounds
-	  }, {
-	    key: '_setCoordinates',
 	    value: function _setCoordinates() {
 	      this._bounds = [];
 	      this._coordinates = this._convertCoordinates(this._coordinates);
@@ -18409,72 +19344,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	          _this3._offset.x = -1 * _point.x;
 	          _this3._offset.y = -1 * _point.y;
 	
-	          _this3._pointScale = _this3._world.pointScale(latlon);
+	          _this3._options.pointScale = _this3._world.pointScale(latlon);
 	        }
 	
 	        return _point;
 	      });
-	    }
-	
-	    // Transform line representation into attribute arrays that can be used by
-	    // THREE.BufferGeometry
-	    //
-	    // TODO: Can this be simplified? It's messy and huge
-	  }, {
-	    key: '_toAttributes',
-	    value: function _toAttributes(line) {
-	      // Three components per vertex
-	      var vertices = new Float32Array(line.verticesCount * 3);
-	      var colours = new Float32Array(line.verticesCount * 3);
-	
-	      var pickingIds;
-	      if (line.pickingId) {
-	        // One component per vertex
-	        pickingIds = new Float32Array(line.verticesCount);
-	      }
-	
-	      var _vertices = line.vertices;
-	      var _colour = line.colours;
-	
-	      var _pickingId;
-	      if (pickingIds) {
-	        _pickingId = line.pickingId;
-	      }
-	
-	      var lastIndex = 0;
-	
-	      for (var i = 0; i < _vertices.length; i++) {
-	        var ax = _vertices[i][0];
-	        var ay = _vertices[i][1];
-	        var az = _vertices[i][2];
-	
-	        var c1 = _colour[i];
-	
-	        vertices[lastIndex * 3 + 0] = ax;
-	        vertices[lastIndex * 3 + 1] = ay;
-	        vertices[lastIndex * 3 + 2] = az;
-	
-	        colours[lastIndex * 3 + 0] = c1[0];
-	        colours[lastIndex * 3 + 1] = c1[1];
-	        colours[lastIndex * 3 + 2] = c1[2];
-	
-	        if (pickingIds) {
-	          pickingIds[lastIndex] = _pickingId;
-	        }
-	
-	        lastIndex++;
-	      }
-	
-	      var attributes = {
-	        vertices: vertices,
-	        colours: colours
-	      };
-	
-	      if (pickingIds) {
-	        attributes.pickingIds = pickingIds;
-	      }
-	
-	      return attributes;
 	    }
 	
 	    // Returns true if the line is flat (has no height)
@@ -18502,6 +19376,146 @@ return /******/ (function(modules) { // webpackBootstrap
 	      _get(Object.getPrototypeOf(PointLayer.prototype), 'destroy', this).call(this);
 	    }
 	  }], [{
+	    key: 'SetBufferAttributes',
+	    value: function SetBufferAttributes(coordinates, options) {
+	      return new Promise(function (resolve) {
+	        var height = 0;
+	
+	        // Convert height into world units
+	        if (options.style.pointHeight) {
+	          height = _geoGeo2['default'].metresToWorld(options.style.pointHeight, options.pointScale);
+	        }
+	
+	        var colour = new _three2['default'].Color();
+	        colour.set(options.style.pointColor);
+	
+	        // Use default geometry if none has been provided or the provided geometry
+	        // isn't valid
+	        if (!options.pointGeometry || !options.pointGeometry instanceof _three2['default'].Geometry || !options.pointGeometry instanceof _three2['default'].BufferGeometry) {
+	          // Debug geometry for points is a thin bar
+	          //
+	          // TODO: Allow point geometry to be customised / overridden
+	          var geometryWidth = _geoGeo2['default'].metresToWorld(25, options.pointScale);
+	          var geometryHeight = _geoGeo2['default'].metresToWorld(200, options.pointScale);
+	          var _geometry = new _three2['default'].BoxGeometry(geometryWidth, geometryHeight, geometryWidth);
+	
+	          // Shift geometry up so it sits on the ground
+	          _geometry.translate(0, geometryHeight * 0.5, 0);
+	
+	          // Pull attributes out of debug geometry
+	          geometry = new _three2['default'].BufferGeometry().fromGeometry(_geometry);
+	        } else {
+	          if (options.geometry instanceof _three2['default'].BufferGeometry) {
+	            geometry = options.pointGeometry;
+	          } else {
+	            geometry = new _three2['default'].BufferGeometry().fromGeometry(options.pointGeometry);
+	          }
+	        }
+	
+	        var attributes = coordinates.map(function (coordinate) {
+	          var _vertices = [];
+	          var _normals = [];
+	          var _colours = [];
+	
+	          var _geometry = geometry.clone();
+	          _geometry.translate(coordinate.x, height, coordinate.y);
+	
+	          var _vertices = _geometry.attributes.position.clone().array;
+	          var _normals = _geometry.attributes.normal.clone().array;
+	          var _colours = _geometry.attributes.color.clone().array;
+	
+	          for (var i = 0; i < _colours.length; i += 3) {
+	            _colours[i] = colour.r;
+	            _colours[i + 1] = colour.g;
+	            _colours[i + 2] = colour.b;
+	          }
+	
+	          var _point = {
+	            positions: _vertices,
+	            normals: _normals,
+	            colors: _colours
+	          };
+	
+	          if (options.interactive && options.pickingId) {
+	            // Inject picking ID
+	            _point.pickingId = options.pickingId;
+	          }
+	
+	          return _point;
+	        });
+	
+	        resolve({
+	          attributes: attributes,
+	          flat: false
+	        });
+	      });
+	    }
+	  }, {
+	    key: 'SetMesh',
+	    value: function SetMesh(attributes, attributeLengths, flat, style, options, skybox) {
+	      var geometry = new _three2['default'].BufferGeometry();
+	
+	      for (var key in attributes) {
+	        geometry.addAttribute(key.slice(0, -1), new _three2['default'].BufferAttribute(attributes[key], attributeLengths[key]));
+	      }
+	
+	      geometry.computeBoundingBox();
+	
+	      var material;
+	      if (options.pointMaterial && options.pointMaterial instanceof _three2['default'].Material) {
+	        material = options.pointMaterial;
+	      } else if (!skybox) {
+	        material = new _three2['default'].MeshPhongMaterial({
+	          vertexColors: _three2['default'].VertexColors,
+	          // side: THREE.BackSide,
+	          transparent: style.transparent,
+	          opacity: style.opacity,
+	          blending: style.blending
+	        });
+	      } else {
+	        material = new _three2['default'].MeshStandardMaterial({
+	          vertexColors: _three2['default'].VertexColors,
+	          // side: THREE.BackSide,
+	          transparent: style.transparent,
+	          opacity: style.opacity,
+	          blending: style.blending
+	        });
+	        material.roughness = 1;
+	        material.metalness = 0.1;
+	        material.envMapIntensity = 3;
+	        material.envMap = skybox.getRenderTarget();
+	      }
+	
+	      var mesh;
+	
+	      // Pass mesh through callback, if defined
+	      if (typeof options.onPolygonMesh === 'function') {
+	        mesh = options.onPolygonMesh(geometry, material);
+	      } else {
+	        mesh = new _three2['default'].Mesh(geometry, material);
+	
+	        mesh.castShadow = true;
+	        mesh.receiveShadow = true;
+	      }
+	
+	      if (flat) {
+	        material.depthWrite = false;
+	        mesh.renderOrder = 4;
+	      }
+	
+	      if (options.interactive) {
+	        material = new _enginePickingMaterial2['default']();
+	        material.side = _three2['default'].BackSide;
+	
+	        var pickingMesh = new _three2['default'].Mesh(geometry, material);
+	      }
+	
+	      return Promise.resolve({
+	        mesh: mesh,
+	        pickingMesh: pickingMesh
+	      });
+	    }
+	  }, {
 	    key: 'isSingle',
 	    value: function isSingle(coordinates) {
 	      return !Array.isArray(coordinates[0]);
@@ -18520,7 +19534,1277 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.pointLayer = noNew;
 
 /***/ },
-/* 75 */
+/* 87 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var _Layer2 = __webpack_require__(34);
+	
+	var _Layer3 = _interopRequireDefault(_Layer2);
+	
+	var _lodashAssign = __webpack_require__(3);
+	
+	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
+	
+	var _reqwest = __webpack_require__(73);
+	
+	var _reqwest2 = _interopRequireDefault(_reqwest);
+	
+	var _utilGeoJSON = __webpack_require__(75);
+	
+	var _utilGeoJSON2 = _interopRequireDefault(_utilGeoJSON);
+	
+	var _utilWorker = __webpack_require__(46);
+	
+	var _utilWorker2 = _interopRequireDefault(_utilWorker);
+	
+	var _utilBuffer = __webpack_require__(81);
+	
+	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
+	
+	var _utilStringify = __webpack_require__(88);
+	
+	var _utilStringify2 = _interopRequireDefault(_utilStringify);
+	
+	var _geometryPolygonLayer = __webpack_require__(84);
+	
+	var _geometryPolygonLayer2 = _interopRequireDefault(_geometryPolygonLayer);
+	
+	var _geometryPolylineLayer = __webpack_require__(85);
+	
+	var _geometryPolylineLayer2 = _interopRequireDefault(_geometryPolylineLayer);
+	
+	var _geometryPointLayer = __webpack_require__(86);
+	
+	var _geometryPointLayer2 = _interopRequireDefault(_geometryPointLayer);
+	
+	var _geoLatLon = __webpack_require__(7);
+	
+	var _geoPoint = __webpack_require__(8);
+	
+	var _geoGeo = __webpack_require__(6);
+	
+	var _geoGeo2 = _interopRequireDefault(_geoGeo);
+	
+	var _enginePickingMaterial = __webpack_require__(82);
+	
+	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
+	
+	// TODO: Allow filter method to be run inside a worker to improve performance
+	// TODO: Allow onEachFeature method to be run inside a worker to improve performance
+	
+	var GeoJSONWorkerLayer = (function (_Layer) {
+	  _inherits(GeoJSONWorkerLayer, _Layer);
+	
+	  function GeoJSONWorkerLayer(geojson, options) {
+	    _classCallCheck(this, GeoJSONWorkerLayer);
+	
+	    var defaults = {
+	      topojson: false,
+	      style: _utilGeoJSON2['default'].defaultStyle,
+	      onEachFeature: null,
+	      onEachFeatureWorker: null,
+	      onAddAttributes: null,
+	      interactive: false,
+	      pointGeometry: null,
+	      onClick: null,
+	      headers: {}
+	    };
+	
+	    var _options = (0, _lodashAssign2['default'])({}, defaults, options);
+	
+	    if (typeof options.style === 'object') {
+	      _options.style = (0, _lodashAssign2['default'])({}, defaults.style, options.style);
+	    }
+	
+	    _get(Object.getPrototypeOf(GeoJSONWorkerLayer.prototype), 'constructor', this).call(this, _options);
+	
+	    this._aborted = false;
+	    this._geojson = geojson;
+	  }
+	
+	  _createClass(GeoJSONWorkerLayer, [{
+	    key: '_onAdd',
+	    value: function _onAdd(world) {
+	      if (this._options.interactive) {
+	        // Worker layer always controls output to add a picking mesh
+	        this._pickingMesh = new THREE.Object3D();
+	      }
+	
+	      // Process GeoJSON
+	      return this._process(this._geojson);
+	    }
+	
+	    // Use workers to request and process GeoJSON, returning data structure
+	    // containing geometry and any supplementary data for output
+	  }, {
+	    key: '_process',
+	    value: function _process(_geojson) {
+	      var _this = this;
+	
+	      return new Promise(function (resolve, reject) {
+	        var style = _this._options.style;
+	
+	        // TODO: Convert to buffer and use transferrable objects
+	        if (typeof _this._options.style === 'function') {
+	          style = _utilStringify2['default'].functionToString(_this._options.style);
+	        }
+	
+	        var pointGeometry = _this._options.pointGeometry;
+	
+	        // TODO: Convert to buffer and use transferrable objects
+	        if (typeof _this._options.pointGeometry === 'function') {
+	          pointGeometry = _utilStringify2['default'].functionToString(_this._options.pointGeometry);
+	        }
+	
+	        var geojson = _geojson;
+	        var transferrables = [];
+	
+	        if (typeof geojson !== 'string') {
+	          _this._geojson = geojson = _utilBuffer2['default'].stringToUint8Array(JSON.stringify(geojson));
+	          transferrables.push(geojson.buffer);
+	          _this._execWorker(geojson, _this._options.topojson, _this._world._originPoint, style, _this._options.interactive, pointGeometry, transferrables).then(function () {
+	            resolve();
+	          })['catch'](reject);
+	        } else if (typeof _this._options.filter === 'function' || typeof _this._options.onEachFeature === 'function') {
+	          GeoJSONWorkerLayer.RequestGeoJSON(geojson).then(function (res) {
+	            // if (this._aborted) {
+	            //   resolve();
+	            //   return;
+	            // }
+	
+	            var fc = _utilGeoJSON2['default'].collectFeatures(res, _this._options.topojson);
+	            var features = fc.features;
+	
+	            // Run filter, if provided
+	            if (_this._options.filter) {
+	              fc.features = features.filter(_this._options.filter);
+	            }
+	
+	            if (_this._options.onEachFeature) {
+	              var feature;
+	              for (var i = 0; i < features.length; i++) {
+	                feature = features[i];
+	                _this._options.onEachFeature(feature);
+	              };
+	            }
+	
+	            _this._geojson = geojson = _utilBuffer2['default'].stringToUint8Array(JSON.stringify(fc));
+	            transferrables.push(geojson.buffer);
+	
+	            _this._execWorker(geojson, false, _this._options.headers, _this._world._originPoint, style, _this._options.interactive, pointGeometry, transferrables).then(function () {
+	              resolve();
+	            })['catch'](reject);
+	          });
+	        } else {
+	          _this._execWorker(geojson, _this._options.topojson, _this._options.headers, _this._world._originPoint, style, _this._options.interactive, pointGeometry, transferrables).then(function () {
+	            resolve();
+	          })['catch'](reject);
+	        }
+	      });
+	    }
+	  }, {
+	    key: '_execWorker',
+	    value: function _execWorker(geojson, topojson, headers, originPoint, style, interactive, pointGeometry, transferrables) {
+	      var _this2 = this;
+	
+	      return new Promise(function (resolve, reject) {
+	        console.time('Worker round trip');
+	
+	        _utilWorker2['default'].exec('GeoJSONWorkerLayer.Process', [geojson, topojson, headers, originPoint, style, interactive, pointGeometry], transferrables).then(function (results) {
+	          console.timeEnd('Worker round trip');
+	
+	          // if (this._aborted) {
+	          //   resolve();
+	          //   return;
+	          // }
+	
+	          var processPromises = [];
+	
+	          if (results.polygons) {
+	            processPromises.push(_this2._processPolygonResults(results.polygons));
+	          }
+	
+	          if (results.polylines) {
+	            processPromises.push(_this2._processPolylineResults(results.polylines));
+	          }
+	
+	          if (results.points) {
+	            processPromises.push(_this2._processPointResults(results.points));
+	          }
+	
+	          if (processPromises.length > 0) {
+	            Promise.all(processPromises).then(function () {
+	              resolve();
+	            })['catch'](reject);
+	          } else {
+	            resolve();
+	          }
+	        });
+	      });
+	    }
+	
+	    // TODO: Dedupe with polyline method
+	  }, {
+	    key: '_processPolygonResults',
+	    value: function _processPolygonResults(results) {
+	      var _this3 = this;
+	
+	      return new Promise(function (resolve, reject) {
+	        var splitPositions = _utilBuffer2['default'].splitFloat32Array(results.attributes.positions);
+	        var splitNormals = _utilBuffer2['default'].splitFloat32Array(results.attributes.normals);
+	        var splitColors = _utilBuffer2['default'].splitFloat32Array(results.attributes.colors);
+	        var splitTops = _utilBuffer2['default'].splitFloat32Array(results.attributes.tops);
+	
+	        var splitOutlinePositions;
+	        var splitOutlineColors;
+	
+	        if (results.outlineAttributes) {
+	          splitOutlinePositions = _utilBuffer2['default'].splitFloat32Array(results.outlineAttributes.positions);
+	          splitOutlineColors = _utilBuffer2['default'].splitFloat32Array(results.outlineAttributes.colors);
+	        }
+	
+	        var splitProperties;
+	        if (results.properties) {
+	          splitProperties = _utilBuffer2['default'].splitUint8Array(results.properties);
+	        }
+	
+	        var flats = results.flats;
+	
+	        var objects = [];
+	        var outlineObjects = [];
+	
+	        var obj;
+	        var pickingId;
+	        var pickingIds;
+	        var properties;
+	
+	        var polygonAttributeLengths = {
+	          positions: 3,
+	          normals: 3,
+	          colors: 3,
+	          tops: 1
+	        };
+	
+	        var polygonOutlineAttributeLengths = {
+	          positions: 3,
+	          colors: 3
+	        };
+	
+	        for (var i = 0; i < splitPositions.length; i++) {
+	          if (splitProperties && splitProperties[i]) {
+	            properties = JSON.parse(_utilBuffer2['default'].uint8ArrayToString(splitProperties[i]));
+	          } else {
+	            properties = {};
+	          }
+	
+	          // WORKERS: obj.attributes should actually an array of polygons for
+	          // the feature, though the current logic isn't aware of that
+	          obj = {
+	            attributes: [{
+	              positions: splitPositions[i],
+	              normals: splitNormals[i],
+	              colors: splitColors[i],
+	              tops: splitTops[i]
+	            }],
+	            properties: properties,
+	            flat: flats[i]
+	          };
+	
+	          // WORKERS: If interactive, generate unique ID for each feature, create
+	          // the buffer attributes and set up event listeners
+	          if (_this3._options.interactive) {
+	            pickingId = _this3.getPickingId();
+	
+	            pickingIds = new Float32Array(splitPositions[i].length / 3);
+	            pickingIds.fill(pickingId);
+	
+	            obj.attributes[0].pickingIds = pickingIds;
+	
+	            polygonAttributeLengths.pickingIds = 1;
+	
+	            _this3._addPicking(pickingId, properties);
+	          }
+	
+	          // TODO: Make this specific to polygon attributes
+	          if (typeof _this3._options.onAddAttributes === 'function') {
+	            var customAttributes = _this3._options.onAddAttributes(obj.attributes[0], properties);
+	            var customAttribute;
+	            for (var key in customAttributes) {
+	              customAttribute = customAttributes[key];
+	              obj.attributes[0][key] = customAttribute.value;
+	              polygonAttributeLengths[key] = customAttribute.length;
+	            }
+	          }
+	
+	          objects.push(obj);
+	        }
+	
+	        for (var i = 0; i < splitOutlinePositions.length; i++) {
+	          obj = {
+	            attributes: [{
+	              positions: splitOutlinePositions[i],
+	              colors: splitOutlineColors[i]
+	            }],
+	            flat: true
+	          };
+	
+	          outlineObjects.push(obj);
+	        }
+	
+	        var polygonAttributes = [];
+	        var polygonOutlineAttributes = [];
+	
+	        var polygonFlat = true;
+	
+	        for (var i = 0; i < objects.length; i++) {
+	          obj = objects[i];
+	
+	          // TODO: Work out why obj.flat is rarely set to something other than
+	          // true or false. Potentially undefined.
+	          if (polygonFlat && obj.flat === false) {
+	            polygonFlat = false;
+	          }
+	
+	          var bufferAttributes = _utilBuffer2['default'].mergeAttributes(obj.attributes);
+	          polygonAttributes.push(bufferAttributes);
+	        };
+	
+	        for (var i = 0; i < outlineObjects.length; i++) {
+	          obj = outlineObjects[i];
+	
+	          var bufferAttributes = _utilBuffer2['default'].mergeAttributes(obj.attributes);
+	          polygonOutlineAttributes.push(bufferAttributes);
+	        };
+	
+	        var outputPromises = [];
+	
+	        var style;
+	
+	        if (polygonAttributes.length > 0) {
+	          var mergedPolygonAttributes = _utilBuffer2['default'].mergeAttributes(polygonAttributes);
+	
+	          // TODO: Make this work when style is a function per feature
+	          style = typeof _this3._options.style === 'function' ? _this3._options.style(objects[0]) : _this3._options.style;
+	          style = (0, _lodashAssign2['default'])({}, _utilGeoJSON2['default'].defaultStyle, style);
+	
+	          outputPromises.push(_this3._setPolygonMesh(mergedPolygonAttributes, polygonAttributeLengths, style, polygonFlat));
+	        }
+	
+	        if (polygonOutlineAttributes.length > 0) {
+	          var mergedPolygonOutlineAttributes = _utilBuffer2['default'].mergeAttributes(polygonOutlineAttributes);
+	
+	          style = typeof _this3._options.style === 'function' ? _this3._options.style(objects[0]) : _this3._options.style;
+	          style = (0, _lodashAssign2['default'])({}, _utilGeoJSON2['default'].defaultStyle, style);
+	
+	          if (style.outlineRenderOrder !== undefined) {
+	            style.lineRenderOrder = style.outlineRenderOrder;
+	          } else {
+	            style.lineRenderOrder = style.renderOrder ? style.renderOrder + 1 : 4;
+	          }
+	
+	          if (style.outlineWidth) {
+	            style.lineWidth = style.outlineWidth;
+	          }
+	
+	          outputPromises.push(_this3._setPolylineMesh(mergedPolygonOutlineAttributes, polygonOutlineAttributeLengths, style, true));
+	        }
+	
+	        Promise.all(outputPromises).then(function (results) {
+	          var _results = _slicedToArray(results, 2);
+	
+	          var polygonResult = _results[0];
+	          var outlineResult = _results[1];
+	
+	          if (polygonResult) {
+	            _this3._polygonMesh = polygonResult.mesh;
+	            _this3.add(_this3._polygonMesh);
+	
+	            if (polygonResult.pickingMesh) {
+	              _this3._pickingMesh.add(polygonResult.pickingMesh);
+	            }
+	          }
+	
+	          if (outlineResult) {
+	            _this3.add(outlineResult.mesh);
+	          }
+	
+	          resolve();
+	        })['catch'](reject);
+	      });
+	    }
+	
+	    // TODO: Dedupe with polygon method
+	  }, {
+	    key: '_processPolylineResults',
+	    value: function _processPolylineResults(results) {
+	      var _this4 = this;
+	
+	      return new Promise(function (resolve, reject) {
+	        var splitPositions = _utilBuffer2['default'].splitFloat32Array(results.attributes.positions);
+	        var splitColors = _utilBuffer2['default'].splitFloat32Array(results.attributes.colors);
+	
+	        var splitProperties;
+	        if (results.properties) {
+	          splitProperties = _utilBuffer2['default'].splitUint8Array(results.properties);
+	        }
+	
+	        var flats = results.flats;
+	
+	        var objects = [];
+	        var obj;
+	        var pickingId;
+	        var pickingIds;
+	        var properties;
+	
+	        var polylineAttributeLengths = {
+	          positions: 3,
+	          colors: 3
+	        };
+	
+	        for (var i = 0; i < splitPositions.length; i++) {
+	          if (splitProperties && splitProperties[i]) {
+	            properties = JSON.parse(_utilBuffer2['default'].uint8ArrayToString(splitProperties[i]));
+	          } else {
+	            properties = {};
+	          }
+	
+	          // WORKERS: obj.attributes should actually an array of polygons for
+	          // the feature, though the current logic isn't aware of that
+	          obj = {
+	            attributes: [{
+	              positions: splitPositions[i],
+	              colors: splitColors[i]
+	            }],
+	            properties: properties,
+	            flat: flats[i]
+	          };
+	
+	          // WORKERS: If interactive, generate unique ID for each feature, create
+	          // the buffer attributes and set up event listeners
+	          if (_this4._options.interactive) {
+	            pickingId = _this4.getPickingId();
+	
+	            pickingIds = new Float32Array(splitPositions[i].length / 3);
+	            pickingIds.fill(pickingId);
+	
+	            obj.attributes[0].pickingIds = pickingIds;
+	
+	            polylineAttributeLengths.pickingIds = 1;
+	
+	            _this4._addPicking(pickingId, properties);
+	          }
+	
+	          // TODO: Make this specific to polyline attributes
+	          if (typeof _this4._options.onAddAttributes === 'function') {
+	            var customAttributes = _this4._options.onAddAttributes(obj.attributes[0], properties);
+	            var customAttribute;
+	            for (var key in customAttributes) {
+	              customAttribute = customAttributes[key];
+	              obj.attributes[0][key] = customAttribute.value;
+	              polylineAttributeLengths[key] = customAttribute.length;
+	            }
+	          }
+	
+	          objects.push(obj);
+	        }
+	
+	        var polylineAttributes = [];
+	
+	        var polylineFlat = true;
+	
+	        for (var i = 0; i < objects.length; i++) {
+	          obj = objects[i];
+	
+	          if (polylineFlat && !obj.flat) {
+	            polylineFlat = false;
+	          }
+	
+	          var bufferAttributes = _utilBuffer2['default'].mergeAttributes(obj.attributes);
+	          polylineAttributes.push(bufferAttributes);
+	        };
+	
+	        if (polylineAttributes.length > 0) {
+	          var mergedPolylineAttributes = _utilBuffer2['default'].mergeAttributes(polylineAttributes);
+	
+	          // TODO: Make this work when style is a function per feature
+	          var style = typeof _this4._options.style === 'function' ? _this4._options.style(objects[0]) : _this4._options.style;
+	          style = (0, _lodashAssign2['default'])({}, _utilGeoJSON2['default'].defaultStyle, style);
+	
+	          _this4._setPolylineMesh(mergedPolylineAttributes, polylineAttributeLengths, style, polylineFlat).then(function (result) {
+	            _this4._polylineMesh = result.mesh;
+	            _this4.add(_this4._polylineMesh);
+	
+	            if (result.pickingMesh) {
+	              _this4._pickingMesh.add(result.pickingMesh);
+	            }
+	
+	            resolve();
+	          })['catch'](reject);
+	        } else {
+	          resolve();
+	        }
+	      });
+	    }
+	  }, {
+	    key: '_processPointResults',
+	    value: function _processPointResults(results) {
+	      var _this5 = this;
+	
+	      return new Promise(function (resolve, reject) {
+	        var splitPositions = _utilBuffer2['default'].splitFloat32Array(results.attributes.positions);
+	        var splitNormals = _utilBuffer2['default'].splitFloat32Array(results.attributes.normals);
+	        var splitColors = _utilBuffer2['default'].splitFloat32Array(results.attributes.colors);
+	
+	        var splitProperties;
+	        if (results.properties) {
+	          splitProperties = _utilBuffer2['default'].splitUint8Array(results.properties);
+	        }
+	
+	        var flats = results.flats;
+	
+	        var objects = [];
+	        var obj;
+	        var pickingId;
+	        var pickingIds;
+	        var properties;
+	
+	        var pointAttributeLengths = {
+	          positions: 3,
+	          normals: 3,
+	          colors: 3
+	        };
+	
+	        for (var i = 0; i < splitPositions.length; i++) {
+	          if (splitProperties && splitProperties[i]) {
+	            properties = JSON.parse(_utilBuffer2['default'].uint8ArrayToString(splitProperties[i]));
+	          } else {
+	            properties = {};
+	          }
+	
+	          // WORKERS: obj.attributes should actually an array of polygons for
+	          // the feature, though the current logic isn't aware of that
+	          obj = {
+	            attributes: [{
+	              positions: splitPositions[i],
+	              normals: splitNormals[i],
+	              colors: splitColors[i]
+	            }],
+	            properties: properties,
+	            flat: flats[i]
+	          };
+	
+	          // WORKERS: If interactive, generate unique ID for each feature, create
+	          // the buffer attributes and set up event listeners
+	          if (_this5._options.interactive) {
+	            pickingId = _this5.getPickingId();
+	
+	            pickingIds = new Float32Array(splitPositions[i].length / 3);
+	            pickingIds.fill(pickingId);
+	
+	            obj.attributes[0].pickingIds = pickingIds;
+	
+	            pointAttributeLengths.pickingIds = 1;
+	
+	            _this5._addPicking(pickingId, properties);
+	          }
+	
+	          // TODO: Make this specific to polygon attributes
+	          if (typeof _this5._options.onAddAttributes === 'function') {
+	            var customAttributes = _this5._options.onAddAttributes(obj.attributes[0], properties);
+	            var customAttribute;
+	            for (var key in customAttributes) {
+	              customAttribute = customAttributes[key];
+	              obj.attributes[0][key] = customAttribute.value;
+	              pointAttributeLengths[key] = customAttribute.length;
+	            }
+	          }
+	
+	          objects.push(obj);
+	        }
+	
+	        var pointAttributes = [];
+	
+	        var pointFlat = true;
+	
+	        for (var i = 0; i < objects.length; i++) {
+	          obj = objects[i];
+	
+	          if (pointFlat && !obj.flat) {
+	            pointFlat = false;
+	          }
+	
+	          var bufferAttributes = _utilBuffer2['default'].mergeAttributes(obj.attributes);
+	          pointAttributes.push(bufferAttributes);
+	        };
+	
+	        if (pointAttributes.length > 0) {
+	          var mergedPointAttributes = _utilBuffer2['default'].mergeAttributes(pointAttributes);
+	
+	          // TODO: Make this work when style is a function per feature
+	          var style = typeof _this5._options.style === 'function' ? _this5._options.style(objects[0]) : _this5._options.style;
+	          style = (0, _lodashAssign2['default'])({}, _utilGeoJSON2['default'].defaultStyle, style);
+	
+	          _this5._setPointMesh(mergedPointAttributes, pointAttributeLengths, style, pointFlat).then(function (result) {
+	            _this5._pointMesh = result.mesh;
+	            _this5.add(_this5._pointMesh);
+	
+	            if (result.pickingMesh) {
+	              _this5._pickingMesh.add(result.pickingMesh);
+	            }
+	
+	            resolve();
+	          })['catch'](reject);
+	        } else {
+	          resolve();
+	        }
+	      });
+	    }
+	
+	    // TODO: At some point this needs to return all the features to the main thread
+	    // so it can generate meshes and output to the scene, as well as perhaps creating
+	    // individual layers / components for each feature to track things like picking
+	    // and properties
+	    //
+	    // TODO: Find a way so the origin point isn't needed to be passed in as it
+	    // feels a bit messy and against the idea of a static Geo class
+	    //
+	    // TODO: Support passing custom geometry for point layers
+	  }, {
+	    key: '_setPolygonMesh',
+	
+	    // Create and store mesh from buffer attributes
+	    //
+	    // Could make this an abstract method for each geometry layer
+	    value: function _setPolygonMesh(attributes, attributeLengths, style, flat) {
+	      if (!this._world) {
+	        return Promise.reject();
+	      }
+	
+	      return _geometryPolygonLayer2['default'].SetMesh(attributes, attributeLengths, flat, style, this._options, this._world._environment._skybox);
+	    }
+	  }, {
+	    key: '_setPolylineMesh',
+	    value: function _setPolylineMesh(attributes, attributeLengths, style, flat) {
+	      if (!this._world) {
+	        return Promise.reject();
+	      }
+	
+	      return _geometryPolylineLayer2['default'].SetMesh(attributes, attributeLengths, flat, style, this._options);
+	    }
+	  }, {
+	    key: '_setPointMesh',
+	    value: function _setPointMesh(attributes, attributeLengths, style, flat) {
+	      if (!this._world) {
+	        return Promise.reject();
+	      }
+	
+	      return _geometryPointLayer2['default'].SetMesh(attributes, attributeLengths, flat, style, this._options, this._world._environment._skybox);
+	    }
+	
+	    // Set up and re-emit interaction events
+	  }, {
+	    key: '_addPicking',
+	    value: function _addPicking(pickingId, properties) {
+	      var _this6 = this;
+	
+	      this._world.on('pick-click-' + pickingId, function (pickingId, point2d, point3d, intersects) {
+	        _this6._world.emit('click', _this6, properties, point2d, point3d);
+	      });
+	
+	      this._world.on('pick-hover-' + pickingId, function (pickingId, point2d, point3d, intersects) {
+	        _this6._world.emit('hover', _this6, properties, point2d, point3d);
+	      });
+	    }
+	
+	    // TODO: Finish cleanup
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {
+	      // Run common destruction logic from parent
+	      _get(Object.getPrototypeOf(GeoJSONWorkerLayer.prototype), 'destroy', this).call(this);
+	    }
+	  }], [{
+	    key: 'Process',
+	    value: function Process(geojson, topojson, headers, originPoint, _style, _properties, _pointGeometry) {
+	      return new Promise(function (resolve, reject) {
+	        GeoJSONWorkerLayer.ProcessGeoJSON(geojson, headers).then(function (res) {
+	          // Collects features into a single FeatureCollection
+	          //
+	          // Also converts TopoJSON to GeoJSON if instructed
+	          var geojson = _utilGeoJSON2['default'].collectFeatures(res, topojson);
+	
+	          // TODO: Check that GeoJSON is valid / usable
+	
+	          var features = geojson.features;
+	
+	          // TODO: Run filter, if provided (must be static)
+	
+	          var pointScale;
+	          var polygons = [];
+	          var polylines = [];
+	          var points = [];
+	
+	          // Deserialise style function if provided
+	          if (typeof _style === 'string') {
+	            _style = _utilStringify2['default'].stringToFunction(_style);
+	          }
+	
+	          // Assume that a style won't be set per feature
+	          var style = _style;
+	
+	          var pointGeometry;
+	          // Deserialise pointGeometry function if provided
+	          if (typeof _pointGeometry === 'string') {
+	            pointGeometry = _utilStringify2['default'].stringToFunction(_pointGeometry);
+	          }
+	
+	          var feature;
+	          for (var i = 0; i < features.length; i++) {
+	            feature = features[i];
+	
+	            var geometry = feature.geometry;
+	            var coordinates = geometry.coordinates ? geometry.coordinates : null;
+	
+	            if (!coordinates || !geometry) {
+	              return;
+	            }
+	
+	            // Get per-feature style object, if provided
+	            if (typeof _style === 'function') {
+	              style = (0, _lodashAssign2['default'])({}, _utilGeoJSON2['default'].defaultStyle, _style(feature));
+	              // console.log(feature, style);
+	            }
+	
+	            if (geometry.type === 'Polygon' || geometry.type === 'MultiPolygon') {
+	              coordinates = _geometryPolygonLayer2['default'].isSingle(coordinates) ? [coordinates] : coordinates;
+	
+	              var converted = coordinates.map(function (_coordinates) {
+	                return _coordinates.map(function (ring) {
+	                  return ring.map(function (coordinate) {
+	                    return (0, _geoLatLon.latLon)(coordinate[1], coordinate[0]);
+	                  });
+	                });
+	              });
+	
+	              var point;
+	              var projected = converted.map(function (_coordinates) {
+	                return _coordinates.map(function (ring) {
+	                  return ring.map(function (latlon) {
+	                    point = _geoGeo2['default'].latLonToPoint(latlon)._subtract(originPoint);
+	
+	                    if (!pointScale) {
+	                      pointScale = _geoGeo2['default'].pointScale(latlon);
+	                    }
+	
+	                    return point;
+	                  });
+	                });
+	              });
+	
+	              var polygon = {
+	                projected: projected,
+	                options: {
+	                  pointScale: pointScale,
+	                  style: style
+	                }
+	              };
+	
+	              if (_properties) {
+	                polygon.properties = feature.properties;
+	              }
+	
+	              polygons.push(polygon);
+	            }
+	
+	            if (geometry.type === 'LineString' || geometry.type === 'MultiLineString') {
+	              coordinates = _geometryPolylineLayer2['default'].isSingle(coordinates) ? [coordinates] : coordinates;
+	
+	              var converted = coordinates.map(function (_coordinates) {
+	                return _coordinates.map(function (coordinate) {
+	                  return (0, _geoLatLon.latLon)(coordinate[1], coordinate[0]);
+	                });
+	              });
+	
+	              var point;
+	              var projected = converted.map(function (_coordinates) {
+	                return _coordinates.map(function (latlon) {
+	                  point = _geoGeo2['default'].latLonToPoint(latlon)._subtract(originPoint);
+	
+	                  if (!pointScale) {
+	                    pointScale = _geoGeo2['default'].pointScale(latlon);
+	                  }
+	
+	                  return point;
+	                });
+	              });
+	
+	              var polyline = {
+	                projected: projected,
+	                options: {
+	                  pointScale: pointScale,
+	                  style: style
+	                }
+	              };
+	
+	              if (_properties) {
+	                polyline.properties = feature.properties;
+	              }
+	
+	              polylines.push(polyline);
+	            }
+	
+	            if (geometry.type === 'Point' || geometry.type === 'MultiPoint') {
+	              coordinates = _geometryPointLayer2['default'].isSingle(coordinates) ? [coordinates] : coordinates;
+	
+	              var converted = coordinates.map(function (coordinate) {
+	                return (0, _geoLatLon.latLon)(coordinate[1], coordinate[0]);
+	              });
+	
+	              var point;
+	              var projected = converted.map(function (latlon) {
+	                point = _geoGeo2['default'].latLonToPoint(latlon)._subtract(originPoint);
+	
+	                if (!pointScale) {
+	                  pointScale = _geoGeo2['default'].pointScale(latlon);
+	                }
+	
+	                return point;
+	              });
+	
+	              var point = {
+	                projected: projected,
+	                options: {
+	                  pointGeometry: pointGeometry(feature),
+	                  pointScale: pointScale,
+	                  style: style
+	                }
+	              };
+	
+	              if (_properties) {
+	                point.properties = feature.properties;
+	              }
+	
+	              points.push(point);
+	            }
+	          };
+	
+	          var polygonBufferPromises = [];
+	          var polylineBufferPromises = [];
+	          var pointBufferPromises = [];
+	
+	          var polygon;
+	          for (var i = 0; i < polygons.length; i++) {
+	            polygon = polygons[i];
+	            polygonBufferPromises.push(_geometryPolygonLayer2['default'].SetBufferAttributes(polygon.projected, polygon.options));
+	          };
+	
+	          var polyline;
+	          for (var i = 0; i < polylines.length; i++) {
+	            polyline = polylines[i];
+	            polylineBufferPromises.push(_geometryPolylineLayer2['default'].SetBufferAttributes(polyline.projected, polyline.options));
+	          };
+	
+	          var point;
+	          for (var i = 0; i < points.length; i++) {
+	            point = points[i];
+	            pointBufferPromises.push(_geometryPointLayer2['default'].SetBufferAttributes(point.projected, point.options));
+	          };
+	
+	          var data = {};
+	          var transferrables = [];
+	
+	          // TODO: Make this work with polylines too
+	          // TODO: Make this so it's not a nest of promises
+	          GeoJSONWorkerLayer.ProcessPolygons(polygonBufferPromises, polygons, _properties).then(function (result) {
+	            data.polygons = result.data;
+	            transferrables = transferrables.concat(result.transferrables);
+	
+	            GeoJSONWorkerLayer.ProcessPolylines(polylineBufferPromises, polylines, _properties).then(function (result) {
+	              data.polylines = result.data;
+	              transferrables = transferrables.concat(result.transferrables);
+	
+	              GeoJSONWorkerLayer.ProcessPoints(pointBufferPromises, points, _properties).then(function (result) {
+	                data.points = result.data;
+	                transferrables = transferrables.concat(result.transferrables);
+	
+	                resolve({
+	                  data: data,
+	                  transferrables: transferrables
+	                });
+	              });
+	            });
+	          });
+	        });
+	      });
+	    }
+	  }, {
+	    key: 'ProcessPolygons',
+	    value: function ProcessPolygons(polygonPromises, polygons, _properties) {
+	      return new Promise(function (resolve, reject) {
+	        Promise.all(polygonPromises).then(function (results) {
+	          var transferrables = [];
+	
+	          var positions = [];
+	          var normals = [];
+	          var colors = [];
+	          var tops = [];
+	
+	          var outlinePositions = [];
+	          var outlineColors = [];
+	
+	          var properties = [];
+	
+	          var flats = [];
+	          var polygon;
+	
+	          var result;
+	          for (var i = 0; i < results.length; i++) {
+	            result = results[i];
+	
+	            polygon = polygons[i];
+	
+	            // WORKERS: Making this a typed array will speed up transfer time
+	            // As things stand this adds on a few milliseconds
+	            flats.push(result.flat);
+	
+	            // WORKERS: result.attributes is actually an array of polygons for each
+	            // feature, though the current logic isn't keeping these all together
+	
+	            var attributes;
+	            for (var j = 0; j < result.attributes.length; j++) {
+	              attributes = result.attributes[j];
+	
+	              positions.push(attributes.positions);
+	              normals.push(attributes.normals);
+	              colors.push(attributes.colors);
+	              tops.push(attributes.tops);
+	
+	              if (_properties) {
+	                properties.push(_utilBuffer2['default'].stringToUint8Array(JSON.stringify(polygon.properties)));
+	              }
+	            };
+	
+	            var outlineAttributes;
+	            for (var j = 0; j < result.outlineAttributes.length; j++) {
+	              outlineAttributes = result.outlineAttributes[j];
+	
+	              outlinePositions.push(outlineAttributes.positions);
+	              outlineColors.push(outlineAttributes.colors);
+	            };
+	          };
+	
+	          var mergedAttributes = {
+	            positions: _utilBuffer2['default'].mergeFloat32Arrays(positions),
+	            normals: _utilBuffer2['default'].mergeFloat32Arrays(normals),
+	            colors: _utilBuffer2['default'].mergeFloat32Arrays(colors),
+	            tops: _utilBuffer2['default'].mergeFloat32Arrays(tops)
+	          };
+	
+	          var mergedOutlineAttributes = {
+	            positions: _utilBuffer2['default'].mergeFloat32Arrays(outlinePositions),
+	            colors: _utilBuffer2['default'].mergeFloat32Arrays(outlineColors)
+	          };
+	
+	          transferrables.push(mergedAttributes.positions[0].buffer);
+	          transferrables.push(mergedAttributes.positions[1].buffer);
+	
+	          transferrables.push(mergedAttributes.normals[0].buffer);
+	          transferrables.push(mergedAttributes.normals[1].buffer);
+	
+	          transferrables.push(mergedAttributes.colors[0].buffer);
+	          transferrables.push(mergedAttributes.colors[1].buffer);
+	
+	          transferrables.push(mergedAttributes.tops[0].buffer);
+	          transferrables.push(mergedAttributes.tops[1].buffer);
+	
+	          transferrables.push(mergedOutlineAttributes.positions[0].buffer);
+	          transferrables.push(mergedOutlineAttributes.positions[1].buffer);
+	
+	          transferrables.push(mergedOutlineAttributes.colors[0].buffer);
+	          transferrables.push(mergedOutlineAttributes.colors[1].buffer);
+	
+	          var mergedProperties;
+	          if (_properties) {
+	            mergedProperties = _utilBuffer2['default'].mergeUint8Arrays(properties);
+	
+	            transferrables.push(mergedProperties[0].buffer);
+	            transferrables.push(mergedProperties[1].buffer);
+	          }
+	
+	          var output = {
+	            attributes: mergedAttributes,
+	            outlineAttributes: mergedOutlineAttributes,
+	            flats: flats
+	          };
+	
+	          if (_properties) {
+	            output.properties = mergedProperties;
+	          }
+	
+	          // TODO: Also return GeoJSON features that can be mapped to objects on
+	          // the main thread. Allow user to provide filter / toggles to only return
+	          // properties from the GeoJSON that they need (eg. don't return geometry,
+	          // or don't return properties.height)
+	          resolve({
+	            data: output,
+	            transferrables: transferrables
+	          });
+	        })['catch'](reject);
+	      });
+	    }
+	  }, {
+	    key: 'ProcessPolylines',
+	    value: function ProcessPolylines(polylinePromises, polylines, _properties) {
+	      return new Promise(function (resolve, reject) {
+	        Promise.all(polylinePromises).then(function (results) {
+	          var transferrables = [];
+	
+	          var positions = [];
+	          var colors = [];
+	
+	          var properties = [];
+	
+	          var flats = [];
+	          var polyline;
+	
+	          var result;
+	          for (var i = 0; i < results.length; i++) {
+	            result = results[i];
+	
+	            polyline = polylines[i];
+	
+	            // WORKERS: Making this a typed array will speed up transfer time
+	            // As things stand this adds on a few milliseconds
+	            flats.push(result.flat);
+	
+	            // WORKERS: result.attributes is actually an array of polygons for each
+	            // feature, though the current logic isn't keeping these all together
+	
+	            var attributes;
+	            for (var j = 0; j < result.attributes.length; j++) {
+	              attributes = result.attributes[j];
+	
+	              positions.push(attributes.positions);
+	              colors.push(attributes.colors);
+	
+	              if (_properties) {
+	                properties.push(_utilBuffer2['default'].stringToUint8Array(JSON.stringify(polyline.properties)));
+	              }
+	            };
+	          };
+	
+	          var mergedAttributes = {
+	            positions: _utilBuffer2['default'].mergeFloat32Arrays(positions),
+	            colors: _utilBuffer2['default'].mergeFloat32Arrays(colors)
+	          };
+	
+	          transferrables.push(mergedAttributes.positions[0].buffer);
+	          transferrables.push(mergedAttributes.positions[1].buffer);
+	
+	          transferrables.push(mergedAttributes.colors[0].buffer);
+	          transferrables.push(mergedAttributes.colors[1].buffer);
+	
+	          var mergedProperties;
+	          if (_properties) {
+	            mergedProperties = _utilBuffer2['default'].mergeUint8Arrays(properties);
+	
+	            transferrables.push(mergedProperties[0].buffer);
+	            transferrables.push(mergedProperties[1].buffer);
+	          }
+	
+	          var output = {
+	            attributes: mergedAttributes,
+	            flats: flats
+	          };
+	
+	          if (_properties) {
+	            output.properties = mergedProperties;
+	          }
+	
+	          // TODO: Also return GeoJSON features that can be mapped to objects on
+	          // the main thread. Allow user to provide filter / toggles to only return
+	          // properties from the GeoJSON that they need (eg. don't return geometry,
+	          // or don't return properties.height)
+	          resolve({
+	            data: output,
+	            transferrables: transferrables
+	          });
+	        })['catch'](reject);
+	      });
+	    }
+	
+	    // TODO: Dedupe with ProcessPolygons as they are identical
+	  }, {
+	    key: 'ProcessPoints',
+	    value: function ProcessPoints(pointPromises, points, _properties) {
+	      return new Promise(function (resolve, reject) {
+	        Promise.all(pointPromises).then(function (results) {
+	          var transferrables = [];
+	
+	          var positions = [];
+	          var normals = [];
+	          var colors = [];
+	
+	          var properties = [];
+	
+	          var flats = [];
+	          var point;
+	
+	          var result;
+	          for (var i = 0; i < results.length; i++) {
+	            result = results[i];
+	
+	            point = points[i];
+	
+	            // WORKERS: Making this a typed array will speed up transfer time
+	            // As things stand this adds on a few milliseconds
+	            flats.push(result.flat);
+	
+	            // WORKERS: result.attributes is actually an array of polygons for each
+	            // feature, though the current logic isn't keeping these all together
+	
+	            var attributes;
+	            for (var j = 0; j < result.attributes.length; j++) {
+	              attributes = result.attributes[j];
+	
+	              positions.push(attributes.positions);
+	              normals.push(attributes.normals);
+	              colors.push(attributes.colors);
+	
+	              if (_properties) {
+	                properties.push(_utilBuffer2['default'].stringToUint8Array(JSON.stringify(polygon.properties)));
+	              }
+	            };
+	          };
+	
+	          var mergedAttributes = {
+	            positions: _utilBuffer2['default'].mergeFloat32Arrays(positions),
+	            normals: _utilBuffer2['default'].mergeFloat32Arrays(normals),
+	            colors: _utilBuffer2['default'].mergeFloat32Arrays(colors)
+	          };
+	
+	          transferrables.push(mergedAttributes.positions[0].buffer);
+	          transferrables.push(mergedAttributes.positions[1].buffer);
+	
+	          transferrables.push(mergedAttributes.normals[0].buffer);
+	          transferrables.push(mergedAttributes.normals[1].buffer);
+	
+	          transferrables.push(mergedAttributes.colors[0].buffer);
+	          transferrables.push(mergedAttributes.colors[1].buffer);
+	
+	          var mergedProperties;
+	          if (_properties) {
+	            mergedProperties = _utilBuffer2['default'].mergeUint8Arrays(properties);
+	
+	            transferrables.push(mergedProperties[0].buffer);
+	            transferrables.push(mergedProperties[1].buffer);
+	          }
+	
+	          var output = {
+	            attributes: mergedAttributes,
+	            flats: flats
+	          };
+	
+	          if (_properties) {
+	            output.properties = mergedProperties;
+	          }
+	
+	          // TODO: Also return GeoJSON features that can be mapped to objects on
+	          // the main thread. Allow user to provide filter / toggles to only return
+	          // properties from the GeoJSON that they need (eg. don't return geometry,
+	          // or don't return properties.height)
+	          resolve({
+	            data: output,
+	            transferrables: transferrables
+	          });
+	        })['catch'](reject);
+	      });
+	    }
+	  }, {
+	    key: 'ProcessGeoJSON',
+	    value: function ProcessGeoJSON(geojson, headers) {
+	      if (typeof geojson === 'string') {
+	        return GeoJSONWorkerLayer.RequestGeoJSON(geojson, headers);
+	      } else {
+	        return Promise.resolve(JSON.parse(_utilBuffer2['default'].uint8ArrayToString(geojson)));
+	      }
+	    }
+	  }, {
+	    key: 'RequestGeoJSON',
+	    value: function RequestGeoJSON(path, headers) {
+	      return (0, _reqwest2['default'])({
+	        url: path,
+	        type: 'json',
+	        crossOrigin: true,
+	        headers: headers
+	      });
+	    }
+	  }]);
+	
+	  return GeoJSONWorkerLayer;
+	})(_Layer3['default']);
+	
+	exports['default'] = GeoJSONWorkerLayer;
+	
+	var noNew = function noNew(geojson, options) {
+	  return new GeoJSONWorkerLayer(geojson, options);
+	};
+	
+	exports.geoJSONWorkerLayer = noNew;
+
+/***/ },
+/* 88 */
+/***/ function(module, exports) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	var Stringify = (function () {
+	  var functionToString = function functionToString(f) {
+	    return f.toString();
+	  };
+	
+	  // Based on https://github.com/tangrams/tangram/blob/2a31893c814cf15d5077f87ffa10af20160716b9/src/utils/utils.js#L245
+	  var stringToFunction = function stringToFunction(str) {
+	    if (typeof str === 'string' && str.match(/^\s*function\s*\w*\s*\([\s\S]*\)\s*\{[\s\S]*\}/m) != null) {
+	      var f;
+	
+	      try {
+	        eval('f = ' + str);
+	        return f;
+	      } catch (err) {
+	        return str;
+	      }
+	    }
+	  };
+	
+	  return {
+	    functionToString: functionToString,
+	    stringToFunction: stringToFunction
+	  };
+	})();
+	
+	exports['default'] = Stringify;
+	module.exports = exports['default'];
+
+/***/ },
+/* 89 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -18535,7 +20819,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _GeoJSONTileLayer2 = __webpack_require__(57);
+	var _GeoJSONTileLayer2 = __webpack_require__(70);
 	
 	var _GeoJSONTileLayer3 = _interopRequireDefault(_GeoJSONTileLayer2);
 	
@@ -18570,7 +20854,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.topoJSONTileLayer = noNew;
 
 /***/ },
-/* 76 */
+/* 90 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -18585,7 +20869,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _GeoJSONLayer2 = __webpack_require__(59);
+	var _GeoJSONLayer2 = __webpack_require__(72);
 	
 	var _GeoJSONLayer3 = _interopRequireDefault(_GeoJSONLayer2);
 	
@@ -18621,7 +20905,58 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.topoJSONLayer = noNew;
 
 /***/ },
-/* 77 */
+/* 91 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var _GeoJSONWorkerLayer2 = __webpack_require__(87);
+	
+	var _GeoJSONWorkerLayer3 = _interopRequireDefault(_GeoJSONWorkerLayer2);
+	
+	var _lodashAssign = __webpack_require__(3);
+	
+	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
+	
+	var TopoJSONWorkerLayer = (function (_GeoJSONWorkerLayer) {
+	  _inherits(TopoJSONWorkerLayer, _GeoJSONWorkerLayer);
+	
+	  function TopoJSONWorkerLayer(topojson, options) {
+	    _classCallCheck(this, TopoJSONWorkerLayer);
+	
+	    var defaults = {
+	      topojson: true
+	    };
+	
+	    options = (0, _lodashAssign2['default'])({}, defaults, options);
+	
+	    _get(Object.getPrototypeOf(TopoJSONWorkerLayer.prototype), 'constructor', this).call(this, topojson, options);
+	  }
+	
+	  return TopoJSONWorkerLayer;
+	})(_GeoJSONWorkerLayer3['default']);
+	
+	exports['default'] = TopoJSONWorkerLayer;
+	
+	var noNew = function noNew(topojson, options) {
+	  return new TopoJSONWorkerLayer(topojson, options);
+	};
+	
+	// Initialise without requiring new keyword
+	exports.topoJSONWorkerLayer = noNew;
+
+/***/ },
+/* 92 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -18632,21 +20967,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// TODO: A lot of these utils don't need to be in separate, tiny files
 	
-	var _wrapNum = __webpack_require__(78);
+	var _wrapNum = __webpack_require__(93);
 	
 	var _wrapNum2 = _interopRequireDefault(_wrapNum);
 	
-	var _extrudePolygon = __webpack_require__(68);
+	var _extrudePolygon = __webpack_require__(80);
 	
 	var _extrudePolygon2 = _interopRequireDefault(_extrudePolygon);
 	
-	var _GeoJSON = __webpack_require__(63);
+	var _GeoJSON = __webpack_require__(75);
 	
 	var _GeoJSON2 = _interopRequireDefault(_GeoJSON);
 	
-	var _Buffer = __webpack_require__(69);
+	var _Buffer = __webpack_require__(81);
 	
 	var _Buffer2 = _interopRequireDefault(_Buffer);
+	
+	var _Worker = __webpack_require__(46);
+	
+	var _Worker2 = _interopRequireDefault(_Worker);
+	
+	var _Stringify = __webpack_require__(88);
+	
+	var _Stringify2 = _interopRequireDefault(_Stringify);
 	
 	var Util = {};
 	
@@ -18654,12 +20997,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	Util.extrudePolygon = _extrudePolygon2['default'];
 	Util.GeoJSON = _GeoJSON2['default'];
 	Util.Buffer = _Buffer2['default'];
+	Util.Worker = _Worker2['default'];
+	Util.Stringify = _Stringify2['default'];
 	
 	exports['default'] = Util;
 	module.exports = exports['default'];
 
 /***/ },
-/* 78 */
+/* 93 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, "__esModule", {
