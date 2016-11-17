@@ -150,7 +150,7 @@ class GeoJSONWorkerLayer extends Layer {
         } else {
           resolve();
         }
-      });
+      }).catch(reject);
     });
   }
 
@@ -775,7 +775,7 @@ class GeoJSONWorkerLayer extends Layer {
             });
           });
         });
-      });
+      }).catch(reject);
     });
   }
 

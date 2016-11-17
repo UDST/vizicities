@@ -98,7 +98,7 @@ class WorkerPool {
 
       // Return result in deferred task promise
       task.deferred.resolve(result);
-    });
+    }).catch(task.deferred.reject);
   }
 }
 
