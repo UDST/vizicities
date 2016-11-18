@@ -38,9 +38,9 @@ class Orbit extends EventEmitter {
     var controls = this._controls;
 
     if (metresDelta < 0) {
-      controls.dollyIn(0.95);
+      controls.dollyIn(Math.abs(metresDelta));
     } else {
-      controls.dollyOut(0.95);
+      controls.dollyOut(metresDelta);
     }
   }
 
