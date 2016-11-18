@@ -56,7 +56,11 @@ class Orbit extends EventEmitter {
 
   // Rotate (left and right)
   rotateTo(angle, animate) {}
-  rotateBy(angleDelta, animate) {}
+  rotateBy(angleDelta, animate) {
+    var controls = this._controls;
+
+    controls.rotateLeft(angleDelta);
+  }
 
   // Fly to the given point, animating pan and tilt/rotation to final position
   // with nice zoom out and in
