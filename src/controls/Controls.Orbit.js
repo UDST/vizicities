@@ -34,7 +34,15 @@ class Orbit extends EventEmitter {
 
   // Zooming the camera in and out
   zoomTo(metres, animate) {}
-  zoomBy(metresDelta, animate) {}
+  zoomBy(metresDelta, animate) {
+    var controls = this._controls;
+
+    if (metresDelta < 0) {
+      controls.dollyIn(Math.abs(metresDelta));
+    } else {
+      controls.dollyOut(metresDelta);
+    }
+  }
 
   // Force camera to look at something other than the target
   lookAt(point, animate) {}
@@ -48,7 +56,11 @@ class Orbit extends EventEmitter {
 
   // Rotate (left and right)
   rotateTo(angle, animate) {}
-  rotateBy(angleDelta, animate) {}
+  rotateBy(angleDelta, animate) {
+    var controls = this._controls;
+
+    controls.rotateLeft(angleDelta);
+  }
 
   // Fly to the given point, animating pan and tilt/rotation to final position
   // with nice zoom out and in
