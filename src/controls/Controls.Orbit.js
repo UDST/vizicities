@@ -28,9 +28,22 @@ class Orbit extends EventEmitter {
     });
   }
 
-  // Moving the camera along the [x,y,z] axis based on a target position
-  panTo(point, animate) {}
-  panBy(pointDelta, animate) {}
+  // Moving the camera along the [x,y] axis based on a target position
+  // Positive x and y goes up and right
+  panTo(point, animate) {
+    var controls = this._controls;
+    var target = controls.target;
+
+    var deltaX = point.x - target.x;
+    var deltaY = point.y - target.z;
+
+    controls.panLeft(-deltaX, controls.object.matrix);
+    controls.panUp(-deltaY, controls.object.matrix);
+  }
+
+  panBy(pointDelta, animate) {
+    this._controls.pan(-pointDelta.x, pointDelta.y);
+  }
 
   // Zooming the camera in and out
   zoomTo(metres, animate) {}
@@ -51,15 +64,33 @@ class Orbit extends EventEmitter {
   lookAtTarget() {}
 
   // Tilt (up and down)
-  tiltTo(angle, animate) {}
-  tiltBy(angleDelta, animate) {}
+  // 0 is straight down
+  // Math.PI / 180 * 90 is flat on the ground
+  tiltTo(angle, animate) {
+    var controls = this._controls;
+    var theta = controls.getPolarAngle();
+    var delta = angle - theta;
+    controls.rotateUp(-delta);
+  }
+
+  tiltBy(angleDelta, animate) {
+    var controls = this._controls;
+    controls.rotateUp(-angleDelta);
+  }
 
   // Rotate (left and right)
-  rotateTo(angle, animate) {}
+  // Right is positive, left negative
+  rotateTo(angle, animate) {
+    var controls = this._controls;
+    var theta = controls.getAzimuthalAngle();
+    var delta = angle - theta;
+    controls.rotateLeft(-delta);
+  }
+
+  // Right is positive, left negative
   rotateBy(angleDelta, animate) {
     var controls = this._controls;
-
-    controls.rotateLeft(angleDelta);
+    controls.rotateLeft(-angleDelta);
   }
 
   // Fly to the given point, animating pan and tilt/rotation to final position
