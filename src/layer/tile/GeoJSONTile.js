@@ -349,7 +349,9 @@ class GeoJSONTile extends Tile {
 
       this._ready = true;
       // console.timeEnd(this._tile);
-    }).catch(() => {});
+    }).catch((err) => {
+      console.error(err);
+    });
   }
 
   _abortRequest() {
