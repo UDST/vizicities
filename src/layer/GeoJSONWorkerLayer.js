@@ -49,7 +49,9 @@ class GeoJSONWorkerLayer extends Layer {
     }
 
     // Process GeoJSON
-    return this._process(this._geojson);
+    return this._process(this._geojson).catch((err) => {
+      console.error(err);
+    });
   }
 
   // Use workers to request and process GeoJSON, returning data structure
