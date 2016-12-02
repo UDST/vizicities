@@ -132,9 +132,9 @@ class World extends EventEmitter {
     window.requestAnimationFrame(this._update.bind(this));
 
     // Update controls
-    this._controls.forEach(controls => {
-      controls.update(delta);
-    });
+    // this._controls.forEach(controls => {
+    //   controls.update(delta);
+    // });
 
     this.emit('preUpdate', delta);
     this._engine.update(delta);
