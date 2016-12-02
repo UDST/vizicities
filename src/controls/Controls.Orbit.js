@@ -39,10 +39,16 @@ class Orbit extends EventEmitter {
 
     controls.panLeft(-deltaX, controls.object.matrix);
     controls.panUp(-deltaY, controls.object.matrix);
+
+    this.update();
+    this._world.emit('controlsMoveEnd', this._controls.target);
   }
 
   panBy(pointDelta, animate) {
     this._controls.pan(-pointDelta.x, pointDelta.y);
+
+    this.update();
+    this._world.emit('controlsMoveEnd', this._controls.target);
   }
 
   // Zooming the camera in and out
@@ -55,6 +61,9 @@ class Orbit extends EventEmitter {
     } else {
       controls.dollyOut(metresDelta);
     }
+
+    this.update();
+    this._world.emit('controlsMoveEnd', this._controls.target);
   }
 
   // Force camera to look at something other than the target
@@ -71,11 +80,17 @@ class Orbit extends EventEmitter {
     var theta = controls.getPolarAngle();
     var delta = angle - theta;
     controls.rotateUp(-delta);
+
+    this.update();
+    this._world.emit('controlsMoveEnd', this._controls.target);
   }
 
   tiltBy(angleDelta, animate) {
     var controls = this._controls;
     controls.rotateUp(-angleDelta);
+
+    this.update();
+    this._world.emit('controlsMoveEnd', this._controls.target);
   }
 
   // Rotate (left and right)
@@ -85,12 +100,18 @@ class Orbit extends EventEmitter {
     var theta = controls.getAzimuthalAngle();
     var delta = angle - theta;
     controls.rotateLeft(-delta);
+
+    this.update();
+    this._world.emit('controlsMoveEnd', this._controls.target);
   }
 
   // Right is positive, left negative
   rotateBy(angleDelta, animate) {
     var controls = this._controls;
     controls.rotateLeft(-angleDelta);
+
+    this.update();
+    this._world.emit('controlsMoveEnd', this._controls.target);
   }
 
   // Fly to the given point, animating pan and tilt/rotation to final position
