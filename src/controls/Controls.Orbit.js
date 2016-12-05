@@ -16,6 +16,10 @@ class Orbit extends EventEmitter {
   // There's currently no distinction between pan, orbit and zoom events
   _initEvents() {
     this._controls.addEventListener('start', (event) => {
+      this.startPosition = this._controls.target.clone();
+      this.startPolar = this._controls.getPolarAngle();
+      this.startAzimuth = this._controls.getAzimuthalAngle();
+
       this._world.emit('controlsMoveStart', event.target.target);
     });
 
@@ -24,7 +28,29 @@ class Orbit extends EventEmitter {
     });
 
     this._controls.addEventListener('end', (event) => {
-      this._world.emit('controlsMoveEnd', event.target.target);
+      var endPosition = this._controls.target.clone();
+      var endPolar = this._controls.getPolarAngle();
+      var endAzimuth = this._controls.getAzimuthalAngle();
+
+      // Did controls change?
+      var changed = false;
+
+      // Panned
+      if (Math.abs(endPosition.distanceTo(this.startPosition)) > 0) {
+        changed = true;
+      }
+
+      // Tilted
+      if (Math.abs(endPolar - this.startPolar) > 0) {
+        changed = true;
+      }
+
+      // Obited
+      if (Math.abs(endAzimuth - this.startAzimuth) > 0) {
+        changed = true;
+      }
+
+      this._world.emit('controlsMoveEnd', event.target.target, changed);
     });
   }
 
