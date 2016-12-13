@@ -403,7 +403,9 @@ class PolygonLayer extends Layer {
     }
 
     if (flat || style.renderOrder !== undefined) {
-      material.depthWrite = false;
+      if (!style.ignoreDepth) {
+        material.depthWrite = false;
+      }
 
       var renderOrder = (style.renderOrder !== undefined) ? style.renderOrder : 3;
       mesh.renderOrder = renderOrder;
