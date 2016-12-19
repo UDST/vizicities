@@ -5,12 +5,12 @@ importScripts('../../dist/vizicities-worker.min.js');
 
 const DEBUG = false;
 
-if (DEBUG) { console.log('Worker started', performance.now()); }
+if (DEBUG) { console.log('Worker started', Date.now()); }
 
 // Send startup message to main thread
 postMessage({
   type: 'startup',
-  payload: performance.now()
+  payload: Date.now()
 });
 
 // Recieve message from main thread
@@ -24,7 +24,7 @@ onmessage = (event) => {
     return;
   }
 
-  var time = performance.now();
+  var time = Date.now();
   if (DEBUG) { console.log('Message received from main thread', time, event.data); }
   // if (DEBUG) console.log('Time to receive message', time - event.data);
 
@@ -50,7 +50,7 @@ onmessage = (event) => {
 
   // Call method with given arguments
   _method.apply(this, event.data.args).then((result) => {
-    console.log('Message sent from worker', performance.now());
+    if (DEBUG) { console.log('Message sent from worker', Date.now()); }
 
     // Return results
     postMessage({

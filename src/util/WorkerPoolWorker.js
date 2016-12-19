@@ -55,7 +55,7 @@ class WorkerPoolWorker {
   }
 
   onMessage(event) {
-    console.log('Message received from worker', performance.now());
+    if (DEBUG) { console.log('Message received from worker', (performance || Date).now()); }
 
     this.busy = false;
 

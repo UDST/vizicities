@@ -141,7 +141,7 @@ class TileLayer extends Layer {
       return;
     }
 
-    // var start = performance.now();
+    // var start = (performance || Date).now();
 
     var camera = this._world.getCamera();
 
@@ -220,7 +220,7 @@ class TileLayer extends Layer {
 
     this._tileList = tileList;
 
-    // console.log(performance.now() - start);
+    // console.log((performance || Date).now() - start);
   }
 
   _divide(checkList) {

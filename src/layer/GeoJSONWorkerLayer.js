@@ -121,10 +121,10 @@ class GeoJSONWorkerLayer extends Layer {
 
   _execWorker(geojson, topojson, headers, originPoint, style, interactive, pointGeometry, transferrables) {
     return new Promise((resolve, reject) => {
-      console.time('Worker round trip');
+      // console.time('Worker round trip');
 
       Worker.exec('GeoJSONWorkerLayer.Process', [geojson, topojson, headers, originPoint, style, interactive, pointGeometry], transferrables).then((results) => {
-        console.timeEnd('Worker round trip');
+        // console.timeEnd('Worker round trip');
 
         // if (this._aborted) {
         //   resolve();
