@@ -89,6 +89,7 @@
     "lru-cache": "^4.0.0",
     "reqwest": "^2.0.5",
     "shortid": "^2.2.6",
+    "text-encoding": "^0.6.1",
     "three": "^0.74.0",
     "topojson": "^1.6.24",
     "xhr2": "^0.1.3"

@@ -20,7 +20,7 @@ class WorkerPool {
       }
 
       Promise.all(workerPromises).then(() => {
-        if (DEBUG) { console.log('All workers ready', performance.now()); }
+        if (DEBUG) { console.log('All workers ready', (performance || Date).now()); }
         resolve();
       }).catch(reject);
     });
@@ -35,7 +35,7 @@ class WorkerPool {
 
       // Start worker and wait for it to be ready
       return worker.start().then(() => {
-        if (DEBUG) { console.log('Worker ready', performance.now()); }
+        if (DEBUG) { console.log('Worker ready', (performance || Date).now()); }
 
         // Add worker to pool
         this.workers.push(worker);
