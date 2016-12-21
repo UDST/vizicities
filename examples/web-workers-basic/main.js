@@ -10,13 +10,13 @@ var world = VIZI.world('world', {
 VIZI.Controls.orbit().addTo(world);
 
 // Leave a single CPU for the main browser thread
-world.createWorkers(7).then(() => {
+world.createWorkers(7).then(function() {
   console.log('Workers ready');
 
   // CartoDB basemap
   VIZI.imageTileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
-  }).addTo(world).then(() => {
+  }).addTo(world).then(function() {
     console.log('Added image tile layer to world');
   });;
 
@@ -42,7 +42,7 @@ world.createWorkers(7).then(() => {
       return feature.geometry.type !== 'Point';
     },
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://whosonfirst.mapzen.com#License">Who\'s On First</a>.'
-  }).addTo(world).then(() => {
+  }).addTo(world).then(function() {
     console.log('Added TopoJSON layer to world');
   });
 });

@@ -10,7 +10,7 @@ var world = VIZI.world('world', {
 VIZI.Controls.orbit().addTo(world);
 
 // Leave a single CPU for the main browser thread
-world.createWorkers(7).then(() => {
+world.createWorkers(7).then(function() {
   console.log('Workers ready');
 
   // CartoDB basemap
