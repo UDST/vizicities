@@ -87,6 +87,7 @@
     "lodash.assign": "^4.0.2",
     "lodash.throttle": "^4.0.0",
     "lru-cache": "^4.0.0",
+    "promise-polyfill": "^6.0.2",
     "reqwest": "^2.0.5",
     "shortid": "^2.2.6",
     "text-encoding": "^0.6.1",

@@ -212,7 +212,7 @@ class TileLayer extends Layer {
     // Get list of tiles that were in the previous update but not the
     // current one (for aborting requests, etc)
     var missingTiles = this._tileList.filter((item) => {
-      return !tileList.includes(item);
+      return tileList.indexOf(item) < 0;
     });
 
     // Abort tiles that are no longer in view

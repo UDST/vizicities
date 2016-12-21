@@ -353,6 +353,12 @@ var Buffer = (function() {
     return textDecoder.decode(ab);
   };
 
+  var fillTypedArray = function(arr, value) {
+    for (var i = 0; i < arr.length; i++) {
+      arr[i] = value;
+    }
+  };
+
   return {
     mergeFloat32Arrays: mergeFloat32Arrays,
     splitFloat32Array: splitFloat32Array,
@@ -362,7 +368,8 @@ var Buffer = (function() {
     createLineGeometry: createLineGeometry,
     createGeometry: createGeometry,
     stringToUint8Array: stringToUint8Array,
-    uint8ArrayToString: uint8ArrayToString
+    uint8ArrayToString: uint8ArrayToString,
+    fillTypedArray: fillTypedArray
   };
 })();
 

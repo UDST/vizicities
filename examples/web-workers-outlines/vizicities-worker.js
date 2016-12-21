@@ -14,7 +14,7 @@ postMessage({
 });
 
 // Recieve message from main thread
-onmessage = (event) => {
+onmessage = function(event) {
   if (!event.data.method) {
     postMessage({
       type: 'error',
@@ -49,7 +49,7 @@ onmessage = (event) => {
   }
 
   // Call method with given arguments
-  _method.apply(this, event.data.args).then((result) => {
+  _method.apply(this, event.data.args).then(function(result) {
     if (DEBUG) { console.log('Message sent from worker', Date.now()); }
 
     // Return results

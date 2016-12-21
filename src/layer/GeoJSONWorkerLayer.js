@@ -225,7 +225,7 @@ class GeoJSONWorkerLayer extends Layer {
           pickingId = this.getPickingId();
 
           pickingIds = new Float32Array(splitPositions[i].length / 3);
-          pickingIds.fill(pickingId);
+          Buffer.fillTypedArray(pickingIds, pickingId);
 
           obj.attributes[0].pickingIds = pickingIds;
 
@@ -387,7 +387,7 @@ class GeoJSONWorkerLayer extends Layer {
           pickingId = this.getPickingId();
 
           pickingIds = new Float32Array(splitPositions[i].length / 3);
-          pickingIds.fill(pickingId);
+          Buffer.fillTypedArray(pickingIds, pickingId);
 
           obj.attributes[0].pickingIds = pickingIds;
 
@@ -498,7 +498,7 @@ class GeoJSONWorkerLayer extends Layer {
           pickingId = this.getPickingId();
 
           pickingIds = new Float32Array(splitPositions[i].length / 3);
-          pickingIds.fill(pickingId);
+          Buffer.fillTypedArray(pickingIds, pickingId);
 
           obj.attributes[0].pickingIds = pickingIds;
 

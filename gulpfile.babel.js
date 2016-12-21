@@ -92,6 +92,11 @@ function build() {
           { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' }
         ]
       },
+      plugins: [
+        new webpack.ProvidePlugin({
+          Promise: 'promise-polyfill'
+        })
+      ],
       devtool: 'source-map'
     }))
     .pipe(gulp.dest(destinationFolder))
@@ -138,6 +143,11 @@ function buildWorker() {
           { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' },
         ]
       },
+      plugins: [
+        new webpack.ProvidePlugin({
+          Promise: 'promise-polyfill'
+        })
+      ],
       devtool: 'source-map'
     }))
     .pipe(gulp.dest(destinationFolder))
