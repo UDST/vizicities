@@ -107,9 +107,8 @@ class ImageTileLayer extends TileLayer {
         setTimeout(() => {
           this._calculateLOD();
           this._initEvents();
+          resolve(this);
         }, 0);
-
-        resolve(this);
       }).catch(reject);
     });
   }
@@ -130,7 +129,7 @@ class ImageTileLayer extends TileLayer {
   }
 
   _onWorldMove(latlon, point) {
-    this._moveBaseLayer(point);
+    // this._moveBaseLayer(point);
   }
 
   _moveBaseLayer(point) {
@@ -150,18 +149,18 @@ class ImageTileLayer extends TileLayer {
     this._throttledWorldUpdate = null;
 
     // Dispose of mesh and materials
-    this._baseLayer.geometry.dispose();
-    this._baseLayer.geometry = null;
+    // this._baseLayer.geometry.dispose();
+    // this._baseLayer.geometry = null;
 
-    if (this._baseLayer.material.map) {
-      this._baseLayer.material.map.dispose();
-      this._baseLayer.material.map = null;
-    }
+    // if (this._baseLayer.material.map) {
+    //   this._baseLayer.material.map.dispose();
+    //   this._baseLayer.material.map = null;
+    // }
 
-    this._baseLayer.material.dispose();
-    this._baseLayer.material = null;
+    // this._baseLayer.material.dispose();
+    // this._baseLayer.material = null;
 
-    this._baseLayer = null;
+    // this._baseLayer = null;
 
     // Run common destruction logic from parent
     super.destroy();
