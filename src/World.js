@@ -277,6 +277,10 @@ class World extends EventEmitter {
       this._layers.splice(layerIndex, 1);
     };
 
+    if (layer._options.attribution) {
+      this._removeAttribution(layer._options.id);
+    }
+
     if (layer.isOutput() && layer.isOutputToScene()) {
       this._engine._scene.remove(layer._object3D);
       this._engine._domScene3D.remove(layer._domObject3D);
