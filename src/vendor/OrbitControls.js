@@ -76,7 +76,7 @@ var OrbitControls = function ( object, domElement ) {
 	this.enableKeys = true;
 
 	// The four arrow keys
-	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
+	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40, CTRL: 17 };
 
 	// Mouse buttons
 	this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
@@ -238,6 +238,7 @@ var OrbitControls = function ( object, domElement ) {
 		document.removeEventListener( 'mouseout', onMouseUp, false );
 
 		window.removeEventListener( 'keydown', onKeyDown, false );
+		window.removeEventListener( 'keyup', onKeyUp, false );
 
 		//scope.dispatchEvent( { type: 'dispose' } ); // should this be added here?
 
@@ -254,6 +255,8 @@ var OrbitControls = function ( object, domElement ) {
 	var endEvent = { type: 'end' };
 
 	var STATE = { NONE : - 1, ROTATE : 0, DOLLY : 1, PAN : 2, TOUCH_ROTATE : 3, TOUCH_DOLLY : 4, TOUCH_PAN : 5 };
+
+	var KEY_STATE = { CTRL : false };
 
 	var state = STATE.NONE;
 
@@ -586,23 +589,41 @@ var OrbitControls = function ( object, domElement ) {
 			case scope.keys.UP:
 				pan( 0, scope.keyPanSpeed );
 				scope.update();
+				scope.dispatchEvent( endEvent );
 				break;
 
 			case scope.keys.BOTTOM:
 				pan( 0, - scope.keyPanSpeed );
 				scope.update();
+				scope.dispatchEvent( endEvent );
 				break;
 
 			case scope.keys.LEFT:
 				pan( scope.keyPanSpeed, 0 );
 				scope.update();
+				scope.dispatchEvent( endEvent );
 				break;
 
 			case scope.keys.RIGHT:
 				pan( - scope.keyPanSpeed, 0 );
 				scope.update();
+				scope.dispatchEvent( endEvent );
 				break;
 
+			case scope.keys.CTRL:
+				KEY_STATE.CTRL = true;
+				break;
+
+		}
+
+	}
+
+	function handleKeyUp( event ) {
+
+		switch ( event.keyCode ) {
+			case scope.keys.CTRL:
+				KEY_STATE.CTRL = false;
+				break;
 		}
 
 	}
@@ -720,11 +741,19 @@ var OrbitControls = function ( object, domElement ) {
 
 		if ( event.button === scope.mouseButtons.ORBIT ) {
 
-			if ( scope.enableRotate === false ) return;
+			if (KEY_STATE.CTRL) {
+				if ( scope.enablePan === false ) return;
 
-			handleMouseDownRotate( event );
+				handleMouseDownPan( event );
 
-			state = STATE.ROTATE;
+				state = STATE.PAN;
+			} else {
+				if ( scope.enableRotate === false ) return;
+
+				handleMouseDownRotate( event );
+
+				state = STATE.ROTATE;
+			}
 
 		} else if ( event.button === scope.mouseButtons.ZOOM ) {
 
@@ -819,6 +848,14 @@ var OrbitControls = function ( object, domElement ) {
 		if ( scope.enabled === false || scope.enableKeys === false || scope.enablePan === false ) return;
 
 		handleKeyDown( event );
+
+	}
+
+	function onKeyUp( event ) {
+
+		if ( scope.enabled === false || scope.enableKeys === false || scope.enablePan === false ) return;
+
+		handleKeyUp( event );
 
 	}
 
@@ -1103,6 +1140,7 @@ var OrbitControls = function ( object, domElement ) {
 	});
 
 	window.addEventListener( 'keydown', onKeyDown, false );
+	window.addEventListener( 'keyup', onKeyUp, false );
 
 	// Expose controls methods for programmatic control
 	this.panLeft = panLeft;
