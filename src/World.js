@@ -153,7 +153,9 @@ class World extends EventEmitter {
 
   _removeAttribution(id) {
     var elem = document.querySelectorAll('#attribution-container [data-layer="' + id + '"]')[0];
-    elem.remove();
+    if (elem) {
+      elem.remove();
+    }
   }
 
   // Set world view

@@ -129,9 +129,11 @@ class EnvironmentLayer extends Layer {
   destroy() {
     this._skyboxLight = null;
 
-    this.remove(this._skybox._mesh);
-    this._skybox.destroy();
-    this._skybox = null;
+    if (this._skybox) {
+      this.remove(this._skybox._mesh);
+      this._skybox.destroy();
+      this._skybox = null;
+    }
 
     super.destroy();
   }
