@@ -99,7 +99,7 @@ At this point you can take a look at your handywork and should be able to see a 
 If you want to be a bit more adventurous then you can add 3D buildings using Mapzen vector tiles:
 
 ```javascript
-VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
+VIZI.topoJSONTileLayer('https://tile.mapzen.com/mapzen/vector/v1/buildings/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
   interactive: false,
   style: function(feature) {
     var height;

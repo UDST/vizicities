@@ -15,7 +15,7 @@ VIZI.imageTileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}
 }).addTo(world);
 
 // Mapzen GeoJSON tile including points, linestrings and polygons
-VIZI.geoJSONLayer('http://vector.mapzen.com/osm/roads,pois,buildings/14/4824/6159.json', {
+VIZI.geoJSONLayer('http://tile.mapzen.com/mapzen/vector/v1/roads,pois,buildings/14/4824/6159.json', {
   output: true,
   style: {
     color: '#ff0000',
