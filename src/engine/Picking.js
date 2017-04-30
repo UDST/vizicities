@@ -1,4 +1,4 @@
-import THREE from 'three';
+import * as THREE from 'three';
 import {point as Point} from '../geo/Point';
 import PickingScene from './PickingScene';
 import throttle from 'lodash.throttle';

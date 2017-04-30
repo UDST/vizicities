@@ -2,7 +2,7 @@
  * GeoJSON helpers for handling data and generating objects
  */
 
-import THREE from 'three';
+import * as THREE from 'three';
 import * as topojson from 'topojson';
 import geojsonMerge from 'geojson-merge';
 import earcut from 'earcut';

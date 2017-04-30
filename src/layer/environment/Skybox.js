@@ -1,4 +1,4 @@
-import THREE from 'three';
+import * as THREE from 'three';
 import Sky from './Sky';
 import throttle from 'lodash.throttle';
 

@@ -1,4 +1,4 @@
-import THREE from 'three';
+import * as THREE from 'three';
 import EffectComposer from '../vendor/EffectComposer';
 
 export default function(renderer, container) {

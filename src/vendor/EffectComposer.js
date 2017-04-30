@@ -1,7 +1,7 @@
 // jscs:disable
 /* eslint-disable */
 
-import THREE from 'three';
+import * as THREE from 'three';
 import CopyShader from './CopyShader';
 import ShaderPass from './ShaderPass';
 import MaskPass, {ClearMaskPass} from './MaskPass';

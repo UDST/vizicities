@@ -1,4 +1,4 @@
-import THREE from 'three';
+import * as THREE from 'three';
 
 export default function(colour, skyboxTarget) {
   var canvas = document.createElement('canvas');

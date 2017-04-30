@@ -1,4 +1,4 @@
-import THREE from 'three';
+import * as THREE from 'three';
 import {CSS3DRenderer} from '../vendor/CSS3DRenderer';
 import DOMScene3D from './DOMScene3D';
 

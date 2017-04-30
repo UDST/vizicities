@@ -1,4 +1,4 @@
-import THREE from 'three';
+import * as THREE from 'three';
 import PickingShader from './PickingShader';
 
 // FROM: https://github.com/brianxu/GPUPicker/blob/master/GPUPicker.js

@@ -1,5 +1,5 @@
 import EventEmitter from 'eventemitter3';
-import THREE from 'three';
+import * as THREE from 'three';
 import Scene from './Scene';
 import DOMScene3D from './DOMScene3D';
 import DOMScene2D from './DOMScene2D';

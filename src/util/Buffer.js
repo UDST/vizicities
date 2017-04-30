@@ -2,7 +2,7 @@
  * BufferGeometry helpers
  */
 
-import THREE from 'three';
+import * as THREE from 'three';
 import {TextEncoder, TextDecoder} from 'text-encoding';
 
 var Buffer = (function() {

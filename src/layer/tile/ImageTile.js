@@ -1,6 +1,6 @@
 import Tile from './Tile';
 import BoxHelper from '../../vendor/BoxHelper';
-import THREE from 'three';
+import * as THREE from 'three';
 
 // TODO: Make sure nothing is left behind in the heap after calling destroy()
 

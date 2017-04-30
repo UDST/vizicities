@@ -5,7 +5,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import THREE from 'three';
+import * as THREE from 'three';
 
 var CSS2DObject = function ( element ) {
 
@@ -42,8 +42,6 @@ var CSS2DRenderer = function () {
 	var viewMatrix = new THREE.Matrix4();
 	var viewProjectionMatrix = new THREE.Matrix4();
 
-	var frustum = new THREE.Frustum();
-
 	var domElement = document.createElement( 'div' );
 	domElement.style.overflow = 'hidden';
 
@@ -64,10 +62,10 @@ var CSS2DRenderer = function () {
 
 	var renderObject = function ( object, camera ) {
 
-		if ( object instanceof CSS2DObject ) {
+		if ( object instanceof THREE.CSS2DObject ) {
 
 			vector.setFromMatrixPosition( object.matrixWorld );
-			vector.applyProjection( viewProjectionMatrix );
+			vector.applyMatrix4( viewProjectionMatrix );
 
 			var element = object.element;
 			var style = 'translate(-50%,-50%) translate(' + ( vector.x * _widthHalf + _widthHalf ) + 'px,' + ( - vector.y * _heightHalf + _heightHalf ) + 'px)';
@@ -81,13 +79,6 @@ var CSS2DRenderer = function () {
 
 				domElement.appendChild( element );
 
-			}
-
-			// Hide if outside view frustum
-			if (!frustum.containsPoint(object.position)) {
-				element.style.display = 'none';
-			} else {
-				element.style.display = 'block';
 			}
 
 		}
@@ -110,8 +101,6 @@ var CSS2DRenderer = function () {
 
 		viewMatrix.copy( camera.matrixWorldInverse.getInverse( camera.matrixWorld ) );
 		viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, viewMatrix );
-
-		frustum.setFromMatrix( new THREE.Matrix4().multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse ) );
 
 		renderObject( scene, camera );
 

@@ -2,7 +2,7 @@ import TileLayer from './TileLayer';
 import extend from 'lodash.assign';
 import GeoJSONTile from './GeoJSONTile';
 import throttle from 'lodash.throttle';
-import THREE from 'three';
+import * as THREE from 'three';
 
 // TODO: Offer on-the-fly slicing of static, non-tile-based GeoJSON files into a
 // tile grid using geojson-vt

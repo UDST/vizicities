@@ -1,7 +1,7 @@
 import EventEmitter from 'eventemitter3';
 import extend from 'lodash.assign';
 import shortid from 'shortid';
-import THREE from 'three';
+import * as THREE from 'three';
 import Scene from '../engine/Scene';
 import {CSS3DObject} from '../vendor/CSS3DRenderer';
 import {CSS2DObject} from '../vendor/CSS2DRenderer';

@@ -1,4 +1,4 @@
-import THREE from 'three';
+import * as THREE from 'three';
 import Scene from './Scene';
 
 // This can only be accessed from Engine.renderer if you want to reference the

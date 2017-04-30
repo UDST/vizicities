@@ -1,6 +1,6 @@
 import {point as Point} from '../../geo/Point';
 import {latLon as LatLon} from '../../geo/LatLon';
-import THREE from 'three';
+import * as THREE from 'three';
 
 // TODO: Make sure nothing is left behind in the heap after calling destroy()
 

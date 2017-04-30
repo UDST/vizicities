@@ -1,7 +1,7 @@
 // jscs:disable
 /* eslint-disable */
 
-import THREE from 'three';
+import * as THREE from 'three';
 
 /**
  * @author mrdoob / http://mrdoob.com/

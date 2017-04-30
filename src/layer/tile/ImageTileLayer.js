@@ -2,7 +2,7 @@ import TileLayer from './TileLayer';
 import ImageTile from './ImageTile';
 import ImageTileLayerBaseMaterial from './ImageTileLayerBaseMaterial';
 import throttle from 'lodash.throttle';
-import THREE from 'three';
+import * as THREE from 'three';
 import extend from 'lodash.assign';
 
 // TODO: Make sure nothing is left behind in the heap after calling destroy()

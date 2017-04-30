@@ -1,4 +1,4 @@
-import THREE from 'three';
+import * as THREE from 'three';
 
 // This can only be accessed from Engine.camera if you want to reference the
 // same scene in multiple places

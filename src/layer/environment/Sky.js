@@ -17,7 +17,7 @@
  * Three.js integration by zz85 http://twitter.com/blurspline
 */
 
-import THREE from 'three';
+import * as THREE from 'three';
 
 THREE.ShaderLib[ 'sky' ] = {
 
