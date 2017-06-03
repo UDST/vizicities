@@ -11,6 +11,20 @@ Geo.MAX_LATITUDE = 85.0511287798;
 Geo.ECC = 0.081819191;
 Geo.ECC2 = 0.081819191 * 0.081819191;
 
+// Multiplier is used to expand or compress the WebGL coordinate space relative
+// to the EPSG:3857 / Pseudo-Mercator coordinate space (metres).
+//
+// This is useful for keeping coordinate calculations to smaller numbers and
+// helps increase accuracy of things like the z-buffer, object intersection,
+// and camera near and far clipping.
+//
+// A multiplier of 1 would mean a 1:1 mapping between WebGL and EPSG:3857
+// coordinates (1 EPSG:3857 metre === 1 WebGL unit)
+//
+// A multiplier of 0.1 would mean a 1:0.1 mapping between WebGL and EPSG:3857
+// coordinates (1 EPSG:3857 metre === 0.1 WebGL units)
+Geo.multiplier = 0.1;
+
 Geo.project = function(latlon) {
   var d = Math.PI / 180;
   var max = Geo.MAX_LATITUDE;
@@ -38,6 +52,9 @@ Geo.latLonToPoint = function(latlon) {
   var projected = Geo.project(latlon);
   projected.y *= -1;
 
+  projected.x *= Geo.multiplier;
+  projected.y *= Geo.multiplier;
+
   return projected;
 };
 
@@ -45,6 +62,10 @@ Geo.latLonToPoint = function(latlon) {
 // This just reverses the Y axis to match WebGL
 Geo.pointToLatLon = function(point) {
   var _point = Point(point.x, point.y * -1);
+
+  _point.x /= Geo.multiplier;
+  _point.y /= Geo.multiplier;
+
   return Geo.unproject(_point);
 };
 
@@ -114,36 +135,21 @@ Geo.metresToWorld = function(metres, pointScale) {
   //
   // Latitude scale is chosen because it fluctuates more than longitude
   var projectedMetres = Geo.metresToProjected(metres, pointScale);
-
-  var scale = Geo.scale();
-
-  // Scale projected metres
-  var scaledMetres = (scale * projectedMetres);
-
-  return scaledMetres;
+  return projectedMetres * Geo.multiplier;
 };
 
 // Convert world (WebGL) units to a value in real metres
 Geo.worldToMetres = function(worldUnits, pointScale) {
-  var scale = Geo.scale();
-
-  var projectedUnits = worldUnits / scale;
+  var projectedUnits = worldUnits;
   var realMetres = Geo.projectedToMetres(projectedUnits, pointScale);
 
-  return realMetres;
+  return realMetres / Geo.multiplier;
 };
 
-// If zoom is provided, returns the map width in pixels for a given zoom
-// Else, provides fixed scale value
+// Returns the world width in pixels for a given zoom, assuming tile dimensions
+// of 256x256 pixels
 Geo.scale = function(zoom) {
-  // If zoom is provided then return scale based on map tile zoom
-  if (zoom >= 0) {
-    return 256 * Math.pow(2, zoom);
-  // Else, return fixed scale value to expand projected coordinates from
-  // their 0 to 1 range into something more practical
-  } else {
-    return 1;
-  }
+  return 256 * Math.pow(2, zoom);
 };
 
 // Returns zoom level for a given scale value
@@ -193,7 +199,7 @@ Geo.distance = function(latlon1, latlon2, accurate) {
 };
 
 Geo.bounds = (function() {
-  var d = Geo.R * Math.PI;
+  var d = Geo.R * Math.PI * Geo.multiplier;
   return [[-d, -d], [d, d]];
 })();
 

@@ -108,14 +108,12 @@ describe('Geo', () => {
   });
 
   describe('#scale', () => {
-    it('defaults to 1', () => {
-      var scale = Geo.scale();
-      expect(scale).to.equal(1);
-    });
-
-    it('uses the zoom level if provided', () => {
+    it('returns scale for given zoom level', () => {
       var scale = Geo.scale(1);
       expect(scale).to.equal(512);
+
+      scale = Geo.scale(2);
+      expect(scale).to.equal(1024);
     });
   });
 
