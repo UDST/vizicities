@@ -130,15 +130,20 @@ class PolylineLayer extends Layer {
 
   // Get unique ID for picking interaction
   _setPickingId() {
-    this._pickingId = this.getPickingId();
+    this._pickingId = this._options.pickingId = this.getPickingId();
   }
 
   // Set up and re-emit interaction events
   _addPickingEvents() {
     // TODO: Find a way to properly remove this listener on destroy
-    this._world.on('pick-' + this._pickingId, (point2d, point3d, intersects) => {
+    this._world.on('pick-click-' + this._pickingId, (point2d, point3d, intersects) => {
       // Re-emit click event from the layer
       this.emit('click', this, point2d, point3d, intersects);
+    });
+
+    this._world.on('pick-hover-' + this._pickingId, (point2d, point3d, intersects) => {
+      // Re-emit click event from the layer
+      this.emit('hover', this, point2d, point3d, intersects);
     });
   }
 
